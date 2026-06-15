@@ -16,12 +16,10 @@ import {
   CheckCircle2,
   BadgeCheck,
   Bed,
+  Sparkles,
+  TrendingUp,
+  Handshake,
 } from "lucide-react";
-
-// ─── Design tokens ────────────────────────────────────────────────────────────
-const RED    = "#C8102E";
-const DARK   = "#1A1A1A";
-const BORDER = "#E5E5E5";
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 const stats = [
@@ -67,7 +65,13 @@ const budgetRanges  = ["Under ₹50L", "₹50L – ₹1Cr", "₹1Cr – ₹2Cr",
 const bhkOptions    = ["1 BHK", "2 BHK", "3 BHK", "4+ BHK"];
 const searchTabs    = ["Buy", "Rent", "Projects", "Commercial"];
 
-// ─── Animated counter ─────────────────────────────────────────────────────────
+const featureChips = [
+  { icon: Sparkles,   label: "AI-Powered Discovery"          },
+  { icon: TrendingUp, label: "Expert Investment Advisory"    },
+  { icon: Handshake,  label: "End-to-End Transaction Support" },
+];
+
+// ─── Animated counter (unchanged) ─────────────────────────────────────────────
 function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
@@ -98,17 +102,20 @@ function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
   );
 }
 
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-function Navbar({ overlaid }) {
+// ─── Navbar — white, scroll-aware (MagicBricks style) ────────────────────────
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: "easeOut" }}
-      className={`w-full z-50 transition-all duration-300 ${
-        overlaid
-          ? "absolute top-0 left-0 right-0 border-b border-white/10"
-          : "sticky top-0 bg-white border-b border-[#E5E5E5] shadow-sm"
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-200 ${
+        scrolled ? "shadow-[0_2px_12px_rgba(0,0,0,0.1)]" : "shadow-none border-b border-[#E5E5E5]"
       }`}
       aria-label="Primary navigation"
     >
@@ -121,36 +128,35 @@ function Navbar({ overlaid }) {
         >
           <div className="relative w-9 h-9 flex-shrink-0">
             <div className="absolute inset-0 bg-[#C8102E] rounded-sm" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Building2 className="w-[18px] h-[18px] text-white" aria-hidden="true" />
-            </div>
+            <Building2 className="absolute inset-0 m-auto w-[18px] h-[18px] text-white" aria-hidden="true" />
             <div className="absolute bottom-0 right-0 w-2 h-2 bg-[#8B0000] rounded-tl-sm" aria-hidden="true" />
           </div>
           <div className="leading-none">
             <span
-              className={`block font-bold text-[15.5px] tracking-tight ${overlaid ? "text-white" : "text-[#1A1A1A]"}`}
+              className="block text-[#1A1A1A] font-bold text-[15.5px] tracking-tight"
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
               PROPERTYBRANDS
             </span>
-            <span className={`block text-[9.5px] font-semibold tracking-[0.22em] uppercase mt-[2px] ${overlaid ? "text-white/60" : "text-[#C8102E]"}`}>
+            <span className="block text-[#C8102E] text-[9.5px] font-semibold tracking-[0.22em] uppercase mt-[2px]">
               Realty Services
             </span>
           </div>
         </a>
 
         {/* Desktop links */}
-        <ul className="hidden lg:flex items-center gap-7" role="list">
+        <ul className="hidden lg:flex items-center gap-6" role="list">
           {["Home", "Properties", "Projects", "Developers", "Services", "About"].map((item) => (
             <li key={item}>
               <a
                 href="#"
-                className={`relative group text-[13.5px] font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] rounded-sm ${
-                  overlaid ? "text-white/80 hover:text-white" : "text-[#444] hover:text-[#C8102E]"
-                }`}
+                className="relative group text-[13.5px] font-medium text-[#444] hover:text-[#C8102E] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] rounded-sm"
               >
                 {item}
-                <span className="absolute -bottom-px left-0 right-0 h-[1.5px] bg-[#C8102E] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-200" aria-hidden="true" />
+                <span
+                  className="absolute -bottom-px left-0 right-0 h-[1.5px] bg-[#C8102E] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-200"
+                  aria-hidden="true"
+                />
               </a>
             </li>
           ))}
@@ -159,11 +165,7 @@ function Navbar({ overlaid }) {
         {/* Right CTA */}
         <a
           href="tel:+919876543210"
-          className={`hidden lg:flex items-center gap-2 font-semibold text-[13px] px-4 py-2 rounded-sm border transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] ${
-            overlaid
-              ? "border-white/30 text-white hover:bg-white hover:text-[#C8102E]"
-              : "border-[#C8102E] text-[#C8102E] hover:bg-[#C8102E] hover:text-white"
-          }`}
+          className="hidden lg:flex items-center gap-2 border border-[#C8102E] text-[#C8102E] hover:bg-[#C8102E] hover:text-white font-semibold text-[13px] px-4 py-2 rounded-sm transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E]"
           aria-label="Call us"
         >
           <Phone className="w-3.5 h-3.5" aria-hidden="true" />
@@ -172,7 +174,7 @@ function Navbar({ overlaid }) {
 
         {/* Mobile hamburger */}
         <button
-          className={`lg:hidden flex flex-col items-end gap-[5px] p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] rounded-sm ${overlaid ? "text-white" : "text-[#444]"}`}
+          className="lg:hidden flex flex-col items-end gap-[5px] p-2 text-[#444] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] rounded-sm"
           aria-label="Open menu"
         >
           <span className="w-5 h-[1.5px] bg-current" />
@@ -180,12 +182,12 @@ function Navbar({ overlaid }) {
           <span className="w-5 h-[1.5px] bg-current" />
         </button>
       </div>
-    </motion.nav>
+    </nav>
   );
 }
 
-// ─── Hero search card (dark, overlaid on image) ───────────────────────────────
-function HeroSearchCard() {
+// ─── Search card — white, MagicBricks style ───────────────────────────────────
+function SearchCard() {
   const [activeTab,    setActiveTab]    = useState("Buy");
   const [location,     setLocation]     = useState("");
   const [budget,       setBudget]       = useState("");
@@ -193,24 +195,24 @@ function HeroSearchCard() {
   const [bhk,          setBhk]          = useState("");
 
   return (
-    <div className="w-full bg-[#1A1A1A]/80 backdrop-blur-md border border-white/10 rounded-sm overflow-hidden shadow-[0_24px_64px_rgba(0,0,0,0.5)]">
-      {/* Tabs */}
-      <div className="flex border-b border-white/10" role="tablist" aria-label="Search intent">
+    <div className="w-full bg-white shadow-[0_8px_40px_rgba(0,0,0,0.22)] overflow-hidden">
+      {/* ── Intent tabs ── */}
+      <div className="flex border-b border-[#E5E5E5]" role="tablist" aria-label="Search intent">
         {searchTabs.map((tab) => (
           <button
             key={tab}
             role="tab"
             aria-selected={activeTab === tab}
             onClick={() => setActiveTab(tab)}
-            className={`relative flex-1 py-3.5 text-[13px] font-semibold tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-[#C8102E] ${
-              activeTab === tab ? "text-white" : "text-white/45 hover:text-white/75"
+            className={`relative flex-1 py-3.5 text-[13.5px] font-semibold tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-[#C8102E] ${
+              activeTab === tab ? "text-[#C8102E]" : "text-[#888] hover:text-[#444]"
             }`}
           >
             {tab}
             {activeTab === tab && (
               <motion.span
                 layoutId="heroTab"
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#C8102E]"
+                className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#C8102E]"
                 transition={{ type: "spring", stiffness: 500, damping: 40 }}
               />
             )}
@@ -218,68 +220,85 @@ function HeroSearchCard() {
         ))}
       </div>
 
-      {/* Fields */}
-      <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-white/10">
-        {/* Location */}
-        <div className="flex-[1.4] relative">
-          <label htmlFor="hero-location" className="sr-only">Location</label>
-          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C8102E]" aria-hidden="true" />
-          <input
-            id="hero-location"
-            type="text"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="City, locality or landmark"
-            className="w-full h-[52px] pl-10 pr-4 bg-transparent text-white placeholder-white/40 text-[13.5px] focus:outline-none focus:bg-white/5 transition-colors"
-          />
+      {/* ── Fields row ── */}
+      <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-[#E5E5E5]">
+
+        {/* Location — wider */}
+        <div className="flex-[1.5] flex flex-col justify-center px-4 py-2.5 gap-0.5">
+          <label htmlFor="hero-location" className="text-[10.5px] font-semibold text-[#888] uppercase tracking-[0.12em]">
+            Location
+          </label>
+          <div className="relative flex items-center">
+            <MapPin className="absolute left-0 w-4 h-4 text-[#C8102E] flex-shrink-0" aria-hidden="true" />
+            <input
+              id="hero-location"
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="City, locality or landmark"
+              className="w-full pl-6 pr-2 h-9 bg-transparent text-[#1A1A1A] placeholder-[#BBB] text-[13.5px] font-medium focus:outline-none"
+            />
+          </div>
         </div>
 
         {/* Budget */}
-        <div className="flex-1 relative">
-          <label htmlFor="hero-budget" className="sr-only">Budget</label>
-          <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C8102E]" aria-hidden="true" />
-          <select
-            id="hero-budget"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            className="w-full h-[52px] pl-10 pr-7 appearance-none bg-transparent text-[13.5px] text-white focus:outline-none focus:bg-white/5 transition-colors [&>option]:bg-[#1A1A1A] [&>option]:text-white"
-          >
-            <option value="" disabled>Budget</option>
-            {budgetRanges.map((b) => <option key={b} value={b}>{b}</option>)}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35 pointer-events-none" aria-hidden="true" />
+        <div className="flex-1 flex flex-col justify-center px-4 py-2.5 gap-0.5">
+          <label htmlFor="hero-budget" className="text-[10.5px] font-semibold text-[#888] uppercase tracking-[0.12em]">
+            Budget
+          </label>
+          <div className="relative flex items-center">
+            <IndianRupee className="absolute left-0 w-4 h-4 text-[#C8102E] flex-shrink-0 pointer-events-none" aria-hidden="true" />
+            <select
+              id="hero-budget"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+              className="w-full pl-6 pr-5 h-9 appearance-none bg-transparent text-[13.5px] font-medium text-[#1A1A1A] focus:outline-none [&>option]:bg-white [&>option]:text-[#1A1A1A]"
+            >
+              <option value="" disabled>Select budget</option>
+              {budgetRanges.map((b) => <option key={b} value={b}>{b}</option>)}
+            </select>
+            <ChevronDown className="absolute right-0 w-3.5 h-3.5 text-[#AAA] pointer-events-none" aria-hidden="true" />
+          </div>
         </div>
 
         {/* Property Type */}
-        <div className="flex-1 relative">
-          <label htmlFor="hero-type" className="sr-only">Property Type</label>
-          <Home className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C8102E]" aria-hidden="true" />
-          <select
-            id="hero-type"
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
-            className="w-full h-[52px] pl-10 pr-7 appearance-none bg-transparent text-[13.5px] text-white focus:outline-none focus:bg-white/5 transition-colors [&>option]:bg-[#1A1A1A] [&>option]:text-white"
-          >
-            <option value="" disabled>Property Type</option>
-            {propertyTypes.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35 pointer-events-none" aria-hidden="true" />
+        <div className="flex-1 flex flex-col justify-center px-4 py-2.5 gap-0.5">
+          <label htmlFor="hero-type" className="text-[10.5px] font-semibold text-[#888] uppercase tracking-[0.12em]">
+            Property Type
+          </label>
+          <div className="relative flex items-center">
+            <Home className="absolute left-0 w-4 h-4 text-[#C8102E] flex-shrink-0 pointer-events-none" aria-hidden="true" />
+            <select
+              id="hero-type"
+              value={propertyType}
+              onChange={(e) => setPropertyType(e.target.value)}
+              className="w-full pl-6 pr-5 h-9 appearance-none bg-transparent text-[13.5px] font-medium text-[#1A1A1A] focus:outline-none [&>option]:bg-white [&>option]:text-[#1A1A1A]"
+            >
+              <option value="" disabled>Select type</option>
+              {propertyTypes.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+            <ChevronDown className="absolute right-0 w-3.5 h-3.5 text-[#AAA] pointer-events-none" aria-hidden="true" />
+          </div>
         </div>
 
         {/* BHK */}
-        <div className="flex-1 relative">
-          <label htmlFor="hero-bhk" className="sr-only">BHK Type</label>
-          <Bed className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C8102E]" aria-hidden="true" />
-          <select
-            id="hero-bhk"
-            value={bhk}
-            onChange={(e) => setBhk(e.target.value)}
-            className="w-full h-[52px] pl-10 pr-7 appearance-none bg-transparent text-[13.5px] text-white focus:outline-none focus:bg-white/5 transition-colors [&>option]:bg-[#1A1A1A] [&>option]:text-white"
-          >
-            <option value="" disabled>BHK Type</option>
-            {bhkOptions.map((b) => <option key={b} value={b}>{b}</option>)}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35 pointer-events-none" aria-hidden="true" />
+        <div className="flex-1 flex flex-col justify-center px-4 py-2.5 gap-0.5">
+          <label htmlFor="hero-bhk" className="text-[10.5px] font-semibold text-[#888] uppercase tracking-[0.12em]">
+            BHK Type
+          </label>
+          <div className="relative flex items-center">
+            <Bed className="absolute left-0 w-4 h-4 text-[#C8102E] flex-shrink-0 pointer-events-none" aria-hidden="true" />
+            <select
+              id="hero-bhk"
+              value={bhk}
+              onChange={(e) => setBhk(e.target.value)}
+              className="w-full pl-6 pr-5 h-9 appearance-none bg-transparent text-[13.5px] font-medium text-[#1A1A1A] focus:outline-none [&>option]:bg-white [&>option]:text-[#1A1A1A]"
+            >
+              <option value="" disabled>Select BHK</option>
+              {bhkOptions.map((b) => <option key={b} value={b}>{b}</option>)}
+            </select>
+            <ChevronDown className="absolute right-0 w-3.5 h-3.5 text-[#AAA] pointer-events-none" aria-hidden="true" />
+          </div>
         </div>
 
         {/* Search button */}
@@ -287,7 +306,7 @@ function HeroSearchCard() {
           type="button"
           whileHover={{ backgroundColor: "#a50d26" }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center justify-center gap-2 bg-[#C8102E] text-white font-bold px-8 h-[52px] text-[13.5px] tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A1A1A] whitespace-nowrap"
+          className="flex items-center justify-center gap-2 bg-[#C8102E] text-white font-bold px-10 text-[14px] tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] focus-visible:ring-offset-2 whitespace-nowrap min-h-[72px] sm:min-h-0"
           aria-label="Search Properties"
         >
           <Search className="w-4 h-4" aria-hidden="true" />
@@ -298,7 +317,7 @@ function HeroSearchCard() {
   );
 }
 
-// ─── Property showcase carousel ───────────────────────────────────────────────
+// ─── Property showcase carousel (unchanged logic) ─────────────────────────────
 function PropertyShowcase() {
   const [active, setActive] = useState(0);
 
@@ -323,25 +342,13 @@ function PropertyShowcase() {
           loading={i === 0 ? "eager" : "lazy"}
         />
       ))}
-
-      {/* Overlays */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/85 via-[#1A1A1A]/20 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A1A]/30 to-transparent" />
-
-      {/* Live badge */}
-      <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-sm shadow">
+      <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white px-3 py-1.5 shadow">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
         <span className="text-[11px] font-semibold text-[#222] tracking-wide">248 listings today</span>
       </div>
-
-      {/* Bottom card */}
       <div className="absolute bottom-0 left-0 right-0 p-5">
-        <motion.div
-          key={active}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-        >
+        <motion.div key={active} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <span className="inline-block text-[10px] font-extrabold tracking-[0.16em] uppercase text-[#C8102E] bg-white px-2 py-0.5 mb-2">
             {card.tag}
           </span>
@@ -354,8 +361,6 @@ function PropertyShowcase() {
             {card.location}
           </p>
         </motion.div>
-
-        {/* Type pills + dots */}
         <div className="flex items-center justify-between mt-4">
           <div className="flex gap-2">
             {propertyHighlights.map((p, i) => (
@@ -363,9 +368,7 @@ function PropertyShowcase() {
                 key={p.title}
                 onClick={() => setActive(i)}
                 className={`text-[11px] font-semibold px-3 py-1 border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                  i === active
-                    ? "bg-[#C8102E] text-white border-[#C8102E]"
-                    : "bg-white/10 text-white/60 border-white/20 hover:bg-white/20 hover:text-white"
+                  i === active ? "bg-[#C8102E] text-white border-[#C8102E]" : "bg-white/10 text-white/60 border-white/20 hover:bg-white/20 hover:text-white"
                 }`}
                 aria-label={`View ${p.title}`}
               >
@@ -391,7 +394,7 @@ function PropertyShowcase() {
   );
 }
 
-// ─── Stats row ────────────────────────────────────────────────────────────────
+// ─── Stats row (unchanged) ────────────────────────────────────────────────────
 function StatsRow() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
@@ -415,7 +418,7 @@ function StatsRow() {
             whileHover={{ backgroundColor: "#FFF5F5" }}
             className="flex items-center gap-4 py-6 px-5 lg:px-8 transition-colors duration-150 cursor-default"
           >
-            <div className="w-9 h-9 rounded-sm border border-[#C8102E]/15 bg-[#C8102E]/5 flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 border border-[#C8102E]/15 bg-[#C8102E]/5 flex items-center justify-center flex-shrink-0">
               <stat.icon className="w-4 h-4 text-[#C8102E]" aria-hidden="true" />
             </div>
             <div>
@@ -435,7 +438,7 @@ function StatsRow() {
   );
 }
 
-// ─── Trust bar ────────────────────────────────────────────────────────────────
+// ─── Trust bar (unchanged) ────────────────────────────────────────────────────
 function TrustBar() {
   return (
     <div className="bg-[#1A1A1A]" role="list" aria-label="Trust indicators">
@@ -459,65 +462,63 @@ function TrustBar() {
 export default function Hero() {
   return (
     <>
-      {/* ── Navbar overlaid on hero image ──────────────────────────────────────── */}
-      <Navbar overlaid />
+      <Navbar />
+
+      {/* Spacer behind fixed navbar */}
+      <div className="h-[62px]" aria-hidden="true" />
 
       <main style={{ fontFamily: "'Inter', sans-serif" }}>
 
-        {/* ══════════════════════════════════════════════════════════════════════
-            HERO — full-bleed dark background with search card (MagicBricks style)
-        ══════════════════════════════════════════════════════════════════════ */}
-        <section
-          className="relative min-h-screen flex flex-col"
-          aria-label="Hero section"
-        >
-          {/* Background — AVIF luxury cityscape */}
+        {/* ════════════════════════════════════════════════════════════
+            HERO — Full-bleed AVIF background, MagicBricks layout
+        ════════════════════════════════════════════════════════════ */}
+        <section className="relative" aria-label="Hero section">
+
+          {/* ── Background image ──────────────────────────────────── */}
           <div className="absolute inset-0 z-0">
             <img
               src="https://images.unsplash.com/photo-1460317442991-0ec209397118?fm=avif&w=1920&q=85"
               alt="Luxury residential cityscape"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
               loading="eager"
-              fetchpriority="high"
+              fetchPriority="high"
             />
-            {/* Primary dark overlay */}
-            <div className="absolute inset-0 bg-[#1A1A1A]/72" />
-            {/* Subtle red warmth at bottom */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#8B0000]/25 via-transparent to-transparent" />
+            {/* Dark overlay — flat, not gradient-heavy */}
+            <div className="absolute inset-0 bg-[#1A1A1A]/68" />
+            {/* Very subtle warm bleed at the very bottom edge only */}
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#8B0000]/18 to-transparent" />
           </div>
 
-          {/* Navbar space (navbar is absolute) */}
-          <div className="h-[62px] flex-shrink-0" aria-hidden="true" />
+          {/* ── Hero body ─────────────────────────────────────────── */}
+          <div className="relative z-10">
+            <div className="max-w-7xl mx-auto px-5 lg:px-8">
 
-          {/* ── Hero content ─────────────────────────────────────────────────── */}
-          <div className="relative z-10 flex-1 flex flex-col justify-center">
-            <div className="max-w-7xl mx-auto px-5 lg:px-8 w-full py-16 lg:py-24">
+              {/* ── Upper text block — large, centred ─────────────── */}
+              <div className="pt-16 pb-10 lg:pt-24 lg:pb-12 text-center max-w-4xl mx-auto">
 
-              {/* Text block — centred, large, editorial */}
-              <div className="max-w-3xl mx-auto text-center mb-12">
                 {/* Eyebrow */}
                 <motion.div
-                  initial={{ opacity: 0, y: 14 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="inline-flex items-center gap-2 mb-5"
+                  transition={{ duration: 0.45 }}
+                  className="inline-flex items-center gap-2 mb-6"
                 >
-                  <span className="w-5 h-[1.5px] bg-[#C8102E]" aria-hidden="true" />
-                  <span className="text-[11.5px] font-bold tracking-[0.22em] uppercase text-white/70">
+                  <span className="w-5 h-px bg-[#C8102E]" aria-hidden="true" />
+                  <span className="text-[11.5px] font-bold tracking-[0.22em] uppercase text-white/65">
                     Trusted PropTech Platform
                   </span>
-                  <span className="w-5 h-[1.5px] bg-[#C8102E]" aria-hidden="true" />
+                  <span className="w-5 h-px bg-[#C8102E]" aria-hidden="true" />
                 </motion.div>
 
-                {/* Main heading */}
+                {/* Main heading — larger, bolder, MagicBricks scale */}
                 <motion.h1
-                  initial={{ opacity: 0, y: 18 }}
+                  initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.55, delay: 0.1 }}
-                  className="text-white leading-[1.08] tracking-tight mb-5"
+                  transition={{ duration: 0.5, delay: 0.08 }}
+                  className="text-white tracking-tight leading-[1.06] mb-5"
                   style={{
                     fontFamily: "'Poppins', sans-serif",
-                    fontSize: "clamp(2.4rem, 5.5vw, 4rem)",
+                    fontSize: "clamp(2.6rem, 6vw, 4.4rem)",
                     fontWeight: 800,
                   }}
                 >
@@ -527,10 +528,10 @@ export default function Hero() {
 
                 {/* Description */}
                 <motion.p
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.52, delay: 0.18 }}
-                  className="text-white/65 text-[15.5px] leading-[1.75] mx-auto max-w-2xl"
+                  transition={{ duration: 0.48, delay: 0.15 }}
+                  className="text-white/60 text-base lg:text-[16px] leading-[1.75] mx-auto max-w-2xl"
                 >
                   PropertyBrands Realty Services is a technology-driven real estate platform connecting homebuyers,
                   investors, developers, landlords, tenants, architects, interior designers, and service providers
@@ -539,115 +540,112 @@ export default function Hero() {
 
                 {/* Taglines */}
                 <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.48, delay: 0.25 }}
-                  className="flex flex-col items-center gap-1 mt-5"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.44, delay: 0.22 }}
+                  className="flex flex-col items-center gap-1 mt-4"
                 >
                   <p
-                    className="text-[#C8102E] font-bold text-[14.5px] tracking-[0.18em] uppercase"
+                    className="text-[#C8102E] font-bold text-[14px] tracking-[0.2em] uppercase"
                     style={{ fontFamily: "'Poppins', sans-serif" }}
                   >
                     Discover. Invest. Build. Grow.
                   </p>
-                  <p className="text-white/40 text-[12.5px] tracking-[0.14em] font-medium">
+                  <p className="text-white/35 text-[12px] tracking-[0.14em] font-medium">
                     Compare · Discuss · Decide
                   </p>
                 </motion.div>
               </div>
 
-              {/* Search card — dark, overlaid */}
+              {/* ── White search card ──────────────────────────────── */}
               <motion.div
-                initial={{ opacity: 0, y: 22 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.32 }}
-                className="max-w-5xl mx-auto"
+                transition={{ duration: 0.5, delay: 0.28 }}
               >
-                <HeroSearchCard />
+                <SearchCard />
               </motion.div>
 
-              {/* CTA buttons row */}
+              {/* ── Feature chips (MagicBricks "Why us" micro-strip) ─ */}
               <motion.div
-                initial={{ opacity: 0, y: 14 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.48, delay: 0.42 }}
-                className="flex flex-wrap items-center justify-center gap-3 mt-7"
+                transition={{ duration: 0.44, delay: 0.38 }}
+                className="flex flex-wrap items-center justify-center gap-3 pt-6 pb-10 lg:pb-14"
               >
-                <motion.button
-                  whileHover={{ backgroundColor: "#a50d26" }}
-                  whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-2 bg-[#C8102E] text-white font-bold px-6 py-3 text-[13.5px] tracking-wide shadow-[0_2px_14px_rgba(200,16,46,0.45)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                  aria-label="Explore Properties"
-                >
-                  <Home className="w-4 h-4" aria-hidden="true" />
-                  Explore Properties
-                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                </motion.button>
-
-                {[
-                  { icon: Calendar,   label: "Schedule Site Visit" },
-                  { icon: Calculator, label: "Calculate EMI"       },
-                  { icon: Phone,      label: "Talk to an Expert"   },
-                ].map(({ icon: Icon, label }) => (
-                  <motion.button
+                {featureChips.map(({ icon: Icon, label }) => (
+                  <div
                     key={label}
-                    whileHover={{ backgroundColor: "rgba(255,255,255,0.15)" }}
-                    whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-2 border border-white/25 text-white/85 font-semibold px-5 py-3 text-[13.5px] tracking-wide transition-all duration-150 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                    aria-label={label}
+                    className="flex items-center gap-2 bg-white/10 border border-white/15 px-4 py-2"
                   >
-                    <Icon className="w-4 h-4" aria-hidden="true" />
-                    {label}
-                  </motion.button>
-                ))}
-              </motion.div>
-
-              {/* Trust indicators row */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.52 }}
-                className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8"
-                role="list"
-                aria-label="Trust indicators"
-              >
-                {trustItems.map((item) => (
-                  <div key={item} role="listitem" className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C8102E] flex-shrink-0" aria-hidden="true" />
-                    <span className="text-white/60 text-[12.5px] font-medium">{item}</span>
+                    <Icon className="w-3.5 h-3.5 text-[#C8102E]" aria-hidden="true" />
+                    <span className="text-white/80 text-[12.5px] font-medium">{label}</span>
                   </div>
                 ))}
               </motion.div>
             </div>
-          </div>
 
-          {/* ── Bottom strip: right-side showcase teaser ────────────────────── */}
-          <div className="relative z-10 border-t border-white/8 bg-[#1A1A1A]/60 backdrop-blur-sm">
-            <div className="max-w-7xl mx-auto px-5 lg:px-8 py-3">
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="text-white/40 text-[11px] font-semibold tracking-[0.16em] uppercase flex-shrink-0">
-                  Featured Projects
-                </span>
-                <div className="flex items-center gap-3 overflow-x-auto pb-1">
-                  {propertyHighlights.map((p) => (
-                    <div key={p.title} className="flex items-center gap-2.5 bg-white/8 border border-white/10 px-3.5 py-2 flex-shrink-0 hover:bg-white/12 transition-colors cursor-pointer group">
-                      <img src={p.img} alt={p.title} className="w-8 h-8 object-cover flex-shrink-0" />
-                      <div>
-                        <p className="text-white text-[12px] font-semibold leading-tight group-hover:text-[#C8102E] transition-colors">{p.title}</p>
-                        <p className="text-white/45 text-[10.5px]">{p.price}</p>
-                      </div>
+            {/* ── CTA buttons — below search, full-width band ────────── */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.44, delay: 0.44 }}
+              className="border-t border-white/10 bg-[#1A1A1A]/55 backdrop-blur-sm"
+            >
+              <div className="max-w-7xl mx-auto px-5 lg:px-8 flex flex-wrap items-center justify-between gap-3 py-4">
+                {/* Left — CTA buttons */}
+                <div className="flex flex-wrap gap-2.5">
+                  <motion.button
+                    whileHover={{ backgroundColor: "#a50d26" }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-2 bg-[#C8102E] text-white font-bold px-5 py-2.5 text-[13px] tracking-wide shadow-[0_2px_12px_rgba(200,16,46,0.4)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    aria-label="Explore Properties"
+                  >
+                    <Home className="w-3.5 h-3.5" aria-hidden="true" />
+                    Explore Properties
+                    <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                  </motion.button>
+
+                  {[
+                    { icon: Calendar,   label: "Schedule Site Visit" },
+                    { icon: Calculator, label: "Calculate EMI"       },
+                    { icon: Phone,      label: "Talk to an Expert"   },
+                  ].map(({ icon: Icon, label }) => (
+                    <motion.button
+                      key={label}
+                      whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
+                      whileTap={{ scale: 0.97 }}
+                      className="flex items-center gap-2 border border-white/20 text-white/80 hover:text-white font-semibold px-4 py-2.5 text-[13px] tracking-wide transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                      aria-label={label}
+                    >
+                      <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                      {label}
+                    </motion.button>
+                  ))}
+                </div>
+
+                {/* Right — trust items */}
+                <div
+                  className="hidden lg:flex items-center gap-5"
+                  role="list"
+                  aria-label="Trust indicators"
+                >
+                  {trustItems.slice(0, 3).map((item) => (
+                    <div key={item} role="listitem" className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#C8102E] flex-shrink-0" aria-hidden="true" />
+                      <span className="text-white/55 text-[12px] font-medium">{item}</span>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
 
-        {/* ── Stats ──────────────────────────────────────────────────────────── */}
+        {/* ── Stats row ──────────────────────────────────────────────── */}
         <StatsRow />
 
-        {/* ── Trust bar ──────────────────────────────────────────────────────── */}
+        {/* ── Trust bar ──────────────────────────────────────────────── */}
         <TrustBar />
       </main>
     </>
