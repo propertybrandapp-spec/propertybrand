@@ -1,492 +1,590 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Building2,
-  Phone,
-  ChevronDown,
-  X,
-  Menu,
-  ArrowRight,
-  MapPin,
-  Mail,
-  LogIn,
-  Calendar,
-} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-const NAV_LINKS = [
-  { label: "Home",       href: "#" },
-  { label: "About Us",   href: "#" },
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+const CITIES = [
+  "Ranchi", "Delhi", "Mumbai", "Bangalore", "Hyderabad",
+  "Chennai", "Pune", "Kolkata", "Ahmedabad", "Jaipur",
+];
+
+const NAV_ITEMS = [
   {
-    label: "Properties",
-    href: "#",
-    children: [
-      { label: "Residential",      sub: "Apartments, Villas & Plots" },
-      { label: "Commercial",       sub: "Offices & Retail Spaces" },
-      { label: "New Launches",     sub: "Upcoming Projects" },
-      { label: "Ready to Move",    sub: "Immediate Possession" },
+    label: "Buy",
+    columns: [
+      {
+        heading: "Residential",
+        links: [
+          "Ready-to-Move Apartments",
+          "Under Construction Projects",
+          "Luxury Apartments",
+          "Affordable Housing",
+          "Gated Communities",
+          "Villas & Row Houses",
+          "Residential Plots",
+        ],
+      },
+      {
+        heading: "Commercial",
+        links: [
+          "Office Spaces",
+          "Managed Workspaces",
+          "Business Centers",
+          "Retail Shops",
+          "Showrooms",
+          "Warehouses",
+          "Industrial Sheds",
+        ],
+      },
+      {
+        heading: "By Budget",
+        links: [
+          "Under ₹30 Lac",
+          "₹30 – 50 Lac",
+          "₹50 Lac – 1 Cr",
+          "₹1 – 1.5 Cr",
+          "₹1.5 – 2 Cr",
+          "Above ₹2 Cr",
+        ],
+      },
     ],
   },
   {
-    label: "Services",
-    href: "#",
-    children: [
-      { label: "Home Loans",          sub: "Best rates, quick approvals" },
-      { label: "Legal Advisory",      sub: "Due diligence & documentation" },
-      { label: "Interior Design",     sub: "Turnkey solutions" },
-      { label: "Property Management", sub: "End-to-end rental support" },
+    label: "Rent",
+    columns: [
+      {
+        heading: "Residential Rentals",
+        links: [
+          "Apartments for Rent",
+          "Villas for Rent",
+          "Independent Houses",
+          "Co-living Spaces",
+          "Student Accommodation",
+          "Furnished Apartments",
+        ],
+      },
+      {
+        heading: "Commercial Rentals",
+        links: [
+          "Office Spaces",
+          "Retail Shops",
+          "Showrooms",
+          "Coworking Spaces",
+          "Warehouses",
+        ],
+      },
+      {
+        heading: "Rental Services",
+        links: [
+          "Tenant Verification",
+          "Rental Agreement",
+          "Property Inspection",
+          "Rent Collection Support",
+          "Property Management",
+        ],
+      },
     ],
   },
-  { label: "Investment", href: "#" },
-  { label: "Blog",       href: "#" },
-  { label: "Contact",    href: "#" },
+  {
+    label: "Sell",
+    columns: [
+      {
+        heading: "Sell Your Property",
+        links: [
+          "Post Free Property Ad",
+          "Sell Apartment",
+          "Sell Villa",
+          "Sell Plot",
+          "Sell Commercial Space",
+        ],
+      },
+      {
+        heading: "Services",
+        links: [
+          "Property Valuation",
+          "Legal Assistance",
+          "Documentation Support",
+          "Resale Assistance",
+          "Channel Partner Network",
+        ],
+      },
+    ],
+  },
+  {
+    label: "Home Loans",
+    columns: [
+      {
+        heading: "Loan Services",
+        links: [
+          "Check Loan Eligibility",
+          "Compare Home Loans",
+          "Fast Approval",
+          "Documentation Support",
+          "Loan Against Property",
+        ],
+      },
+      {
+        heading: "Partner Banks",
+        links: [
+          "SBI Home Loan",
+          "HDFC Home Loan",
+          "ICICI Home Loan",
+          "Axis Bank Home Loan",
+          "LIC Housing Finance",
+        ],
+      },
+      {
+        heading: "Calculators",
+        links: [
+          "EMI Calculator",
+          "Affordability Calculator",
+          "Down Payment Calculator",
+          "Stamp Duty Calculator",
+          "Registration Cost Calculator",
+        ],
+      },
+    ],
+  },
+  {
+    label: "Home Interiors",
+    columns: [
+      {
+        heading: "Interior Design",
+        links: [
+          "Modular Kitchen Design",
+          "Bedroom Interiors",
+          "Living Room Design",
+          "Office Interiors",
+          "Commercial Interiors",
+          "Furniture Planning",
+        ],
+      },
+      {
+        heading: "Packages",
+        links: [
+          "Essential Package",
+          "Premium Package",
+          "Luxury Package",
+        ],
+      },
+      {
+        heading: "Architecture",
+        links: [
+          "House Planning",
+          "Residential Design",
+          "3D Visualization",
+          "Approval Drawings",
+          "Site Supervision",
+        ],
+      },
+    ],
+  },
+  {
+    label: "Investment Advisory",
+    badge: "NEW",
+    columns: [
+      {
+        heading: "Investment Options",
+        links: [
+          "High Growth Corridors",
+          "Rental Yield Opportunities",
+          "Commercial Investments",
+          "Land Banking",
+          "Retirement Homes",
+          "NRI Investments",
+        ],
+      },
+      {
+        heading: "Investment Tools",
+        links: [
+          "ROI Calculator",
+          "Rental Yield Calculator",
+          "Capital Appreciation Estimator",
+          "Investment Comparison Tool",
+        ],
+      },
+    ],
+  },
+  {
+    label: "Help",
+    columns: [
+      {
+        heading: "Support",
+        links: [
+          "How to Buy a Property",
+          "How to Rent a Property",
+          "How to Apply for Home Loan",
+          "What is RERA?",
+          "How to Calculate EMI",
+          "Contact Us",
+        ],
+      },
+      {
+        heading: "Resources",
+        links: [
+          "Real Estate Blog",
+          "Market Reports",
+          "Infrastructure Updates",
+          "Government Policies",
+          "Smart City Updates",
+        ],
+      },
+    ],
+  },
 ];
 
-const MOBILE_LINKS = [
-  "Home",
-  "About Us",
-  "Properties",
-  "Services",
-  "Investment",
-  "Blog",
-  "Contact",
-];
-
-// ─── Top utility bar ──────────────────────────────────────────────────────────
-function TopBar({ scrolled }) {
+// ── Chevron Icon ──────────────────────────────────────────────────────────────
+function ChevronDown({ className = "" }) {
   return (
-    <motion.div
-      initial={false}
-      animate={{
-        height: scrolled ? 0 : "auto",
-        opacity: scrolled ? 0 : 1,
-      }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="overflow-hidden bg-[#0F4C81]"
-      aria-hidden={scrolled}
+    <svg
+      className={`w-3 h-3 transition-transform duration-200 ${className}`}
+      fill="currentColor"
+      viewBox="0 0 20 20"
     >
-      <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between py-2">
-        {/* Left — contact details */}
-        <div className="flex items-center gap-6">
-          <a
-            href="tel:+919876543210"
-            className="flex items-center gap-1.5 text-white/80 hover:text-white text-[11.5px] font-medium transition-colors duration-150 focus:outline-none focus-visible:underline"
-            aria-label="Call us"
-          >
-            <Phone className="w-3 h-3 text-amber-400" aria-hidden="true" />
-            +91 98765 43210
-          </a>
-          <a
-            href="mailto:info@propertybrands.in"
-            className="hidden sm:flex items-center gap-1.5 text-white/80 hover:text-white text-[11.5px] font-medium transition-colors duration-150 focus:outline-none focus-visible:underline"
-            aria-label="Email us"
-          >
-            <Mail className="w-3 h-3 text-amber-400" aria-hidden="true" />
-            info@propertybrands.in
-          </a>
-        </div>
-
-        {/* Right — trust badge */}
-        <div className="hidden md:flex items-center gap-1.5">
-          <MapPin className="w-3 h-3 text-amber-400 flex-shrink-0" aria-hidden="true" />
-          <span className="text-white/70 text-[11px] font-medium tracking-wide">
-            Serving 25+ cities across India
-          </span>
-        </div>
-      </div>
-    </motion.div>
+      <path
+        fillRule="evenodd"
+        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+        clipRule="evenodd"
+      />
+    </svg>
   );
 }
 
-// ─── Dropdown menu ────────────────────────────────────────────────────────────
-function DropdownMenu({ items, isOpen }) {
+// ── Dropdown Menu ─────────────────────────────────────────────────────────────
+function DropdownMenu({ item, isOpen }) {
+  if (!isOpen || !item.columns) return null;
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 4 }}
-          transition={{ duration: 0.18, ease: "easeOut" }}
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-64 bg-white border border-slate-200 shadow-[0_8px_32px_rgba(15,76,129,0.12)] z-50"
-          role="menu"
-          aria-orientation="vertical"
-        >
-          {/* Notch */}
-          <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-white border-l border-t border-slate-200 rotate-45" aria-hidden="true" />
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 min-w-max">
+      {/* Arrow */}
+      <div className="flex justify-center">
+        <div className="w-3 h-3 bg-white border-l border-t border-gray-200 rotate-45 -mb-1.5 z-10 relative" />
+      </div>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
+        <div className="flex gap-0 divide-x divide-gray-100">
+          {item.columns.map((col) => (
+            <div key={col.heading} className="p-5 min-w-[180px]">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                {col.heading}
+              </p>
+              <ul className="space-y-1.5">
+                {col.links.map((link) => (
+                  <li key={link}>
+                    <a
+                      href="#"
+                      className="text-sm text-gray-600 hover:text-[#E03A3C] transition-colors block py-0.5"
+                    >
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-          <ul className="py-1.5">
-            {items.map((item) => (
-              <li key={item.label} role="none">
-                <a
-                  href="#"
-                  role="menuitem"
-                  className="group flex flex-col px-5 py-3 hover:bg-slate-50 transition-colors duration-100 focus:outline-none focus-visible:bg-slate-100"
+// ── City Selector Dropdown ────────────────────────────────────────────────────
+function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
+  return (
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-1.5 text-white text-sm font-medium hover:text-yellow-200 transition ml-3"
+      >
+        <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+            clipRule="evenodd"
+          />
+        </svg>
+        <span className="hidden sm:inline">{selectedCity}</span>
+        <ChevronDown className={isOpen ? "rotate-180" : ""} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-2 overflow-hidden">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 pb-1">
+            Select City
+          </p>
+          {CITIES.map((city) => (
+            <button
+              key={city}
+              onClick={() => onSelect(city)}
+              className={`block w-full text-left px-3 py-2 text-sm transition ${
+                city === selectedCity
+                  ? "text-[#E03A3C] bg-red-50 font-semibold"
+                  : "text-gray-700 hover:bg-gray-50 hover:text-[#E03A3C]"
+              }`}
+            >
+              {city}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Mobile Nav Item ───────────────────────────────────────────────────────────
+function MobileNavItem({ item }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-gray-100 last:border-0">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full px-5 py-3.5 text-sm font-semibold text-gray-800"
+      >
+        <span className="flex items-center gap-2">
+          {item.label}
+          {item.badge && (
+            <span className="bg-green-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+              {item.badge}
+            </span>
+          )}
+        </span>
+        <ChevronDown className={open ? "rotate-180 text-[#E03A3C]" : "text-gray-400"} />
+      </button>
+      {open && item.columns && (
+        <div className="bg-gray-50 px-5 pb-4">
+          {item.columns.map((col) => (
+            <div key={col.heading} className="mt-3">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                {col.heading}
+              </p>
+              <ul className="space-y-1">
+                {col.links.map((link) => (
+                  <li key={link}>
+                    <a
+                      href="#"
+                      className="text-sm text-gray-600 hover:text-[#E03A3C] block py-0.5 transition"
+                    >
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main Navbar ───────────────────────────────────────────────────────────────
+export default function Navbar() {
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [cityOpen, setCityOpen] = useState(false);
+  const [selectedCity, setSelectedCity] = useState("Ranchi");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const navRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  // Close all dropdowns on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (navRef.current && !navRef.current.contains(e.target)) {
+        setActiveDropdown(null);
+        setCityOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  // Close mobile menu on resize
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth >= 1024) setMobileOpen(false);
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  function handleMouseEnter(label) {
+    clearTimeout(timeoutRef.current);
+    setActiveDropdown(label);
+    setCityOpen(false);
+  }
+
+  function handleMouseLeave() {
+    timeoutRef.current = setTimeout(() => setActiveDropdown(null), 120);
+  }
+
+  function handleCitySelect(city) {
+    setSelectedCity(city);
+    setCityOpen(false);
+  }
+
+  return (
+    <header ref={navRef} className="sticky top-0 z-50">
+      {/* ── Top Bar ── */}
+      <div className="bg-[#E03A3C]">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
+          {/* Logo + City */}
+          <div className="flex items-center">
+            <a href="/" className="flex items-center gap-0.5">
+              <span className="text-white font-extrabold text-[22px] tracking-tight leading-none">
+                property
+                <span className="text-yellow-300">Brands</span>
+              </span>
+            </a>
+            <CityDropdown
+              selectedCity={selectedCity}
+              onSelect={handleCitySelect}
+              isOpen={cityOpen}
+              onToggle={() => {
+                setCityOpen(!cityOpen);
+                setActiveDropdown(null);
+              }}
+            />
+          </div>
+
+          {/* Right side – desktop */}
+          <div className="hidden lg:flex items-center gap-4">
+            <button className="text-white text-sm font-semibold hover:text-yellow-200 transition">
+              PB Prime
+            </button>
+            <div className="w-px h-4 bg-white/30" />
+            <button className="text-white text-sm font-semibold hover:text-yellow-200 transition">
+              Login
+            </button>
+            <button className="bg-white text-[#E03A3C] text-sm font-bold px-4 py-1.5 rounded-md hover:bg-yellow-50 transition flex items-center gap-1.5 shadow-sm">
+              Post Property
+              <span className="bg-[#E03A3C] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded">
+                FREE
+              </span>
+            </button>
+          </div>
+
+          {/* Hamburger – mobile */}
+          <button
+            className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+          >
+            <span
+              className={`block w-5 h-0.5 bg-white transition-all duration-300 ${
+                mobileOpen ? "rotate-45 translate-y-2" : ""
+              }`}
+            />
+            <span
+              className={`block w-5 h-0.5 bg-white transition-all duration-300 ${
+                mobileOpen ? "opacity-0" : ""
+              }`}
+            />
+            <span
+              className={`block w-5 h-0.5 bg-white transition-all duration-300 ${
+                mobileOpen ? "-rotate-45 -translate-y-2" : ""
+              }`}
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* ── Secondary Nav – Desktop ── */}
+      <nav className="hidden lg:block bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4">
+          <ul className="flex items-center">
+            {NAV_ITEMS.map((item) => (
+              <li
+                key={item.label}
+                className="relative"
+                onMouseEnter={() => handleMouseEnter(item.label)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  className={`flex items-center gap-1 px-4 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors border-b-2 -mb-px ${
+                    activeDropdown === item.label
+                      ? "text-[#E03A3C] border-[#E03A3C]"
+                      : "text-gray-700 border-transparent hover:text-[#E03A3C] hover:border-[#E03A3C]"
+                  }`}
                 >
-                  <span className="text-[13px] font-semibold text-[#0F172A] group-hover:text-[#0F4C81] transition-colors duration-150">
-                    {item.label}
-                  </span>
-                  {item.sub && (
-                    <span className="text-[11.5px] text-slate-400 mt-0.5 font-normal">
-                      {item.sub}
+                  {item.label}
+                  {item.badge && (
+                    <span className="bg-green-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded leading-none">
+                      {item.badge}
                     </span>
                   )}
-                </a>
+                  <ChevronDown
+                    className={activeDropdown === item.label ? "rotate-180 text-[#E03A3C]" : "text-gray-400"}
+                  />
+                </button>
+                <DropdownMenu item={item} isOpen={activeDropdown === item.label} />
               </li>
             ))}
           </ul>
-
-          {/* Footer link */}
-          <div className="border-t border-slate-100 px-5 py-2.5">
-            <a
-              href="#"
-              className="flex items-center gap-1.5 text-[#0F4C81] text-[12px] font-semibold hover:gap-2.5 transition-all duration-150 focus:outline-none focus-visible:underline"
-            >
-              View all
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-// ─── Desktop nav link ─────────────────────────────────────────────────────────
-function NavLink({ link, scrolled, isActive, onSetActive }) {
-  const hasChildren = !!link.children;
-  const isOpen = isActive;
-  const ref = useRef(null);
-
-  // Close on outside click
-  useEffect(() => {
-    if (!isOpen) return;
-    function handle(e) {
-      if (ref.current && !ref.current.contains(e.target)) onSetActive(false);
-    }
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, [isOpen, onSetActive]);
-
-  const textColor = scrolled
-    ? "text-slate-600 hover:text-[#0F4C81]"
-    : "text-slate-700 hover:text-[#0F4C81]";
-
-  return (
-    <li className="relative" ref={ref}>
-      {hasChildren ? (
-        <button
-          onClick={() => onSetActive(!isOpen)}
-          className={`group flex items-center gap-1 text-[13.5px] font-medium py-1 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81] focus-visible:ring-offset-1 rounded-sm ${textColor} ${isOpen ? "text-[#0F4C81]" : ""}`}
-          aria-haspopup="true"
-          aria-expanded={isOpen}
-        >
-          {link.label}
-          <ChevronDown
-            className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180 text-[#0F4C81]" : "text-slate-400"}`}
-            aria-hidden="true"
-          />
-          {/* Underline */}
-          <span
-            className={`absolute -bottom-px left-0 right-0 h-[1.5px] bg-[#0F4C81] origin-left transition-transform duration-200 ${isOpen ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
-            aria-hidden="true"
-          />
-        </button>
-      ) : (
-        <a
-          href={link.href}
-          className={`group relative flex items-center text-[13.5px] font-medium py-1 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81] focus-visible:ring-offset-1 rounded-sm ${textColor}`}
-        >
-          {link.label}
-          <span
-            className="absolute -bottom-px left-0 right-0 h-[1.5px] bg-[#0F4C81] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-200"
-            aria-hidden="true"
-          />
-        </a>
-      )}
-
-      {hasChildren && (
-        <DropdownMenu items={link.children} isOpen={isOpen} />
-      )}
-    </li>
-  );
-}
-
-// ─── Mobile drawer ────────────────────────────────────────────────────────────
-function MobileDrawer({ isOpen, onClose }) {
-  // Trap focus & close on Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    function onKey(e) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, onClose]);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            key="backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 bg-[#0F172A]/50 z-40 lg:hidden"
-            onClick={onClose}
-            aria-hidden="true"
-          />
-
-          {/* Drawer — slides from right */}
-          <motion.aside
-            key="drawer"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed top-0 right-0 bottom-0 w-[82vw] max-w-sm bg-white z-50 lg:hidden flex flex-col shadow-2xl"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile navigation menu"
-          >
-            {/* Drawer header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-sm bg-[#0F4C81] flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-4 h-4 text-white" aria-hidden="true" />
-                </div>
-                <div className="leading-none">
-                  <span
-                    className="block text-[#0F172A] font-bold text-[14px] tracking-tight"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
-                  >
-                    PropertyBrands
-                  </span>
-                  <span className="block text-[#0F4C81] text-[9.5px] font-semibold tracking-[0.16em] uppercase mt-0.5">
-                    Realty Services
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={onClose}
-                className="p-2 text-slate-400 hover:text-slate-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81] rounded-sm"
-                aria-label="Close menu"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Nav links */}
-            <nav className="flex-1 overflow-y-auto px-2 py-4" aria-label="Mobile navigation">
-              <ul role="list">
-                {MOBILE_LINKS.map((label, i) => (
-                  <motion.li
-                    key={label}
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 + i * 0.04, duration: 0.25, ease: "easeOut" }}
-                  >
-                    <a
-                      href="#"
-                      onClick={onClose}
-                      className="flex items-center justify-between px-4 py-3.5 text-[15px] font-medium text-slate-700 hover:text-[#0F4C81] hover:bg-slate-50 rounded-sm transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81]"
-                    >
-                      {label}
-                      <ArrowRight className="w-3.5 h-3.5 text-slate-300" aria-hidden="true" />
-                    </a>
-                  </motion.li>
-                ))}
-              </ul>
-
-              {/* Divider */}
-              <div className="mx-4 my-4 border-t border-slate-100" aria-hidden="true" />
-
-              {/* CTA buttons */}
-              <div className="px-4 flex flex-col gap-3">
-                <a
-                  href="#"
-                  onClick={onClose}
-                  className="flex items-center justify-center gap-2 border border-slate-300 text-slate-700 font-semibold py-3 rounded-sm text-[14px] hover:border-[#0F4C81] hover:text-[#0F4C81] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81]"
-                  aria-label="Login to your account"
-                >
-                  <LogIn className="w-4 h-4" aria-hidden="true" />
-                  Login
-                </a>
-                <a
-                  href="#"
-                  onClick={onClose}
-                  className="flex items-center justify-center gap-2 bg-[#0F4C81] text-white font-bold py-3 rounded-sm text-[14px] hover:bg-[#0d3f6e] transition-colors duration-150 shadow-[0_2px_10px_rgba(15,76,129,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81] focus-visible:ring-offset-2"
-                  aria-label="Schedule a site visit"
-                >
-                  <Calendar className="w-4 h-4" aria-hidden="true" />
-                  Schedule Site Visit
-                </a>
-              </div>
-            </nav>
-
-            {/* Drawer footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50">
-              <a
-                href="tel:+919876543210"
-                className="flex items-center gap-2 text-[13px] text-slate-500 hover:text-[#0F4C81] transition-colors focus:outline-none focus-visible:underline"
-                aria-label="Call us"
-              >
-                <Phone className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
-                +91 98765 43210
-              </a>
-            </div>
-          </motion.aside>
-        </>
-      )}
-    </AnimatePresence>
-  );
-}
-
-// ─── Navbar (main export) ─────────────────────────────────────────────────────
-export default function Navbar() {
-  const [scrolled, setScrolled]         = useState(false);
-  const [mobileOpen, setMobileOpen]     = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
-
-  // Scroll detection
-  useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 24);
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Close dropdown on route/resize
-  useEffect(() => {
-    function onResize() {
-      if (window.innerWidth >= 1024) setMobileOpen(false);
-      setActiveDropdown(null);
-    }
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  return (
-    <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-white/97 backdrop-blur-md border-b border-slate-200 shadow-[0_1px_12px_rgba(15,76,129,0.08)]"
-            : "bg-white border-b border-slate-200"
-        }`}
-        style={{ fontFamily: "'Inter', sans-serif" }}
-      >
-        {/* Top utility bar */}
-        <TopBar scrolled={scrolled} />
-
-        {/* Main nav row */}
-        <div className="max-w-7xl mx-auto px-5 lg:px-8">
-          <div className="flex items-center justify-between h-[62px]">
-
-            {/* ── Logo ──────────────────────────────────────────────────────── */}
-            <a
-              href="/"
-              className="flex items-center gap-3 flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81] rounded-sm"
-              aria-label="PropertyBrands Realty Services — go to homepage"
-            >
-              {/* Logomark */}
-              <div className="relative w-9 h-9 flex-shrink-0">
-                <div className="absolute inset-0 bg-[#0F4C81] rounded-sm" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Building2 className="w-[18px] h-[18px] text-white" aria-hidden="true" />
-                </div>
-                {/* Amber accent corner */}
-                <div className="absolute bottom-0 right-0 w-2 h-2 bg-amber-400 rounded-tl-sm" aria-hidden="true" />
-              </div>
-
-              {/* Wordmark */}
-              <div className="leading-none">
-                <span
-                  className="block text-[#0F172A] font-bold tracking-tight text-[15.5px]"
-                  style={{ fontFamily: "'Poppins', sans-serif" }}
-                >
-                  PROPERTYBRANDS
-                </span>
-                <span className="block text-[#0F4C81] text-[9.5px] font-semibold tracking-[0.22em] uppercase mt-[2px]">
-                  Realty Services
-                </span>
-              </div>
-            </a>
-
-            {/* ── Desktop nav links ──────────────────────────────────────────── */}
-            <nav aria-label="Main navigation" className="hidden lg:block">
-              <ul className="flex items-center gap-7" role="list">
-                {NAV_LINKS.map((link) => (
-                  <NavLink
-                    key={link.label}
-                    link={link}
-                    scrolled={scrolled}
-                    isActive={activeDropdown === link.label}
-                    onSetActive={(val) =>
-                      setActiveDropdown(val ? link.label : null)
-                    }
-                  />
-                ))}
-              </ul>
-            </nav>
-
-            {/* ── Right CTAs ─────────────────────────────────────────────────── */}
-            <div className="hidden lg:flex items-center gap-3">
-              {/* Login — ghost */}
-              <motion.a
-                href="#"
-                whileHover={{ borderColor: "#0F4C81", color: "#0F4C81" }}
-                whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-1.5 border border-slate-300 text-slate-600 font-semibold px-4 py-2 rounded-sm text-[13px] tracking-wide transition-all duration-150 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81] focus-visible:ring-offset-1"
-                aria-label="Login to your account"
-              >
-                <LogIn className="w-3.5 h-3.5" aria-hidden="true" />
-                Login
-              </motion.a>
-
-              {/* Schedule Site Visit — primary */}
-              <motion.a
-                href="#"
-                whileHover={{ backgroundColor: "#0d3f6e" }}
-                whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-1.5 bg-[#0F4C81] text-white font-bold px-5 py-2 rounded-sm text-[13px] tracking-wide transition-colors duration-150 shadow-[0_2px_10px_rgba(15,76,129,0.22)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81] focus-visible:ring-offset-2"
-                aria-label="Schedule a site visit"
-              >
-                <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
-                Schedule Site Visit
-              </motion.a>
-            </div>
-
-            {/* ── Mobile hamburger ──────────────────────────────────────────── */}
-            <button
-              onClick={() => setMobileOpen(true)}
-              className="lg:hidden flex flex-col items-end gap-[5px] p-2 text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F4C81] rounded-sm"
-              aria-label="Open navigation menu"
-              aria-expanded={mobileOpen}
-              aria-controls="mobile-drawer"
-            >
-              <span className="w-5 h-[1.5px] bg-current" />
-              <span className="w-4 h-[1.5px] bg-current" />
-              <span className="w-5 h-[1.5px] bg-current" />
-            </button>
-          </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Mobile drawer */}
-      <MobileDrawer isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      {/* ── Mobile Menu ── */}
+      <div
+        className={`lg:hidden bg-white border-t border-gray-100 shadow-xl overflow-hidden transition-all duration-300 ${
+          mobileOpen ? "max-h-[85vh] overflow-y-auto" : "max-h-0"
+        }`}
+      >
+        {/* Mobile top actions */}
+        <div className="flex items-center justify-between px-5 py-3 bg-red-50 border-b border-red-100">
+          <button className="text-[#E03A3C] text-sm font-semibold">PB Prime</button>
+          <button className="text-[#E03A3C] text-sm font-semibold">Login</button>
+          <button className="bg-[#E03A3C] text-white text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5">
+            Post Property
+            <span className="bg-white text-[#E03A3C] text-[9px] font-extrabold px-1 py-0.5 rounded">
+              FREE
+            </span>
+          </button>
+        </div>
 
-      {/* Spacer — pushes page content below fixed header */}
-      <div className="h-[62px]" aria-hidden="true" />
-    </>
+        {/* City selector mobile */}
+        <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2">
+          <svg className="w-4 h-4 text-[#E03A3C]" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span className="text-sm text-gray-700 font-medium">{selectedCity}</span>
+          <button
+            className="ml-auto text-xs text-[#E03A3C] font-semibold"
+            onClick={() => setCityOpen(!cityOpen)}
+          >
+            Change City
+          </button>
+        </div>
+
+        {/* Mobile city list */}
+        {cityOpen && (
+          <div className="grid grid-cols-3 gap-2 px-5 py-3 bg-gray-50 border-b border-gray-100">
+            {CITIES.map((city) => (
+              <button
+                key={city}
+                onClick={() => {
+                  handleCitySelect(city);
+                  setMobileOpen(false);
+                }}
+                className={`text-sm py-1.5 px-2 rounded-md text-center transition ${
+                  city === selectedCity
+                    ? "bg-[#E03A3C] text-white font-semibold"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {city}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Mobile nav items */}
+        <div>
+          {NAV_ITEMS.map((item) => (
+            <MobileNavItem key={item.label} item={item} />
+          ))}
+        </div>
+      </div>
+    </header>
   );
 }

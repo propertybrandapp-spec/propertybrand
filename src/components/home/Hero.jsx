@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 const NAV_LINKS = [
   { label: "Buy", hasDropdown: true },
   { label: "Rent", hasDropdown: true },
@@ -75,73 +74,7 @@ export default function Hero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="font-sans min-h-screen bg-white">
-      {/* ── Top Nav ── */}
-      <header className="bg-[#E03A3C] shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <a href="/" className="flex items-center gap-1">
-              <span className="text-white font-bold text-xl tracking-tight leading-none">
-                property
-                <span className="text-yellow-300">Brands</span>
-              </span>
-            </a>
-            <button className="ml-3 flex items-center gap-1 text-white text-sm font-medium opacity-90 hover:opacity-100">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-              </svg>
-              <span className="hidden sm:inline">Ranchi</span>
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Right Actions */}
-          <div className="flex items-center gap-3">
-            <button className="text-white text-sm font-medium hover:text-yellow-200 transition hidden sm:block">
-              PB Prime
-            </button>
-            <button className="text-white text-sm font-medium hover:text-yellow-200 transition">
-              Login
-            </button>
-            <button className="bg-white text-[#E03A3C] text-sm font-bold px-4 py-1.5 rounded hover:bg-yellow-50 transition flex items-center gap-1.5 shadow">
-              Post Property
-              <span className="bg-[#E03A3C] text-white text-[10px] font-bold px-1.5 py-0.5 rounded">FREE</span>
-            </button>
-          </div>
-        </div>
-
-        {/* ── Secondary Nav ── */}
-        <nav className="bg-white border-b border-gray-100 shadow-sm">
-          <div className="max-w-7xl mx-auto px-4">
-            <ul className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
-              {NAV_LINKS.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href="#"
-                    className="flex items-center gap-1 px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#E03A3C] whitespace-nowrap transition border-b-2 border-transparent hover:border-[#E03A3C]"
-                  >
-                    {link.label}
-                    {link.badge && (
-                      <span className="bg-green-500 text-white text-[9px] font-bold px-1 py-0.5 rounded ml-0.5 leading-none">
-                        {link.badge}
-                      </span>
-                    )}
-                    {link.hasDropdown && (
-                      <svg className="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
-      </header>
-
+    <div className="font-sans min-h-screen bg-white">      
       {/* ── Hero Section ── */}
       <section className="bg-white py-10 px-4">
         <div className="max-w-7xl mx-auto">
