@@ -1,653 +1,622 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useState } from "react";
 import {
-  MapPin,
-  IndianRupee,
-  Home,
   Search,
-  ChevronDown,
+  MapPin,
+  Home,
+  Bed,
+  Building2,
+  Calendar,
+  Star,
+  CreditCard,
+  TrendingUp,
+  CheckCircle2,
+  Sparkles,
+  Users,
   Phone,
   Calculator,
-  Calendar,
+  ChevronDown,
   ArrowRight,
-  Building2,
-  Users,
-  Globe,
-  CheckCircle2,
-  BadgeCheck,
-  Bed,
-  Sparkles,
-  TrendingUp,
-  Handshake,
+  Shield,
+  Zap,
+  Award,
+  Filter,
+  SlidersHorizontal,
+  IndianRupee,
 } from "lucide-react";
 
-// ─── Static data ──────────────────────────────────────────────────────────────
-const stats = [
-  { icon: Home,      label: "Properties Listed", value: "5000", suffix: "+" },
-  { icon: Users,     label: "Happy Clients",      value: "1000", suffix: "+" },
-  { icon: Building2, label: "Developer Partners", value: "200",  suffix: "+" },
-  { icon: Globe,     label: "Cities Covered",     value: "25",   suffix: "+" },
-];
+/* ─── tiny utility: join class strings ─── */
+const cx = (...cls) => cls.filter(Boolean).join(" ");
 
-const propertyHighlights = [
-  {
-    tag: "New Launch",
-    title: "Luxury Apartments",
-    price: "Starting ₹75 Lakhs",
-    img: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?fm=avif&w=900&q=85",
-    location: "Whitefield, Bengaluru",
-  },
-  {
-    tag: "Featured",
-    title: "Premium Villas",
-    price: "Starting ₹1.5 Cr",
-    img: "https://images.unsplash.com/photo-1613977257363-707ba9348227?fm=avif&w=900&q=85",
-    location: "Jubilee Hills, Hyderabad",
-  },
-  {
-    tag: "High ROI",
-    title: "Commercial Spaces",
-    price: "High ROI Investments",
-    img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?fm=avif&w=900&q=85",
-    location: "BKC, Mumbai",
-  },
-];
+/* ─── Sub-components ─── */
 
-const trustItems = [
-  "Verified Listings",
-  "Expert Advisory",
-  "Home Loan Support",
-  "Investment Assistance",
-];
-
-const propertyTypes = ["Apartment", "Villa", "Plot", "Commercial", "Studio", "Penthouse"];
-const budgetRanges  = ["Under ₹50L", "₹50L – ₹1Cr", "₹1Cr – ₹2Cr", "₹2Cr – ₹5Cr", "₹5Cr+"];
-const bhkOptions    = ["1 BHK", "2 BHK", "3 BHK", "4+ BHK"];
-const searchTabs    = ["Buy", "Rent", "Projects", "Commercial"];
-
-const featureChips = [
-  { icon: Sparkles,   label: "AI-Powered Discovery"          },
-  { icon: TrendingUp, label: "Expert Investment Advisory"    },
-  { icon: Handshake,  label: "End-to-End Transaction Support" },
-];
-
-// ─── Animated counter (unchanged) ─────────────────────────────────────────────
-function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
-
-  useEffect(() => {
-    if (!inView) return;
-    const numericTarget = parseInt(target.replace(/\D/g, ""), 10);
-    let start = 0;
-    const step = numericTarget / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= numericTarget) {
-        setCount(numericTarget);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [inView, target, duration]);
-
+function TabBar({ active, onChange }) {
+  const tabs = ["Buy", "Rent", "Commercial", "New Projects", "Plot"];
   return (
-    <span ref={ref}>
-      {count.toLocaleString("en-IN")}
-      {suffix}
-    </span>
-  );
-}
-
-// ─── Navbar — white, scroll-aware (MagicBricks style) ────────────────────────
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-200 ${
-        scrolled ? "shadow-[0_2px_12px_rgba(0,0,0,0.1)]" : "shadow-none border-b border-[#E5E5E5]"
-      }`}
-      aria-label="Primary navigation"
-    >
-      <div className="max-w-7xl mx-auto px-5 lg:px-8 flex items-center justify-between h-[62px]">
-        {/* Logo */}
-        <a
-          href="/"
-          className="flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] rounded-sm"
-          aria-label="PropertyBrands home"
-        >
-          <div className="relative w-9 h-9 flex-shrink-0">
-            <div className="absolute inset-0 bg-[#C8102E] rounded-sm" />
-            <Building2 className="absolute inset-0 m-auto w-[18px] h-[18px] text-white" aria-hidden="true" />
-            <div className="absolute bottom-0 right-0 w-2 h-2 bg-[#8B0000] rounded-tl-sm" aria-hidden="true" />
-          </div>
-          <div className="leading-none">
-            <span
-              className="block text-[#1A1A1A] font-bold text-[15.5px] tracking-tight"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
-            >
-              PROPERTYBRANDS
-            </span>
-            <span className="block text-[#C8102E] text-[9.5px] font-semibold tracking-[0.22em] uppercase mt-[2px]">
-              Realty Services
-            </span>
-          </div>
-        </a>
-
-        {/* Desktop links */}
-        <ul className="hidden lg:flex items-center gap-6" role="list">
-          {["Home", "Properties", "Projects", "Developers", "Services", "About"].map((item) => (
-            <li key={item}>
-              <a
-                href="#"
-                className="relative group text-[13.5px] font-medium text-[#444] hover:text-[#C8102E] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] rounded-sm"
-              >
-                {item}
-                <span
-                  className="absolute -bottom-px left-0 right-0 h-[1.5px] bg-[#C8102E] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-200"
-                  aria-hidden="true"
-                />
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        {/* Right CTA */}
-        <a
-          href="tel:+919876543210"
-          className="hidden lg:flex items-center gap-2 border border-[#C8102E] text-[#C8102E] hover:bg-[#C8102E] hover:text-white font-semibold text-[13px] px-4 py-2 rounded-sm transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E]"
-          aria-label="Call us"
-        >
-          <Phone className="w-3.5 h-3.5" aria-hidden="true" />
-          +91 98765 43210
-        </a>
-
-        {/* Mobile hamburger */}
+    <div className="flex items-center overflow-x-auto scrollbar-none border-b border-gray-100 bg-gray-50/60">
+      {tabs.map((t) => (
         <button
-          className="lg:hidden flex flex-col items-end gap-[5px] p-2 text-[#444] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] rounded-sm"
-          aria-label="Open menu"
+          key={t}
+          onClick={() => onChange(t)}
+          className={cx(
+            "flex-shrink-0 px-5 py-4 text-sm font-semibold whitespace-nowrap transition-all duration-200 border-b-2 -mb-px focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d8232a] focus-visible:ring-inset",
+            active === t
+              ? "text-[#d8232a] border-[#d8232a] bg-white"
+              : "text-gray-500 border-transparent hover:text-gray-800 hover:bg-gray-100/80"
+          )}
         >
-          <span className="w-5 h-[1.5px] bg-current" />
-          <span className="w-4 h-[1.5px] bg-current" />
-          <span className="w-5 h-[1.5px] bg-current" />
+          {t}
         </button>
-      </div>
-    </nav>
+      ))}
+    </div>
   );
 }
 
-// ─── Search card — white, MagicBricks style ───────────────────────────────────
-function SearchCard() {
-  const [activeTab,    setActiveTab]    = useState("Buy");
-  const [location,     setLocation]     = useState("");
-  const [budget,       setBudget]       = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [bhk,          setBhk]          = useState("");
-
+function SelectField({ label, icon: Icon, options, value, onChange, placeholder }) {
   return (
-    <div className="w-full bg-white shadow-[0_8px_40px_rgba(0,0,0,0.22)] overflow-hidden">
-      {/* ── Intent tabs ── */}
-      <div className="flex border-b border-[#E5E5E5]" role="tablist" aria-label="Search intent">
-        {searchTabs.map((tab) => (
-          <button
-            key={tab}
-            role="tab"
-            aria-selected={activeTab === tab}
-            onClick={() => setActiveTab(tab)}
-            className={`relative flex-1 py-3.5 text-[13.5px] font-semibold tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-[#C8102E] ${
-              activeTab === tab ? "text-[#C8102E]" : "text-[#888] hover:text-[#444]"
-            }`}
-          >
-            {tab}
-            {activeTab === tab && (
-              <motion.span
-                layoutId="heroTab"
-                className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#C8102E]"
-                transition={{ type: "spring", stiffness: 500, damping: 40 }}
-              />
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Fields row ── */}
-      <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-[#E5E5E5]">
-
-        {/* Location — wider */}
-        <div className="flex-[1.5] flex flex-col justify-center px-4 py-2.5 gap-0.5">
-          <label htmlFor="hero-location" className="text-[10.5px] font-semibold text-[#888] uppercase tracking-[0.12em]">
-            Location
-          </label>
-          <div className="relative flex items-center">
-            <MapPin className="absolute left-0 w-4 h-4 text-[#C8102E] flex-shrink-0" aria-hidden="true" />
-            <input
-              id="hero-location"
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="City, locality or landmark"
-              className="w-full pl-6 pr-2 h-9 bg-transparent text-[#1A1A1A] placeholder-[#BBB] text-[13.5px] font-medium focus:outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Budget */}
-        <div className="flex-1 flex flex-col justify-center px-4 py-2.5 gap-0.5">
-          <label htmlFor="hero-budget" className="text-[10.5px] font-semibold text-[#888] uppercase tracking-[0.12em]">
-            Budget
-          </label>
-          <div className="relative flex items-center">
-            <IndianRupee className="absolute left-0 w-4 h-4 text-[#C8102E] flex-shrink-0 pointer-events-none" aria-hidden="true" />
-            <select
-              id="hero-budget"
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-              className="w-full pl-6 pr-5 h-9 appearance-none bg-transparent text-[13.5px] font-medium text-[#1A1A1A] focus:outline-none [&>option]:bg-white [&>option]:text-[#1A1A1A]"
-            >
-              <option value="" disabled>Select budget</option>
-              {budgetRanges.map((b) => <option key={b} value={b}>{b}</option>)}
-            </select>
-            <ChevronDown className="absolute right-0 w-3.5 h-3.5 text-[#AAA] pointer-events-none" aria-hidden="true" />
-          </div>
-        </div>
-
-        {/* Property Type */}
-        <div className="flex-1 flex flex-col justify-center px-4 py-2.5 gap-0.5">
-          <label htmlFor="hero-type" className="text-[10.5px] font-semibold text-[#888] uppercase tracking-[0.12em]">
-            Property Type
-          </label>
-          <div className="relative flex items-center">
-            <Home className="absolute left-0 w-4 h-4 text-[#C8102E] flex-shrink-0 pointer-events-none" aria-hidden="true" />
-            <select
-              id="hero-type"
-              value={propertyType}
-              onChange={(e) => setPropertyType(e.target.value)}
-              className="w-full pl-6 pr-5 h-9 appearance-none bg-transparent text-[13.5px] font-medium text-[#1A1A1A] focus:outline-none [&>option]:bg-white [&>option]:text-[#1A1A1A]"
-            >
-              <option value="" disabled>Select type</option>
-              {propertyTypes.map((p) => <option key={p} value={p}>{p}</option>)}
-            </select>
-            <ChevronDown className="absolute right-0 w-3.5 h-3.5 text-[#AAA] pointer-events-none" aria-hidden="true" />
-          </div>
-        </div>
-
-        {/* BHK */}
-        <div className="flex-1 flex flex-col justify-center px-4 py-2.5 gap-0.5">
-          <label htmlFor="hero-bhk" className="text-[10.5px] font-semibold text-[#888] uppercase tracking-[0.12em]">
-            BHK Type
-          </label>
-          <div className="relative flex items-center">
-            <Bed className="absolute left-0 w-4 h-4 text-[#C8102E] flex-shrink-0 pointer-events-none" aria-hidden="true" />
-            <select
-              id="hero-bhk"
-              value={bhk}
-              onChange={(e) => setBhk(e.target.value)}
-              className="w-full pl-6 pr-5 h-9 appearance-none bg-transparent text-[13.5px] font-medium text-[#1A1A1A] focus:outline-none [&>option]:bg-white [&>option]:text-[#1A1A1A]"
-            >
-              <option value="" disabled>Select BHK</option>
-              {bhkOptions.map((b) => <option key={b} value={b}>{b}</option>)}
-            </select>
-            <ChevronDown className="absolute right-0 w-3.5 h-3.5 text-[#AAA] pointer-events-none" aria-hidden="true" />
-          </div>
-        </div>
-
-        {/* Search button */}
-        <motion.button
-          type="button"
-          whileHover={{ backgroundColor: "#a50d26" }}
-          whileTap={{ scale: 0.98 }}
-          className="flex items-center justify-center gap-2 bg-[#C8102E] text-white font-bold px-10 text-[14px] tracking-wide transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E] focus-visible:ring-offset-2 whitespace-nowrap min-h-[72px] sm:min-h-0"
-          aria-label="Search Properties"
+    <div>
+      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+        {label}
+      </label>
+      <div className="relative">
+        <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#d8232a] pointer-events-none" />
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-label={label}
+          className="w-full pl-9 pr-8 py-3 border border-gray-200 rounded-xl text-sm text-gray-700 bg-gray-50 hover:bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d8232a]/25 focus:border-[#d8232a] transition-all duration-150 appearance-none cursor-pointer"
         >
-          <Search className="w-4 h-4" aria-hidden="true" />
-          Search Properties
-        </motion.button>
+          <option value="">{placeholder}</option>
+          {options.map((o) => (
+            <option key={o}>{o}</option>
+          ))}
+        </select>
+        <ChevronDown
+          size={13}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+        />
       </div>
     </div>
   );
 }
 
-// ─── Property showcase carousel (unchanged logic) ─────────────────────────────
-function PropertyShowcase() {
-  const [active, setActive] = useState(0);
+function TextField({ label, icon: Icon, placeholder, value, onChange }) {
+  return (
+    <div>
+      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+        {label}
+      </label>
+      <div className="relative">
+        <Icon size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#d8232a] pointer-events-none" />
+        <input
+          type="text"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-label={label}
+          className="w-full pl-9 pr-3 py-3 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 bg-gray-50 hover:bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d8232a]/25 focus:border-[#d8232a] transition-all duration-150"
+        />
+      </div>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    const t = setInterval(() => setActive((p) => (p + 1) % propertyHighlights.length), 4500);
-    return () => clearInterval(t);
-  }, []);
+/* ─── Floating stat card for the hero image ─── */
+function StatCard({ icon: Icon, title, subtitle, positionClass }) {
+  return (
+    <div
+      className={cx(
+        "absolute bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/60 p-3.5 flex items-center gap-3 min-w-[170px] hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300",
+        positionClass
+      )}
+    >
+      <div className="w-9 h-9 bg-[#fef2f2] rounded-xl flex items-center justify-center flex-shrink-0">
+        <Icon size={18} className="text-[#d8232a]" />
+      </div>
+      <div>
+        <p className="font-bold text-gray-900 text-sm leading-tight">{title}</p>
+        <p className="text-[11px] text-gray-500 mt-0.5">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
 
-  const card = propertyHighlights[active];
+/* ─── Skyline illustration ─── */
+function SkylineIllustration() {
+  const buildings = [
+    { h: "h-24", w: "w-8", delay: "" },
+    { h: "h-36", w: "w-12", delay: "" },
+    { h: "h-20", w: "w-7", delay: "" },
+    { h: "h-44", w: "w-14", delay: "" },
+    { h: "h-28", w: "w-10", delay: "" },
+    { h: "h-40", w: "w-12", delay: "" },
+    { h: "h-16", w: "w-8", delay: "" },
+    { h: "h-32", w: "w-10", delay: "" },
+  ];
+  return (
+    <div className="absolute inset-0 flex flex-col overflow-hidden">
+      {/* Sky */}
+      <div className="flex-1 bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#334155]">
+        {/* Stars */}
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-0.5 h-0.5 bg-white/60 rounded-full"
+            style={{
+              top: `${Math.random() * 60}%`,
+              left: `${(i * 5.3) % 95}%`,
+              opacity: 0.4 + (i % 4) * 0.15,
+            }}
+          />
+        ))}
+        {/* Glow / moon */}
+        <div className="absolute top-8 right-10 w-14 h-14 bg-amber-300/80 rounded-full blur-sm shadow-[0_0_30px_rgba(252,211,77,0.6)]" />
+        <div className="absolute top-10 right-12 w-10 h-10 bg-amber-200 rounded-full" />
+      </div>
+      {/* Building silhouettes */}
+      <div className="flex items-end justify-around px-2 gap-1 h-36">
+        {buildings.map((b, i) => (
+          <div
+            key={i}
+            className={cx(
+              b.h,
+              b.w,
+              "bg-[#1e293b] rounded-t-sm flex-shrink-0 relative overflow-hidden"
+            )}
+          >
+            {/* Window grid */}
+            <div className="absolute inset-1 grid grid-cols-2 gap-0.5">
+              {[...Array(8)].map((_, j) => (
+                <div
+                  key={j}
+                  className={cx(
+                    "rounded-[1px]",
+                    (i + j) % 3 === 0
+                      ? "bg-amber-300/70"
+                      : (i + j) % 5 === 0
+                      ? "bg-blue-300/50"
+                      : "bg-slate-700"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════
+   MAIN HERO COMPONENT
+════════════════════════════════════════ */
+export default function Hero() {
+  const [activeTab, setActiveTab] = useState("Buy");
+  const [location, setLocation] = useState("");
+  const [budget, setBudget] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [bedrooms, setBedrooms] = useState("");
+  const [builder, setBuilder] = useState("");
+  const [possession, setPossession] = useState("");
+  const [amenity, setAmenity] = useState("");
+  const [loanEligibility, setLoanEligibility] = useState("");
+  const [investmentPotential, setInvestmentPotential] = useState("");
+  const [showAllFilters, setShowAllFilters] = useState(false);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    alert(
+      `Searching: ${activeTab} | Location: ${location || "Any"} | Budget: ${
+        budget || "Any"
+      } | Type: ${propertyType || "Any"}`
+    );
+  };
 
   return (
-    <div className="relative w-full h-full min-h-[420px] overflow-hidden">
-      {propertyHighlights.map((p, i) => (
-        <motion.img
-          key={p.img}
-          src={p.img}
-          alt={p.title}
-          className="absolute inset-0 w-full h-full object-cover"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: i === active ? 1 : 0 }}
-          transition={{ duration: 0.9, ease: "easeInOut" }}
-          loading={i === 0 ? "eager" : "lazy"}
+    <div className="min-h-screen bg-white font-sans antialiased">
+      {/* ══════════════════════════════
+          SECTION 1 — HERO
+      ══════════════════════════════ */}
+      <section className="relative bg-white overflow-hidden">
+        {/* Decorative soft red blobs */}
+        <div
+          aria-hidden="true"
+          className="absolute top-0 right-0 w-[520px] h-[520px] bg-[#d8232a]/5 rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none"
         />
-      ))}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/85 via-[#1A1A1A]/20 to-transparent" />
-      <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-white px-3 py-1.5 shadow">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-        <span className="text-[11px] font-semibold text-[#222] tracking-wide">248 listings today</span>
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 p-5">
-        <motion.div key={active} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          <span className="inline-block text-[10px] font-extrabold tracking-[0.16em] uppercase text-[#C8102E] bg-white px-2 py-0.5 mb-2">
-            {card.tag}
-          </span>
-          <h3 className="text-white font-bold text-xl leading-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            {card.title}
-          </h3>
-          <p className="text-white/80 text-sm mt-1 font-semibold">{card.price}</p>
-          <p className="text-white/50 text-[11px] mt-0.5 flex items-center gap-1">
-            <MapPin className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
-            {card.location}
-          </p>
-        </motion.div>
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex gap-2">
-            {propertyHighlights.map((p, i) => (
+        <div
+          aria-hidden="true"
+          className="absolute bottom-0 left-0 w-72 h-72 bg-[#d8232a]/4 rounded-full translate-y-1/2 -translate-x-1/3 pointer-events-none"
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8 lg:pt-20 lg:pb-10 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16 items-center">
+            {/* ── LEFT: Text + CTAs ── */}
+            <div className="space-y-7">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-[#fef2f2] border border-[#d8232a]/25 text-[#d8232a] px-4 py-2 rounded-full text-[11px] font-bold tracking-[0.1em] uppercase">
+                <Sparkles size={13} />
+                PropertyBrands Realty Services
+              </div>
+
+              {/* Main heading */}
+              <div>
+                <h1 className="text-4xl sm:text-5xl lg:text-[3.25rem] xl:text-6xl font-extrabold text-gray-900 leading-[1.1] tracking-tight">
+                  Your Trusted{" "}
+                  <span className="relative inline-block text-[#d8232a]">
+                    Search Partner
+                    <svg
+                      className="absolute -bottom-1 left-0 w-full"
+                      viewBox="0 0 300 8"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2 6 C60 2, 180 2, 298 5"
+                        stroke="#d8232a"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        opacity="0.35"
+                      />
+                    </svg>
+                  </span>
+                </h1>
+              </div>
+
+              {/* Description */}
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-lg">
+                PropertyBrands Realty Services is a technology-driven real
+                estate platform connecting homebuyers, investors, developers,
+                landlords, tenants, architects, interior designers, and service
+                providers through a seamless digital ecosystem.
+              </p>
+
+              {/* Taglines */}
+              <div className="space-y-2.5">
+                {["Discover. Invest. Build. Grow.", "Compare. Discuss. Decide."].map(
+                  (line) => (
+                    <div key={line} className="flex items-center gap-2.5">
+                      <span className="w-2 h-2 bg-[#d8232a] rounded-full flex-shrink-0" />
+                      <span className="text-gray-800 font-semibold text-sm sm:text-base">
+                        {line}
+                      </span>
+                    </div>
+                  )
+                )}
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-2 bg-[#d8232a] text-white px-5 py-3.5 rounded-xl font-semibold text-sm hover:bg-[#b81e22] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-[#d8232a]/25 hover:-translate-y-0.5 col-span-2 sm:col-span-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d8232a] focus-visible:ring-offset-2"
+                >
+                  <Home size={15} />
+                  Explore Properties
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-2 bg-white text-[#d8232a] border-2 border-[#d8232a] px-5 py-3.5 rounded-xl font-semibold text-sm hover:bg-[#fef2f2] active:scale-[0.98] transition-all duration-200 col-span-2 sm:col-span-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d8232a] focus-visible:ring-offset-2"
+                >
+                  <Calendar size={15} />
+                  Schedule Site Visit
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-2 bg-gray-900 text-white px-5 py-3.5 rounded-xl font-semibold text-sm hover:bg-gray-800 active:scale-[0.98] transition-all duration-200 col-span-2 sm:col-span-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
+                >
+                  <Calculator size={15} />
+                  Calculate EMI
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-2 bg-white text-gray-800 border-2 border-gray-200 px-5 py-3.5 rounded-xl font-semibold text-sm hover:border-gray-400 hover:bg-gray-50 active:scale-[0.98] transition-all duration-200 col-span-2 sm:col-span-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
+                >
+                  <Phone size={15} />
+                  Talk to an Expert
+                </button>
+              </div>
+
+              {/* Trust bar */}
+              <div className="flex flex-wrap gap-5 pt-5 border-t border-gray-100">
+                {[
+                  { icon: Shield, stat: "50K+", label: "Verified Listings" },
+                  { icon: Users, stat: "1L+", label: "Active Users" },
+                  { icon: Award, stat: "500+", label: "Expert Advisors" },
+                ].map(({ icon: Icon, stat, label }) => (
+                  <div key={label} className="flex items-center gap-2 text-sm text-gray-500">
+                    <Icon size={15} className="text-[#d8232a] flex-shrink-0" />
+                    <span>
+                      <strong className="text-gray-900 font-bold">{stat}</strong>{" "}
+                      {label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── RIGHT: Property image placeholder + floating cards ── */}
+            <div className="relative hidden lg:block select-none">
+              {/* Decorative ring behind card */}
+              <div
+                aria-hidden="true"
+                className="absolute -top-6 -left-6 w-40 h-40 border-2 border-[#d8232a]/10 rounded-full"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute -bottom-8 -right-6 w-56 h-56 border-2 border-[#d8232a]/6 rounded-full"
+              />
+
+              {/* Main image card */}
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
+                <SkylineIllustration />
+
+                {/* Gradient vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+
+                {/* RERA badge — top left */}
+                <div className="absolute top-5 left-5 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-[#d8232a] text-[11px] font-bold px-3 py-1.5 rounded-full shadow-sm">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                  RERA Approved
+                </div>
+
+                {/* Bottom label */}
+                <div className="absolute bottom-5 left-5 right-5 text-white">
+                  <p className="text-xs font-medium text-white/65 mb-1 uppercase tracking-wider">
+                    Premium Residential Properties
+                  </p>
+                  <p className="text-xl font-extrabold tracking-tight">
+                    Starting from ₹45 Lakhs
+                  </p>
+                </div>
+              </div>
+
+              {/* Floating stat cards */}
+              <StatCard
+                icon={CheckCircle2}
+                title="Verified Listings"
+                subtitle="50,000+ properties"
+                positionClass="-top-4 -right-5"
+              />
+              <StatCard
+                icon={Zap}
+                title="AI Discovery"
+                subtitle="Smart recommendations"
+                positionClass="top-1/2 -left-7 -translate-y-1/2"
+              />
+              <StatCard
+                icon={Users}
+                title="Expert Advisory"
+                subtitle="500+ consultants"
+                positionClass="-bottom-4 -right-5"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════
+          SECTION 2 — ADVANCED SEARCH
+      ══════════════════════════════ */}
+      <section className="relative z-20 pb-20">
+        {/* Negative margin pulls card up to overlap hero on large screens */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:-mt-6">
+          <div className="bg-white rounded-3xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden">
+            {/* Tab bar */}
+            <TabBar active={activeTab} onChange={setActiveTab} />
+
+            {/* Card body */}
+            <form onSubmit={handleSearch} noValidate>
+              <div className="p-5 sm:p-7 lg:p-8">
+                {/* Header row */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 bg-[#fef2f2] rounded-lg flex items-center justify-center">
+                      <Filter size={14} className="text-[#d8232a]" />
+                    </div>
+                    <h2 className="text-base font-bold text-gray-900">
+                      Find Your Perfect Property
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAllFilters((s) => !s)}
+                    className="flex items-center gap-1.5 text-xs text-[#d8232a] font-semibold hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d8232a] rounded"
+                    aria-expanded={showAllFilters}
+                  >
+                    <SlidersHorizontal size={13} />
+                    {showAllFilters ? "Fewer Filters" : "More Filters"}
+                  </button>
+                </div>
+
+                {/* ── Primary filters: always visible ── */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <TextField
+                    label="Location"
+                    icon={MapPin}
+                    placeholder="City, locality, society…"
+                    value={location}
+                    onChange={setLocation}
+                  />
+                  <SelectField
+                    label="Budget"
+                    icon={IndianRupee}
+                    placeholder="Select Budget"
+                    value={budget}
+                    onChange={setBudget}
+                    options={[
+                      "Below ₹25 Lakhs",
+                      "₹25 – 50 Lakhs",
+                      "₹50 – 75 Lakhs",
+                      "₹75 Lakhs – 1 Cr",
+                      "₹1 Cr – 2 Cr",
+                      "Above ₹2 Cr",
+                    ]}
+                  />
+                  <SelectField
+                    label="Property Type"
+                    icon={Home}
+                    placeholder="All Types"
+                    value={propertyType}
+                    onChange={setPropertyType}
+                    options={[
+                      "Apartment",
+                      "Villa",
+                      "Plot / Land",
+                      "Builder Floor",
+                      "Penthouse",
+                      "Studio",
+                      "Commercial Space",
+                      "Warehouse",
+                    ]}
+                  />
+                  <SelectField
+                    label="Bedrooms"
+                    icon={Bed}
+                    placeholder="Any BHK"
+                    value={bedrooms}
+                    onChange={setBedrooms}
+                    options={["1 BHK", "2 BHK", "3 BHK", "4 BHK", "4+ BHK"]}
+                  />
+                </div>
+
+                {/* ── Advanced filters: togglable ── */}
+                <div
+                  className={cx(
+                    "overflow-hidden transition-all duration-500 ease-in-out",
+                    showAllFilters
+                      ? "max-h-[600px] opacity-100 mt-4"
+                      : "max-h-0 opacity-0"
+                  )}
+                  aria-hidden={!showAllFilters}
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 pt-1 border-t border-dashed border-gray-200 pt-4">
+                    <TextField
+                      label="Builder / Developer"
+                      icon={Building2}
+                      placeholder="e.g. DLF, Godrej…"
+                      value={builder}
+                      onChange={setBuilder}
+                    />
+                    <SelectField
+                      label="Possession Status"
+                      icon={Calendar}
+                      placeholder="Any Status"
+                      value={possession}
+                      onChange={setPossession}
+                      options={[
+                        "Ready to Move",
+                        "Under Construction",
+                        "New Launch",
+                        "In 6 Months",
+                        "In 1 Year",
+                        "In 2 Years",
+                      ]}
+                    />
+                    <SelectField
+                      label="Amenities"
+                      icon={Star}
+                      placeholder="Select Amenities"
+                      value={amenity}
+                      onChange={setAmenity}
+                      options={[
+                        "Swimming Pool",
+                        "Gym / Fitness Centre",
+                        "Covered Parking",
+                        "24×7 Security",
+                        "Clubhouse",
+                        "Landscaped Garden",
+                        "Power Backup",
+                        "Elevator / Lift",
+                      ]}
+                    />
+                    <SelectField
+                      label="Loan Eligibility"
+                      icon={CreditCard}
+                      placeholder="Check Eligibility"
+                      value={loanEligibility}
+                      onChange={setLoanEligibility}
+                      options={[
+                        "Salaried",
+                        "Self Employed",
+                        "Business Owner",
+                        "NRI / OCI",
+                        "Freelancer",
+                      ]}
+                    />
+                    <SelectField
+                      label="Investment Potential"
+                      icon={TrendingUp}
+                      placeholder="Any Growth"
+                      value={investmentPotential}
+                      onChange={setInvestmentPotential}
+                      options={[
+                        "High Growth Corridor",
+                        "Emerging Location",
+                        "Rental Yield Focus",
+                        "Capital Appreciation",
+                        "Commercial Returns",
+                      ]}
+                    />
+                  </div>
+                </div>
+
+                {/* ── Footer: trust note + CTA ── */}
+                <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex flex-wrap gap-4 text-xs text-gray-400">
+                    <span className="flex items-center gap-1.5">
+                      <CheckCircle2 size={12} className="text-green-500 flex-shrink-0" />
+                      All listings RERA compliant
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Shield size={12} className="text-[#d8232a] flex-shrink-0" />
+                      Verified by our team
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Zap size={12} className="text-amber-500 flex-shrink-0" />
+                      AI-powered results
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2.5 bg-[#d8232a] hover:bg-[#b81e22] active:bg-[#9a191f] text-white font-bold text-base px-10 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:shadow-[#d8232a]/30 hover:-translate-y-0.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d8232a] focus-visible:ring-offset-2"
+                  >
+                    <Search size={17} />
+                    Search Properties
+                    <ArrowRight
+                      size={15}
+                      className="group-hover:translate-x-1 transition-transform duration-200"
+                    />
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* ── Popular searches row ── */}
+          <div className="mt-5 flex flex-wrap items-center gap-2 px-1">
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest mr-1">
+              Popular:
+            </span>
+            {[
+              "2 BHK in Pune",
+              "Villa in Hyderabad",
+              "Plots near Bengaluru",
+              "Ready to Move Flats",
+              "NRI Investment",
+              "Luxury Apartments",
+            ].map((tag) => (
               <button
-                key={p.title}
-                onClick={() => setActive(i)}
-                className={`text-[11px] font-semibold px-3 py-1 border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                  i === active ? "bg-[#C8102E] text-white border-[#C8102E]" : "bg-white/10 text-white/60 border-white/20 hover:bg-white/20 hover:text-white"
-                }`}
-                aria-label={`View ${p.title}`}
+                key={tag}
+                type="button"
+                className="text-xs text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:border-[#d8232a] hover:text-[#d8232a] hover:bg-[#fef2f2] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d8232a]"
               >
-                {p.title}
+                {tag}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-1.5">
-            {propertyHighlights.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActive(i)}
-                aria-label={`Slide ${i + 1}`}
-                className={`transition-all duration-300 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                  i === active ? "w-5 h-1.5 bg-[#C8102E]" : "w-1.5 h-1.5 bg-white/35 hover:bg-white/60"
-                }`}
-              />
-            ))}
-          </div>
         </div>
-      </div>
+      </section>
     </div>
-  );
-}
-
-// ─── Stats row (unchanged) ────────────────────────────────────────────────────
-function StatsRow() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 14 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="border-t border-[#E5E5E5] bg-white"
-      aria-label="Company statistics"
-    >
-      <div className="max-w-7xl mx-auto px-5 lg:px-8 grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-[#E5E5E5]">
-        {stats.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.45, delay: 0.08 + i * 0.07 }}
-            whileHover={{ backgroundColor: "#FFF5F5" }}
-            className="flex items-center gap-4 py-6 px-5 lg:px-8 transition-colors duration-150 cursor-default"
-          >
-            <div className="w-9 h-9 border border-[#C8102E]/15 bg-[#C8102E]/5 flex items-center justify-center flex-shrink-0">
-              <stat.icon className="w-4 h-4 text-[#C8102E]" aria-hidden="true" />
-            </div>
-            <div>
-              <p
-                className="text-[#1A1A1A] font-extrabold text-2xl leading-none tabular-nums"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-                aria-label={`${stat.value}${stat.suffix} ${stat.label}`}
-              >
-                <AnimatedCounter target={stat.value} suffix={stat.suffix} duration={1800} />
-              </p>
-              <p className="text-[#888] text-[12px] mt-1 font-medium">{stat.label}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Trust bar (unchanged) ────────────────────────────────────────────────────
-function TrustBar() {
-  return (
-    <div className="bg-[#1A1A1A]" role="list" aria-label="Trust indicators">
-      <div className="max-w-7xl mx-auto px-5 lg:px-8 flex flex-wrap items-center justify-center lg:justify-between gap-x-8 gap-y-2 py-3">
-        {trustItems.map((item) => (
-          <div key={item} role="listitem" className="flex items-center gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#C8102E] flex-shrink-0" aria-hidden="true" />
-            <span className="text-white/75 text-[12px] font-medium tracking-wide">{item}</span>
-          </div>
-        ))}
-        <div className="flex items-center gap-2" role="listitem">
-          <BadgeCheck className="w-3.5 h-3.5 text-[#C8102E] flex-shrink-0" aria-hidden="true" />
-          <span className="text-white/75 text-[12px] font-medium tracking-wide">RERA Compliant</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Hero (main export) ───────────────────────────────────────────────────────
-export default function Hero() {
-  return (
-    <>
-      <Navbar />
-
-      {/* Spacer behind fixed navbar */}
-      <div className="h-[62px]" aria-hidden="true" />
-
-      <main style={{ fontFamily: "'Inter', sans-serif" }}>
-
-        {/* ════════════════════════════════════════════════════════════
-            HERO — Full-bleed AVIF background, MagicBricks layout
-        ════════════════════════════════════════════════════════════ */}
-        <section className="relative" aria-label="Hero section">
-
-          {/* ── Background image ──────────────────────────────────── */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src="https://images.unsplash.com/photo-1460317442991-0ec209397118?fm=avif&w=1920&q=85"
-              alt="Luxury residential cityscape"
-              className="w-full h-full object-cover object-center"
-              loading="eager"
-              fetchPriority="high"
-            />
-            {/* Dark overlay — flat, not gradient-heavy */}
-            <div className="absolute inset-0 bg-[#1A1A1A]/68" />
-            {/* Very subtle warm bleed at the very bottom edge only */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#8B0000]/18 to-transparent" />
-          </div>
-
-          {/* ── Hero body ─────────────────────────────────────────── */}
-          <div className="relative z-10">
-            <div className="max-w-7xl mx-auto px-5 lg:px-8">
-
-              {/* ── Upper text block — large, centred ─────────────── */}
-              <div className="pt-16 pb-10 lg:pt-24 lg:pb-12 text-center max-w-4xl mx-auto">
-
-                {/* Eyebrow */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45 }}
-                  className="inline-flex items-center gap-2 mb-6"
-                >
-                  <span className="w-5 h-px bg-[#C8102E]" aria-hidden="true" />
-                  <span className="text-[11.5px] font-bold tracking-[0.22em] uppercase text-white/65">
-                    Trusted PropTech Platform
-                  </span>
-                  <span className="w-5 h-px bg-[#C8102E]" aria-hidden="true" />
-                </motion.div>
-
-                {/* Main heading — larger, bolder, MagicBricks scale */}
-                <motion.h1
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.08 }}
-                  className="text-white tracking-tight leading-[1.06] mb-5"
-                  style={{
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: "clamp(2.6rem, 6vw, 4.4rem)",
-                    fontWeight: 800,
-                  }}
-                >
-                  Your Trusted{" "}
-                  <span className="text-[#C8102E]">Search Partner</span>
-                </motion.h1>
-
-                {/* Description */}
-                <motion.p
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.48, delay: 0.15 }}
-                  className="text-white/60 text-base lg:text-[16px] leading-[1.75] mx-auto max-w-2xl"
-                >
-                  PropertyBrands Realty Services is a technology-driven real estate platform connecting homebuyers,
-                  investors, developers, landlords, tenants, architects, interior designers, and service providers
-                  through a seamless digital ecosystem.
-                </motion.p>
-
-                {/* Taglines */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.44, delay: 0.22 }}
-                  className="flex flex-col items-center gap-1 mt-4"
-                >
-                  <p
-                    className="text-[#C8102E] font-bold text-[14px] tracking-[0.2em] uppercase"
-                    style={{ fontFamily: "'Poppins', sans-serif" }}
-                  >
-                    Discover. Invest. Build. Grow.
-                  </p>
-                  <p className="text-white/35 text-[12px] tracking-[0.14em] font-medium">
-                    Compare · Discuss · Decide
-                  </p>
-                </motion.div>
-              </div>
-
-              {/* ── White search card ──────────────────────────────── */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.28 }}
-              >
-                <SearchCard />
-              </motion.div>
-
-              {/* ── Feature chips (MagicBricks "Why us" micro-strip) ─ */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.44, delay: 0.38 }}
-                className="flex flex-wrap items-center justify-center gap-3 pt-6 pb-10 lg:pb-14"
-              >
-                {featureChips.map(({ icon: Icon, label }) => (
-                  <div
-                    key={label}
-                    className="flex items-center gap-2 bg-white/10 border border-white/15 px-4 py-2"
-                  >
-                    <Icon className="w-3.5 h-3.5 text-[#C8102E]" aria-hidden="true" />
-                    <span className="text-white/80 text-[12.5px] font-medium">{label}</span>
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            {/* ── CTA buttons — below search, full-width band ────────── */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.44, delay: 0.44 }}
-              className="border-t border-white/10 bg-[#1A1A1A]/55 backdrop-blur-sm"
-            >
-              <div className="max-w-7xl mx-auto px-5 lg:px-8 flex flex-wrap items-center justify-between gap-3 py-4">
-                {/* Left — CTA buttons */}
-                <div className="flex flex-wrap gap-2.5">
-                  <motion.button
-                    whileHover={{ backgroundColor: "#a50d26" }}
-                    whileTap={{ scale: 0.97 }}
-                    className="flex items-center gap-2 bg-[#C8102E] text-white font-bold px-5 py-2.5 text-[13px] tracking-wide shadow-[0_2px_12px_rgba(200,16,46,0.4)] transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                    aria-label="Explore Properties"
-                  >
-                    <Home className="w-3.5 h-3.5" aria-hidden="true" />
-                    Explore Properties
-                    <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-                  </motion.button>
-
-                  {[
-                    { icon: Calendar,   label: "Schedule Site Visit" },
-                    { icon: Calculator, label: "Calculate EMI"       },
-                    { icon: Phone,      label: "Talk to an Expert"   },
-                  ].map(({ icon: Icon, label }) => (
-                    <motion.button
-                      key={label}
-                      whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
-                      whileTap={{ scale: 0.97 }}
-                      className="flex items-center gap-2 border border-white/20 text-white/80 hover:text-white font-semibold px-4 py-2.5 text-[13px] tracking-wide transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                      aria-label={label}
-                    >
-                      <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                      {label}
-                    </motion.button>
-                  ))}
-                </div>
-
-                {/* Right — trust items */}
-                <div
-                  className="hidden lg:flex items-center gap-5"
-                  role="list"
-                  aria-label="Trust indicators"
-                >
-                  {trustItems.slice(0, 3).map((item) => (
-                    <div key={item} role="listitem" className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#C8102E] flex-shrink-0" aria-hidden="true" />
-                      <span className="text-white/55 text-[12px] font-medium">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ── Stats row ──────────────────────────────────────────────── */}
-        <StatsRow />
-
-        {/* ── Trust bar ──────────────────────────────────────────────── */}
-        <TrustBar />
-      </main>
-    </>
   );
 }
