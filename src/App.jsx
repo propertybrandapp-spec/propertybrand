@@ -1,16 +1,21 @@
-import PreferredAgents from "./components/home/PreferredAgents"
 import Navbar from "./components/common/Navbar";
 import Hero from "./components/home/Hero";
-import PopularProperties from './components/home/PopularProperties'
-
+import PopularProperties from "./components/home/PopularProperties";
+import PreferredAgents from "./components/home/PreferredAgents";
+import InvestmentAdvisory from "./components/home/InvestmentAdvisory";
+import Testimonials from "./components/home/Testimonials";
+import Footer from "./components/home/Footer";
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <>
       <Navbar />
       <Hero />
       <PopularProperties />
       <PreferredAgents />
-    </div>
+      <InvestmentAdvisory />
+      <Testimonials />
+      <Footer />
+    </>
   );
 }
 
