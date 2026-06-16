@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 const NAV_LINKS = [
   { label: "Buy", hasDropdown: true },
   { label: "Rent", hasDropdown: true },
@@ -74,33 +75,36 @@ export default function Hero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="font-sans min-h-screen bg-white">      
+    <div className="font-sans min-h-screen bg-[#161616]">
+      {/* ── Top Nav ── */}
+      {/*Dont need we have a nav component already */}
+
       {/* ── Hero Section ── */}
-      <section className="bg-white py-10 px-4">
+      <section className="bg-[#161616] py-10 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Search Box */}
             <div className="flex-1 min-w-0">
               {/* Headline */}
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-1 leading-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-[#F2F4F5] mb-1 leading-tight">
                 Start your{" "}
-                <span className="text-[#E03A3C] font-extrabold">#DiscoverInvestGrow</span>{" "}
+                <span className="text-[#2C9DD5] font-extrabold">#DiscoverInvestGrow</span>{" "}
                 Journey
               </h1>
-              <p className="text-gray-400 text-sm mb-6 font-medium tracking-wide">
+              <p className="text-[#A5AEB5] text-sm mb-6 font-medium tracking-wide">
                 Discover. Invest. Build. Grow. Compare. Discuss. Decide.
               </p>
 
               {/* Search Tabs */}
-              <div className="flex flex-wrap gap-0 mb-4 border-b border-gray-200">
+              <div className="flex flex-wrap gap-0 mb-4 border-b border-[#2a2a2a]">
                 {SEARCH_TABS.map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px ${
                       activeTab === tab
-                        ? "text-[#E03A3C] border-[#E03A3C]"
-                        : "text-gray-500 border-transparent hover:text-[#E03A3C]"
+                        ? "text-[#2C9DD5] border-[#2C9DD5]"
+                        : "text-[#A5AEB5] border-transparent hover:text-[#2C9DD5]"
                     }`}
                   >
                     {tab}
@@ -109,10 +113,10 @@ export default function Hero() {
               </div>
 
               {/* Search Bar */}
-              <div className="flex flex-col sm:flex-row gap-0 border border-gray-300 rounded-lg overflow-visible shadow-sm bg-white">
+              <div className="flex flex-col sm:flex-row gap-0 border border-[#3a3a3a] rounded-lg overflow-visible shadow-sm bg-[#161616]">
                 {/* Location */}
-                <div className="flex items-center gap-2 px-3 py-3 flex-1 min-w-0 border-b sm:border-b-0 sm:border-r border-gray-200">
-                  <svg className="w-4 h-4 text-[#E03A3C] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <div className="flex items-center gap-2 px-3 py-3 flex-1 min-w-0 border-b sm:border-b-0 sm:border-r border-[#2a2a2a]">
+                  <svg className="w-4 h-4 text-[#2C9DD5] shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                   </svg>
                   <input
@@ -120,29 +124,29 @@ export default function Hero() {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="Search locality, city, project..."
-                    className="flex-1 text-sm text-gray-700 placeholder-gray-400 bg-transparent focus:outline-none min-w-0"
+                    className="flex-1 text-sm text-[#EDEFF2] placeholder-[#A5AEB5] bg-transparent focus:outline-none min-w-0"
                   />
                 </div>
 
                 {/* Property Type Dropdown */}
-                <div className="relative border-b sm:border-b-0 sm:border-r border-gray-200">
+                <div className="relative border-b sm:border-b-0 sm:border-r border-[#2a2a2a]">
                   <button
                     onClick={() => {
                       setShowPropertyDropdown(!showPropertyDropdown);
                       setShowBudgetDropdown(false);
                     }}
-                    className="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 whitespace-nowrap hover:bg-gray-50 w-full sm:w-auto"
+                    className="flex items-center gap-2 px-4 py-3 text-sm text-[#EDEFF2] whitespace-nowrap hover:bg-[#0B0B0B] w-full sm:w-auto"
                   >
-                    <svg className="w-4 h-4 text-[#E03A3C]" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-[#2C9DD5]" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                     </svg>
                     {propertyType}
-                    <svg className="w-3.5 h-3.5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-3.5 h-3.5 text-[#A5AEB5]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
                   </button>
                   {showPropertyDropdown && (
-                    <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-1">
+                    <div className="absolute top-full left-0 mt-1 w-48 bg-[#161616] border border-[#2a2a2a] rounded-lg shadow-xl z-50 py-1">
                       {PROPERTY_TYPES.map((type) => (
                         <button
                           key={type}
@@ -150,7 +154,7 @@ export default function Hero() {
                             setPropertyType(type);
                             setShowPropertyDropdown(false);
                           }}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-[#E03A3C] transition"
+                          className="block w-full text-left px-4 py-2 text-sm text-[#EDEFF2] hover:bg-[#1a0a0a] hover:text-[#2C9DD5] transition"
                         >
                           {type}
                         </button>
@@ -160,25 +164,25 @@ export default function Hero() {
                 </div>
 
                 {/* Budget Dropdown */}
-                <div className="relative border-b sm:border-b-0 sm:border-r border-gray-200">
+                <div className="relative border-b sm:border-b-0 sm:border-r border-[#2a2a2a]">
                   <button
                     onClick={() => {
                       setShowBudgetDropdown(!showBudgetDropdown);
                       setShowPropertyDropdown(false);
                     }}
-                    className="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 whitespace-nowrap hover:bg-gray-50 w-full sm:w-auto"
+                    className="flex items-center gap-2 px-4 py-3 text-sm text-[#EDEFF2] whitespace-nowrap hover:bg-[#0B0B0B] w-full sm:w-auto"
                   >
-                    <svg className="w-4 h-4 text-[#E03A3C]" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-[#2C9DD5]" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                     </svg>
                     {budget}
-                    <svg className="w-3.5 h-3.5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-3.5 h-3.5 text-[#A5AEB5]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
                   </button>
                   {showBudgetDropdown && (
-                    <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-1">
+                    <div className="absolute top-full left-0 mt-1 w-52 bg-[#161616] border border-[#2a2a2a] rounded-lg shadow-xl z-50 py-1">
                       {BUDGET_RANGES.map((range) => (
                         <button
                           key={range}
@@ -186,7 +190,7 @@ export default function Hero() {
                             setBudget(range);
                             setShowBudgetDropdown(false);
                           }}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-[#E03A3C] transition"
+                          className="block w-full text-left px-4 py-2 text-sm text-[#EDEFF2] hover:bg-[#1a0a0a] hover:text-[#2C9DD5] transition"
                         >
                           {range}
                         </button>
@@ -196,7 +200,7 @@ export default function Hero() {
                 </div>
 
                 {/* Search Button */}
-                <button className="flex items-center justify-center gap-2 bg-[#E03A3C] text-white px-6 py-3 text-sm font-bold hover:bg-red-700 transition rounded-b-lg sm:rounded-b-none sm:rounded-r-lg whitespace-nowrap">
+                <button className="flex items-center justify-center gap-2 bg-[#BA0D0B] text-white px-6 py-3 text-sm font-bold hover:bg-[#5C0B03] transition rounded-b-lg sm:rounded-b-none sm:rounded-r-lg whitespace-nowrap">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
                   </svg>
@@ -209,7 +213,7 @@ export default function Hero() {
                 {["Explore Properties", "Schedule Site Visit", "Calculate EMI", "Talk to an Expert"].map((cta) => (
                   <button
                     key={cta}
-                    className="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded-full hover:border-[#E03A3C] hover:text-[#E03A3C] transition font-medium"
+                    className="text-xs border border-[#3a3a3a] text-[#A5AEB5] px-3 py-1.5 rounded-full hover:border-[#2C9DD5] hover:text-[#2C9DD5] transition font-medium"
                   >
                     {cta}
                   </button>
@@ -219,26 +223,26 @@ export default function Hero() {
 
             {/* Sidebar Promo Card */}
             <div className="w-full lg:w-64 shrink-0">
-              <div className="rounded-xl overflow-hidden border border-gray-100 shadow-md bg-gradient-to-br from-red-50 to-white">
+              <div className="rounded-xl overflow-hidden border border-[#2a2a2a] shadow-md bg-gradient-to-br from-[#0B0B0B] to-white">
                 <div className="relative">
                   <img
                     src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=200&fit=crop"
                     alt="Interior design"
                     className="w-full h-40 object-cover"
                   />
-                  <div className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-[11px] font-bold px-2 py-0.5 rounded">
+                  <div className="absolute top-2 left-2 bg-[#E87C02] text-[#F2F4F5] text-[11px] font-bold px-2 py-0.5 rounded">
                     Save 40%
                   </div>
                 </div>
                 <div className="p-4">
-                  <p className="text-xs text-gray-500 font-medium mb-0.5">Get Home Interiors from</p>
-                  <p className="text-sm font-bold text-gray-900 mb-3">Top Architects & Designers</p>
-                  <button className="w-full bg-[#E03A3C] text-white text-xs font-bold py-2 rounded hover:bg-red-700 transition">
+                  <p className="text-xs text-[#A5AEB5] font-medium mb-0.5">Get Home Interiors from</p>
+                  <p className="text-sm font-bold text-[#F2F4F5] mb-3">Top Architects & Designers</p>
+                  <button className="w-full bg-[#BA0D0B] text-white text-xs font-bold py-2 rounded hover:bg-[#5C0B03] transition">
                     Check Offers
                   </button>
                   <div className="flex justify-center gap-1.5 mt-3">
                     {[0, 1, 2].map((i) => (
-                      <span key={i} className={`block w-1.5 h-1.5 rounded-full ${i === 1 ? "bg-[#E03A3C]" : "bg-gray-300"}`} />
+                      <span key={i} className={`block w-1.5 h-1.5 rounded-full ${i === 1 ? "bg-[#2C9DD5]" : "bg-[#3a3a3a]"}`} />
                     ))}
                   </div>
                 </div>
@@ -248,10 +252,10 @@ export default function Hero() {
 
           {/* ── Property Cards Grid ── */}
           <div className="mt-10">
-            <h2 className="text-xl font-bold text-gray-900 mb-1">
+            <h2 className="text-xl font-bold text-[#F2F4F5] mb-1">
               We've got properties for everyone
             </h2>
-            <div className="w-12 h-0.5 bg-[#E03A3C] mb-5 rounded-full" />
+            <div className="w-12 h-0.5 bg-[#2C9DD5] mb-5 rounded-full" />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {/* Card 1 – Verified Listings */}
@@ -295,16 +299,16 @@ export default function Hero() {
               </div>
 
               {/* Card 3 – Promo */}
-              <div className="relative rounded-xl overflow-hidden bg-[#E03A3C] group cursor-pointer shadow-sm hover:shadow-lg transition flex flex-col justify-between p-4 h-44">
+              <div className="relative rounded-xl overflow-hidden bg-[#BA0D0B] group cursor-pointer shadow-sm hover:shadow-lg transition flex flex-col justify-between p-4 h-44">
                 <div>
                   <p className="text-white font-bold text-base leading-tight mb-1">
                     Discover Your<br />Dream Property
                   </p>
-                  <p className="text-red-100 text-xs">
+                  <p className="text-[#A5AEB5] text-xs">
                     Exclusive access to premium listings & investment insights
                   </p>
                 </div>
-                <button className="self-start bg-white text-[#E03A3C] text-xs font-bold px-4 py-2 rounded-full hover:bg-yellow-50 transition">
+                <button className="self-start bg-[#F2F4F5] text-[#BA0D0B] text-xs font-bold px-4 py-2 rounded-full hover:bg-[#1e1e1e] transition">
                   Talk to an Expert
                 </button>
               </div>
