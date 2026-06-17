@@ -178,10 +178,10 @@ function HeartBtn({ id }) {
         e.stopPropagation();
         setLiked(!liked);
       }}
-      className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-[#161616]/90 backdrop-blur flex items-center justify-center shadow hover:scale-110 transition z-10"
+      className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-[#FFFFFF]/90 backdrop-blur flex items-center justify-center shadow hover:scale-110 transition z-10"
     >
       <svg
-        className={`w-3.5 h-3.5 transition-colors ${liked ? "fill-red-500 text-red-500" : "fill-none text-[#A5AEB5]"}`}
+        className={`w-3.5 h-3.5 transition-colors ${liked ? "fill-red-500 text-red-500" : "fill-none text-[#5B6670]"}`}
         stroke="currentColor"
         strokeWidth={2}
         viewBox="0 0 24 24"
@@ -210,7 +210,7 @@ function ImageCarousel({ images, imgCount, badge, badgeColor }) {
   }
 
   return (
-    <div className="relative w-full h-44 overflow-hidden rounded-t-xl group/img bg-[#1e1e1e]">
+    <div className="relative w-full h-44 overflow-hidden rounded-t-xl group/img bg-[#F2F4F6]">
       <img
         src={images[current]}
         alt="property"
@@ -222,13 +222,13 @@ function ImageCarousel({ images, imgCount, badge, badgeColor }) {
         <>
           <button
             onClick={prev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#0B0B0B]/50 text-white text-xs flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition"
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#FFFFFF]/50 text-white text-xs flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition"
           >
             ‹
           </button>
           <button
             onClick={next}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#0B0B0B]/50 text-white text-xs flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#FFFFFF]/50 text-white text-xs flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition"
           >
             ›
           </button>
@@ -236,7 +236,7 @@ function ImageCarousel({ images, imgCount, badge, badgeColor }) {
       )}
 
       {/* Image count pill */}
-      <div className="absolute bottom-2 left-2.5 flex items-center gap-1 bg-[#0B0B0B]/60 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full">
+      <div className="absolute bottom-2 left-2.5 flex items-center gap-1 bg-[#FFFFFF]/60 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full">
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
         </svg>
@@ -261,7 +261,7 @@ function PropertyCard({ property }) {
   } = property;
 
   return (
-    <div className="relative bg-[#161616] rounded-xl border border-[#2a2a2a] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64">
+    <div className="relative bg-[#FFFFFF] rounded-xl border border-[#E5E8EB] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64">
       {featured && (
         <div className="absolute -top-px left-0 right-0 h-0.5 bg-gradient-to-r from-yellow-400 via-[#2C9DD5] to-yellow-400 rounded-t-xl z-10" />
       )}
@@ -277,7 +277,7 @@ function PropertyCard({ property }) {
       <div className="p-3.5">
         {/* Title + Price */}
         <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="text-sm font-bold text-[#F2F4F5] leading-tight">{title}</h3>
+          <h3 className="text-sm font-bold text-[#15191C] leading-tight">{title}</h3>
           {verified && (
             <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-[#4ade80] font-bold">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -290,9 +290,9 @@ function PropertyCard({ property }) {
 
         {/* Price + Area */}
         <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-base font-extrabold text-[#F2F4F5]">{price}</span>
-          <span className="text-xs text-[#A5AEB5] font-medium">|</span>
-          <span className="text-xs text-[#A5AEB5] font-medium">{area}</span>
+          <span className="text-base font-extrabold text-[#15191C]">{price}</span>
+          <span className="text-xs text-[#5B6670] font-medium">|</span>
+          <span className="text-xs text-[#5B6670] font-medium">{area}</span>
         </div>
 
         {/* Location */}
@@ -300,13 +300,13 @@ function PropertyCard({ property }) {
           <svg className="w-3 h-3 text-[#2C9DD5] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
-          <span className="text-[11px] text-[#A5AEB5] leading-tight">{location}</span>
+          <span className="text-[11px] text-[#5B6670] leading-tight">{location}</span>
         </div>
 
         {/* Amenities */}
         <div className="flex flex-wrap gap-1 mb-3">
           {amenities.slice(0, 3).map((a) => (
-            <span key={a} className="text-[10px] bg-[#1e1e1e] text-[#A5AEB5] px-1.5 py-0.5 rounded font-medium">
+            <span key={a} className="text-[10px] bg-[#F2F4F6] text-[#5B6670] px-1.5 py-0.5 rounded font-medium">
               {a}
             </span>
           ))}
@@ -318,9 +318,9 @@ function PropertyCard({ property }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2.5 border-t border-[#2a2a2a]">
-          <div className="text-[11px] text-[#A5AEB5]">
-            By <span className="font-semibold text-[#A5AEB5]">{postedBy}</span>
+        <div className="flex items-center justify-between pt-2.5 border-t border-[#E5E8EB]">
+          <div className="text-[11px] text-[#5B6670]">
+            By <span className="font-semibold text-[#5B6670]">{postedBy}</span>
             {" · "}
             {postedDays === 0 ? "Today" : `${postedDays}d ago`}
           </div>
@@ -341,7 +341,7 @@ function SectionHeader({ title, seeAllLabel = "See all Properties" }) {
   return (
     <div className="flex items-center justify-between mb-4">
       <div>
-        <h2 className="text-xl font-bold text-[#F2F4F5]">{title}</h2>
+        <h2 className="text-xl font-bold text-[#15191C]">{title}</h2>
         <div className="w-10 h-0.5 bg-[#2C9DD5] rounded-full mt-1" />
       </div>
       <a href="#" className="flex items-center gap-1 text-sm font-semibold text-[#2C9DD5] hover:underline">
@@ -368,7 +368,7 @@ function ScrollRow({ properties }) {
       {/* Left arrow */}
       <button
         onClick={() => scroll(-1)}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#161616] border border-[#2a2a2a] shadow-lg flex items-center justify-center text-[#A5AEB5] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/row:opacity-100 transition"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#5B6670] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/row:opacity-100 transition"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -389,7 +389,7 @@ function ScrollRow({ properties }) {
       {/* Right arrow */}
       <button
         onClick={() => scroll(1)}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#161616] border border-[#2a2a2a] shadow-lg flex items-center justify-center text-[#A5AEB5] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/row:opacity-100 transition"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#5B6670] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/row:opacity-100 transition"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -412,7 +412,7 @@ export default function PopularProperties() {
   const builderProperties = filtered.filter((p) => p.postedBy === "Builder");
 
   return (
-    <section className="bg-[#161616] py-10 px-4">
+    <section className="bg-[#FFFFFF] py-10 px-4">
       <div className="max-w-7xl mx-auto">
 
         {/* ── Filter Tabs ── */}
@@ -425,7 +425,7 @@ export default function PopularProperties() {
               className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                 activeFilter === tab
                   ? "bg-[#2C9DD5] text-white border-[#2C9DD5] shadow"
-                  : "bg-[#161616] text-[#A5AEB5] border-[#3a3a3a] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
+                  : "bg-[#FFFFFF] text-[#5B6670] border-[#D6DADD] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
               }`}
             >
               {tab}
@@ -453,7 +453,7 @@ export default function PopularProperties() {
         {ownerProperties.length === 0 && builderProperties.length === 0 && (
           <div className="mb-10">
             <SectionHeader title={`${activeFilter} Properties`} />
-            <div className="text-center py-16 text-[#A5AEB5]">
+            <div className="text-center py-16 text-[#5B6670]">
               <svg className="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
@@ -468,15 +468,15 @@ export default function PopularProperties() {
             <p className="text-white font-bold text-lg leading-tight">
               Not finding what you're looking for?
             </p>
-            <p className="text-[#A5AEB5] text-sm mt-0.5">
+            <p className="text-[#5B6670] text-sm mt-0.5">
               Talk to our property experts for personalized recommendations.
             </p>
           </div>
           <div className="flex gap-3 shrink-0">
-            <button className="bg-[#161616] text-[#2C9DD5] text-sm font-bold px-5 py-2.5 rounded-lg hover:bg-[#1e1e1e] transition shadow">
+            <button className="bg-[#FFFFFF] text-[#2C9DD5] text-sm font-bold px-5 py-2.5 rounded-lg hover:bg-[#F2F4F6] transition shadow">
               Schedule Site Visit
             </button>
-            <button className="bg-[#161616]/20 text-white text-sm font-bold px-5 py-2.5 rounded-lg hover:bg-[#161616]/30 transition border border-white/40">
+            <button className="bg-[#FFFFFF]/20 text-white text-sm font-bold px-5 py-2.5 rounded-lg hover:bg-[#FFFFFF]/30 transition border border-white/40">
               Talk to Expert
             </button>
           </div>

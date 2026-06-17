@@ -2,170 +2,274 @@ import { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 
 const banks = [
-  { id: 1,  name: "L&T Financial Services", abbr: "L&T",    bgColor: "bg-blue-900",   rate: "7.9%"  },
-  { id: 2,  name: "LIC Housing Finance",    abbr: "LIC",    bgColor: "bg-green-700",  rate: "7.8%"  },
-  { id: 3,  name: "SBI",                    abbr: "SBI",    bgColor: "bg-sky-600",    rate: "7.25%" },
-  { id: 4,  name: "Canara Bank",            abbr: "CAN",    bgColor: "bg-blue-800",   rate: "7.15%" },
-  { id: 5,  name: "Bank of Baroda",         abbr: "BoB",    bgColor: "bg-red-700",    rate: "7.2%"  },
-  { id: 6,  name: "HDFC Bank",              abbr: "HDFC",   bgColor: "bg-red-800",    rate: "7.35%" },
-  { id: 7,  name: "ICICI Bank",             abbr: "ICICI",  bgColor: "bg-orange-600", rate: "7.4%"  },
-  { id: 8,  name: "Axis Bank",              abbr: "AXIS",   bgColor: "bg-purple-700", rate: "7.5%"  },
-  { id: 9,  name: "Kotak Mahindra",         abbr: "KMB",    bgColor: "bg-red-600",    rate: "7.6%"  },
-  { id: 10, name: "Punjab National Bank",   abbr: "PNB",    bgColor: "bg-indigo-700", rate: "7.3%"  },
+  {
+    id: 1,
+    name: "L&T Financial Services",
+    logo: null,
+    abbr: "L&T",
+    bgColor: "bg-blue-900",
+    textColor: "text-white",
+    rate: "7.9%",
+  },
+  {
+    id: 2,
+    name: "LIC Housing Finance",
+    logo: null,
+    abbr: "LIC HFL",
+    bgColor: "bg-green-700",
+    textColor: "text-white",
+    rate: "7.8%",
+  },
+  {
+    id: 3,
+    name: "SBI",
+    logo: null,
+    abbr: "SBI",
+    bgColor: "bg-sky-600",
+    textColor: "text-white",
+    rate: "7.25%",
+  },
+  {
+    id: 4,
+    name: "Canara Bank",
+    logo: null,
+    abbr: "Canara",
+    bgColor: "bg-blue-800",
+    textColor: "text-white",
+    rate: "7.15%",
+  },
+  {
+    id: 5,
+    name: "Bank of Baroda",
+    logo: null,
+    abbr: "BoB",
+    bgColor: "bg-red-700",
+    textColor: "text-white",
+    rate: "7.2%",
+  },
+  {
+    id: 6,
+    name: "HDFC Bank",
+    logo: null,
+    abbr: "HDFC",
+    bgColor: "bg-red-800",
+    textColor: "text-white",
+    rate: "7.35%",
+  },
+  {
+    id: 7,
+    name: "ICICI Bank",
+    logo: null,
+    abbr: "ICICI",
+    bgColor: "bg-orange-600",
+    textColor: "text-white",
+    rate: "7.4%",
+  },
+  {
+    id: 8,
+    name: "Axis Bank",
+    logo: null,
+    abbr: "Axis",
+    bgColor: "bg-purple-700",
+    textColor: "text-white",
+    rate: "7.5%",
+  },
 ];
 
-// Duplicate banks array for seamless infinite loop
-const infiniteBanks = [...banks, ...banks, ...banks];
+// SVG logos for top banks
+const SBILogo = () => (
+  <svg viewBox="0 0 60 28" className="w-10 h-6" fill="none">
+    <circle cx="10" cy="14" r="10" fill="#1a5ca3" />
+    <path d="M5 14 Q10 7 15 14 Q10 21 5 14Z" fill="white" opacity="0.7" />
+    <text x="20" y="19" fontSize="13" fontWeight="bold" fill="#1a5ca3" fontFamily="Arial">
+      SBI
+    </text>
+  </svg>
+);
 
-const BankCard = ({ bank }) => (
-  <div className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group" style={{ minWidth: "110px" }}>
-    <div className="w-20 h-16 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-center group-hover:shadow-md group-hover:-translate-y-0.5 transition-all overflow-hidden">
-      <div className={`w-14 h-12 rounded-lg flex items-center justify-center text-white text-sm font-extrabold tracking-wide ${bank.bgColor}`}>
-        {bank.abbr}
-      </div>
-    </div>
-    <span className="text-[11px] text-gray-500 font-medium text-center leading-tight">
-      Starts at{" "}
-      <span className="text-gray-800 font-bold">{bank.rate}</span>
-    </span>
+const BankLogoFallback = ({ abbr, bgColor }) => (
+  <div
+    className={`w-10 h-10 rounded flex items-center justify-center text-white text-xs font-bold ${bgColor}`}
+  >
+    {abbr.slice(0, 3)}
   </div>
 );
 
 export default function MagicLoansSection() {
   const scrollRef = useRef(null);
-  const [isPaused, setIsPaused] = useState(false);
-  const animFrameRef = useRef(null);
-  const speedRef = useRef(0.8); // px per frame
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const autoScrollRef = useRef(null);
 
-  // Continuous smooth scroll via requestAnimationFrame
+  const checkScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  };
+
+  const scrollBy = (dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setIsAutoScrolling(false);
+    el.scrollBy({ left: dir * 180, behavior: "smooth" });
+    setTimeout(() => setIsAutoScrolling(true), 3000);
+  };
+
+  // Auto-scroll loop
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
-    const step = () => {
-      if (!isPaused) {
-        el.scrollLeft += speedRef.current;
-        // Reset to start of second copy for seamless loop
-        const oneThird = el.scrollWidth / 3;
-        if (el.scrollLeft >= oneThird * 2) {
-          el.scrollLeft -= oneThird;
-        }
+    const tick = () => {
+      if (!isAutoScrolling) return;
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+      if (atEnd) {
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: 2, behavior: "auto" });
       }
-      animFrameRef.current = requestAnimationFrame(step);
     };
 
-    animFrameRef.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, [isPaused]);
+    autoScrollRef.current = setInterval(tick, 30);
+    return () => clearInterval(autoScrollRef.current);
+  }, [isAutoScrolling]);
 
-  const manualScroll = (dir) => {
+  useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    setIsPaused(true);
-    el.scrollBy({ left: dir * 220, behavior: "smooth" });
-    setTimeout(() => setIsPaused(false), 2000);
-  };
+    el.addEventListener("scroll", checkScroll);
+    checkScroll();
+    return () => el.removeEventListener("scroll", checkScroll);
+  }, []);
 
   return (
     <div className="w-full px-4 py-4 bg-white">
+      {/* Card wrapper */}
       <div
         className="relative w-full rounded-2xl overflow-hidden border border-gray-200"
         style={{
-          background: "linear-gradient(135deg, #ffffff 0%, #f0fdf4 40%, #fef9f0 70%, #fff 100%)",
-          boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
+          background:
+            "linear-gradient(135deg, #ffffff 0%, #f0fdf4 40%, #fef9f0 70%, #fff 100%)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
         }}
       >
         {/* Decorative blobs */}
         <div
-          className="absolute top-0 right-1/3 w-48 h-48 rounded-full opacity-20 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #f87171 0%, transparent 70%)" }}
+          className="absolute top-0 right-64 w-40 h-40 rounded-full opacity-20 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle, #f87171 0%, transparent 70%)",
+          }}
         />
         <div
-          className="absolute bottom-0 right-1/2 w-36 h-36 rounded-full opacity-15 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #86efac 0%, transparent 70%)" }}
+          className="absolute bottom-0 right-80 w-32 h-32 rounded-full opacity-15 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle, #86efac 0%, transparent 70%)",
+          }}
         />
 
         <div className="flex items-stretch">
-          {/* ── Left content ── */}
+          {/* Left content */}
           <div className="flex-1 px-6 py-5 flex flex-col justify-between min-w-0">
-
             {/* Brand */}
             <div>
-              <div className="flex items-center gap-0.5 mb-2">
-                <span className="text-[#e8303a] font-bold text-xl tracking-tight leading-none">magic</span>
-                <span className="font-bold text-xl tracking-tight leading-none text-gray-900">
+              <div className="flex items-center gap-1 mb-2">
+                <span className="text-[#e8303a] font-bold text-lg tracking-tight leading-none">
+                  magic
+                </span>
+                <span
+                  className="font-bold text-lg tracking-tight leading-none"
+                  style={{ color: "#222" }}
+                >
                   L
                   <span
-                    className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full mx-0.5 align-middle"
-                    style={{ background: "#e8303a", marginBottom: "2px" }}
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full mx-0.5 align-middle"
+                    style={{ background: "#e8303a", marginBottom: "1px" }}
                   >
-                    <span className="text-white font-black text-[10px]">O</span>
+                    <span className="text-white font-bold text-[9px]">O</span>
                   </span>
                   ans
                 </span>
               </div>
 
+              {/* Headline */}
               <h2 className="text-gray-900 font-bold text-lg leading-snug mb-2">
                 Compare Home Loan Offers from 40+ Banks
               </h2>
 
+              {/* Badges */}
               <div className="flex flex-wrap gap-4 mb-4">
                 <div className="flex items-center gap-1.5 text-sm text-gray-700">
-                  <CheckCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span>Rates starting from <span className="font-bold text-gray-900">7.1%</span></span>
+                  <CheckCircle className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                  <span>
+                    Rates starting from{" "}
+                    <span className="font-bold text-gray-900">7.1%</span>
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-sm text-gray-700">
-                  <CheckCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span><span className="font-bold text-[#e8303a]">0%*</span> Processing Fee</span>
+                  <CheckCircle className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                  <span>
+                    <span className="font-bold text-[#e8303a]">0%*</span>{" "}
+                    Processing Fee
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Bank slider */}
             <div>
-              <p className="text-[10px] font-semibold text-[#e8303a] tracking-widest uppercase mb-3">
+              <p className="text-[10px] font-semibold text-[#e8303a] tracking-widest uppercase mb-2">
                 Our Banking Partners
               </p>
 
-              <div className="relative flex items-center gap-2">
+              <div className="relative flex items-center">
                 {/* Left arrow */}
                 <button
-                  onClick={() => manualScroll(-1)}
-                  className="flex-shrink-0 w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center shadow-sm hover:bg-gray-50 hover:shadow-md transition-all z-10"
+                  onClick={() => scrollBy(-1)}
+                  disabled={!canScrollLeft}
+                  className="flex-shrink-0 w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center mr-2 shadow-sm transition disabled:opacity-30 hover:bg-gray-50 z-10"
                   aria-label="Scroll left"
                 >
                   <ChevronLeft className="w-4 h-4 text-gray-500" />
                 </button>
 
-                {/* Scrollable track — overflow hidden so no scrollbar shows */}
+                {/* Scrollable bank cards */}
                 <div
                   ref={scrollRef}
-                  className="flex gap-4 overflow-x-hidden flex-1"
+                  className="flex gap-3 overflow-x-auto scrollbar-hide flex-1"
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                  onMouseEnter={() => setIsPaused(true)}
-                  onMouseLeave={() => setIsPaused(false)}
-                  onTouchStart={() => setIsPaused(true)}
-                  onTouchEnd={() => setTimeout(() => setIsPaused(false), 1500)}
+                  onMouseEnter={() => setIsAutoScrolling(false)}
+                  onMouseLeave={() => setIsAutoScrolling(true)}
                 >
-                  {infiniteBanks.map((bank, i) => (
-                    <BankCard key={`${bank.id}-${i}`} bank={bank} />
+                  {banks.map((bank) => (
+                    <div
+                      key={bank.id}
+                      className="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer group"
+                      style={{ minWidth: "80px" }}
+                    >
+                      <div className="w-16 h-10 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center justify-center group-hover:shadow-md transition-shadow overflow-hidden px-1">
+                        <BankLogoFallback abbr={bank.abbr} bgColor={bank.bgColor} />
+                      </div>
+                      <span className="text-[11px] text-gray-600 font-medium">
+                        Starts at{" "}
+                        <span className="text-gray-800 font-semibold">
+                          {bank.rate}
+                        </span>
+                      </span>
+                    </div>
                   ))}
                 </div>
 
                 {/* Right arrow */}
                 <button
-                  onClick={() => manualScroll(1)}
-                  className="flex-shrink-0 w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center shadow-sm hover:bg-gray-50 hover:shadow-md transition-all z-10"
+                  onClick={() => scrollBy(1)}
+                  disabled={!canScrollRight}
+                  className="flex-shrink-0 w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center ml-2 shadow-sm transition disabled:opacity-30 hover:bg-gray-50 z-10"
                   aria-label="Scroll right"
                 >
                   <ChevronRight className="w-4 h-4 text-gray-500" />
                 </button>
-
-                {/* Fade edges */}
-                <div className="absolute left-10 top-0 h-full w-8 pointer-events-none z-10"
-                  style={{ background: "linear-gradient(to right, rgba(255,255,255,0.9), transparent)" }} />
-                <div className="absolute right-10 top-0 h-full w-8 pointer-events-none z-10"
-                  style={{ background: "linear-gradient(to left, rgba(255,255,255,0.9), transparent)" }} />
               </div>
             </div>
 
@@ -178,7 +282,7 @@ export default function MagicLoansSection() {
                 Explore Bank Offers <span aria-hidden>→</span>
               </a>
               <button
-                className="px-6 py-2.5 rounded-full text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+                className="px-5 py-2.5 rounded-full text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 style={{
                   background: "linear-gradient(135deg, #e8303a, #c0202a)",
                   boxShadow: "0 4px 14px rgba(232,48,58,0.4)",
@@ -189,32 +293,45 @@ export default function MagicLoansSection() {
             </div>
           </div>
 
-          {/* ── Right illustration ── */}
-          <div className="hidden sm:flex items-end justify-center w-48 flex-shrink-0 relative pr-2 pb-0">
-            <svg viewBox="0 0 160 160" className="w-44 h-44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Right illustration */}
+          <div className="hidden sm:flex items-end justify-center w-48 flex-shrink-0 relative pr-4 pb-0">
+            {/* Hand + House SVG illustration */}
+            <svg
+              viewBox="0 0 160 160"
+              className="w-44 h-44"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               {/* House body */}
               <rect x="30" y="80" width="80" height="55" rx="3" fill="#d1d5db" />
               {/* Roof */}
               <polygon points="22,82 70,40 118,82" fill="#9ca3af" />
               {/* Door */}
               <rect x="57" y="108" width="18" height="27" rx="2" fill="#6b7280" />
+              {/* Door knob */}
               <circle cx="72" cy="123" r="2" fill="#d1d5db" />
               {/* Windows */}
               <rect x="35" y="90" width="20" height="14" rx="2" fill="#bfdbfe" />
               <rect x="84" y="90" width="20" height="14" rx="2" fill="#bfdbfe" />
+              {/* Window cross */}
               <line x1="45" y1="90" x2="45" y2="104" stroke="white" strokeWidth="1" />
               <line x1="35" y1="97" x2="55" y2="97" stroke="white" strokeWidth="1" />
               <line x1="94" y1="90" x2="94" y2="104" stroke="white" strokeWidth="1" />
               <line x1="84" y1="97" x2="104" y2="97" stroke="white" strokeWidth="1" />
               {/* Chimney */}
               <rect x="85" y="50" width="12" height="20" rx="2" fill="#9ca3af" />
-              {/* Hand */}
+
+              {/* Hand coming from top right */}
               <g transform="translate(88, 10) rotate(15)">
+                {/* Palm */}
                 <rect x="0" y="30" width="28" height="28" rx="6" fill="#f5cba7" />
+                {/* Fingers */}
                 <rect x="2" y="10" width="7" height="26" rx="4" fill="#f5cba7" />
                 <rect x="11" y="4" width="7" height="30" rx="4" fill="#f5cba7" />
                 <rect x="20" y="8" width="7" height="26" rx="4" fill="#f5cba7" />
+                {/* Thumb */}
                 <rect x="-7" y="32" width="10" height="18" rx="5" fill="#f5cba7" />
+                {/* Fingernails */}
                 <rect x="3" y="11" width="5" height="6" rx="3" fill="#fde8d8" />
                 <rect x="12" y="5" width="5" height="6" rx="3" fill="#fde8d8" />
                 <rect x="21" y="9" width="5" height="6" rx="3" fill="#fde8d8" />
@@ -223,6 +340,10 @@ export default function MagicLoansSection() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+      `}</style>
     </div>
   );
 }

@@ -198,10 +198,10 @@ function Stars({ rating, size = "sm" }) {
 function TestimonialCard({ t, featured = false }) {
   return (
     <div
-      className={`bg-[#161616] rounded-2xl border transition-shadow duration-200 flex flex-col h-full ${
+      className={`bg-[#FFFFFF] rounded-2xl border transition-shadow duration-200 flex flex-col h-full ${
         featured
           ? "border-[#2C9DD5]/30 shadow-lg ring-1 ring-[#2C9DD5]/10"
-          : "border-[#2a2a2a] hover:shadow-lg hover:border-[#3a3a3a]"
+          : "border-[#E5E8EB] hover:shadow-lg hover:border-[#D6DADD]"
       }`}
     >
       {/* Quote mark */}
@@ -209,14 +209,14 @@ function TestimonialCard({ t, featured = false }) {
         <svg className="w-8 h-8 text-[#2C9DD5]/20 fill-current mb-2" viewBox="0 0 32 32">
           <path d="M10 8C6.686 8 4 10.686 4 14v10h10V14H7.8C7.8 11.9 9.5 10.2 11.6 10.2L10 8zm14 0c-3.314 0-6 2.686-6 6v10h10V14h-6.2c0-2.1 1.7-3.8 3.8-3.8L24 8z" />
         </svg>
-        <p className={`text-sm text-[#A5AEB5] leading-relaxed ${featured ? "text-[#EDEFF2]" : ""}`}>
+        <p className={`text-sm text-[#5B6670] leading-relaxed ${featured ? "text-[#1F242A]" : ""}`}>
           "{t.text}"
         </p>
       </div>
 
       {/* Property tag */}
       <div className="px-5 pt-3">
-        <span className="inline-flex items-center gap-1 text-[10px] bg-[#1e1e1e] text-[#A5AEB5] px-2.5 py-1 rounded-full font-medium">
+        <span className="inline-flex items-center gap-1 text-[10px] bg-[#F2F4F6] text-[#5B6670] px-2.5 py-1 rounded-full font-medium">
           <svg className="w-3 h-3 text-[#2C9DD5]" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
@@ -225,26 +225,26 @@ function TestimonialCard({ t, featured = false }) {
       </div>
 
       {/* Footer */}
-      <div className="mt-auto px-5 py-4 border-t border-[#2a2a2a] flex items-center justify-between gap-3">
+      <div className="mt-auto px-5 py-4 border-t border-[#E5E8EB] flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.avatarBg} flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm`}>
             {t.avatar}
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <p className="text-sm font-bold text-[#F2F4F5]">{t.name}</p>
+              <p className="text-sm font-bold text-[#15191C]">{t.name}</p>
               {t.verified && (
                 <svg className="w-3.5 h-3.5 text-blue-500 fill-blue-500" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               )}
             </div>
-            <p className="text-[11px] text-[#A5AEB5]">{t.role} · {t.location}</p>
+            <p className="text-[11px] text-[#5B6670]">{t.role} · {t.location}</p>
           </div>
         </div>
         <div className="text-right shrink-0">
           <Stars rating={t.rating} />
-          <p className="text-[10px] text-[#A5AEB5] mt-0.5">{t.date}</p>
+          <p className="text-[10px] text-[#5B6670] mt-0.5">{t.date}</p>
         </div>
       </div>
     </div>
@@ -274,7 +274,7 @@ export default function Testimonials() {
   }, [activeFilter]);
 
   return (
-    <section className="bg-[#161616] py-12 px-4">
+    <section className="bg-[#FFFFFF] py-12 px-4">
       <div className="max-w-7xl mx-auto space-y-12">
 
         {/* ── Stats Counter ── */}
@@ -283,7 +283,7 @@ export default function Testimonials() {
             <h2 className="text-2xl font-extrabold text-white">
               Trusted by Thousands Across India
             </h2>
-            <p className="text-[#A5AEB5] text-sm mt-1">
+            <p className="text-[#5B6670] text-sm mt-1">
               Numbers that reflect our commitment to excellence
             </p>
           </div>
@@ -294,7 +294,7 @@ export default function Testimonials() {
                 <div className="text-3xl font-extrabold text-white tracking-tight">
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="text-[#A5AEB5] text-sm mt-1 font-medium">{stat.label}</div>
+                <div className="text-[#5B6670] text-sm mt-1 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -305,16 +305,16 @@ export default function Testimonials() {
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold text-[#F2F4F5]">What Our Clients Say</h2>
+              <h2 className="text-xl font-bold text-[#15191C]">What Our Clients Say</h2>
               <div className="w-10 h-0.5 bg-[#2C9DD5] rounded-full mt-1" />
-              <p className="text-[#A5AEB5] text-sm mt-1">Real stories from real people</p>
+              <p className="text-[#5B6670] text-sm mt-1">Real stories from real people</p>
             </div>
-            <div className="flex items-center gap-1.5 bg-[#1e1e1e] border border-[#3a2a00] px-3 py-1.5 rounded-full">
+            <div className="flex items-center gap-1.5 bg-[#F2F4F6] border border-[#3a2a00] px-3 py-1.5 rounded-full">
               <svg className="w-4 h-4 text-[#E87C02] fill-[#E87C02]" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <span className="text-sm font-bold text-[#F2F4F5]">4.9</span>
-              <span className="text-xs text-[#A5AEB5]">/ 5 · 1200+ reviews</span>
+              <span className="text-sm font-bold text-[#15191C]">4.9</span>
+              <span className="text-xs text-[#5B6670]">/ 5 · 1200+ reviews</span>
             </div>
           </div>
 
@@ -327,7 +327,7 @@ export default function Testimonials() {
                 className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                   activeFilter === f
                     ? "bg-[#2C9DD5] text-white border-[#2C9DD5] shadow-sm"
-                    : "bg-[#161616] text-[#A5AEB5] border-[#2a2a2a] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
+                    : "bg-[#FFFFFF] text-[#5B6670] border-[#E5E8EB] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
                 }`}
               >
                 {f}
@@ -368,15 +368,15 @@ export default function Testimonials() {
         </div>
 
         {/* ── Partner Logos ── */}
-        <div className="border-t border-[#2a2a2a] pt-10">
-          <p className="text-center text-sm font-semibold text-[#A5AEB5] uppercase tracking-widest mb-6">
+        <div className="border-t border-[#E5E8EB] pt-10">
+          <p className="text-center text-sm font-semibold text-[#5B6670] uppercase tracking-widest mb-6">
             Our Trusted Partners & Accreditations
           </p>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
             {PARTNER_LOGOS.map((logo) => (
               <div
                 key={logo.name}
-                className="flex items-center justify-center rounded-xl border border-[#2a2a2a] py-4 px-2 hover:shadow-md transition cursor-pointer"
+                className="flex items-center justify-center rounded-xl border border-[#E5E8EB] py-4 px-2 hover:shadow-md transition cursor-pointer"
                 style={{ background: logo.bg }}
               >
                 <span
@@ -392,14 +392,14 @@ export default function Testimonials() {
 
         {/* ── CTA ── */}
         <div className="text-center py-6">
-          <p className="text-[#A5AEB5] text-sm mb-4">
+          <p className="text-[#5B6670] text-sm mb-4">
             Join thousands of happy clients who found their dream property with us
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <button className="bg-[#BA0D0B] text-white font-bold px-6 py-3 rounded-lg hover:bg-[#5C0B03] transition shadow-sm">
               Explore Properties
             </button>
-            <button className="bg-[#161616] text-[#2C9DD5] font-bold px-6 py-3 rounded-lg border-2 border-[#2C9DD5] hover:bg-[#1a0a0a] transition">
+            <button className="bg-[#FFFFFF] text-[#2C9DD5] font-bold px-6 py-3 rounded-lg border-2 border-[#2C9DD5] hover:bg-[#1a0a0a] transition">
               Talk to an Expert
             </button>
           </div>
