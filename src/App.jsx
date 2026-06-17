@@ -1,15 +1,15 @@
 import { useState } from "react";
-import Navbar from "./components/common/Navbar";
-import Hero from "./components/home/Hero";
-import PopularProperties from "./components/home/PopularProperties";
-import PreferredAgents from "./components/home/PreferredAgents";
-import InvestmentAdvisory from "./components/home/InvestmentAdvisory";
-import BlogInsights from "./components/home/BlogInsights";
-import Testimonials from "./components/home/Testimonials";
-import ChannelPartner from "./components/home/ChannelPartner";
-import PropertyManagement from "./components/home/PropertyManagement";
-import SearchResults from "./components/home/SearchResults";
-import Footer from "./components/home/Footer";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import PopularProperties from "./components/PopularProperties";
+import PreferredAgents from "./components/PreferredAgents";
+import InvestmentAdvisory from "./components/InvestmentAdvisory";
+import BlogInsights from "./components/BlogInsights";
+import Testimonials from "./components/Testimonials";
+import ChannelPartner from "./components/ChannelPartner";
+import PropertyManagement from "./components/PropertyManagement";
+import SearchResults from "./components/SearchResults";
+import Footer from "./components/Footer";
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"
