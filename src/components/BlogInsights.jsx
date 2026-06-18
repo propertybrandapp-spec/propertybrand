@@ -56,7 +56,7 @@ const BLOG_POSTS = [
   {
     id: 3,
     category: "Home & Lifestyle",
-    categoryColor: "bg-[#FDF1E5]0",
+    categoryColor: "bg-[#E87C02]",
     title: "Vastu Tips for Your New Home: A Practical 2025 Guide",
     excerpt: "Modern Vastu principles that work with contemporary architecture for positivity and prosperity.",
     author: "Sunita Nair",
@@ -143,7 +143,7 @@ const NEWS_ITEMS = [
   {
     id: 5,
     tag: "Rates",
-    tagColor: "bg-[#1a0a0a] text-[#BA0D0B]",
+    tagColor: "bg-[#FCEAEA] text-[#BA0D0B]",
     headline: "RBI holds repo rate; home loan EMIs to remain stable in Q2 2025",
     time: "3 days ago",
     source: "RBI",
@@ -181,7 +181,7 @@ function BlogCard({ post }) {
           className="absolute top-3 right-3 w-7 h-7 rounded-full bg-[#FFFFFF]/90 flex items-center justify-center hover:scale-110 transition"
         >
           <svg
-            className={`w-3.5 h-3.5 ${bookmarked ? "fill-[#2C9DD5] text-[#2C9DD5]" : "fill-none text-[#5B6670]"}`}
+            className={`w-3.5 h-3.5 ${bookmarked ? "fill-[#2C9DD5] text-[#2C9DD5]" : "fill-none text-[#495057]"}`}
             stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -194,14 +194,14 @@ function BlogCard({ post }) {
         <h3 className="text-sm font-bold text-[#15191C] leading-snug mb-2 group-hover:text-[#2C9DD5] transition-colors line-clamp-2">
           {post.title}
         </h3>
-        <p className="text-xs text-[#5B6670] leading-relaxed mb-3 line-clamp-2 flex-1">
+        <p className="text-xs text-[#495057] leading-relaxed mb-3 line-clamp-2 flex-1">
           {post.excerpt}
         </p>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1.5 mb-3">
           {post.tags.slice(0, 2).map((tag) => (
-            <span key={tag} className="text-[10px] bg-[#F2F4F6] text-[#5B6670] px-2 py-0.5 rounded-full font-medium">
+            <span key={tag} className="text-[10px] bg-[#F2F4F6] text-[#495057] px-2 py-0.5 rounded-full font-medium">
               #{tag}
             </span>
           ))}
@@ -213,9 +213,9 @@ function BlogCard({ post }) {
             <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#2C9DD5] to-[#BA0D0B] flex items-center justify-center text-white text-[8px] font-bold">
               {post.author.charAt(0)}
             </div>
-            <span className="text-[10px] text-[#5B6670] font-medium">{post.author}</span>
+            <span className="text-[10px] text-[#495057] font-medium">{post.author}</span>
           </div>
-          <div className="flex items-center gap-2 text-[10px] text-[#5B6670]">
+          <div className="flex items-center gap-2 text-[10px] text-[#495057]">
             <span className="flex items-center gap-0.5">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -253,14 +253,14 @@ function FeaturedArticle({ article }) {
           <span className={`${article.categoryColor} text-white text-[10px] font-bold px-2.5 py-1 rounded-full`}>
             {article.category}
           </span>
-          <span className="text-[#5B6670] text-[10px]">{article.date}</span>
-          <span className="text-[#5B6670] text-[10px]">·</span>
-          <span className="text-[#5B6670] text-[10px]">{article.readTime}</span>
+          <span className="text-[#495057] text-[10px]">{article.date}</span>
+          <span className="text-[#495057] text-[10px]">·</span>
+          <span className="text-[#495057] text-[10px]">{article.readTime}</span>
         </div>
         <h2 className="text-white text-lg font-extrabold leading-snug mb-2 line-clamp-2 group-hover:text-[#E87C02] transition-colors">
           {article.title}
         </h2>
-        <p className="text-[#5B6670] text-xs leading-relaxed line-clamp-2 mb-3">
+        <p className="text-[#495057] text-xs leading-relaxed line-clamp-2 mb-3">
           {article.excerpt}
         </p>
         <div className="flex items-center justify-between">
@@ -270,7 +270,7 @@ function FeaturedArticle({ article }) {
             </div>
             <div>
               <p className="text-white text-[11px] font-semibold">{article.author}</p>
-              <p className="text-[#5B6670] text-[10px]">{article.authorRole}</p>
+              <p className="text-[#495057] text-[10px]">{article.authorRole}</p>
             </div>
           </div>
           <button className="flex items-center gap-1.5 bg-[#FFFFFF]/10 hover:bg-[#FFFFFF]/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/30 transition">
@@ -311,9 +311,9 @@ function NewsFeed() {
                   {item.headline}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] text-[#5B6670]">{item.time}</span>
-                  <span className="text-[#5B6670] text-[10px]">·</span>
-                  <span className="text-[10px] text-[#5B6670] font-medium">{item.source}</span>
+                  <span className="text-[10px] text-[#495057]">{item.time}</span>
+                  <span className="text-[#495057] text-[10px]">·</span>
+                  <span className="text-[10px] text-[#495057] font-medium">{item.source}</span>
                 </div>
               </div>
             </div>
@@ -359,7 +359,7 @@ export default function BlogInsights() {
               Latest Insights & Trends
             </h2>
             <div className="w-10 h-0.5 bg-[#2C9DD5] rounded-full mt-1" />
-            <p className="text-[#5B6670] text-sm mt-1">
+            <p className="text-[#495057] text-sm mt-1">
               Stay updated with real estate news, guides & market intelligence
             </p>
           </div>
@@ -380,7 +380,7 @@ export default function BlogInsights() {
               className={`shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                 activeCategory === cat.label
                   ? "bg-[#2C9DD5] text-white border-[#2C9DD5] shadow-sm"
-                  : "bg-[#FFFFFF] text-[#5B6670] border-[#E5E8EB] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
+                  : "bg-[#FFFFFF] text-[#495057] border-[#E5E8EB] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
               }`}
             >
               <span>{cat.icon}</span>
@@ -407,7 +407,7 @@ export default function BlogInsights() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-16 text-[#5B6670]">
+          <div className="text-center py-16 text-[#495057]">
             <p className="text-4xl mb-3">📭</p>
             <p className="text-sm font-medium">No articles in this category yet.</p>
           </div>
@@ -423,13 +423,13 @@ export default function BlogInsights() {
               <a
                 key={g.label}
                 href={g.link}
-                className="flex items-center gap-3 p-3 rounded-xl border border-[#E5E8EB] hover:border-[#2C9DD5] hover:bg-[#1a0a0a] transition group"
+                className="flex items-center gap-3 p-3 rounded-xl border border-[#E5E8EB] hover:border-[#2C9DD5] hover:bg-[#EAF4FB] transition group"
               >
                 <span className="text-xl shrink-0">{g.icon}</span>
                 <span className="text-sm font-semibold text-[#1F242A] group-hover:text-[#2C9DD5] transition leading-snug">
                   {g.label}
                 </span>
-                <svg className="w-4 h-4 text-[#5B6670] group-hover:text-[#2C9DD5] ml-auto shrink-0 transition" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[#495057] group-hover:text-[#2C9DD5] ml-auto shrink-0 transition" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </a>
@@ -443,7 +443,7 @@ export default function BlogInsights() {
             <p className="text-white font-extrabold text-xl leading-tight mb-1">
               Stay Ahead of the Market
             </p>
-            <p className="text-[#5B6670] text-sm">
+            <p className="text-[#495057] text-sm">
               Get weekly insights on property trends, investment opportunities & new project launches — straight to your inbox.
             </p>
           </div>
@@ -451,7 +451,7 @@ export default function BlogInsights() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 md:w-64 text-sm border-0 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2C9DD5]/50 bg-[#FFFFFF]/20 text-white placeholder-[#5B6670]"
+              className="flex-1 md:w-64 text-sm border-0 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2C9DD5]/50 bg-[#FFFFFF]/20 text-white placeholder-[#495057]"
             />
             <button className="bg-[#FFFFFF] text-[#2C9DD5] text-sm font-bold px-5 py-3 rounded-lg hover:bg-[#F2F4F6] transition shrink-0 shadow">
               Subscribe

@@ -32,15 +32,16 @@ export default function App() {
 
       {/* ── Dev nav strip (remove in production) ── */}
       <div
-        className="flex items-center gap-2 px-4 py-2 overflow-x-auto"
+        className="px-4 py-2.5 overflow-x-auto"
         style={{
           background: "#FFFFFF",
           borderBottom: "1px solid #E5E8EB",
           scrollbarWidth: "none",
         }}
       >
+        <div className="max-w-7xl mx-auto flex items-center gap-2.5">
         <span
-          className="text-[10px] font-bold uppercase tracking-widest shrink-0"
+          className="text-[11px] font-bold uppercase tracking-widest shrink-0"
           style={{ color: "#5B6670" }}
         >
           Pages:
@@ -54,16 +55,17 @@ export default function App() {
           <button
             key={p.id}
             onClick={() => navigate(p.id)}
-            className="shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+            className="shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all"
             style={{
               background: page === p.id ? "#2C9DD5" : "transparent",
-              color: page === p.id ? "#15191C" : "#5B6670",
+              color: page === p.id ? "#FFFFFF" : "#15191C",
               border: `1px solid ${page === p.id ? "#2C9DD5" : "#E5E8EB"}`,
             }}
           >
             {p.label}
           </button>
         ))}
+        </div>
       </div>
 
       {/* ── Page rendering ── */}

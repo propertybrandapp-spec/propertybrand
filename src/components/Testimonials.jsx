@@ -209,14 +209,14 @@ function TestimonialCard({ t, featured = false }) {
         <svg className="w-8 h-8 text-[#2C9DD5]/20 fill-current mb-2" viewBox="0 0 32 32">
           <path d="M10 8C6.686 8 4 10.686 4 14v10h10V14H7.8C7.8 11.9 9.5 10.2 11.6 10.2L10 8zm14 0c-3.314 0-6 2.686-6 6v10h10V14h-6.2c0-2.1 1.7-3.8 3.8-3.8L24 8z" />
         </svg>
-        <p className={`text-sm text-[#5B6670] leading-relaxed ${featured ? "text-[#1F242A]" : ""}`}>
+        <p className={`text-sm text-[#495057] leading-relaxed ${featured ? "text-[#1F242A]" : ""}`}>
           "{t.text}"
         </p>
       </div>
 
       {/* Property tag */}
       <div className="px-5 pt-3">
-        <span className="inline-flex items-center gap-1 text-[10px] bg-[#F2F4F6] text-[#5B6670] px-2.5 py-1 rounded-full font-medium">
+        <span className="inline-flex items-center gap-1 text-[10px] bg-[#F2F4F6] text-[#495057] px-2.5 py-1 rounded-full font-medium">
           <svg className="w-3 h-3 text-[#2C9DD5]" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
@@ -239,12 +239,12 @@ function TestimonialCard({ t, featured = false }) {
                 </svg>
               )}
             </div>
-            <p className="text-[11px] text-[#5B6670]">{t.role} · {t.location}</p>
+            <p className="text-[11px] text-[#495057]">{t.role} · {t.location}</p>
           </div>
         </div>
         <div className="text-right shrink-0">
           <Stars rating={t.rating} />
-          <p className="text-[10px] text-[#5B6670] mt-0.5">{t.date}</p>
+          <p className="text-[10px] text-[#495057] mt-0.5">{t.date}</p>
         </div>
       </div>
     </div>
@@ -283,7 +283,7 @@ export default function Testimonials() {
             <h2 className="text-2xl font-extrabold text-white">
               Trusted by Thousands Across India
             </h2>
-            <p className="text-[#5B6670] text-sm mt-1">
+            <p className="text-[#495057] text-sm mt-1">
               Numbers that reflect our commitment to excellence
             </p>
           </div>
@@ -294,7 +294,7 @@ export default function Testimonials() {
                 <div className="text-3xl font-extrabold text-white tracking-tight">
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                 </div>
-                <div className="text-[#5B6670] text-sm mt-1 font-medium">{stat.label}</div>
+                <div className="text-[#495057] text-sm mt-1 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -307,14 +307,14 @@ export default function Testimonials() {
             <div>
               <h2 className="text-xl font-bold text-[#15191C]">What Our Clients Say</h2>
               <div className="w-10 h-0.5 bg-[#2C9DD5] rounded-full mt-1" />
-              <p className="text-[#5B6670] text-sm mt-1">Real stories from real people</p>
+              <p className="text-[#495057] text-sm mt-1">Real stories from real people</p>
             </div>
             <div className="flex items-center gap-1.5 bg-[#F2F4F6] border border-[#3a2a00] px-3 py-1.5 rounded-full">
               <svg className="w-4 h-4 text-[#E87C02] fill-[#E87C02]" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
               <span className="text-sm font-bold text-[#15191C]">4.9</span>
-              <span className="text-xs text-[#5B6670]">/ 5 · 1200+ reviews</span>
+              <span className="text-xs text-[#495057]">/ 5 · 1200+ reviews</span>
             </div>
           </div>
 
@@ -327,7 +327,7 @@ export default function Testimonials() {
                 className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                   activeFilter === f
                     ? "bg-[#2C9DD5] text-white border-[#2C9DD5] shadow-sm"
-                    : "bg-[#FFFFFF] text-[#5B6670] border-[#E5E8EB] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
+                    : "bg-[#FFFFFF] text-[#495057] border-[#E5E8EB] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
                 }`}
               >
                 {f}
@@ -369,7 +369,7 @@ export default function Testimonials() {
 
         {/* ── Partner Logos ── */}
         <div className="border-t border-[#E5E8EB] pt-10">
-          <p className="text-center text-sm font-semibold text-[#5B6670] uppercase tracking-widest mb-6">
+          <p className="text-center text-sm font-semibold text-[#495057] uppercase tracking-widest mb-6">
             Our Trusted Partners & Accreditations
           </p>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
@@ -392,14 +392,14 @@ export default function Testimonials() {
 
         {/* ── CTA ── */}
         <div className="text-center py-6">
-          <p className="text-[#5B6670] text-sm mb-4">
+          <p className="text-[#495057] text-sm mb-4">
             Join thousands of happy clients who found their dream property with us
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <button className="bg-[#BA0D0B] text-white font-bold px-6 py-3 rounded-lg hover:bg-[#5C0B03] transition shadow-sm">
               Explore Properties
             </button>
-            <button className="bg-[#FFFFFF] text-[#2C9DD5] font-bold px-6 py-3 rounded-lg border-2 border-[#2C9DD5] hover:bg-[#1a0a0a] transition">
+            <button className="bg-[#FFFFFF] text-[#2C9DD5] font-bold px-6 py-3 rounded-lg border-2 border-[#2C9DD5] hover:bg-[#EAF4FB] transition">
               Talk to an Expert
             </button>
           </div>

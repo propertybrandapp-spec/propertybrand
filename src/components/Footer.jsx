@@ -139,8 +139,8 @@ function QuickInquiry() {
           </svg>
         </div>
         <p className="text-white font-bold text-base mb-1">Inquiry Submitted!</p>
-        <p className="text-[#5B6670] text-sm">Our expert will call you within 24 hours.</p>
-        <button onClick={() => setSubmitted(false)} className="mt-4 text-xs text-[#5B6670] hover:text-white underline">
+        <p className="text-[#495057] text-sm">Our expert will call you within 24 hours.</p>
+        <button onClick={() => setSubmitted(false)} className="mt-4 text-xs text-[#495057] hover:text-white underline">
           Submit another
         </button>
       </div>
@@ -160,7 +160,7 @@ function QuickInquiry() {
           placeholder={field.placeholder}
           value={form[field.key]}
           onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
-          className="w-full bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#5B6670] focus:outline-none focus:border-white/60 transition"
+          className="w-full bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#495057] focus:outline-none focus:border-white/60 transition"
         />
       ))}
       <select
@@ -180,14 +180,14 @@ function QuickInquiry() {
           placeholder="Preferred Location"
           value={form.location}
           onChange={(e) => setForm({ ...form, location: e.target.value })}
-          className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#5B6670] focus:outline-none focus:border-white/60 transition"
+          className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#495057] focus:outline-none focus:border-white/60 transition"
         />
         <input
           type="text"
           placeholder="Budget"
           value={form.budget}
           onChange={(e) => setForm({ ...form, budget: e.target.value })}
-          className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#5B6670] focus:outline-none focus:border-white/60 transition"
+          className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#495057] focus:outline-none focus:border-white/60 transition"
         />
       </div>
       <button
@@ -212,7 +212,7 @@ export default function Footer() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
             {/* Left – Contact info */}
             <div>
-              <span className="text-[#5B6670] text-xs font-bold uppercase tracking-widest mb-2 block">
+              <span className="text-[#495057] text-xs font-bold uppercase tracking-widest mb-2 block">
                 Get in Touch
               </span>
               <h2 className="text-white text-2xl font-extrabold leading-tight mb-6">
@@ -263,7 +263,7 @@ export default function Footer() {
                       {item.icon}
                     </div>
                     <div>
-                      <p className="text-[#5B6670] text-[10px] font-bold uppercase tracking-wider">{item.label}</p>
+                      <p className="text-[#495057] text-[10px] font-bold uppercase tracking-wider">{item.label}</p>
                       <p className="text-white text-sm font-medium mt-0.5">{item.value}</p>
                     </div>
                   </div>
@@ -272,7 +272,7 @@ export default function Footer() {
 
               {/* Social Icons */}
               <div className="mt-6">
-                <p className="text-[#5B6670] text-xs font-bold uppercase tracking-widest mb-3">Follow Us</p>
+                <p className="text-[#495057] text-xs font-bold uppercase tracking-widest mb-3">Follow Us</p>
                 <div className="flex items-center gap-2">
                   {SOCIAL_LINKS.map((s) => (
                     <a
@@ -290,7 +290,7 @@ export default function Footer() {
 
             {/* Right – Quick Inquiry Form */}
             <div>
-              <p className="text-[#5B6670] text-xs font-bold uppercase tracking-widest mb-2">
+              <p className="text-[#495057] text-xs font-bold uppercase tracking-widest mb-2">
                 Quick Inquiry
               </p>
               <h3 className="text-white font-bold text-lg mb-4">Tell us what you're looking for</h3>
@@ -309,7 +309,7 @@ export default function Footer() {
               <div className="text-white font-extrabold text-xl tracking-tight mb-3">
                 property<span className="text-[#E87C02]">Brands</span>
               </div>
-              <p className="text-[#5B6670] text-xs leading-relaxed mb-4">
+              <p className="text-[#495057] text-xs leading-relaxed mb-4">
                 A next-generation PropTech company offering end-to-end real estate solutions across residential, commercial, investment advisory, and property management.
               </p>
               <div className="flex items-center gap-1.5 bg-[#2C9DD5]/20 border border-[#2C9DD5]/30 rounded-lg px-3 py-2 w-fit">
@@ -332,9 +332,9 @@ export default function Footer() {
                     <li key={link.label}>
                       <a
                         href={link.href}
-                        className="text-[#5B6670] text-xs hover:text-white transition flex items-center gap-1 group"
+                        className="text-[#495057] text-xs hover:text-white transition flex items-center gap-1 group"
                       >
-                        <svg className="w-2.5 h-2.5 text-[#5B6670] group-hover:text-[#2C9DD5] transition shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                        <svg className="w-2.5 h-2.5 text-[#495057] group-hover:text-[#2C9DD5] transition shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                         </svg>
                         {link.label}
@@ -349,10 +349,10 @@ export default function Footer() {
           {/* Quick Links strip */}
           <div className="border-t border-gray-800 pt-6 pb-4">
             <div className="flex flex-wrap items-center gap-1 mb-2">
-              <span className="text-[#5B6670] text-xs font-semibold mr-1">Quick Links:</span>
+              <span className="text-[#495057] text-xs font-semibold mr-1">Quick Links:</span>
               {QUICK_LINKS.map((l, i) => (
                 <span key={l.label} className="flex items-center gap-1">
-                  <a href={l.href} className="text-[#5B6670] text-xs hover:text-white transition">{l.label}</a>
+                  <a href={l.href} className="text-[#495057] text-xs hover:text-white transition">{l.label}</a>
                   {i < QUICK_LINKS.length - 1 && <span className="text-[#1F242A] text-xs">·</span>}
                 </span>
               ))}
@@ -364,13 +364,13 @@ export default function Footer() {
       {/* ── Bottom Bar ── */}
       <div className="bg-[#FFFFFF] px-4 py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[#5B6670] text-xs text-center sm:text-left">
+          <p className="text-[#495057] text-xs text-center sm:text-left">
             © {currentYear} PropertyBrands Realty Services. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             {["Privacy Policy", "Terms & Conditions", "Disclaimer", "Sitemap"].map((l, i, arr) => (
               <span key={l} className="flex items-center gap-4">
-                <a href="#" className="text-[#5B6670] text-xs hover:text-white transition">{l}</a>
+                <a href="#" className="text-[#495057] text-xs hover:text-white transition">{l}</a>
                 {i < arr.length - 1 && <span className="text-[#1F242A] text-xs">·</span>}
               </span>
             ))}

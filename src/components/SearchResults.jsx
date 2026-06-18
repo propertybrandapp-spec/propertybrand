@@ -201,12 +201,12 @@ function CheckBox({ label, checked, onChange }) {
         }}
       >
         {checked && (
-          <svg className="w-2.5 h-2.5" fill="none" stroke="#15191C" strokeWidth={3} viewBox="0 0 24 24">
+          <svg className="w-2.5 h-2.5" fill="none" stroke="#FFFFFF" strokeWidth={3} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         )}
       </div>
-      <span className="text-xs transition-colors" style={{ color: checked ? "#15191C" : "#5B6670" }}>{label}</span>
+      <span className="text-xs transition-colors" style={{ color: checked ? "#15191C" : "#495057" }}>{label}</span>
     </label>
   );
 }
@@ -216,8 +216,8 @@ function PriceRange({ min, max, value, onChange }) {
   return (
     <div>
       <div className="flex justify-between mb-2">
-        <span className="text-xs" style={{ color: "#5B6670" }}>Min: <span style={{ color: "#2C9DD5" }}>₹{(value[0] / 100000).toFixed(0)} Lac</span></span>
-        <span className="text-xs" style={{ color: "#5B6670" }}>Max: <span style={{ color: "#2C9DD5" }}>₹{value[1] >= 10000000 ? (value[1] / 10000000).toFixed(1) + " Cr" : (value[1] / 100000).toFixed(0) + " Lac"}</span></span>
+        <span className="text-xs" style={{ color: "#495057" }}>Min: <span style={{ color: "#2C9DD5" }}>₹{(value[0] / 100000).toFixed(0)} Lac</span></span>
+        <span className="text-xs" style={{ color: "#495057" }}>Max: <span style={{ color: "#2C9DD5" }}>₹{value[1] >= 10000000 ? (value[1] / 10000000).toFixed(1) + " Cr" : (value[1] / 100000).toFixed(0) + " Lac"}</span></span>
       </div>
       <input type="range" min={min} max={max} step={500000}
         value={value[1]}
@@ -260,7 +260,7 @@ function Sidebar({ filters, setFilters, onReset }) {
         <div className="p-5 space-y-6 max-h-[80vh] overflow-y-auto" style={{ scrollbarWidth: "none" }}>
           {/* Price Range */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#5B6670" }}>Budget</p>
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#495057" }}>Budget</p>
             <PriceRange min={0} max={100000000} value={filters.budget}
               onChange={val => setFilters(f => ({ ...f, budget: val }))} />
           </div>
@@ -268,7 +268,7 @@ function Sidebar({ filters, setFilters, onReset }) {
           {/* Dynamic sections */}
           {sections.map(sec => (
             <div key={sec.title}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#5B6670" }}>{sec.title}</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#495057" }}>{sec.title}</p>
               <div className="space-y-2">
                 {sec.options.map(opt => (
                   <CheckBox key={opt} label={opt}
@@ -314,7 +314,7 @@ function PropertyCardList({ property }) {
 
         {/* Badge */}
         <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full"
-          style={{ background: property.badgeColor, color: "#15191C" }}>
+          style={{ background: property.badgeColor, color: "#FFFFFF" }}>
           {property.badge}
         </span>
 
@@ -322,14 +322,14 @@ function PropertyCardList({ property }) {
         <button onClick={e => { e.stopPropagation(); setSaved(!saved); }}
           className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110"
           style={{ background: "rgba(11,11,11,0.8)" }}>
-          <svg className="w-3.5 h-3.5" fill={saved ? "#BA0D0B" : "none"} stroke={saved ? "#BA0D0B" : "#15191C"} strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-3.5 h-3.5" fill={saved ? "#BA0D0B" : "none"} stroke={saved ? "#BA0D0B" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
 
         {/* Image count */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(11,11,11,0.8)", color: "#15191C" }}>
+          style={{ background: "rgba(11,11,11,0.8)", color: "#FFFFFF" }}>
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
           </svg>
@@ -356,8 +356,8 @@ function PropertyCardList({ property }) {
         {/* Price + Area */}
         <div className="flex items-baseline gap-3 mb-2">
           <span className="text-xl font-extrabold" style={{ color: "#2C9DD5" }}>{property.price}</span>
-          <span className="text-xs" style={{ color: "#5B6670" }}>|</span>
-          <span className="text-sm font-medium" style={{ color: "#5B6670" }}>{property.area}</span>
+          <span className="text-xs" style={{ color: "#495057" }}>|</span>
+          <span className="text-sm font-medium" style={{ color: "#495057" }}>{property.area}</span>
         </div>
 
         {/* Location */}
@@ -365,7 +365,7 @@ function PropertyCardList({ property }) {
           <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#2C9DD5" }}>
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
-          <span className="text-xs" style={{ color: "#5B6670" }}>{property.location}</span>
+          <span className="text-xs" style={{ color: "#495057" }}>{property.location}</span>
         </div>
 
         {/* Meta chips */}
@@ -377,7 +377,7 @@ function PropertyCardList({ property }) {
             { label: property.age !== "—" ? `Age: ${property.age}` : null },
           ].filter(x => x.label).map(chip => (
             <span key={chip.label} className="text-[10px] font-medium px-2.5 py-1 rounded-full"
-              style={{ background: "#FFFFFF", color: "#5B6670", border: "1px solid #E5E8EB" }}>
+              style={{ background: "#FFFFFF", color: "#495057", border: "1px solid #E5E8EB" }}>
               {chip.label}
             </span>
           ))}
@@ -400,7 +400,7 @@ function PropertyCardList({ property }) {
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-auto pt-3" style={{ borderTop: "1px solid #E5E8EB" }}>
-          <div className="text-xs" style={{ color: "#5B6670" }}>
+          <div className="text-xs" style={{ color: "#495057" }}>
             By <span className="font-semibold" style={{ color: "#1F242A" }}>{property.postedBy}</span>
             {" · "}
             {property.postedDays === 0 ? "Today" : `${property.postedDays}d ago`}
@@ -408,7 +408,7 @@ function PropertyCardList({ property }) {
           <div className="flex gap-2">
             <button className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
               style={{ background: "transparent", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#15191C"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#FFFFFF"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2C9DD5"; }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V5z" />
@@ -416,7 +416,7 @@ function PropertyCardList({ property }) {
               Contact
             </button>
             <button className="text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
-              style={{ background: "#BA0D0B", color: "#15191C" }}
+              style={{ background: "#BA0D0B", color: "#FFFFFF" }}
               onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
               onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}>
               Site Visit
@@ -443,18 +443,18 @@ function PropertyCardGrid({ property }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55), transparent 60%)" }} />
         <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full"
-          style={{ background: property.badgeColor, color: "#15191C" }}>
+          style={{ background: property.badgeColor, color: "#FFFFFF" }}>
           {property.badge}
         </span>
         <button onClick={e => { e.stopPropagation(); setSaved(!saved); }}
           className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
           style={{ background: "rgba(11,11,11,0.8)" }}>
-          <svg className="w-3.5 h-3.5" fill={saved ? "#BA0D0B" : "none"} stroke={saved ? "#BA0D0B" : "#15191C"} strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-3.5 h-3.5" fill={saved ? "#BA0D0B" : "none"} stroke={saved ? "#BA0D0B" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
         <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
-          style={{ background: "rgba(11,11,11,0.8)", color: "#15191C" }}>
+          style={{ background: "rgba(11,11,11,0.8)", color: "#FFFFFF" }}>
           📷 {property.imgCount}
         </div>
       </div>
@@ -470,13 +470,13 @@ function PropertyCardGrid({ property }) {
         </div>
         <div className="flex items-baseline gap-2 mb-2">
           <span className="text-base font-extrabold" style={{ color: "#2C9DD5" }}>{property.price}</span>
-          <span className="text-xs" style={{ color: "#5B6670" }}>| {property.area}</span>
+          <span className="text-xs" style={{ color: "#495057" }}>| {property.area}</span>
         </div>
         <div className="flex items-center gap-1.5 mb-3">
           <svg className="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#2C9DD5" }}>
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
-          <span className="text-[11px]" style={{ color: "#5B6670" }}>{property.location}</span>
+          <span className="text-[11px]" style={{ color: "#495057" }}>{property.location}</span>
         </div>
         <div className="flex flex-wrap gap-1 mb-3">
           {property.amenities.slice(0, 3).map(a => (
@@ -488,12 +488,12 @@ function PropertyCardGrid({ property }) {
           )}
         </div>
         <div className="flex items-center justify-between mt-auto pt-3" style={{ borderTop: "1px solid #E5E8EB" }}>
-          <span className="text-[10px]" style={{ color: "#5B6670" }}>
+          <span className="text-[10px]" style={{ color: "#495057" }}>
             <span style={{ color: "#1F242A" }}>{property.postedBy}</span>
             {" · "}{property.postedDays === 0 ? "Today" : `${property.postedDays}d ago`}
           </span>
           <button className="text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
-            style={{ background: "#BA0D0B", color: "#15191C" }}
+            style={{ background: "#BA0D0B", color: "#FFFFFF" }}
             onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
             onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}>
             Contact
@@ -567,17 +567,17 @@ export default function SearchResults() {
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#2C9DD5" }}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span className="text-sm" style={{ color: "#5B6670" }}>Flat +1</span>
+            <span className="text-sm" style={{ color: "#495057" }}>Flat +1</span>
           </div>
           <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 w-full sm:w-40"
             style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#2C9DD5" }}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1" />
             </svg>
-            <span className="text-sm" style={{ color: "#5B6670" }}>Budget</span>
+            <span className="text-sm" style={{ color: "#495057" }}>Budget</span>
           </div>
           <button className="px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all"
-            style={{ background: "#BA0D0B", color: "#15191C" }}
+            style={{ background: "#BA0D0B", color: "#FFFFFF" }}
             onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
             onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -593,7 +593,7 @@ export default function SearchResults() {
             <h1 className="text-lg font-bold" style={{ color: "#15191C" }}>
               Properties in <span style={{ color: "#2C9DD5" }}>Ranchi</span>
             </h1>
-            <p className="text-xs mt-0.5" style={{ color: "#5B6670" }}>
+            <p className="text-xs mt-0.5" style={{ color: "#495057" }}>
               {sorted.length} properties found
               {activeFilterCount > 0 && <span style={{ color: "#E87C02" }}> · {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} applied</span>}
             </p>
@@ -619,7 +619,7 @@ export default function SearchResults() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18M6 12h12M9 17h6" />
                 </svg>
                 {sortBy}
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#5B6670" }}>
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#495057" }}>
                   <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </button>
@@ -629,7 +629,7 @@ export default function SearchResults() {
                   {SORT_OPTIONS.map(opt => (
                     <button key={opt} onClick={() => { setSortBy(opt); setShowSortDropdown(false); }}
                       className="block w-full text-left px-4 py-2.5 text-sm transition-colors"
-                      style={{ color: sortBy === opt ? "#2C9DD5" : "#5B6670", background: sortBy === opt ? "#EAF4FB" : "transparent" }}>
+                      style={{ color: sortBy === opt ? "#2C9DD5" : "#495057", background: sortBy === opt ? "#EAF4FB" : "transparent" }}>
                       {opt}
                     </button>
                   ))}
@@ -645,12 +645,12 @@ export default function SearchResults() {
                   style={{ background: viewMode === mode ? "#2C9DD5" : "#FFFFFF" }}>
                   {mode === "list" ? (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
-                      style={{ color: viewMode === "list" ? "#15191C" : "#5B6670" }}>
+                      style={{ color: viewMode === "list" ? "#FFFFFF" : "#495057" }}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
-                      style={{ color: viewMode === "grid" ? "#15191C" : "#5B6670" }}>
+                      style={{ color: viewMode === "grid" ? "#FFFFFF" : "#495057" }}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
                   )}
@@ -671,10 +671,10 @@ export default function SearchResults() {
                 style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
                 <span className="text-5xl mb-4">🏚️</span>
                 <p className="text-base font-bold mb-1" style={{ color: "#15191C" }}>No properties found</p>
-                <p className="text-sm mb-4" style={{ color: "#5B6670" }}>Try adjusting your filters</p>
+                <p className="text-sm mb-4" style={{ color: "#495057" }}>Try adjusting your filters</p>
                 <button onClick={resetFilters}
                   className="px-5 py-2.5 rounded-xl text-sm font-bold"
-                  style={{ background: "#BA0D0B", color: "#15191C" }}>
+                  style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
                   Reset Filters
                 </button>
               </div>
@@ -693,7 +693,7 @@ export default function SearchResults() {
               <div className="mt-8 flex justify-center">
                 <button className="px-8 py-3 rounded-xl text-sm font-bold transition-all"
                   style={{ background: "transparent", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#15191C"; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#FFFFFF"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2C9DD5"; }}>
                   Load More Properties
                 </button>
@@ -714,7 +714,7 @@ export default function SearchResults() {
                 <div className="flex items-center gap-3">
                   <button onClick={resetFilters} className="text-xs font-semibold" style={{ color: "#BA0D0B" }}>Reset</button>
                   <button onClick={() => setShowMobileFilters(false)}>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#5B6670" }}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#495057" }}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -726,7 +726,7 @@ export default function SearchResults() {
               <div className="sticky bottom-0 px-5 py-4" style={{ background: "#FFFFFF", borderTop: "1px solid #E5E8EB" }}>
                 <button onClick={() => setShowMobileFilters(false)}
                   className="w-full py-3 rounded-xl text-sm font-bold"
-                  style={{ background: "#BA0D0B", color: "#15191C" }}>
+                  style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
                   Show {sorted.length} Results
                 </button>
               </div>

@@ -36,15 +36,18 @@
       'Helvetica Neue', Arial, sans-serif;
     background-color: var(--bg-dark);
     color: var(--text-light);
-    line-height: 1.5;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.25;
+    letter-spacing: -0.02em;
     color: var(--text-light);
   }
 
@@ -530,3 +533,40 @@ button:active {
   box-shadow: 0 0 0 3px rgba(44, 157, 213, 0.25);
   border-radius: 6px;
 }
+
+/* ── Readability Refinement ──────────────────────────────────────────────────
+   Raises the floor on overly small/light text across the whole site without
+   touching individual component files. Tailwind's arbitrary-value sizes like
+   text-[9px]/text-[10px]/text-[11px] are bumped to a comfortable minimum, and
+   the muted gray gets darkened slightly for better contrast on long copy. */
+@layer utilities {
+  .text-\[9px\],
+  .text-\[10px\] {
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+  }
+
+  .text-\[11px\] {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+  }
+
+  .text-xs {
+    font-size: 13.5px !important;
+    line-height: 1.55 !important;
+  }
+
+  .text-sm {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+  }
+
+  .text-base {
+    font-size: 16.5px !important;
+    line-height: 1.6 !important;
+  }
+}
+
+/* Note: --text-muted CSS variable kept as-is below; the actual color darkening
+   for inline-styled components is applied via direct hex replacement across
+   the component files (see #5B6670 → #495057). */

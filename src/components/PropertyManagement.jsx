@@ -78,7 +78,7 @@ const PLANS = [
     price: "₹2,999",
     period: "/month",
     idealFor: "Self-managed owners",
-    color: "#5B6670",
+    color: "#495057",
     borderColor: "#E5E8EB",
     features: [
       { text: "Tenant Sourcing", included: true },
@@ -175,7 +175,7 @@ function PlanCard({ plan }) {
     >
       {plan.popular && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[11px] font-bold px-4 py-1 rounded-full whitespace-nowrap"
-          style={{ background: "#2C9DD5", color: "#15191C" }}>
+          style={{ background: "#2C9DD5", color: "#FFFFFF" }}>
           Most Popular
         </div>
       )}
@@ -183,13 +183,13 @@ function PlanCard({ plan }) {
       {/* Header */}
       <div className="mb-5">
         <h3 className="text-base font-extrabold mb-0.5" style={{ color: plan.color }}>{plan.name}</h3>
-        <p className="text-xs" style={{ color: "#5B6670" }}>{plan.idealFor}</p>
+        <p className="text-xs" style={{ color: "#495057" }}>{plan.idealFor}</p>
       </div>
 
       {/* Price */}
       <div className="mb-5 pb-5" style={{ borderBottom: "1px solid #E5E8EB" }}>
         <span className="text-3xl font-black" style={{ color: "#15191C" }}>{plan.price}</span>
-        <span className="text-sm ml-1" style={{ color: "#5B6670" }}>{plan.period}</span>
+        <span className="text-sm ml-1" style={{ color: "#495057" }}>{plan.period}</span>
       </div>
 
       {/* Features */}
@@ -215,11 +215,11 @@ function PlanCard({ plan }) {
         className="w-full py-2.5 rounded-xl text-sm font-bold transition-all"
         style={{
           background: plan.popular ? "#BA0D0B" : "transparent",
-          color: plan.popular ? "#15191C" : plan.color,
+          color: plan.popular ? "#FFFFFF" : plan.color,
           border: plan.popular ? "none" : `1.5px solid ${plan.color}`,
         }}
-        onMouseEnter={e => { e.currentTarget.style.background = "#BA0D0B"; e.currentTarget.style.color = "#15191C"; e.currentTarget.style.border = "none"; }}
-        onMouseLeave={e => { e.currentTarget.style.background = plan.popular ? "#BA0D0B" : "transparent"; e.currentTarget.style.color = plan.popular ? "#15191C" : plan.color; e.currentTarget.style.border = plan.popular ? "none" : `1.5px solid ${plan.color}`; }}
+        onMouseEnter={e => { e.currentTarget.style.background = "#BA0D0B"; e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.border = "none"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = plan.popular ? "#BA0D0B" : "transparent"; e.currentTarget.style.color = plan.popular ? "#FFFFFF" : plan.color; e.currentTarget.style.border = plan.popular ? "none" : `1.5px solid ${plan.color}`; }}
       >
         Get Started
       </button>
@@ -252,20 +252,20 @@ export default function PropertyManagement() {
               <span style={{ color: "#2C9DD5" }}>Care Solutions</span>
             </h2>
             <div className="w-10 h-0.5 rounded-full mt-3" style={{ background: "#2C9DD5" }} />
-            <p className="text-sm mt-3 max-w-lg" style={{ color: "#5B6670" }}>
+            <p className="text-sm mt-3 max-w-lg" style={{ color: "#495057" }}>
               Own property, not problems. Our end-to-end management service takes care of everything — from tenant sourcing to resale — so you can earn passively without the stress.
             </p>
           </div>
           <div className="flex gap-3 shrink-0">
             <button className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
-              style={{ background: "#BA0D0B", color: "#15191C" }}
+              style={{ background: "#BA0D0B", color: "#FFFFFF" }}
               onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
               onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}>
               Enquire Now
             </button>
             <button className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
               style={{ background: "transparent", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#15191C"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#FFFFFF"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2C9DD5"; }}>
               View Plans
             </button>
@@ -283,7 +283,7 @@ export default function PropertyManagement() {
               <span className="text-3xl shrink-0">{item.icon}</span>
               <div>
                 <h3 className="text-sm font-bold mb-1" style={{ color: "#15191C" }}>{item.title}</h3>
-                <p className="text-xs leading-relaxed mb-2.5" style={{ color: "#5B6670" }}>{item.desc}</p>
+                <p className="text-xs leading-relaxed mb-2.5" style={{ color: "#495057" }}>{item.desc}</p>
                 <span className="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full"
                   style={{ background: "#E87C0215", color: "#E87C02", border: "1px solid #E87C0230" }}>
                   {item.highlight}
@@ -307,7 +307,7 @@ export default function PropertyManagement() {
                   className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
                     background: activeTab === tab ? "#2C9DD5" : "transparent",
-                    color: activeTab === tab ? "#15191C" : "#5B6670",
+                    color: activeTab === tab ? "#FFFFFF" : "#495057",
                     border: `1px solid ${activeTab === tab ? "#2C9DD5" : "#E5E8EB"}`,
                   }}>
                   {tab}
@@ -334,7 +334,7 @@ export default function PropertyManagement() {
                   </span>
                 </div>
                 <h3 className="text-sm font-bold mb-2" style={{ color: "#15191C" }}>{service.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: "#5B6670" }}>{service.desc}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "#495057" }}>{service.desc}</p>
               </div>
             ))}
           </div>
@@ -346,7 +346,7 @@ export default function PropertyManagement() {
             style={{ background: "#FFFFFF", borderBottom: "1px solid #E5E8EB" }}>
             <div>
               <h3 className="text-base font-bold" style={{ color: "#15191C" }}>Owner Dashboard</h3>
-              <p className="text-xs mt-0.5" style={{ color: "#5B6670" }}>Track everything from one place — web & mobile</p>
+              <p className="text-xs mt-0.5" style={{ color: "#495057" }}>Track everything from one place — web & mobile</p>
             </div>
             <span className="text-[10px] font-bold px-3 py-1 rounded-full"
               style={{ background: "#2C9DD518", color: "#2C9DD5", border: "1px solid #2C9DD540" }}>
@@ -365,16 +365,16 @@ export default function PropertyManagement() {
               ].map((stat) => (
                 <div key={stat.label} className="rounded-xl p-4"
                   style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
-                  <p className="text-xs mb-1" style={{ color: "#5B6670" }}>{stat.label}</p>
+                  <p className="text-xs mb-1" style={{ color: "#495057" }}>{stat.label}</p>
                   <p className="text-xl font-extrabold" style={{ color: stat.color }}>{stat.value}</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: "#5B6670" }}>{stat.sub}</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: "#495057" }}>{stat.sub}</p>
                 </div>
               ))}
             </div>
 
             {/* Recent activity */}
             <div className="rounded-xl p-4 mb-5" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
-              <p className="text-xs font-bold mb-3" style={{ color: "#5B6670" }}>Recent Activity</p>
+              <p className="text-xs font-bold mb-3" style={{ color: "#495057" }}>Recent Activity</p>
               <div className="space-y-3">
                 {[
                   { dot: "#4ade80", text: "Rent received — Flat 2B, Harmu Colony", time: "2 hours ago" },
@@ -385,7 +385,7 @@ export default function PropertyManagement() {
                   <div key={i} className="flex items-center gap-3">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ background: item.dot }} />
                     <p className="text-xs flex-1" style={{ color: "#1F242A" }}>{item.text}</p>
-                    <p className="text-[10px] shrink-0" style={{ color: "#5B6670" }}>{item.time}</p>
+                    <p className="text-[10px] shrink-0" style={{ color: "#495057" }}>{item.time}</p>
                   </div>
                 ))}
               </div>
@@ -397,7 +397,7 @@ export default function PropertyManagement() {
                 <div key={f.label} className="rounded-xl p-3 text-center"
                   style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
                   <span className="text-xl block mb-1">{f.icon}</span>
-                  <p className="text-[9px] font-medium leading-tight" style={{ color: "#5B6670" }}>{f.label}</p>
+                  <p className="text-[9px] font-medium leading-tight" style={{ color: "#495057" }}>{f.label}</p>
                 </div>
               ))}
             </div>
@@ -409,12 +409,12 @@ export default function PropertyManagement() {
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold" style={{ color: "#15191C" }}>Simple, Transparent Pricing</h2>
             <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#2C9DD5" }} />
-            <p className="text-sm mt-2" style={{ color: "#5B6670" }}>No hidden charges. Cancel anytime.</p>
+            <p className="text-sm mt-2" style={{ color: "#495057" }}>No hidden charges. Cancel anytime.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {PLANS.map((plan) => <PlanCard key={plan.name} plan={plan} />)}
           </div>
-          <p className="text-center text-xs mt-5" style={{ color: "#5B6670" }}>
+          <p className="text-center text-xs mt-5" style={{ color: "#495057" }}>
             All plans include GST. Custom pricing available for{" "}
             <span style={{ color: "#2C9DD5" }}>5+ properties</span>.{" "}
             <a href="#" className="hover:underline" style={{ color: "#E87C02" }}>Contact us</a> for bulk rates.
@@ -430,19 +430,19 @@ export default function PropertyManagement() {
             <h3 className="text-2xl font-extrabold mb-3" style={{ color: "#15191C" }}>
               Ready to Stress-Free Property Ownership?
             </h3>
-            <p className="text-sm mb-6 max-w-xl mx-auto" style={{ color: "#5B6670" }}>
+            <p className="text-sm mb-6 max-w-xl mx-auto" style={{ color: "#495057" }}>
               Talk to our property management experts today. First consultation is free.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#BA0D0B", color: "#15191C" }}
+                style={{ background: "#BA0D0B", color: "#FFFFFF" }}
                 onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
                 onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}>
                 Book Free Consultation
               </button>
               <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
                 style={{ background: "transparent", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
-                onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#15191C"; }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#FFFFFF"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2C9DD5"; }}>
                 View All Plans
               </button>

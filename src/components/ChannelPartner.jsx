@@ -68,7 +68,7 @@ const BENEFITS = [
 const TIERS = [
   {
     name: "Associate",
-    color: "#5B6670",
+    color: "#495057",
     borderColor: "#E5E8EB",
     deals: "0–5 deals/yr",
     commission: "1.5%",
@@ -126,7 +126,7 @@ function TierCard({ tier }) {
       {tier.popular && (
         <div
           className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[11px] font-bold px-4 py-1 rounded-full"
-          style={{ background: "#2C9DD5", color: "#15191C" }}
+          style={{ background: "#2C9DD5", color: "#FFFFFF" }}
         >
           Most Popular
         </div>
@@ -145,7 +145,7 @@ function TierCard({ tier }) {
       {/* Commission */}
       <div className="mb-5 pb-5" style={{ borderBottom: `1px solid #E5E8EB` }}>
         <span className="text-3xl font-black" style={{ color: "#15191C" }}>{tier.commission}</span>
-        <span className="text-sm ml-1" style={{ color: "#5B6670" }}>commission</span>
+        <span className="text-sm ml-1" style={{ color: "#495057" }}>commission</span>
       </div>
 
       {/* Perks */}
@@ -164,11 +164,11 @@ function TierCard({ tier }) {
         className="w-full py-2.5 rounded-xl text-sm font-bold transition-all"
         style={{
           background: tier.popular ? "#BA0D0B" : "transparent",
-          color: tier.popular ? "#15191C" : tier.color,
+          color: tier.popular ? "#FFFFFF" : tier.color,
           border: tier.popular ? "none" : `1.5px solid ${tier.color}`,
         }}
-        onMouseEnter={e => { e.currentTarget.style.background = "#BA0D0B"; e.currentTarget.style.color = "#15191C"; e.currentTarget.style.border = "none"; }}
-        onMouseLeave={e => { e.currentTarget.style.background = tier.popular ? "#BA0D0B" : "transparent"; e.currentTarget.style.color = tier.popular ? "#15191C" : tier.color; e.currentTarget.style.border = tier.popular ? "none" : `1.5px solid ${tier.color}`; }}
+        onMouseEnter={e => { e.currentTarget.style.background = "#BA0D0B"; e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.border = "none"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = tier.popular ? "#BA0D0B" : "transparent"; e.currentTarget.style.color = tier.popular ? "#FFFFFF" : tier.color; e.currentTarget.style.border = tier.popular ? "none" : `1.5px solid ${tier.color}`; }}
       >
         {tier.cta}
       </button>
@@ -194,7 +194,7 @@ function PartnerForm() {
           </svg>
         </div>
         <p className="font-bold text-lg mb-1" style={{ color: "#15191C" }}>Application Submitted!</p>
-        <p className="text-sm" style={{ color: "#5B6670" }}>Our partner team will contact you within 24 hours.</p>
+        <p className="text-sm" style={{ color: "#495057" }}>Our partner team will contact you within 24 hours.</p>
         <button onClick={() => setSubmitted(false)} className="mt-5 text-xs underline" style={{ color: "#2C9DD5" }}>Submit another</button>
       </div>
     );
@@ -226,7 +226,7 @@ function PartnerForm() {
       <div className="grid grid-cols-2 gap-3">
         <select value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })}
           className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-          style={{ background: "#FFFFFF", border: "1.5px solid #E5E8EB", color: form.city ? "#15191C" : "#5B6670" }}>
+          style={{ background: "#FFFFFF", border: "1.5px solid #E5E8EB", color: form.city ? "#15191C" : "#495057" }}>
           <option value="">Select City</option>
           {["Ranchi", "Delhi", "Mumbai", "Bangalore", "Hyderabad", "Pune", "Kolkata"].map(c => (
             <option key={c} value={c} style={{ background: "#FFFFFF", color: "#15191C" }}>{c}</option>
@@ -234,7 +234,7 @@ function PartnerForm() {
         </select>
         <select value={form.experience} onChange={(e) => setForm({ ...form, experience: e.target.value })}
           className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-          style={{ background: "#FFFFFF", border: "1.5px solid #E5E8EB", color: form.experience ? "#15191C" : "#5B6670" }}>
+          style={{ background: "#FFFFFF", border: "1.5px solid #E5E8EB", color: form.experience ? "#15191C" : "#495057" }}>
           <option value="">Experience</option>
           {["0–1 years", "1–3 years", "3–5 years", "5–10 years", "10+ years"].map(e => (
             <option key={e} value={e} style={{ background: "#FFFFFF", color: "#15191C" }}>{e}</option>
@@ -250,13 +250,13 @@ function PartnerForm() {
       />
       <button onClick={handleSubmit}
         className="w-full py-3 rounded-xl text-sm font-bold transition-all"
-        style={{ background: "#BA0D0B", color: "#15191C" }}
+        style={{ background: "#BA0D0B", color: "#FFFFFF" }}
         onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
         onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}
       >
         Submit Partner Application
       </button>
-      <p className="text-center text-xs" style={{ color: "#5B6670" }}>
+      <p className="text-center text-xs" style={{ color: "#495057" }}>
         By submitting you agree to our{" "}
         <a href="#" style={{ color: "#2C9DD5" }} className="hover:underline">Partner Terms & Conditions</a>
       </p>
@@ -285,7 +285,7 @@ export default function ChannelPartner() {
               <span style={{ color: "#2C9DD5" }}>PropertyBrands</span>{" "}
               Partner Network
             </h2>
-            <p className="text-base max-w-2xl mx-auto mb-8" style={{ color: "#5B6670" }}>
+            <p className="text-base max-w-2xl mx-auto mb-8" style={{ color: "#495057" }}>
               Connect with India's fastest-growing PropTech platform. Access premium inventory, qualified leads, marketing support, and industry-leading commissions.
             </p>
 
@@ -295,21 +295,21 @@ export default function ChannelPartner() {
                 <div key={s.label} className="rounded-xl px-4 py-4"
                   style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
                   <p className="text-2xl font-extrabold" style={{ color: "#2C9DD5" }}>{s.value}</p>
-                  <p className="text-xs mt-0.5 font-medium" style={{ color: "#5B6670" }}>{s.label}</p>
+                  <p className="text-xs mt-0.5 font-medium" style={{ color: "#495057" }}>{s.label}</p>
                 </div>
               ))}
             </div>
 
             <div className="flex flex-wrap justify-center gap-3">
               <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#BA0D0B", color: "#15191C" }}
+                style={{ background: "#BA0D0B", color: "#FFFFFF" }}
                 onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
                 onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}>
                 Become a Partner
               </button>
               <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
                 style={{ background: "transparent", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
-                onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#15191C"; }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#FFFFFF"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2C9DD5"; }}>
                 Learn More
               </button>
@@ -322,7 +322,7 @@ export default function ChannelPartner() {
           <div className="mb-8">
             <h2 className="text-2xl font-bold" style={{ color: "#15191C" }}>Why Partner With Us?</h2>
             <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#2C9DD5" }} />
-            <p className="text-sm mt-2" style={{ color: "#5B6670" }}>Everything you need to grow your real estate business</p>
+            <p className="text-sm mt-2" style={{ color: "#495057" }}>Everything you need to grow your real estate business</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {BENEFITS.map((b) => (
@@ -336,7 +336,7 @@ export default function ChannelPartner() {
                   {b.icon}
                 </div>
                 <h3 className="text-sm font-bold mb-1.5" style={{ color: "#15191C" }}>{b.title}</h3>
-                <p className="text-xs leading-relaxed mb-3" style={{ color: "#5B6670" }}>{b.desc}</p>
+                <p className="text-xs leading-relaxed mb-3" style={{ color: "#495057" }}>{b.desc}</p>
                 <span className="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full"
                   style={{ background: "#E87C0215", color: "#E87C02", border: "1px solid #E87C0230" }}>
                   {b.highlight}
@@ -351,7 +351,7 @@ export default function ChannelPartner() {
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-bold" style={{ color: "#15191C" }}>Partner Tiers</h2>
             <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#2C9DD5" }} />
-            <p className="text-sm mt-2" style={{ color: "#5B6670" }}>Progress through tiers as you close more deals</p>
+            <p className="text-sm mt-2" style={{ color: "#495057" }}>Progress through tiers as you close more deals</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {TIERS.map((tier) => <TierCard key={tier.name} tier={tier} />)}
@@ -374,7 +374,7 @@ export default function ChannelPartner() {
                   )}
                 </div>
                 <h3 className="text-sm font-bold mb-1" style={{ color: "#15191C" }}>{step.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: "#5B6670" }}>{step.desc}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "#495057" }}>{step.desc}</p>
               </div>
             ))}
           </div>
@@ -388,7 +388,7 @@ export default function ChannelPartner() {
               Join Now
             </span>
             <h3 className="text-xl font-bold mb-1" style={{ color: "#15191C" }}>Partner Registration</h3>
-            <p className="text-sm mb-6" style={{ color: "#5B6670" }}>
+            <p className="text-sm mb-6" style={{ color: "#495057" }}>
               Fill in your details and our team will onboard you within 24 hours.
             </p>
             <PartnerForm />
@@ -406,12 +406,12 @@ export default function ChannelPartner() {
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
-                  style={{ background: "linear-gradient(135deg, #2C9DD5, #1a5f85)", color: "#15191C" }}>
+                  style={{ background: "linear-gradient(135deg, #2C9DD5, #1a5f85)", color: "#FFFFFF" }}>
                   RK
                 </div>
                 <div>
                   <p className="text-sm font-bold" style={{ color: "#15191C" }}>Rajesh Kumar</p>
-                  <p className="text-xs" style={{ color: "#5B6670" }}>Gold Partner · Kumar Properties, Ranchi</p>
+                  <p className="text-xs" style={{ color: "#495057" }}>Gold Partner · Kumar Properties, Ranchi</p>
                 </div>
                 <div className="ml-auto flex gap-0.5">
                   {[1,2,3,4,5].map(s => (

@@ -125,7 +125,7 @@ const NEW_PROJECT_FEATURES = [
       </svg>
     ),
     label: "All Reports from RERA",
-    bg: "bg-[#1a0a0a]",
+    bg: "bg-[#FCEAEA]",
     iconColor: "text-[#2C9DD5]",
   },
   {
@@ -172,14 +172,14 @@ function AgentCard({ agent }) {
     <div className="flex-shrink-0 w-64 bg-[#FFFFFF] border border-[#E5E8EB] rounded-xl p-4 hover:shadow-xl transition-shadow duration-200 cursor-pointer group">
       {/* Badge */}
       <div className="flex items-center justify-between mb-3">
-        <span className="flex items-center gap-1 text-[10px] font-bold text-[#2C9DD5] bg-[#1a0a0a] px-2 py-0.5 rounded-full border border-[#5C0B03]">
+        <span className="flex items-center gap-1 text-[10px] font-bold text-[#2C9DD5] bg-[#EAF4FB] px-2 py-0.5 rounded-full border border-[#2C9DD5]/30">
           <svg className="w-3 h-3 fill-[#2C9DD5]" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
           {agent.badge}
         </span>
         {/* Agency logo placeholder */}
-        <div className="w-8 h-8 rounded-md bg-[#F2F4F6] flex items-center justify-center text-[8px] font-bold text-[#5B6670] border border-[#E5E8EB]">
+        <div className="w-8 h-8 rounded-md bg-[#F2F4F6] flex items-center justify-center text-[8px] font-bold text-[#495057] border border-[#E5E8EB]">
           LOGO
         </div>
       </div>
@@ -191,22 +191,22 @@ function AgentCard({ agent }) {
         </div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-[#15191C] truncate">{agent.name}</p>
-          <p className="text-[11px] text-[#5B6670] truncate">{agent.agency}</p>
+          <p className="text-[11px] text-[#495057] truncate">{agent.agency}</p>
           <div className="flex items-center gap-1 mt-0.5">
             <Stars rating={agent.rating} />
-            <span className="text-[10px] text-[#5B6670]">({agent.reviews})</span>
+            <span className="text-[10px] text-[#495057]">({agent.reviews})</span>
           </div>
         </div>
       </div>
 
       {/* Meta row */}
-      <div className="text-[11px] text-[#5B6670] mb-3 flex items-center gap-1">
-        <svg className="w-3 h-3 text-[#5B6670] shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+      <div className="text-[11px] text-[#495057] mb-3 flex items-center gap-1">
+        <svg className="w-3 h-3 text-[#495057] shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
         Operating Since <span className="font-semibold text-[#1F242A] ml-0.5">{agent.operatingSince}</span>
-        <span className="mx-1 text-[#5B6670]">|</span>
-        <svg className="w-3 h-3 text-[#5B6670] shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <span className="mx-1 text-[#495057]">|</span>
+        <svg className="w-3 h-3 text-[#495057] shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
         Buyers <span className="font-semibold text-[#1F242A] ml-0.5">{agent.buyerServed}</span>
@@ -216,18 +216,18 @@ function AgentCard({ agent }) {
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div className="bg-[#FFFFFF] rounded-lg p-2 text-center">
           <p className="text-base font-extrabold text-[#15191C]">{agent.propertiesForSale}</p>
-          <p className="text-[10px] text-[#5B6670] font-medium leading-tight">Properties<br />for Sale</p>
+          <p className="text-[10px] text-[#495057] font-medium leading-tight">Properties<br />for Sale</p>
         </div>
         <div className="bg-[#FFFFFF] rounded-lg p-2 text-center">
           <p className="text-base font-extrabold text-[#15191C]">{agent.propertiesForRent}</p>
-          <p className="text-[10px] text-[#5B6670] font-medium leading-tight">Properties<br />for Rent</p>
+          <p className="text-[10px] text-[#495057] font-medium leading-tight">Properties<br />for Rent</p>
         </div>
       </div>
 
       {/* Specialization tags */}
       <div className="flex gap-1.5 flex-wrap mb-3">
         {agent.specialization.map((s) => (
-          <span key={s} className="text-[10px] bg-[#1a0a0a] text-[#2C9DD5] border border-[#5C0B03] px-2 py-0.5 rounded-full font-semibold">
+          <span key={s} className="text-[10px] bg-[#EAF4FB] text-[#2C9DD5] border border-[#2C9DD5]/30 px-2 py-0.5 rounded-full font-semibold">
             {s}
           </span>
         ))}
@@ -260,7 +260,7 @@ function NewProjectsSection() {
         <h2 className="text-2xl font-extrabold text-[#15191C] tracking-tight">
           property<span className="text-[#2C9DD5]">Homes</span>
         </h2>
-        <p className="text-[#5B6670] text-sm mt-1 font-medium">
+        <p className="text-[#495057] text-sm mt-1 font-medium">
           Encyclopedia For All New Projects
         </p>
       </div>
@@ -299,16 +299,16 @@ function SiteVisitBanner() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         {/* Left */}
         <div className="flex-1">
-          <p className="text-[#5B6670] text-xs font-bold uppercase tracking-widest mb-1">
+          <p className="text-[#495057] text-xs font-bold uppercase tracking-widest mb-1">
             Plan hassle-free
           </p>
           <h3 className="text-white text-xl font-extrabold leading-tight mb-1">
             Site Visits & Evaluate Projects
           </h3>
-          <p className="text-[#5B6670] text-sm mb-1">
+          <p className="text-[#495057] text-sm mb-1">
             with <span className="text-[#2C9DD5] font-bold">PropertyDiary</span>
           </p>
-          <p className="text-[#5B6670] text-xs font-medium flex items-center gap-1.5 mt-2">
+          <p className="text-[#495057] text-xs font-medium flex items-center gap-1.5 mt-2">
             <span className="text-[#E87C02] text-base">🚕</span>
             Get <strong className="text-white">Free Cab</strong> for every site visit!
           </p>
@@ -321,7 +321,7 @@ function SiteVisitBanner() {
               <span className="text-[#2C9DD5] text-xs font-extrabold shrink-0 mt-0.5">{step.num}</span>
               <div>
                 <p className="text-white text-xs font-bold leading-tight">{step.label}</p>
-                <p className="text-[#5B6670] text-[10px] mt-0.5 leading-tight">{step.desc}</p>
+                <p className="text-[#495057] text-[10px] mt-0.5 leading-tight">{step.desc}</p>
               </div>
               {i < SITE_VISIT_STEPS.length - 1 && (
                 <svg className="w-3 h-3 text-slate-600 shrink-0 mt-0.5 hidden sm:block" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -373,7 +373,7 @@ export default function PreferredAgents() {
           <div className="relative group/agents">
             <button
               onClick={() => scroll(-1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#5B6670] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/agents:opacity-100 transition"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#495057] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/agents:opacity-100 transition"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -392,7 +392,7 @@ export default function PreferredAgents() {
 
             <button
               onClick={() => scroll(1)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#5B6670] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/agents:opacity-100 transition"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#495057] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/agents:opacity-100 transition"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

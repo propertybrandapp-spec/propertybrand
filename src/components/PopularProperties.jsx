@@ -181,7 +181,7 @@ function HeartBtn({ id }) {
       className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-[#FFFFFF]/90 backdrop-blur flex items-center justify-center shadow hover:scale-110 transition z-10"
     >
       <svg
-        className={`w-3.5 h-3.5 transition-colors ${liked ? "fill-red-500 text-red-500" : "fill-none text-[#5B6670]"}`}
+        className={`w-3.5 h-3.5 transition-colors ${liked ? "fill-red-500 text-red-500" : "fill-none text-[#495057]"}`}
         stroke="currentColor"
         strokeWidth={2}
         viewBox="0 0 24 24"
@@ -291,8 +291,8 @@ function PropertyCard({ property }) {
         {/* Price + Area */}
         <div className="flex items-baseline gap-2 mb-2">
           <span className="text-base font-extrabold text-[#15191C]">{price}</span>
-          <span className="text-xs text-[#5B6670] font-medium">|</span>
-          <span className="text-xs text-[#5B6670] font-medium">{area}</span>
+          <span className="text-xs text-[#495057] font-medium">|</span>
+          <span className="text-xs text-[#495057] font-medium">{area}</span>
         </div>
 
         {/* Location */}
@@ -300,13 +300,13 @@ function PropertyCard({ property }) {
           <svg className="w-3 h-3 text-[#2C9DD5] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
-          <span className="text-[11px] text-[#5B6670] leading-tight">{location}</span>
+          <span className="text-[11px] text-[#495057] leading-tight">{location}</span>
         </div>
 
         {/* Amenities */}
         <div className="flex flex-wrap gap-1 mb-3">
           {amenities.slice(0, 3).map((a) => (
-            <span key={a} className="text-[10px] bg-[#F2F4F6] text-[#5B6670] px-1.5 py-0.5 rounded font-medium">
+            <span key={a} className="text-[10px] bg-[#F2F4F6] text-[#495057] px-1.5 py-0.5 rounded font-medium">
               {a}
             </span>
           ))}
@@ -319,8 +319,8 @@ function PropertyCard({ property }) {
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-2.5 border-t border-[#E5E8EB]">
-          <div className="text-[11px] text-[#5B6670]">
-            By <span className="font-semibold text-[#5B6670]">{postedBy}</span>
+          <div className="text-[11px] text-[#495057]">
+            By <span className="font-semibold text-[#495057]">{postedBy}</span>
             {" · "}
             {postedDays === 0 ? "Today" : `${postedDays}d ago`}
           </div>
@@ -368,7 +368,7 @@ function ScrollRow({ properties }) {
       {/* Left arrow */}
       <button
         onClick={() => scroll(-1)}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#5B6670] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/row:opacity-100 transition"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#495057] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/row:opacity-100 transition"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -389,7 +389,7 @@ function ScrollRow({ properties }) {
       {/* Right arrow */}
       <button
         onClick={() => scroll(1)}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#5B6670] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/row:opacity-100 transition"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#495057] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/row:opacity-100 transition"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -425,7 +425,7 @@ export default function PopularProperties() {
               className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                 activeFilter === tab
                   ? "bg-[#2C9DD5] text-white border-[#2C9DD5] shadow"
-                  : "bg-[#FFFFFF] text-[#5B6670] border-[#D6DADD] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
+                  : "bg-[#FFFFFF] text-[#495057] border-[#D6DADD] hover:border-[#2C9DD5] hover:text-[#2C9DD5]"
               }`}
             >
               {tab}
@@ -453,7 +453,7 @@ export default function PopularProperties() {
         {ownerProperties.length === 0 && builderProperties.length === 0 && (
           <div className="mb-10">
             <SectionHeader title={`${activeFilter} Properties`} />
-            <div className="text-center py-16 text-[#5B6670]">
+            <div className="text-center py-16 text-[#495057]">
               <svg className="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
@@ -468,7 +468,7 @@ export default function PopularProperties() {
             <p className="text-white font-bold text-lg leading-tight">
               Not finding what you're looking for?
             </p>
-            <p className="text-[#5B6670] text-sm mt-0.5">
+            <p className="text-[#495057] text-sm mt-0.5">
               Talk to our property experts for personalized recommendations.
             </p>
           </div>

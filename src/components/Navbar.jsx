@@ -94,9 +94,9 @@ function DropdownMenu({ item, isOpen }) {
               <ul className="space-y-1.5">
                 {col.links.map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-sm block py-0.5 transition-colors" style={{ color: "#5B6670" }}
+                    <a href="#" className="text-sm block py-0.5 transition-colors" style={{ color: "#495057" }}
                       onMouseEnter={e => e.target.style.color = "#2C9DD5"}
-                      onMouseLeave={e => e.target.style.color = "#5B6670"}>
+                      onMouseLeave={e => e.target.style.color = "#495057"}>
                       {link}
                     </a>
                   </li>
@@ -126,9 +126,9 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
           {CITIES.map((city) => (
             <button key={city} onClick={() => onSelect(city)}
               className="block w-full text-left px-3 py-2 text-sm transition"
-              style={{ color: city === selectedCity ? "#2C9DD5" : "#5B6670" }}
+              style={{ color: city === selectedCity ? "#2C9DD5" : "#495057" }}
               onMouseEnter={e => e.currentTarget.style.color = "#2C9DD5"}
-              onMouseLeave={e => e.currentTarget.style.color = city === selectedCity ? "#2C9DD5" : "#5B6670"}>
+              onMouseLeave={e => e.currentTarget.style.color = city === selectedCity ? "#2C9DD5" : "#495057"}>
               {city}
             </button>
           ))}
@@ -147,7 +147,7 @@ function MobileNavItem({ item }) {
           {item.label}
           {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: "#E87C02", color: "#FFFFFF" }}>{item.badge}</span>}
         </span>
-        <ChevronDown className={open ? "rotate-180" : ""} style={{ color: open ? "#2C9DD5" : "#5B6670" }} />
+        <ChevronDown className={open ? "rotate-180" : ""} style={{ color: open ? "#2C9DD5" : "#495057" }} />
       </button>
       {open && item.columns && (
         <div className="px-5 pb-4" style={{ background: "#FFFFFF" }}>
@@ -156,7 +156,7 @@ function MobileNavItem({ item }) {
               <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: "#2C9DD5" }}>{col.heading}</p>
               <ul className="space-y-1">
                 {col.links.map((link) => (
-                  <li key={link}><a href="#" className="text-sm block py-0.5 transition" style={{ color: "#5B6670" }}>{link}</a></li>
+                  <li key={link}><a href="#" className="text-sm block py-0.5 transition" style={{ color: "#495057" }}>{link}</a></li>
                 ))}
               </ul>
             </div>
@@ -212,7 +212,7 @@ export default function Navbar() {
             <div className="w-px h-4" style={{ background: "#2C9DD5" }} />
             <button className="text-sm font-semibold transition" style={{ color: "#15191C" }}>Login</button>
             <button className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm transition"
-              style={{ background: "#BA0D0B", color: "#15191C" }}>
+              style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
               Post Property
               <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded" style={{ background: "#E87C02", color: "#FFFFFF" }}>FREE</span>
             </button>
@@ -234,7 +234,7 @@ export default function Navbar() {
             {NAV_ITEMS.map((item) => (
               <li key={item.label} className="relative" onMouseEnter={() => handleMouseEnter(item.label)} onMouseLeave={handleMouseLeave}>
                 <button className="flex items-center gap-1 px-4 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors border-b-2 -mb-px"
-                  style={{ color: activeDropdown === item.label ? "#2C9DD5" : "#5B6670", borderBottomColor: activeDropdown === item.label ? "#2C9DD5" : "transparent" }}>
+                  style={{ color: activeDropdown === item.label ? "#2C9DD5" : "#495057", borderBottomColor: activeDropdown === item.label ? "#2C9DD5" : "transparent" }}>
                   {item.label}
                   {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded leading-none" style={{ background: "#E87C02", color: "#FFFFFF" }}>{item.badge}</span>}
                   <ChevronDown className={activeDropdown === item.label ? "rotate-180" : ""} />
@@ -252,7 +252,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }}>
           <button className="text-sm font-semibold" style={{ color: "#2C9DD5" }}>PB Prime</button>
           <button className="text-sm font-semibold" style={{ color: "#15191C" }}>Login</button>
-          <button className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#BA0D0B", color: "#15191C" }}>
+          <button className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
             Post Property <span className="text-[9px] font-extrabold px-1 py-0.5 rounded" style={{ background: "#E87C02", color: "#FFFFFF" }}>FREE</span>
           </button>
         </div>
@@ -268,7 +268,7 @@ export default function Navbar() {
             {CITIES.map((city) => (
               <button key={city} onClick={() => { handleCitySelect(city); setMobileOpen(false); }}
                 className="text-sm py-1.5 px-2 rounded-md text-center transition"
-                style={{ background: city === selectedCity ? "#2C9DD5" : "transparent", color: city === selectedCity ? "#15191C" : "#5B6670" }}>
+                style={{ background: city === selectedCity ? "#2C9DD5" : "transparent", color: city === selectedCity ? "#FFFFFF" : "#495057" }}>
                 {city}
               </button>
             ))}
