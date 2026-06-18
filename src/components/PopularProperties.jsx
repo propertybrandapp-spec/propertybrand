@@ -463,23 +463,31 @@ export default function PopularProperties() {
         )}
 
         {/* ── Bottom CTA Banner ── */}
-        <div className="rounded-2xl bg-gradient-to-r from-[#2C9DD5] to-[#5C0B03] p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="text-white font-bold text-lg leading-tight">
-              Not finding what you're looking for?
-            </p>
-            <p className="text-[#495057] text-sm mt-0.5">
-              Talk to our property experts for personalized recommendations.
-            </p>
-          </div>
-          <div className="flex gap-3 shrink-0">
-            <button className="bg-[#FFFFFF] text-[#2C9DD5] text-sm font-bold px-5 py-2.5 rounded-lg hover:bg-[#F2F4F6] transition shadow">
-              Schedule Site Visit
-            </button>
-            <button className="bg-[#FFFFFF]/20 text-white text-sm font-bold px-5 py-2.5 rounded-lg hover:bg-[#FFFFFF]/30 transition border border-white/40">
-              Talk to Expert
-            </button>
-          </div>
+        <div className="rounded-3xl bg-[radial-gradient(circle_at_top_right,_rgba(186,13,11,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] border border-slate-200 shadow-lg p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+
+    <div>
+      <p className="text-[#15191C] font-bold text-2xl leading-tight">
+        Not finding what you're looking for?
+      </p>
+
+      <p className="text-slate-600 text-sm mt-2 max-w-xl">
+        Connect with our property experts and get personalized recommendations
+        based on your budget, preferred location, and investment goals.
+      </p>
+    </div>
+
+    <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+      
+      <button className="bg-[#BA0D0B] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#990A09] transition-all duration-300 shadow-md hover:shadow-lg">
+        Schedule Site Visit
+      </button>
+
+      <button className="bg-white border border-slate-300 text-[#15191C] text-sm font-semibold px-6 py-3 rounded-xl hover:border-[#BA0D0B] hover:text-[#BA0D0B] transition-all duration-300">
+        Talk to Expert
+      </button>
+
+    </div>
+
         </div>
 
       </div>

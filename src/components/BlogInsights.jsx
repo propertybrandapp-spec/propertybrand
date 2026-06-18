@@ -239,46 +239,89 @@ function BlogCard({ post }) {
 // ── Featured Article ──────────────────────────────────────────────────────────
 function FeaturedArticle({ article }) {
   return (
-    <div className="relative rounded-2xl overflow-hidden cursor-pointer group h-72">
+    <div className="relative h-72 overflow-hidden rounded-3xl border border-slate-200 shadow-lg cursor-pointer group bg-white">
+      
+      {/* Image */}
       <img
         src={article.image}
         alt={article.title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#15191C]/95 via-[#15191C]/55 to-transparent" />
 
       {/* Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-6">
-        <div className="flex items-center gap-2 mb-2">
-          <span className={`${article.categoryColor} text-white text-[10px] font-bold px-2.5 py-1 rounded-full`}>
+      <div className="absolute inset-x-0 bottom-0 p-6">
+        
+        {/* Meta */}
+        <div className="flex items-center gap-2 mb-3">
+          <span
+            className={`${article.categoryColor} text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm`}
+          >
             {article.category}
           </span>
-          <span className="text-[#495057] text-[10px]">{article.date}</span>
-          <span className="text-[#495057] text-[10px]">·</span>
-          <span className="text-[#495057] text-[10px]">{article.readTime}</span>
+
+          <span className="text-slate-300 text-[10px]">
+            {article.date}
+          </span>
+
+          <span className="text-slate-400 text-[10px]">•</span>
+
+          <span className="text-slate-300 text-[10px]">
+            {article.readTime}
+          </span>
         </div>
-        <h2 className="text-white text-lg font-extrabold leading-snug mb-2 line-clamp-2 group-hover:text-[#E87C02] transition-colors">
+
+        {/* Title */}
+        <h2 className="text-white text-xl font-extrabold leading-snug mb-2 line-clamp-2 transition-colors duration-300 group-hover:text-[#BA0D0B]">
           {article.title}
         </h2>
-        <p className="text-[#495057] text-xs leading-relaxed line-clamp-2 mb-3">
+
+        {/* Excerpt */}
+        <p className="text-slate-300 text-xs leading-relaxed line-clamp-2 mb-4">
           {article.excerpt}
         </p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#2C9DD5] to-[#BA0D0B] flex items-center justify-center text-white text-[9px] font-bold">
+
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-4">
+          
+          {/* Author */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#BA0D0B] to-[#E87C02] flex items-center justify-center text-white text-[10px] font-bold shadow-md">
               {article.author.charAt(0)}
             </div>
+
             <div>
-              <p className="text-white text-[11px] font-semibold">{article.author}</p>
-              <p className="text-[#495057] text-[10px]">{article.authorRole}</p>
+              <p className="text-white text-xs font-semibold">
+                {article.author}
+              </p>
+
+              <p className="text-slate-400 text-[10px]">
+                {article.authorRole}
+              </p>
             </div>
           </div>
-          <button className="flex items-center gap-1.5 bg-[#FFFFFF]/10 hover:bg-[#FFFFFF]/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/30 transition">
+
+          {/* CTA */}
+          <button className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:border-[#BA0D0B] hover:bg-[#BA0D0B]">
             Read Full Article
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.5}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
+
         </div>
       </div>
     </div>
@@ -438,26 +481,46 @@ export default function BlogInsights() {
         </div>
 
         {/* ── Newsletter CTA ── */}
-        <div className="bg-gradient-to-r from-[#2C9DD5] to-[#5C0B03] rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <p className="text-white font-extrabold text-xl leading-tight mb-1">
-              Stay Ahead of the Market
-            </p>
-            <p className="text-[#495057] text-sm">
-              Get weekly insights on property trends, investment opportunities & new project launches — straight to your inbox.
-            </p>
-          </div>
-          <div className="flex gap-2 w-full md:w-auto shrink-0">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 md:w-64 text-sm border-0 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2C9DD5]/50 bg-[#FFFFFF]/20 text-white placeholder-[#495057]"
-            />
-            <button className="bg-[#FFFFFF] text-[#2C9DD5] text-sm font-bold px-5 py-3 rounded-lg hover:bg-[#F2F4F6] transition shrink-0 shadow">
-              Subscribe
-            </button>
-          </div>
-        </div>
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(186,13,11,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] p-8 shadow-lg">
+
+  {/* Decorative Glow */}
+  <div className="absolute -top-16 -right-16 w-48 h-48 bg-red-100 rounded-full blur-3xl opacity-40 pointer-events-none" />
+
+  <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+    
+    {/* Content */}
+    <div className="max-w-xl">
+      <span className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest">
+        Newsletter
+      </span>
+
+      <p className="text-[#15191C] font-extrabold text-2xl leading-tight mt-2 mb-2">
+        Stay Ahead of the Market
+      </p>
+
+      <p className="text-slate-600 text-sm leading-relaxed">
+        Get weekly insights on property trends, investment opportunities,
+        market analysis, and new project launches delivered directly to your
+        inbox.
+      </p>
+    </div>
+
+    {/* Form */}
+    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
+      
+      <input
+        type="email"
+        placeholder="Enter your email"
+        className="w-full md:w-72 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-[#15191C] shadow-sm transition-all focus:border-[#BA0D0B] focus:outline-none focus:ring-4 focus:ring-red-100"
+      />
+
+      <button className="rounded-xl bg-[#BA0D0B] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#990A09] hover:shadow-lg">
+        Subscribe
+      </button>
+
+    </div>
+  </div>
+</div>
 
       </div>
     </section>

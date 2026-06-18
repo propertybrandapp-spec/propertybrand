@@ -295,37 +295,79 @@ function NewProjectsSection() {
 // ── Site Visit Banner ─────────────────────────────────────────────────────────
 function SiteVisitBanner() {
   return (
-    <div className="bg-gradient-to-r from-[#FFFFFF] to-[#FFFFFF] rounded-2xl p-6 md:p-8">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(186,13,11,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] shadow-lg p-6 md:p-8">
+      
+      {/* Decorative Glow */}
+      <div className="absolute -top-20 -right-20 w-64 h-64 bg-red-100 rounded-full blur-3xl opacity-30 pointer-events-none" />
+
+      <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+        
         {/* Left */}
-        <div className="flex-1">
-          <p className="text-[#495057] text-xs font-bold uppercase tracking-widest mb-1">
+        <div className="flex-1 max-w-md">
+          <p className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest mb-2">
             Plan hassle-free
           </p>
-          <h3 className="text-white text-xl font-extrabold leading-tight mb-1">
+
+          <h3 className="text-[#15191C] text-2xl font-extrabold leading-tight mb-2">
             Site Visits & Evaluate Projects
           </h3>
-          <p className="text-[#495057] text-sm mb-1">
-            with <span className="text-[#2C9DD5] font-bold">PropertyDiary</span>
+
+          <p className="text-slate-600 text-sm mb-2">
+            with{" "}
+            <span className="text-[#BA0D0B] font-bold">
+              PropertyDiary
+            </span>
           </p>
-          <p className="text-[#495057] text-xs font-medium flex items-center gap-1.5 mt-2">
-            <span className="text-[#E87C02] text-base">🚕</span>
-            Get <strong className="text-white">Free Cab</strong> for every site visit!
-          </p>
+
+          <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mt-2">
+            <span className="text-lg">🚕</span>
+
+            <p className="text-sm text-slate-700">
+              Get{" "}
+              <span className="font-bold text-[#15191C]">
+                Free Cab
+              </span>{" "}
+              for every site visit
+            </p>
+          </div>
         </div>
 
         {/* Steps */}
-        <div className="flex flex-col sm:flex-row gap-4 flex-1">
+        <div className="flex flex-col sm:flex-row gap-6 flex-1">
           {SITE_VISIT_STEPS.map((step, i) => (
-            <div key={step.num} className="flex items-start gap-2 flex-1">
-              <span className="text-[#2C9DD5] text-xs font-extrabold shrink-0 mt-0.5">{step.num}</span>
-              <div>
-                <p className="text-white text-xs font-bold leading-tight">{step.label}</p>
-                <p className="text-[#495057] text-[10px] mt-0.5 leading-tight">{step.desc}</p>
+            <div
+              key={step.num}
+              className="flex items-start gap-3 flex-1"
+            >
+              <div className="w-8 h-8 rounded-full bg-red-50 border border-red-100 flex items-center justify-center shrink-0">
+                <span className="text-[#BA0D0B] text-xs font-extrabold">
+                  {step.num}
+                </span>
               </div>
+
+              <div>
+                <p className="text-[#15191C] text-sm font-bold leading-tight">
+                  {step.label}
+                </p>
+
+                <p className="text-slate-500 text-xs mt-1 leading-relaxed">
+                  {step.desc}
+                </p>
+              </div>
+
               {i < SITE_VISIT_STEPS.length - 1 && (
-                <svg className="w-3 h-3 text-slate-600 shrink-0 mt-0.5 hidden sm:block" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                <svg
+                  className="w-4 h-4 text-slate-300 shrink-0 mt-2 hidden sm:block"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               )}
             </div>
@@ -333,9 +375,10 @@ function SiteVisitBanner() {
         </div>
 
         {/* CTA */}
-        <button className="bg-[#BA0D0B] text-white text-sm font-bold px-6 py-2.5 rounded-lg hover:bg-[#5C0B03] transition shrink-0">
+        <button className="bg-[#BA0D0B] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#990A09] transition-all duration-300 shadow-md hover:shadow-lg shrink-0">
           Find out how
         </button>
+
       </div>
     </div>
   );

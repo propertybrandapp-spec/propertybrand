@@ -207,160 +207,217 @@ export default function Footer() {
   return (
     <footer>
       {/* ── Get in Touch Band ── */}
-      <div className="bg-gradient-to-br from-[#BA0D0B] via-[#5C0B03] to-[#FFFFFF] px-4 py-12">
+      <div className="bg-[radial-gradient(circle_at_top_right,_rgba(186,13,11,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] px-4 py-16">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-            {/* Left – Contact info */}
-            <div>
-              <span className="text-[#495057] text-xs font-bold uppercase tracking-widest mb-2 block">
-                Get in Touch
-              </span>
-              <h2 className="text-white text-2xl font-extrabold leading-tight mb-6">
-                property<span className="text-[#E87C02]">Brands</span> Realty Services
-              </h2>
-              <div className="space-y-4">
-                {[
-                  {
-                    icon: (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    ),
-                    label: "Corporate Office",
-                    value: "PropertyBrands Realty Services, Ranchi, Jharkhand — 834001",
-                  },
-                  {
-                    icon: (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V5z" />
-                      </svg>
-                    ),
-                    label: "Phone & WhatsApp",
-                    value: "+91 94301 00000 · +91 98765 00000",
-                  },
-                  {
-                    icon: (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    ),
-                    label: "Email",
-                    value: "info@propertybrands.in",
-                  },
-                  {
-                    icon: (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                      </svg>
-                    ),
-                    label: "Website",
-                    value: "www.propertybrands.in",
-                  },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#FFFFFF]/15 flex items-center justify-center text-white shrink-0 mt-0.5">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <p className="text-[#495057] text-[10px] font-bold uppercase tracking-wider">{item.label}</p>
-                      <p className="text-white text-sm font-medium mt-0.5">{item.value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      
+      {/* Left – Contact Info */}
+        <div>
+          <span className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest mb-2 block">
+          Get in Touch
+          </span>
 
-              {/* Social Icons */}
-              <div className="mt-6">
-                <p className="text-[#495057] text-xs font-bold uppercase tracking-widest mb-3">Follow Us</p>
-                <div className="flex items-center gap-2">
-                  {SOCIAL_LINKS.map((s) => (
-                    <a
-                      key={s.name}
-                      href={s.href}
-                      aria-label={s.name}
-                      className={`w-9 h-9 rounded-lg bg-[#FFFFFF]/15 border border-white/20 flex items-center justify-center text-white transition ${s.bg}`}
-                    >
-                      {s.icon}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <h2 className="text-[#15191C] text-3xl font-extrabold leading-tight mb-8">
+          property<span className="text-[#E87C02]">Brands</span> Realty Services
+          </h2>
 
-            {/* Right – Quick Inquiry Form */}
-            <div>
-              <p className="text-[#495057] text-xs font-bold uppercase tracking-widest mb-2">
-                Quick Inquiry
-              </p>
-              <h3 className="text-white font-bold text-lg mb-4">Tell us what you're looking for</h3>
-              <QuickInquiry />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Main Footer Links ── */}
-      <div className="bg-[#FFFFFF] px-4 py-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-10">
-            {/* Brand column */}
-            <div className="col-span-2 md:col-span-4 lg:col-span-1">
-              <div className="text-white font-extrabold text-xl tracking-tight mb-3">
-                property<span className="text-[#E87C02]">Brands</span>
-              </div>
-              <p className="text-[#495057] text-xs leading-relaxed mb-4">
-                A next-generation PropTech company offering end-to-end real estate solutions across residential, commercial, investment advisory, and property management.
-              </p>
-              <div className="flex items-center gap-1.5 bg-[#2C9DD5]/20 border border-[#2C9DD5]/30 rounded-lg px-3 py-2 w-fit">
-                <svg className="w-3.5 h-3.5 text-[#2C9DD5]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        <div className="space-y-5">
+          {[
+            {
+              icon: (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="text-[#2C9DD5] text-[10px] font-bold">RERA Registered</span>
+              ),
+              label: "Corporate Office",
+              value: "PropertyBrands Realty Services, Ranchi, Jharkhand — 834001",
+            },
+            {
+              icon: (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V5z" />
+                </svg>
+              ),
+              label: "Phone & WhatsApp",
+              value: "+91 94301 00000 · +91 98765 00000",
+            },
+            {
+              icon: (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              ),
+              label: "Email",
+              value: "info@propertybrands.in",
+            },
+            {
+              icon: (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+              ),
+              label: "Website",
+              value: "www.propertybrands.in",
+            },
+          ].map((item) => (
+            <div key={item.label} className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-[#BA0D0B] shrink-0">
+                {item.icon}
+              </div>
+
+              <div>
+                <p className="text-[#BA0D0B] text-[11px] font-bold uppercase tracking-wider">
+                  {item.label}
+                </p>
+
+                <p className="text-[#15191C] text-sm font-medium mt-1">
+                  {item.value}
+                </p>
               </div>
             </div>
+          ))}
+        </div>
 
-            {/* Link columns */}
-            {FOOTER_LINKS.map((col) => (
-              <div key={col.heading}>
-                <h4 className="text-white text-sm font-bold mb-4 flex items-center gap-1.5">
-                  <span className="w-1 h-4 bg-[#2C9DD5] rounded-full inline-block" />
-                  {col.heading}
-                </h4>
-                <ul className="space-y-2">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        className="text-[#495057] text-xs hover:text-white transition flex items-center gap-1 group"
-                      >
-                        <svg className="w-2.5 h-2.5 text-[#495057] group-hover:text-[#2C9DD5] transition shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+        {/* Social Icons */}
+        <div className="mt-8">
+          <p className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest mb-3">
+            Follow Us
+          </p>
+
+          <div className="flex items-center gap-3">
+            {SOCIAL_LINKS.map((s) => (
+              <a
+                key={s.name}
+                href={s.href}
+                aria-label={s.name}
+                className="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-[#BA0D0B] text-slate-600 transition-all duration-300 flex items-center justify-center"
+              >
+                {s.icon}
+              </a>
             ))}
           </div>
-
-          {/* Quick Links strip */}
-          <div className="border-t border-gray-800 pt-6 pb-4">
-            <div className="flex flex-wrap items-center gap-1 mb-2">
-              <span className="text-[#495057] text-xs font-semibold mr-1">Quick Links:</span>
-              {QUICK_LINKS.map((l, i) => (
-                <span key={l.label} className="flex items-center gap-1">
-                  <a href={l.href} className="text-[#495057] text-xs hover:text-white transition">{l.label}</a>
-                  {i < QUICK_LINKS.length - 1 && <span className="text-[#1F242A] text-xs">·</span>}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
+      {/* Right – Inquiry Form */}
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8">
+        <p className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest mb-2">
+          Quick Inquiry
+        </p>
+
+        <h3 className="text-[#15191C] font-bold text-2xl mb-6">
+          Tell us what you're looking for
+        </h3>
+
+        <QuickInquiry />
+      </div>
+
+    </div>
+  </div>
+</div>
+
+      {/* ── Main Footer Links ── */}
+    <div className="bg-gradient-to-b from-white to-slate-50 px-4 py-12 border-t border-slate-200">
+      <div className="max-w-7xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-sm p-8 md:p-10">
+
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-10">
+
+          {/* Brand column */}
+          <div className="col-span-2 md:col-span-4 lg:col-span-1">
+            <div className="text-[#15191C] font-extrabold text-xl tracking-tight mb-3">
+              property<span className="text-[#E87C02]">Brands</span>
+            </div>
+
+            <p className="text-slate-600 text-xs leading-relaxed mb-4">
+              A next-generation PropTech company offering end-to-end real estate
+              solutions across residential, commercial, investment advisory, and
+              property management.
+            </p>
+
+            <div className="flex items-center gap-2 bg-sky-50 border border-sky-100 rounded-xl px-3 py-2 w-fit">
+              <svg
+                className="w-4 h-4 text-sky-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+
+              <span className="text-sky-700 text-[10px] font-bold">
+                RERA Registered
+              </span>
+            </div>
+          </div>
+
+          {/* Link columns */}
+          {FOOTER_LINKS.map((col) => (
+            <div key={col.heading}>
+              <h4 className="text-[#15191C] text-sm font-bold mb-4 flex items-center gap-2">
+                <span className="w-1 h-4 bg-[#BA0D0B] rounded-full inline-block" />
+                {col.heading}
+              </h4>
+
+              <ul className="space-y-2.5">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      className="text-slate-600 text-xs hover:text-[#BA0D0B] transition-all duration-300 flex items-center gap-1.5 group"
+                    >
+                      <svg
+                        className="w-2.5 h-2.5 text-slate-400 group-hover:text-[#BA0D0B] transition"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Links Strip */}
+        <div className="border-t border-slate-200 pt-6">
+          <div className="flex flex-wrap items-center gap-1">
+            <span className="text-slate-700 text-xs font-semibold mr-1">
+              Quick Links:
+            </span>
+
+            {QUICK_LINKS.map((l, i) => (
+              <span key={l.label} className="flex items-center gap-1">
+                <a
+                  href={l.href}
+                  className="text-slate-600 text-xs hover:text-[#BA0D0B] transition"
+                >
+                  {l.label}
+                </a>
+
+                {i < QUICK_LINKS.length - 1 && (
+                  <span className="text-slate-300 text-xs">•</span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
       {/* ── Bottom Bar ── */}
       <div className="bg-[#FFFFFF] px-4 py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -370,7 +427,7 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             {["Privacy Policy", "Terms & Conditions", "Disclaimer", "Sitemap"].map((l, i, arr) => (
               <span key={l} className="flex items-center gap-4">
-                <a href="#" className="text-[#495057] text-xs hover:text-white transition">{l}</a>
+                <a href="#"className="text-slate-600 text-xs font-medium hover:text-[#BA0D0B] hover:translate-x-0.5 transition-all duration-300 inline-flex items-center">{l}</a>
                 {i < arr.length - 1 && <span className="text-[#1F242A] text-xs">·</span>}
               </span>
             ))}

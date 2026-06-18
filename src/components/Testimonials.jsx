@@ -278,27 +278,55 @@ export default function Testimonials() {
       <div className="max-w-7xl mx-auto space-y-12">
 
         {/* ── Stats Counter ── */}
-        <div className="bg-gradient-to-r from-[#2C9DD5] to-[#5C0B03] rounded-2xl p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-extrabold text-white">
-              Trusted by Thousands Across India
-            </h2>
-            <p className="text-[#495057] text-sm mt-1">
-              Numbers that reflect our commitment to excellence
-            </p>
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(186,13,11,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] p-8 md:p-10 shadow-lg">
+
+  {/* Decorative Glow */}
+  <div className="absolute -top-20 -right-20 w-64 h-64 bg-red-100 rounded-full blur-3xl opacity-30 pointer-events-none" />
+
+  <div className="relative">
+    
+    {/* Heading */}
+    <div className="text-center mb-10">
+      <span className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest">
+        Our Impact
+      </span>
+
+      <h2 className="mt-2 text-3xl font-extrabold text-[#15191C]">
+        Trusted by Thousands Across India
+      </h2>
+
+      <p className="mt-2 text-sm text-slate-600">
+        Numbers that reflect our commitment to excellence and customer satisfaction
+      </p>
+    </div>
+
+    {/* Stats Grid */}
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+      {STATS.map((stat) => (
+        <div
+          key={stat.label}
+          className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        >
+          <div className="mb-3 text-3xl">
+            {stat.icon}
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {STATS.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-3xl mb-2">{stat.icon}</div>
-                <div className="text-3xl font-extrabold text-white tracking-tight">
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                </div>
-                <div className="text-[#495057] text-sm mt-1 font-medium">{stat.label}</div>
-              </div>
-            ))}
+
+          <div className="text-3xl font-extrabold text-[#BA0D0B] tracking-tight">
+            <AnimatedCounter
+              target={stat.value}
+              suffix={stat.suffix}
+            />
+          </div>
+
+          <div className="mt-2 text-sm font-medium text-slate-600">
+            {stat.label}
           </div>
         </div>
+      ))}
+    </div>
+
+  </div>
+</div>
 
         {/* ── Testimonials ── */}
         <div>

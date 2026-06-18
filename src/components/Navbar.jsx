@@ -220,7 +220,8 @@ export default function Navbar() {
           <button className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5" onClick={() => setMobileOpen(!mobileOpen)}>
             {[0,1,2].map((i) => (
               <span key={i} className="block w-5 h-0.5 transition-all duration-300" style={{ background: "#15191C",
-                transform: mobileOpen ? (i===0?"rotate(45deg) translateY(8px)":i===2?"rotate(-45deg) translateY(-8px)":""):"",
+                transform: mobileOpen ? (i===0?"rotate(45deg) translateY(8px)":i===2?"rotate(-45deg) translateY(-8px)":"")
+                :"",
                 opacity: mobileOpen && i===1 ? 0 : 1 }} />
             ))}
           </button>
