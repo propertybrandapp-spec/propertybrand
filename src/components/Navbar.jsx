@@ -1,76 +1,205 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+
+import ContactUs from "./ContactUs";
 
 const CITIES = [
   "Ranchi", "Delhi", "Mumbai", "Bangalore", "Hyderabad",
   "Chennai", "Pune", "Kolkata", "Ahmedabad", "Jaipur",
 ];
+// ── NAV URL MAP ───────────────────────────────────────────────────────────────
+// Paste real URLs/page-ids here for each nav destination. To point any link
+// elsewhere, just change the value on the right — no need to touch markup below.
+const NAV_URL_MAP = {
+  // Buy Property (per spec: Residential / Commercial / Plotted Developments)
+  readyToMove: "search",
+  underConstruction: "search",
+  luxuryApartments: "search",
+  affordableHousing: "search",
+  gatedCommunities: "search",
+  villasRowHouses: "search",
+  residentialPlots: "search",
+  officeSpaces: "search",
+  retailSpaces: "search",
+  industrialProperties: "search",
 
+  // Rent Property (per spec: Rental Services)
+  rentApartments: "search",
+  rentVillas: "search",
+  rentOfficeSpaces: "search",
+  rentShops: "search",
+  coLivingSpaces: "search",
+  studentAccommodation: "search",
+
+  // Investment Advisory (per spec)
+  highGrowthCorridors: "home",
+  rentalYieldOpportunities: "home",
+  commercialInvestments: "home",
+  landBanking: "home",
+  retirementHomes: "home",
+  nriInvestments: "home",
+  roiCalculator: "home",
+  rentalYieldCalculator: "home",
+
+  // Home Loan Assistance (per spec)
+  emiCalculator: "home",
+  eligibilityCheck: "home",
+  loanComparison: "home",
+
+  // Architects & Interior Design (per spec)
+  housePlanning: "property-management",
+  residentialDesign: "property-management",
+  modularKitchen: "property-management",
+  interiorPackages: "property-management",
+
+  // Property Management (per spec)
+  tenantManagement: "property-management",
+  rentCollection: "property-management",
+  maintenanceCoordination: "property-management",
+
+  // Help (per spec: FAQ + Contact)
+  howToBuy: "home",
+  howToRent: "home",
+  howToApplyLoan: "home",
+  whatIsRera: "home",
+  howToCalculateEmi: "home",
+  howToRentProperty: "home",
+  blog: "blog",
+  contact: "contact",
+};
 const NAV_ITEMS = [
   {
     label: "Buy",
     columns: [
       {
-        heading: "Residential",
-        links: ["Ready-to-Move Apartments","Under Construction Projects","Luxury Apartments","Affordable Housing","Gated Communities","Villas & Row Houses","Residential Plots"],
+        heading: "Residential Properties",
+        links: [
+          { label: "Ready-to-Move Apartments", page: NAV_URL_MAP.readyToMove },
+          { label: "Under Construction Projects", page: NAV_URL_MAP.underConstruction },
+          { label: "Luxury Apartments", page: NAV_URL_MAP.luxuryApartments },
+          { label: "Affordable Housing", page: NAV_URL_MAP.affordableHousing },
+          { label: "Gated Communities", page: NAV_URL_MAP.gatedCommunities },
+          { label: "Villas & Row Houses", page: NAV_URL_MAP.villasRowHouses },
+          { label: "Residential Plots", page: NAV_URL_MAP.residentialPlots },
+        ],
       },
       {
-        heading: "Commercial",
-        links: ["Office Spaces","Managed Workspaces","Business Centers","Retail Shops","Showrooms","Warehouses","Industrial Sheds"],
-      },
-      {
-        heading: "By Budget",
-        links: ["Under ₹30 Lac","₹30 – 50 Lac","₹50 Lac – 1 Cr","₹1 – 1.5 Cr","₹1.5 – 2 Cr","Above ₹2 Cr"],
+        heading: "Commercial Properties",
+        links: [
+          { label: "Office Spaces", page: NAV_URL_MAP.officeSpaces },
+          { label: "Retail Spaces", page: NAV_URL_MAP.retailSpaces },
+          { label: "Industrial Properties", page: NAV_URL_MAP.industrialProperties },
+        ],
       },
     ],
   },
   {
     label: "Rent",
     columns: [
-      { heading: "Residential Rentals", links: ["Apartments for Rent","Villas for Rent","Independent Houses","Co-living Spaces","Student Accommodation","Furnished Apartments"] },
-      { heading: "Commercial Rentals", links: ["Office Spaces","Retail Shops","Showrooms","Coworking Spaces","Warehouses"] },
-      { heading: "Rental Services", links: ["Tenant Verification","Rental Agreement","Property Inspection","Rent Collection Support","Property Management"] },
+      {
+        heading: "Rental Properties",
+        links: [
+          { label: "Apartments", page: NAV_URL_MAP.rentApartments },
+          { label: "Villas", page: NAV_URL_MAP.rentVillas },
+          { label: "Office Spaces", page: NAV_URL_MAP.rentOfficeSpaces },
+          { label: "Shops", page: NAV_URL_MAP.rentShops },
+          { label: "Co-living Spaces", page: NAV_URL_MAP.coLivingSpaces },
+          { label: "Student Accommodation", page: NAV_URL_MAP.studentAccommodation },
+        ],
+      },
     ],
   },
   {
-    label: "Sell",
+    label: "Investment Advisory",
     columns: [
-      { heading: "Sell Your Property", links: ["Post Free Property Ad","Sell Apartment","Sell Villa","Sell Plot","Sell Commercial Space"] },
-      { heading: "Services", links: ["Property Valuation","Legal Assistance","Documentation Support","Resale Assistance","Channel Partner Network"] },
+      {
+        heading: "Investment Options",
+        links: [
+          { label: "High Growth Corridors", page: NAV_URL_MAP.highGrowthCorridors },
+          { label: "Rental Yield Opportunities", page: NAV_URL_MAP.rentalYieldOpportunities },
+          { label: "Commercial Investments", page: NAV_URL_MAP.commercialInvestments },
+          { label: "Land Banking Opportunities", page: NAV_URL_MAP.landBanking },
+          { label: "Retirement Homes", page: NAV_URL_MAP.retirementHomes },
+          { label: "NRI Investments", page: NAV_URL_MAP.nriInvestments },
+        ],
+      },
+      {
+        heading: "Investment Tools",
+        links: [
+          { label: "ROI Calculator", page: NAV_URL_MAP.roiCalculator },
+          { label: "Rental Yield Calculator", page: NAV_URL_MAP.rentalYieldCalculator },
+        ],
+      },
     ],
   },
   {
     label: "Home Loans",
     columns: [
-      { heading: "Loan Services", links: ["Check Loan Eligibility","Compare Home Loans","Fast Approval","Documentation Support","Loan Against Property"] },
-      { heading: "Partner Banks", links: ["SBI Home Loan","HDFC Home Loan","ICICI Home Loan","Axis Bank Home Loan","LIC Housing Finance"] },
-      { heading: "Calculators", links: ["EMI Calculator","Affordability Calculator","Down Payment Calculator","Stamp Duty Calculator","Registration Cost Calculator"] },
+      {
+        heading: "Home Loan Assistance",
+        links: [
+          { label: "EMI Calculator", page: NAV_URL_MAP.emiCalculator },
+          { label: "Eligibility Check", page: NAV_URL_MAP.eligibilityCheck },
+          { label: "Loan Comparison", page: NAV_URL_MAP.loanComparison },
+        ],
+      },
     ],
   },
   {
-    label: "Home Interiors",
+    label: "Architects & Design",
     columns: [
-      { heading: "Interior Design", links: ["Modular Kitchen Design","Bedroom Interiors","Living Room Design","Office Interiors","Commercial Interiors","Furniture Planning"] },
-      { heading: "Packages", links: ["Essential Package","Premium Package","Luxury Package"] },
-      { heading: "Architecture", links: ["House Planning","Residential Design","3D Visualization","Approval Drawings","Site Supervision"] },
+      {
+        heading: "Architects & Design Consultation",
+        links: [
+          { label: "House Planning", page: NAV_URL_MAP.housePlanning },
+          { label: "Residential Design", page: NAV_URL_MAP.residentialDesign },
+        ],
+      },
+      {
+        heading: "Interior Design Services",
+        links: [
+          { label: "Modular Kitchen Design", page: NAV_URL_MAP.modularKitchen },
+          { label: "Interior Packages", page: NAV_URL_MAP.interiorPackages },
+        ],
+      },
     ],
   },
   {
-    label: "Investment Advisory",
-    badge: "NEW",
+    label: "Property Management",
     columns: [
-      { heading: "Investment Options", links: ["High Growth Corridors","Rental Yield Opportunities","Commercial Investments","Land Banking","Retirement Homes","NRI Investments"] },
-      { heading: "Investment Tools", links: ["ROI Calculator","Rental Yield Calculator","Capital Appreciation Estimator","Investment Comparison Tool"] },
+      {
+        heading: "Complete Property Care",
+        links: [
+          { label: "Tenant Management", page: NAV_URL_MAP.tenantManagement },
+          { label: "Rent Collection", page: NAV_URL_MAP.rentCollection },
+          { label: "Maintenance Coordination", page: NAV_URL_MAP.maintenanceCoordination },
+        ],
+      },
     ],
   },
   {
     label: "Help",
     columns: [
-      { heading: "Support", links: ["How to Buy a Property","How to Rent a Property","How to Apply for Home Loan","What is RERA?","How to Calculate EMI","Contact Us"] },
-      { heading: "Resources", links: ["Real Estate Blog","Market Reports","Infrastructure Updates","Government Policies","Smart City Updates"] },
+      {
+        heading: "FAQ",
+        links: [
+          { label: "How to Buy a Property", page: NAV_URL_MAP.howToBuy },
+          { label: "How to Apply for a Home Loan", page: NAV_URL_MAP.howToApplyLoan },
+          { label: "What is RERA?", page: NAV_URL_MAP.whatIsRera },
+          { label: "How to Calculate EMI", page: NAV_URL_MAP.howToCalculateEmi },
+          { label: "How to Rent a Property", page: NAV_URL_MAP.howToRentProperty },
+        ],
+      },
+      {
+        heading: "Resources",
+        links: [
+          { label: "Real Estate Blog", page: NAV_URL_MAP.blog },
+          { label: "Contact Us", page: NAV_URL_MAP.contact },
+        ],
+      },
     ],
   },
 ];
-
 function ChevronDown({ className = "" }) {
   return (
     <svg className={`w-3 h-3 transition-transform duration-200 ${className}`} fill="currentColor" viewBox="0 0 20 20">
@@ -79,11 +208,25 @@ function ChevronDown({ className = "" }) {
   );
 }
 
-function DropdownMenu({ item, isOpen }) {
+function DropdownMenu({ item, isOpen, onNavigate ,index}) {
   if (!isOpen || !item.columns) return null;
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 min-w-max">
-      <div className="flex justify-center">
+<div
+  className={`absolute top-full mt-0 z-50 min-w-max ${
+    index <= 1
+      ? "left-0"
+      : "left-1/2 -translate-x-1/2"
+  }`}
+>
+        <div
+  className={`flex ${
+    index === 0
+      ? "justify-start pl-8"
+      : index === 1
+      ? "justify-start pl-9"
+      : "justify-center"
+  }`}
+>
         <div className="w-3 h-3 rotate-45 -mb-1.5 z-10 relative border-l border-t" style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }} />
       </div>
       <div className="rounded-xl shadow-2xl overflow-hidden border" style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }}>
@@ -93,12 +236,12 @@ function DropdownMenu({ item, isOpen }) {
               <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#2C9DD5" }}>{col.heading}</p>
               <ul className="space-y-1.5">
                 {col.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm block py-0.5 transition-colors" style={{ color: "#495057" }}
+                  <li key={link.label}>
+                    <button onClick={() => onNavigate && onNavigate(link.page)} className="text-sm block py-0.5 transition-colors text-left w-full" style={{ color: "#495057" }}
                       onMouseEnter={e => e.target.style.color = "#2C9DD5"}
                       onMouseLeave={e => e.target.style.color = "#495057"}>
-                      {link}
-                    </a>
+                      {link.label}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -232,7 +375,7 @@ export default function Navbar() {
       <nav className="hidden lg:block border-b" style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }}>
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center">
-            {NAV_ITEMS.map((item) => (
+            {NAV_ITEMS.map((item,index) => (
               <li key={item.label} className="relative" onMouseEnter={() => handleMouseEnter(item.label)} onMouseLeave={handleMouseLeave}>
                 <button className="flex items-center gap-1 px-4 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors border-b-2 -mb-px"
                   style={{ color: activeDropdown === item.label ? "#2C9DD5" : "#495057", borderBottomColor: activeDropdown === item.label ? "#2C9DD5" : "transparent" }}>
@@ -240,7 +383,7 @@ export default function Navbar() {
                   {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded leading-none" style={{ background: "#E87C02", color: "#FFFFFF" }}>{item.badge}</span>}
                   <ChevronDown className={activeDropdown === item.label ? "rotate-180" : ""} />
                 </button>
-                <DropdownMenu item={item} isOpen={activeDropdown === item.label} />
+                <DropdownMenu item={item} isOpen={activeDropdown === item.label} index={index}/>
               </li>
             ))}
           </ul>

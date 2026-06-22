@@ -10,6 +10,13 @@ import ChannelPartner from "./components/ChannelPartner";
 import PropertyManagement from "./components/PropertyManagement";
 import SearchResults from "./components/SearchResults";
 import Footer from "./components/Footer";
+import ContactUs from "./components/ContactUs";
+import { Routes, Route } from "react-router-dom";
+
+<Routes>
+  <Route path="/" element={<Hero />} />
+  <Route path="/ContactUs" element={<ContactUs />} />
+</Routes>
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"

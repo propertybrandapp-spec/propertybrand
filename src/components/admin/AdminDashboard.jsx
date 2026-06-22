@@ -1,0 +1,291 @@
+import { useState } from "react";
+import AdminLayout from "./AdminLayout";
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+const KPI_CARDS = [
+  {
+    label: "Total Listings",
+    value: "1,284",
+    change: "+12.4%",
+    positive: true,
+    icon: "🏠",
+    color: "#2C9DD5",
+    bg: "#EAF4FB",
+  },
+  {
+    label: "Active Leads",
+    value: "342",
+    change: "+8.1%",
+    positive: true,
+    icon: "📞",
+    color: "#E87C02",
+    bg: "#FDF1E5",
+  },
+  {
+    label: "Revenue (MTD)",
+    value: "₹48.2 Cr",
+    change: "+18.6%",
+    positive: true,
+    icon: "💰",
+    color: "#4ade80",
+    bg: "#EAF8EC",
+  },
+  {
+    label: "Pending Approvals",
+    value: "23",
+    change: "-4.2%",
+    positive: false,
+    icon: "⏳",
+    color: "#BA0D0B",
+    bg: "#FCEAEA",
+  },
+];
+
+const RECENT_ACTIVITY = [
+  { type: "listing", text: "New listing submitted — 3 BHK Flat, Harmu Colony", time: "12 min ago", color: "#2C9DD5" },
+  { type: "lead", text: "Lead converted — Rajesh Kumar, Kanke Road Villa", time: "45 min ago", color: "#4ade80" },
+  { type: "agent", text: "Agent verification requested — Priya Sharma", time: "1 hour ago", color: "#E87C02" },
+  { type: "blog", text: "Blog post published — 'Ranchi Real Estate 2025'", time: "2 hours ago", color: "#2C9DD5" },
+  { type: "alert", text: "Listing flagged for review — duplicate images", time: "3 hours ago", color: "#BA0D0B" },
+  { type: "lead", text: "New inquiry — Office Space, Main Road", time: "4 hours ago", color: "#4ade80" },
+];
+
+const TOP_LISTINGS = [
+  { title: "5 BHK Luxury Villa", location: "Golf Course Road", views: "2,840", leads: 34, price: "₹7.20 Cr" },
+  { title: "3 BHK Apartment", location: "Harmu Colony", views: "2,140", leads: 28, price: "₹2.40 Cr" },
+  { title: "2 BHK Apartment", location: "Morabadi", views: "1,820", leads: 22, price: "₹68 Lac" },
+  { title: "4 BHK Villa", location: "Kanke Road", views: "1,650", leads: 19, price: "₹3.80 Cr" },
+];
+
+const CHART_DATA = [42, 58, 49, 65, 72, 68, 80, 75, 88, 92, 85, 96];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// ── Bar Chart (lightweight, no deps) ──────────────────────────────────────────
+function MiniBarChart() {
+  const max = Math.max(...CHART_DATA);
+  return (
+    <div className="flex items-end gap-2 h-40">
+      {CHART_DATA.map((val, i) => (
+        <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
+          <div className="w-full flex flex-col items-center justify-end h-32 relative">
+            <div
+              className="w-full rounded-t-md transition-all duration-300 group-hover:opacity-80"
+              style={{
+                height: `${(val / max) * 100}%`,
+                background: i === CHART_DATA.length - 1 ? "#2C9DD5" : "#EAF4FB",
+              }}
+            />
+          </div>
+          <span className="text-[10px]" style={{ color: "#495057" }}>{MONTHS[i]}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Donut (lightweight) ────────────────────────────────────────────────────────
+function MiniDonut() {
+  const segments = [
+    { label: "Apartments", value: 45, color: "#2C9DD5" },
+    { label: "Villas", value: 25, color: "#E87C02" },
+    { label: "Plots", value: 18, color: "#BA0D0B" },
+    { label: "Commercial", value: 12, color: "#4ade80" },
+  ];
+  let cumulative = 0;
+  return (
+    <div className="flex items-center gap-6">
+      <div className="relative w-32 h-32 shrink-0">
+        <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="#F2F4F6" strokeWidth="3.5" />
+          {segments.map((seg) => {
+            const offset = cumulative;
+            cumulative += seg.value;
+            return (
+              <circle
+                key={seg.label}
+                cx="18" cy="18" r="15.9" fill="none"
+                stroke={seg.color} strokeWidth="3.5"
+                strokeDasharray={`${seg.value} ${100 - seg.value}`}
+                strokeDashoffset={`-${offset}`}
+                strokeLinecap="round"
+              />
+            );
+          })}
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <p className="text-xl font-extrabold" style={{ color: "#15191C" }}>1,284</p>
+          <p className="text-[10px]" style={{ color: "#495057" }}>Total</p>
+        </div>
+      </div>
+      <div className="space-y-2 flex-1">
+        {segments.map((seg) => (
+          <div key={seg.label} className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: seg.color }} />
+            <span className="text-xs flex-1" style={{ color: "#15191C" }}>{seg.label}</span>
+            <span className="text-xs font-bold" style={{ color: "#495057" }}>{seg.value}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Export ───────────────────────────────────────────────────────────────
+export default function AdminDashboard({ onNavigate }) {
+  const [period, setPeriod] = useState("This Month");
+
+  return (
+    <AdminLayout activePage="dashboard" onNavigate={onNavigate} title="Dashboard" subtitle="Overview of platform performance">
+      <div className="space-y-6">
+
+        {/* ── Period Filter ── */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <p className="text-sm" style={{ color: "#495057" }}>Welcome back, here's what's happening today.</p>
+          <div className="flex gap-2">
+            {["Today", "This Week", "This Month", "This Year"].map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
+                style={{
+                  background: period === p ? "#2C9DD5" : "#FFFFFF",
+                  color: period === p ? "#FFFFFF" : "#495057",
+                  border: `1px solid ${period === p ? "#2C9DD5" : "#E5E8EB"}`,
+                }}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── KPI Cards ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {KPI_CARDS.map((kpi) => (
+            <div
+              key={kpi.label}
+              className="rounded-2xl p-5 transition-shadow hover:shadow-lg"
+              style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                  style={{ background: kpi.bg }}
+                >
+                  {kpi.icon}
+                </div>
+                <span
+                  className="text-xs font-bold px-2 py-1 rounded-full"
+                  style={{
+                    background: kpi.positive ? "#EAF8EC" : "#FCEAEA",
+                    color: kpi.positive ? "#16a34a" : "#BA0D0B",
+                  }}
+                >
+                  {kpi.change}
+                </span>
+              </div>
+              <p className="text-2xl font-extrabold" style={{ color: "#15191C" }}>{kpi.value}</p>
+              <p className="text-sm mt-1" style={{ color: "#495057" }}>{kpi.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Charts Row ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Bar chart */}
+          <div
+            className="lg:col-span-2 rounded-2xl p-6"
+            style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-base font-bold" style={{ color: "#15191C" }}>Listings Growth</h3>
+                <p className="text-xs mt-0.5" style={{ color: "#495057" }}>Monthly new listings added</p>
+              </div>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "#EAF4FB", color: "#2C9DD5" }}>
+                +96 this month
+              </span>
+            </div>
+            <MiniBarChart />
+          </div>
+
+          {/* Donut */}
+          <div
+            className="rounded-2xl p-6"
+            style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+          >
+            <h3 className="text-base font-bold mb-1" style={{ color: "#15191C" }}>Listings by Type</h3>
+            <p className="text-xs mb-5" style={{ color: "#495057" }}>Distribution across categories</p>
+            <MiniDonut />
+          </div>
+        </div>
+
+        {/* ── Activity + Top Listings ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {/* Recent Activity */}
+          <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
+            <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #E5E8EB" }}>
+              <h3 className="text-base font-bold" style={{ color: "#15191C" }}>Recent Activity</h3>
+              <button className="text-xs font-semibold" style={{ color: "#2C9DD5" }}>View all</button>
+            </div>
+            <div>
+              {RECENT_ACTIVITY.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 px-6 py-3.5"
+                  style={{ borderBottom: i < RECENT_ACTIVITY.length - 1 ? "1px solid #F2F4F6" : "none" }}
+                >
+                  <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: item.color }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm" style={{ color: "#15191C" }}>{item.text}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Top Listings */}
+          <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
+            <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #E5E8EB" }}>
+              <h3 className="text-base font-bold" style={{ color: "#15191C" }}>Top Performing Listings</h3>
+              <button
+                onClick={() => onNavigate("listings")}
+                className="text-xs font-semibold"
+                style={{ color: "#2C9DD5" }}
+              >
+                View all
+              </button>
+            </div>
+            <div>
+              {TOP_LISTINGS.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 px-6 py-3.5"
+                  style={{ borderBottom: i < TOP_LISTINGS.length - 1 ? "1px solid #F2F4F6" : "none" }}
+                >
+                  <span
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
+                    style={{ background: "#F2F4F6", color: "#495057" }}
+                  >
+                    {i + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate" style={{ color: "#15191C" }}>{item.title}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.location} · {item.price}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-xs font-bold" style={{ color: "#2C9DD5" }}>{item.views} views</p>
+                    <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.leads} leads</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </AdminLayout>
+  );
+}
