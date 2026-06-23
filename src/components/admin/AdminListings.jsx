@@ -83,7 +83,7 @@ function ActionMenu({ listing }) {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function AdminListings({ onNavigate }) {
+export default function AdminListings({ onNavigate, onLogout, adminProfile }) {
   const [activeFilter, setActiveFilter] = useState("All");
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
@@ -111,7 +111,7 @@ export default function AdminListings({ onNavigate }) {
   };
 
   return (
-    <AdminLayout activePage="listings" onNavigate={onNavigate} title="Property Listings" subtitle="Manage, approve, and moderate all listings">
+    <AdminLayout activePage="listings" onNavigate={onNavigate} onLogout={onLogout} adminProfile={adminProfile} title="Property Listings" subtitle="Manage, approve, and moderate all listings">
       <div className="space-y-5">
 
         {/* ── Top bar: search + add button ── */}

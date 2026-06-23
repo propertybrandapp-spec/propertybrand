@@ -123,7 +123,7 @@ function LeadDrawer({ lead, onClose }) {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function AdminLeads({ onNavigate }) {
+export default function AdminLeads({ onNavigate, onLogout, adminProfile }) {
   const [activeStage, setActiveStage] = useState("All");
   const [selectedLead, setSelectedLead] = useState(null);
   const [viewMode, setViewMode] = useState("table");
@@ -131,7 +131,7 @@ export default function AdminLeads({ onNavigate }) {
   const filtered = activeStage === "All" ? LEADS : LEADS.filter((l) => l.stage === activeStage);
 
   return (
-    <AdminLayout activePage="leads" onNavigate={onNavigate} title="Leads & Inquiries" subtitle="Track and manage every customer inquiry">
+    <AdminLayout activePage="leads" onNavigate={onNavigate} onLogout={onLogout} adminProfile={adminProfile} title="Leads & Inquiries" subtitle="Track and manage every customer inquiry">
       <div className="space-y-5">
 
         {/* ── Stage Pipeline Summary ── */}

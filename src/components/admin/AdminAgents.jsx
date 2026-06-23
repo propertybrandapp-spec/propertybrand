@@ -126,7 +126,7 @@ function AgentCard({ agent, onAction }) {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function AdminAgents({ onNavigate }) {
+export default function AdminAgents({ onNavigate, onLogout, adminProfile }) {
   const [activeTab, setActiveTab] = useState("All Agents");
   const [agents, setAgents] = useState(AGENTS);
 
@@ -155,7 +155,7 @@ export default function AdminAgents({ onNavigate }) {
   };
 
   return (
-    <AdminLayout activePage="agents" onNavigate={onNavigate} title="Agents & Channel Partners" subtitle="Manage partner verification and performance tiers">
+    <AdminLayout activePage="agents" onNavigate={onNavigate} onLogout={onLogout} adminProfile={adminProfile} title="Agents & Channel Partners" subtitle="Manage partner verification and performance tiers">
       <div className="space-y-5">
 
         {/* ── Stats Row ── */}

@@ -156,9 +156,12 @@ function Sidebar({ activePage, onNavigate, collapsed, setCollapsed, mobileOpen, 
 }
 
 // ── Topbar ────────────────────────────────────────────────────────────────────
-function Topbar({ title, subtitle, onMenuClick }) {
+function Topbar({ title, subtitle, onMenuClick, onLogout, adminProfile }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  const initials = adminProfile?.avatar_initials || adminProfile?.full_name?.charAt(0) || "A";
+  const displayName = adminProfile?.full_name || "Admin";
 
   return (
     <header
@@ -248,9 +251,9 @@ function Topbar({ title, subtitle, onMenuClick }) {
               className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
               style={{ background: "#2C9DD5", color: "#FFFFFF" }}
             >
-              A
+              {initials}
             </div>
-            <span className="hidden lg:block text-sm font-semibold" style={{ color: "#15191C" }}>Admin</span>
+            <span className="hidden lg:block text-sm font-semibold" style={{ color: "#15191C" }}>{displayName}</span>
             <svg className="hidden lg:block w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#495057" }}>
               <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
@@ -273,6 +276,7 @@ function Topbar({ title, subtitle, onMenuClick }) {
               ))}
               <div style={{ borderTop: "1px solid #E5E8EB" }} />
               <button
+                onClick={() => { setProfileOpen(false); onLogout && onLogout(); }}
                 className="block w-full text-left px-4 py-2.5 text-sm font-semibold transition-colors"
                 style={{ color: "#BA0D0B" }}
                 onMouseEnter={(e) => e.currentTarget.style.background = "#FCEAEA"}
@@ -289,7 +293,7 @@ function Topbar({ title, subtitle, onMenuClick }) {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function AdminLayout({ activePage, onNavigate, title, subtitle, children }) {
+export default function AdminLayout({ activePage, onNavigate, title, subtitle, children, onLogout, adminProfile }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -305,7 +309,7 @@ export default function AdminLayout({ activePage, onNavigate, title, subtitle, c
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <Topbar title={title} subtitle={subtitle} onMenuClick={() => setMobileOpen(true)} />
+        <Topbar title={title} subtitle={subtitle} onMenuClick={() => setMobileOpen(true)} onLogout={onLogout} adminProfile={adminProfile} />
         <main className="flex-1 p-5 lg:p-8">{children}</main>
       </div>
     </div>

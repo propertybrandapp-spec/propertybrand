@@ -10,16 +10,10 @@ import ChannelPartner from "./components/ChannelPartner";
 import PropertyManagement from "./components/PropertyManagement";
 import SearchResults from "./components/SearchResults";
 import Footer from "./components/Footer";
-import ContactUs from "./components/ContactUs";
-import { Routes, Route } from "react-router-dom";
-
-<Routes>
-  <Route path="/" element={<Hero />} />
-  <Route path="/ContactUs" element={<ContactUs />} />
-</Routes>
+import AdminApp from "./components/admin/AdminApp";
 
 // ── Simple client-side page router ───────────────────────────────────────────
-// Pages: "home" | "search" | "channel-partner" | "property-management"
+// Pages: "home" | "search" | "channel-partner" | "property-management" | "admin"
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -27,6 +21,12 @@ export default function App() {
   function navigate(to) {
     setPage(to);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // ── Admin console renders standalone — no public Navbar/Footer/dev-strip.
+  // AdminApp handles its own auth gate, sidebar, and topbar internally.
+  if (page === "admin") {
+    return <AdminApp />;
   }
 
   return (
@@ -58,6 +58,7 @@ export default function App() {
           { id: "search", label: "🔍 Search Results" },
           { id: "channel-partner", label: "🤝 Channel Partner" },
           { id: "property-management", label: "🏢 Property Management" },
+          { id: "admin", label: "🔐 Admin Console" },
         ].map((p) => (
           <button
             key={p.id}

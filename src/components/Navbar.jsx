@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import ContactUs from "./ContactUs";
 
 const CITIES = [
-  "Ranchi", "Delhi", "Mumbai", "Bangalore", "Hyderabad",
+  "Bhubaneswar", "Delhi", "Mumbai", "Bangalore", "Hyderabad",
   "Chennai", "Pune", "Kolkata", "Ahmedabad", "Jaipur",
 ];
 // ── NAV URL MAP ───────────────────────────────────────────────────────────────
@@ -313,7 +313,7 @@ function MobileNavItem({ item }) {
 export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [cityOpen, setCityOpen] = useState(false);
-  const [selectedCity, setSelectedCity] = useState("Ranchi");
+  const [selectedCity, setSelectedCity] = useState("Bhubaneswar");
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef(null);
   const timeoutRef = useRef(null);

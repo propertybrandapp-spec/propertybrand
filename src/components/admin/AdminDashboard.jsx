@@ -1,45 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabaseClient";
 import AdminLayout from "./AdminLayout";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
-const KPI_CARDS = [
-  {
-    label: "Total Listings",
-    value: "1,284",
-    change: "+12.4%",
-    positive: true,
-    icon: "🏠",
-    color: "#2C9DD5",
-    bg: "#EAF4FB",
-  },
-  {
-    label: "Active Leads",
-    value: "342",
-    change: "+8.1%",
-    positive: true,
-    icon: "📞",
-    color: "#E87C02",
-    bg: "#FDF1E5",
-  },
-  {
-    label: "Revenue (MTD)",
-    value: "₹48.2 Cr",
-    change: "+18.6%",
-    positive: true,
-    icon: "💰",
-    color: "#4ade80",
-    bg: "#EAF8EC",
-  },
-  {
-    label: "Pending Approvals",
-    value: "23",
-    change: "-4.2%",
-    positive: false,
-    icon: "⏳",
-    color: "#BA0D0B",
-    bg: "#FCEAEA",
-  },
+// Static visual config (icon/color) — paired with live counts fetched below.
+const KPI_CONFIG = [
+  { key: "totalListings", label: "Total Listings", icon: "🏠", color: "#2C9DD5", bg: "#EAF4FB" },
+  { key: "activeLeads", label: "Active Leads", icon: "📞", color: "#E87C02", bg: "#FDF1E5" },
+  { key: "revenue", label: "Revenue (MTD)", icon: "💰", color: "#4ade80", bg: "#EAF8EC" },
+  { key: "pendingApprovals", label: "Pending Approvals", icon: "⏳", color: "#BA0D0B", bg: "#FCEAEA" },
 ];
 
 const RECENT_ACTIVITY = [
@@ -132,11 +102,83 @@ function MiniDonut() {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function AdminDashboard({ onNavigate }) {
+export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
   const [period, setPeriod] = useState("This Month");
+  const [kpis, setKpis] = useState({ totalListings: 0, activeLeads: 0, revenue: "₹0", pendingApprovals: 0 });
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [topListings, setTopListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  async function fetchDashboardData() {
+    setLoading(true);
+
+    // Total listings count
+    const { count: totalListings } = await supabase
+      .from("listings")
+      .select("*", { count: "exact", head: true });
+
+    // Active leads (everything not closed)
+    const { count: activeLeads } = await supabase
+      .from("leads")
+      .select("*", { count: "exact", head: true })
+      .not("stage", "in", '("Closed Won","Closed Lost")');
+
+    // Pending approvals
+    const { count: pendingApprovals } = await supabase
+      .from("listings")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "Pending");
+
+    // Top 4 listings by views
+    const { data: topListingsData } = await supabase
+      .from("listings")
+      .select("title, location, price_label, views")
+      .eq("status", "Live")
+      .order("views", { ascending: false })
+      .limit(4);
+
+    // Recent leads as a simple activity feed (extend with a dedicated
+    // activity_log table later if you want richer event tracking)
+    const { data: recentLeadsData } = await supabase
+      .from("leads")
+      .select("name, interest, created_at, stage")
+      .order("created_at", { ascending: false })
+      .limit(6);
+
+    setKpis({
+      totalListings: totalListings || 0,
+      activeLeads: activeLeads || 0,
+      revenue: "₹0",  // wire this to a real revenue/transactions table when you build one
+      pendingApprovals: pendingApprovals || 0,
+    });
+
+    setTopListings(
+      (topListingsData || []).map((l) => ({
+        title: l.title,
+        location: l.location,
+        price: l.price_label,
+        views: l.views?.toLocaleString() || "0",
+        leads: 0, // join against leads.listing_id once you start linking leads to listings
+      }))
+    );
+
+    setRecentActivity(
+      (recentLeadsData || []).map((l) => ({
+        text: `New lead — ${l.name}${l.interest ? `, ${l.interest}` : ""}`,
+        time: new Date(l.created_at).toLocaleString(),
+        color: l.stage === "New" ? "#2C9DD5" : "#4ade80",
+      }))
+    );
+
+    setLoading(false);
+  }
 
   return (
-    <AdminLayout activePage="dashboard" onNavigate={onNavigate} title="Dashboard" subtitle="Overview of platform performance">
+    <AdminLayout activePage="dashboard" onNavigate={onNavigate} onLogout={onLogout} adminProfile={adminProfile} title="Dashboard" subtitle="Overview of platform performance">
       <div className="space-y-6">
 
         {/* ── Period Filter ── */}
@@ -162,7 +204,7 @@ export default function AdminDashboard({ onNavigate }) {
 
         {/* ── KPI Cards ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {KPI_CARDS.map((kpi) => (
+          {KPI_CONFIG.map((kpi) => (
             <div
               key={kpi.label}
               className="rounded-2xl p-5 transition-shadow hover:shadow-lg"
@@ -175,17 +217,13 @@ export default function AdminDashboard({ onNavigate }) {
                 >
                   {kpi.icon}
                 </div>
-                <span
-                  className="text-xs font-bold px-2 py-1 rounded-full"
-                  style={{
-                    background: kpi.positive ? "#EAF8EC" : "#FCEAEA",
-                    color: kpi.positive ? "#16a34a" : "#BA0D0B",
-                  }}
-                >
-                  {kpi.change}
-                </span>
+                {loading ? (
+                  <span className="text-xs px-2 py-1 rounded-full" style={{ background: "#F2F4F6", color: "#495057" }}>...</span>
+                ) : null}
               </div>
-              <p className="text-2xl font-extrabold" style={{ color: "#15191C" }}>{kpi.value}</p>
+              <p className="text-2xl font-extrabold" style={{ color: "#15191C" }}>
+                {loading ? "—" : (kpi.key === "revenue" ? kpis[kpi.key] : kpis[kpi.key]?.toLocaleString())}
+              </p>
               <p className="text-sm mt-1" style={{ color: "#495057" }}>{kpi.label}</p>
             </div>
           ))}
@@ -230,7 +268,7 @@ export default function AdminDashboard({ onNavigate }) {
               <button className="text-xs font-semibold" style={{ color: "#2C9DD5" }}>View all</button>
             </div>
             <div>
-              {RECENT_ACTIVITY.map((item, i) => (
+              {(recentActivity.length ? recentActivity : RECENT_ACTIVITY).map((item, i) => (
                 <div
                   key={i}
                   className="flex items-start gap-3 px-6 py-3.5"
@@ -259,7 +297,7 @@ export default function AdminDashboard({ onNavigate }) {
               </button>
             </div>
             <div>
-              {TOP_LISTINGS.map((item, i) => (
+              {(topListings.length ? topListings : TOP_LISTINGS).map((item, i) => (
                 <div
                   key={i}
                   className="flex items-center gap-4 px-6 py-3.5"
