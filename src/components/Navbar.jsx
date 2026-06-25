@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-
-import ContactUs from "./ContactUs";
+import { useAuth } from "../lib/AuthContext";
+import AuthModal from "./AuthModal";
+import ClientAccountMenu from "./ClientAccountMenu";
 
 const CITIES = [
-  "Bhubaneswar", "Delhi", "Mumbai", "Bangalore", "Hyderabad",
+  "Ranchi", "Delhi", "Mumbai", "Bangalore", "Hyderabad",
   "Chennai", "Pune", "Kolkata", "Ahmedabad", "Jaipur",
 ];
+
 // ── NAV URL MAP ───────────────────────────────────────────────────────────────
 // Paste real URLs/page-ids here for each nav destination. To point any link
 // elsewhere, just change the value on the right — no need to touch markup below.
@@ -67,6 +68,7 @@ const NAV_URL_MAP = {
   blog: "blog",
   contact: "contact",
 };
+
 const NAV_ITEMS = [
   {
     label: "Buy",
@@ -200,6 +202,7 @@ const NAV_ITEMS = [
     ],
   },
 ];
+
 function ChevronDown({ className = "" }) {
   return (
     <svg className={`w-3 h-3 transition-transform duration-200 ${className}`} fill="currentColor" viewBox="0 0 20 20">
@@ -208,7 +211,7 @@ function ChevronDown({ className = "" }) {
   );
 }
 
-function DropdownMenu({ item, isOpen, onNavigate ,index}) {
+function DropdownMenu({ item, isOpen, onNavigate,index }) {
   if (!isOpen || !item.columns) return null;
   return (
 <div
@@ -281,7 +284,7 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
   );
 }
 
-function MobileNavItem({ item }) {
+function MobileNavItem({ item, onNavigate, onLinkClick }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="border-b last:border-0" style={{ borderColor: "#2C9DD5" }}>
@@ -299,7 +302,15 @@ function MobileNavItem({ item }) {
               <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: "#2C9DD5" }}>{col.heading}</p>
               <ul className="space-y-1">
                 {col.links.map((link) => (
-                  <li key={link}><a href="#" className="text-sm block py-0.5 transition" style={{ color: "#495057" }}>{link}</a></li>
+                  <li key={link.label}>
+                    <button
+                      onClick={() => { onNavigate && onNavigate(link.page); onLinkClick && onLinkClick(); }}
+                      className="text-sm block py-0.5 transition text-left w-full"
+                      style={{ color: "#495057" }}
+                    >
+                      {link.label}
+                    </button>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -310,7 +321,9 @@ function MobileNavItem({ item }) {
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ onNavigate }) {
+  const { isLoggedIn } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [cityOpen, setCityOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Bhubaneswar");
@@ -353,7 +366,11 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-4">
             <button className="text-sm font-semibold transition" style={{ color: "#2C9DD5" }}>PB Prime</button>
             <div className="w-px h-4" style={{ background: "#2C9DD5" }} />
-            <button className="text-sm font-semibold transition" style={{ color: "#15191C" }}>Login</button>
+            {isLoggedIn ? (
+              <ClientAccountMenu onNavigate={onNavigate} />
+            ) : (
+              <button onClick={() => setAuthModalOpen(true)} className="text-sm font-semibold transition" style={{ color: "#15191C" }}>Login</button>
+            )}
             <button className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm transition"
               style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
               Post Property
@@ -363,8 +380,7 @@ export default function Navbar() {
           <button className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5" onClick={() => setMobileOpen(!mobileOpen)}>
             {[0,1,2].map((i) => (
               <span key={i} className="block w-5 h-0.5 transition-all duration-300" style={{ background: "#15191C",
-                transform: mobileOpen ? (i===0?"rotate(45deg) translateY(8px)":i===2?"rotate(-45deg) translateY(-8px)":"")
-                :"",
+                transform: mobileOpen ? (i===0?"rotate(45deg) translateY(8px)":i===2?"rotate(-45deg) translateY(-8px)":""):"",
                 opacity: mobileOpen && i===1 ? 0 : 1 }} />
             ))}
           </button>
@@ -383,7 +399,7 @@ export default function Navbar() {
                   {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded leading-none" style={{ background: "#E87C02", color: "#FFFFFF" }}>{item.badge}</span>}
                   <ChevronDown className={activeDropdown === item.label ? "rotate-180" : ""} />
                 </button>
-                <DropdownMenu item={item} isOpen={activeDropdown === item.label} index={index}/>
+                <DropdownMenu item={item} isOpen={activeDropdown === item.label} index={index} />
               </li>
             ))}
           </ul>
@@ -395,7 +411,11 @@ export default function Navbar() {
         style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }}>
         <div className="flex items-center justify-between px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }}>
           <button className="text-sm font-semibold" style={{ color: "#2C9DD5" }}>PB Prime</button>
-          <button className="text-sm font-semibold" style={{ color: "#15191C" }}>Login</button>
+          {isLoggedIn ? (
+            <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("profile"); }} className="text-sm font-semibold" style={{ color: "#15191C" }}>My Account</button>
+          ) : (
+            <button onClick={() => { setMobileOpen(false); setAuthModalOpen(true); }} className="text-sm font-semibold" style={{ color: "#15191C" }}>Login</button>
+          )}
           <button className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
             Post Property <span className="text-[9px] font-extrabold px-1 py-0.5 rounded" style={{ background: "#E87C02", color: "#FFFFFF" }}>FREE</span>
           </button>
@@ -418,8 +438,10 @@ export default function Navbar() {
             ))}
           </div>
         )}
-        <div>{NAV_ITEMS.map((item) => <MobileNavItem key={item.label} item={item} />)}</div>
+        <div>{NAV_ITEMS.map((item) => <MobileNavItem key={item.label} item={item} onNavigate={onNavigate} onLinkClick={() => setMobileOpen(false)} />)}</div>
       </div>
+
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </header>
   );
 }

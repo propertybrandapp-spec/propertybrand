@@ -170,9 +170,97 @@ create index idx_agents_status on public.agents(status);
 create index idx_blog_posts_status on public.blog_posts(status);
 
 -- ════════════════════════════════════════════════════════════════════════════
+-- CLIENT-FACING TABLES (regular site visitors — buyers, investors, NRIs, agents
+-- signing up publicly. Separate from admin_profiles, which is internal staff.)
+-- ════════════════════════════════════════════════════════════════════════════
+
+-- ── 7. CLIENT PROFILES ────────────────────────────────────────────────────────
+create table public.client_profiles (
+  id uuid references auth.users(id) primary key,
+  full_name text not null,
+  phone text,
+  city text,
+  client_type text default 'Buyer' check (client_type in ('Buyer', 'Investor', 'NRI', 'Agent', 'Tenant', 'Landlord')),
+  avatar_url text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table public.client_profiles enable row level security;
+
+-- Clients can only ever see/edit their own profile row — never anyone else's
+create policy "Clients can view own profile"
+  on public.client_profiles for select
+  using (auth.uid() = id);
+
+create policy "Clients can insert own profile"
+  on public.client_profiles for insert
+  with check (auth.uid() = id);
+
+create policy "Clients can update own profile"
+  on public.client_profiles for update
+  using (auth.uid() = id);
+
+-- Admins can view all client profiles (for support/CRM purposes)
+create policy "Admins can view all client profiles"
+  on public.client_profiles for select
+  using (auth.uid() in (select id from public.admin_profiles));
+
+
+-- ── 8. SAVED PROPERTIES (wishlist / heart-icon favorites) ────────────────────
+create table public.saved_properties (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid references public.client_profiles(id) not null,
+  listing_id uuid references public.listings(id) not null,
+  created_at timestamptz default now(),
+  unique (client_id, listing_id)
+);
+
+alter table public.saved_properties enable row level security;
+
+create policy "Clients can view own saved properties"
+  on public.saved_properties for select
+  using (auth.uid() = client_id);
+
+create policy "Clients can save properties"
+  on public.saved_properties for insert
+  with check (auth.uid() = client_id);
+
+create policy "Clients can unsave properties"
+  on public.saved_properties for delete
+  using (auth.uid() = client_id);
+
+
+-- ── Auto-create a client_profiles row whenever someone signs up ─────────────
+-- This trigger fires on auth.users insert so client signup never needs a
+-- second manual insert step from the frontend.
+create function public.handle_new_client_user()
+returns trigger as $$
+begin
+  insert into public.client_profiles (id, full_name, phone)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', 'New User'),
+    new.raw_user_meta_data->>'phone'
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_client_user();
+
+create index idx_saved_properties_client on public.saved_properties(client_id);
+
+-- ════════════════════════════════════════════════════════════════════════════
 -- After running this file:
 -- 1. Go to Authentication → Users → Add User to create your first admin login
 -- 2. Copy that user's UUID
 -- 3. Run: insert into public.admin_profiles (id, full_name, role)
 --         values ('paste-uuid-here', 'Your Name', 'super_admin');
+--
+-- Client signups (regular site visitors) need NO manual step — the trigger
+-- above automatically creates their client_profiles row the moment they
+-- sign up through the public AuthModal component.
 -- ════════════════════════════════════════════════════════════════════════════

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AuthProvider } from "./lib/AuthContext";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import PopularProperties from "./components/PopularProperties";
@@ -11,11 +12,19 @@ import PropertyManagement from "./components/PropertyManagement";
 import SearchResults from "./components/SearchResults";
 import Footer from "./components/Footer";
 import AdminApp from "./components/admin/AdminApp";
+import AboutUs from "./components/AboutUs";
+import ContactUs from "./components/ContactUs";
+import Careers from "./components/Careers";
+import ClientProfile from "./components/ClientProfile";
+import SavedProperties from "./components/SavedProperties";
+import MyInquiries from "./components/MyInquiries";
 
 // ── Simple client-side page router ───────────────────────────────────────────
-// Pages: "home" | "search" | "channel-partner" | "property-management" | "admin"
+// Pages: "home" | "search" | "channel-partner" | "property-management"
+//      | "about" | "contact" | "careers" | "blog" | "admin"
+//      | "profile" | "saved" | "inquiries"
 
-export default function App() {
+function AppContent() {
   const [page, setPage] = useState("home");
 
   function navigate(to) {
@@ -58,6 +67,13 @@ export default function App() {
           { id: "search", label: "🔍 Search Results" },
           { id: "channel-partner", label: "🤝 Channel Partner" },
           { id: "property-management", label: "🏢 Property Management" },
+          { id: "about", label: "📖 About Us" },
+          { id: "contact", label: "✉️ Contact Us" },
+          { id: "careers", label: "💼 Careers" },
+          { id: "blog", label: "📰 Blog" },
+          { id: "profile", label: "👤 My Profile" },
+          { id: "saved", label: "❤️ Saved Properties" },
+          { id: "inquiries", label: "📋 My Inquiries" },
           { id: "admin", label: "🔐 Admin Console" },
         ].map((p) => (
           <button
@@ -96,10 +112,32 @@ export default function App() {
         {page === "channel-partner" && <ChannelPartner />}
 
         {page === "property-management" && <PropertyManagement />}
+
+        {page === "about" && <AboutUs onNavigate={navigate} />}
+
+        {page === "contact" && <ContactUs onNavigate={navigate} />}
+
+        {page === "careers" && <Careers onNavigate={navigate} />}
+
+        {page === "blog" && <BlogInsights />}
+
+        {page === "profile" && <ClientProfile onNavigate={navigate} />}
+
+        {page === "saved" && <SavedProperties onNavigate={navigate} />}
+
+        {page === "inquiries" && <MyInquiries onNavigate={navigate} />}
       </main>
 
       {/* ── Footer always visible ── */}
       <Footer onNavigate={navigate} />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
