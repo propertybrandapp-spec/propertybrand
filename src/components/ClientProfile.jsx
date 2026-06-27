@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../lib/AuthContext";
+import { uploadToR2, validateImageFile } from "../lib/r2Upload";
 
 const CLIENT_TYPES = ["Buyer", "Investor", "NRI", "Agent", "Tenant", "Landlord"];
 
@@ -8,6 +9,34 @@ export default function ClientProfile({ onNavigate }) {
   const [form, setForm] = useState({ full_name: "", phone: "", city: "", client_type: "Buyer" });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+  const fileInputRef = useRef(null);
+
+  async function handleAvatarChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validationError = validateImageFile(file, 2); // 2MB limit for avatars
+    if (validationError) {
+      setAvatarError(validationError);
+      return;
+    }
+
+    setAvatarError("");
+    setAvatarUploading(true);
+
+    const result = await uploadToR2(file, "avatars");
+
+    if (result.error) {
+      setAvatarError(result.error);
+      setAvatarUploading(false);
+      return;
+    }
+
+    await updateProfile({ avatar_url: result.url });
+    setAvatarUploading(false);
+  }
 
   useEffect(() => {
     if (profile) {
@@ -53,12 +82,48 @@ export default function ClientProfile({ onNavigate }) {
     <div style={{ background: "#FFFFFF" }} className="min-h-screen">
       <section className="px-4 py-12" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EAF4FB 100%)" }}>
         <div className="max-w-3xl mx-auto text-center">
-          <div
-            className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold"
-            style={{ background: "#2C9DD5", color: "#FFFFFF" }}
-          >
-            {initials}
+          <div className="relative w-20 h-20 mx-auto mb-4">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={avatarUploading}
+              className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold overflow-hidden transition-opacity"
+              style={{ background: "#2C9DD5", color: "#FFFFFF", opacity: avatarUploading ? 0.6 : 1 }}
+            >
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                initials
+              )}
+            </button>
+            {avatarUploading && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-full" style={{ background: "rgba(11,11,11,0.4)" }}>
+                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" style={{ color: "#FFFFFF" }}>
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.3" />
+                  <path d="M22 12a10 10 0 00-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              </div>
+            )}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center"
+              style={{ background: "#BA0D0B", border: "2px solid #FFFFFF" }}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="#FFFFFF" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
           </div>
+          {avatarError && (
+            <p className="text-xs mb-2" style={{ color: "#BA0D0B" }}>{avatarError}</p>
+          )}
           <h1 className="text-2xl font-extrabold" style={{ color: "#15191C" }}>{form.full_name || "Welcome"}</h1>
           <p className="text-sm mt-1" style={{ color: "#495057" }}>{session.user.email}</p>
         </div>

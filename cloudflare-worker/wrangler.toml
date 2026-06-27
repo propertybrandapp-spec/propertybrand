@@ -1,0 +1,22 @@
+# Cloudflare Worker config for the PropertyBrands R2 upload gateway.
+# Deploy from the cloudflare-worker/ folder with: wrangler deploy
+
+name = "propertybrands-r2-upload"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+# Binds the Worker to your R2 bucket so it can read files directly
+# (only used by the GET /file/:key fallback proxy — uploads go straight
+# from the browser to R2 via the presigned URL, bypassing the Worker).
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "propertybrands-media"
+
+# ── Secrets (DO NOT put real values here — set these with `wrangler secret put`) ──
+# Required secrets:
+#   wrangler secret put R2_ACCOUNT_ID
+#   wrangler secret put R2_ACCESS_KEY_ID
+#   wrangler secret put R2_SECRET_ACCESS_KEY
+#   wrangler secret put R2_BUCKET_NAME
+#   wrangler secret put R2_PUBLIC_BASE_URL
+#   wrangler secret put ALLOWED_ORIGIN
