@@ -109,7 +109,7 @@ async function handleFileGet(request, env) {
 
   return new Response(object.body, { headers });
 }
-
+  
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function corsHeaders(env) {
   return {

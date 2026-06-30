@@ -188,7 +188,7 @@ export default function ClientProfile({ onNavigate }) {
                   type="text"
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  placeholder="e.g. Ranchi"
+                  placeholder="e.g. Bhubaneswar"
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
                   style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
                   onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
