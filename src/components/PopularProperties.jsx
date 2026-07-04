@@ -337,19 +337,19 @@ function PropertyCard({ property }) {
 }
 
 // ── Section Header ────────────────────────────────────────────────────────────
-function SectionHeader({ title, seeAllLabel = "See all Properties" }) {
+function SectionHeader({ title, seeAllLabel = "See all Properties", onNavigate }) {
   return (
     <div className="flex items-center justify-between mb-4">
       <div>
         <h2 className="text-xl font-bold text-[#15191C]">{title}</h2>
         <div className="w-10 h-0.5 bg-[#2C9DD5] rounded-full mt-1" />
       </div>
-      <a href="#" className="flex items-center gap-1 text-sm font-semibold text-[#2C9DD5] hover:underline">
+      <button onClick={() => onNavigate && onNavigate("search")} className="flex items-center gap-1 text-sm font-semibold text-[#2C9DD5] hover:underline">
         {seeAllLabel}
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-      </a>
+      </button>
     </div>
   );
 }
@@ -400,7 +400,7 @@ function ScrollRow({ properties }) {
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function PopularProperties() {
+export default function PopularProperties({ onNavigate }) {
   const [activeFilter, setActiveFilter] = useState("All");
 
   const filtered =
@@ -436,7 +436,7 @@ export default function PopularProperties() {
         {/* ── Owner Properties Row ── */}
         {ownerProperties.length > 0 && (
           <div className="mb-10">
-            <SectionHeader title="Popular Owner Properties" />
+            <SectionHeader title="Popular Owner Properties" onNavigate={onNavigate} />
             <ScrollRow properties={ownerProperties} />
           </div>
         )}
@@ -444,7 +444,7 @@ export default function PopularProperties() {
         {/* ── Builder / Featured Projects Row ── */}
         {builderProperties.length > 0 && (
           <div className="mb-10">
-            <SectionHeader title="Featured Projects" seeAllLabel="See all Projects" />
+            <SectionHeader title="Featured Projects" seeAllLabel="See all Projects" onNavigate={onNavigate} />
             <ScrollRow properties={builderProperties} />
           </div>
         )}
@@ -452,7 +452,7 @@ export default function PopularProperties() {
         {/* ── All Properties (fallback when filter shows mixed) ── */}
         {ownerProperties.length === 0 && builderProperties.length === 0 && (
           <div className="mb-10">
-            <SectionHeader title={`${activeFilter} Properties`} />
+            <SectionHeader title={`${activeFilter} Properties`} onNavigate={onNavigate} />
             <div className="text-center py-16 text-[#495057]">
               <svg className="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

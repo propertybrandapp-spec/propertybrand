@@ -177,7 +177,7 @@ function TierCard({ tier }) {
 }
 
 // ── Registration Form ─────────────────────────────────────────────────────────
-function PartnerForm() {
+function PartnerForm({ onNavigate }) {
   const [form, setForm] = useState({ name: "", phone: "", email: "", city: "", rera: "", experience: "" });
   const [submitted, setSubmitted] = useState(false);
 
@@ -258,14 +258,14 @@ function PartnerForm() {
       </button>
       <p className="text-center text-xs" style={{ color: "#495057" }}>
         By submitting you agree to our{" "}
-        <a href="#" style={{ color: "#2C9DD5" }} className="hover:underline">Partner Terms & Conditions</a>
+        <button onClick={() => onNavigate && onNavigate("terms-conditions")} style={{ color: "#2C9DD5" }} className="hover:underline">Partner Terms & Conditions</button>
       </p>
     </div>
   );
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function ChannelPartner() {
+export default function ChannelPartner({ onNavigate }) {
   return (
     <section style={{ background: "#FFFFFF" }} className="py-12 px-4">
       <div className="max-w-7xl mx-auto space-y-14">
@@ -391,7 +391,7 @@ export default function ChannelPartner() {
             <p className="text-sm mb-6" style={{ color: "#495057" }}>
               Fill in your details and our team will onboard you within 24 hours.
             </p>
-            <PartnerForm />
+            <PartnerForm onNavigate={onNavigate} />
           </div>
 
           {/* Right – testimonial + perks highlight */}

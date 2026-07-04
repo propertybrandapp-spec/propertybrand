@@ -18,11 +18,17 @@ import Careers from "./components/Careers";
 import ClientProfile from "./components/ClientProfile";
 import SavedProperties from "./components/SavedProperties";
 import MyInquiries from "./components/MyInquiries";
+import Faq from "./components/Faq";
+import PrivacyPolicy from "./components/PrivacyPolicy";
+import TermsConditions from "./components/TermsConditions";
+import Disclaimer from "./components/Disclaimer";
+import Sitemap from "./components/Sitemap";
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"
-//      | "about" | "contact" | "careers" | "blog" | "admin"
-//      | "profile" | "saved" | "inquiries"
+//      | "investment-advisory" | "agents" | "about" | "contact" | "careers"
+//      | "blog" | "faq" | "privacy-policy" | "terms-conditions" | "disclaimer"
+//      | "sitemap" | "admin" | "profile" | "saved" | "inquiries"
 
 function AppContent() {
   const [page, setPage] = useState("home");
@@ -67,10 +73,17 @@ function AppContent() {
           { id: "search", label: "🔍 Search Results" },
           { id: "channel-partner", label: "🤝 Channel Partner" },
           { id: "property-management", label: "🏢 Property Management" },
+          { id: "investment-advisory", label: "📈 Investment Advisory" },
+          { id: "agents", label: "🧑‍💼 Preferred Agents" },
           { id: "about", label: "📖 About Us" },
           { id: "contact", label: "✉️ Contact Us" },
           { id: "careers", label: "💼 Careers" },
           { id: "blog", label: "📰 Blog" },
+          { id: "faq", label: "❓ Help / FAQ" },
+          { id: "privacy-policy", label: "🔒 Privacy Policy" },
+          { id: "terms-conditions", label: "📄 Terms & Conditions" },
+          { id: "disclaimer", label: "⚠️ Disclaimer" },
+          { id: "sitemap", label: "🗺️ Sitemap" },
           { id: "profile", label: "👤 My Profile" },
           { id: "saved", label: "❤️ Saved Properties" },
           { id: "inquiries", label: "📋 My Inquiries" },
@@ -98,20 +111,24 @@ function AppContent() {
           <>
             <Hero onNavigate={navigate} />
             <PopularProperties onNavigate={navigate} />
-            <PreferredAgents />
-            <InvestmentAdvisory />
-            <PropertyManagement />
-            <ChannelPartner />
-            <BlogInsights />
+            <PreferredAgents onNavigate={navigate} />
+            <InvestmentAdvisory onNavigate={navigate} />
+            <PropertyManagement onNavigate={navigate} />
+            <ChannelPartner onNavigate={navigate} />
+            <BlogInsights onNavigate={navigate} />
             <Testimonials />
           </>
         )}
 
         {page === "search" && <SearchResults />}
 
-        {page === "channel-partner" && <ChannelPartner />}
+        {page === "channel-partner" && <ChannelPartner onNavigate={navigate} />}
 
-        {page === "property-management" && <PropertyManagement />}
+        {page === "property-management" && <PropertyManagement onNavigate={navigate} />}
+
+        {page === "investment-advisory" && <InvestmentAdvisory onNavigate={navigate} />}
+
+        {page === "agents" && <PreferredAgents onNavigate={navigate} />}
 
         {page === "about" && <AboutUs onNavigate={navigate} />}
 
@@ -119,7 +136,17 @@ function AppContent() {
 
         {page === "careers" && <Careers onNavigate={navigate} />}
 
-        {page === "blog" && <BlogInsights />}
+        {page === "blog" && <BlogInsights onNavigate={navigate} />}
+
+        {page === "faq" && <Faq onNavigate={navigate} />}
+
+        {page === "privacy-policy" && <PrivacyPolicy onNavigate={navigate} />}
+
+        {page === "terms-conditions" && <TermsConditions onNavigate={navigate} />}
+
+        {page === "disclaimer" && <Disclaimer onNavigate={navigate} />}
+
+        {page === "sitemap" && <Sitemap onNavigate={navigate} />}
 
         {page === "profile" && <ClientProfile onNavigate={navigate} />}
 

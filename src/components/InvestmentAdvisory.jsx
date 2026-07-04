@@ -331,7 +331,7 @@ function CorridorCard({ corridor }) {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function InvestmentAdvisory() {
+export default function InvestmentAdvisory({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("Home Loan");
 
   return (
@@ -350,12 +350,12 @@ export default function InvestmentAdvisory() {
               <p className="text-slate-500 text-sm">Compare Home Loan Offers from 40+ Banks</p>
               <div className="w-10 h-0.5 bg-[#BA0D0B] rounded-full mt-2" />
             </div>
-            <a href="#" className="text-sm font-semibold text-[#BA0D0B] hover:underline flex items-center gap-1">
+            <button onClick={() => onNavigate && onNavigate("investment-advisory")} className="text-sm font-semibold text-[#BA0D0B] hover:underline flex items-center gap-1">
               View all offers
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
-            </a>
+            </button>
           </div>
 
           {/* Loan Services Row */}
@@ -373,7 +373,7 @@ export default function InvestmentAdvisory() {
 
           {/* EMI Calculator */}
           <EMICalculator />
-          <MagicLoansSection />
+          <MagicLoansSection onNavigate={onNavigate} />
         </div>
 
         {/* ── Investment Advisory Section ── */}
@@ -383,12 +383,12 @@ export default function InvestmentAdvisory() {
               <h2 className="text-xl font-bold text-[#15191C]">Smart Real Estate Investment</h2>
               <div className="w-10 h-0.5 bg-[#BA0D0B] rounded-full mt-1" />
             </div>
-            <a href="#" className="text-sm font-semibold text-[#BA0D0B] hover:underline flex items-center gap-1">
+            <button onClick={() => onNavigate && onNavigate("investment-advisory")} className="text-sm font-semibold text-[#BA0D0B] hover:underline flex items-center gap-1">
               View all corridors
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
-            </a>
+            </button>
           </div>
           <p className="text-slate-500 text-sm mb-5">Our experts help investors identify high-growth opportunities</p>
 

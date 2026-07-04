@@ -14,16 +14,17 @@ const URL_MAP = {
   sellProperty: "search",
   rentProperty: "search",
   blogs: "blog",
-  emiCalculator: "home",
+  emiCalculator: "investment-advisory",
   careers: "careers",
   contact: "contact",
 
-  // External / legal pages — paste real URLs here when ready
-  privacyPolicy: "#",
-  termsConditions: "#",
-  disclaimer: "#",
+  // Legal pages (internal — wired to real pages in App.jsx)
+  privacyPolicy: "privacy-policy",
+  termsConditions: "terms-conditions",
+  disclaimer: "disclaimer",
+  sitemap: "sitemap",
 
-  // Social media — paste real profile URLs here
+  // Social media — paste real profile URLs here when ready
   facebook: "#",
   instagram: "#",
   linkedin: "#",
@@ -42,11 +43,12 @@ const QUICK_LINKS = [
   { label: "Contact", page: URL_MAP.contact },
 ];
 
-// ── Legal (per spec: Privacy Policy, Terms & Conditions, Disclaimer) ──────────
+// ── Legal (per spec: Privacy Policy, Terms & Conditions, Disclaimer, Sitemap) ─
 const LEGAL_LINKS = [
-  { label: "Privacy Policy", href: URL_MAP.privacyPolicy },
-  { label: "Terms & Conditions", href: URL_MAP.termsConditions },
-  { label: "Disclaimer", href: URL_MAP.disclaimer },
+  { label: "Privacy Policy", page: URL_MAP.privacyPolicy },
+  { label: "Terms & Conditions", page: URL_MAP.termsConditions },
+  { label: "Disclaimer", page: URL_MAP.disclaimer },
+  { label: "Sitemap", page: URL_MAP.sitemap },
 ];
 
 const SOCIAL_LINKS = [
@@ -174,7 +176,7 @@ function QuickInquiry() {
 }
 
 // ── Main Footer ───────────────────────────────────────────────────────────────
-export default function Footer() {
+export default function Footer({ onNavigate }) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -338,12 +340,12 @@ export default function Footer() {
 
             {QUICK_LINKS.map((l, i) => (
               <span key={l.label} className="flex items-center gap-1">
-                <a
-                  href={l.href}
+                <button
+                  onClick={() => onNavigate && onNavigate(l.page)}
                   className="text-slate-600 text-xs hover:text-[#BA0D0B] transition"
                 >
                   {l.label}
-                </a>
+                </button>
 
                 {i < QUICK_LINKS.length - 1 && (
                   <span className="text-slate-300 text-xs">•</span>
@@ -362,9 +364,14 @@ export default function Footer() {
             © {currentYear} PropertyBrands Realty Services. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            {["Privacy Policy", "Terms & Conditions", "Disclaimer", "Sitemap"].map((l, i, arr) => (
-              <span key={l} className="flex items-center gap-4">
-                <a href="#"className="text-slate-600 text-xs font-medium hover:text-[#BA0D0B] hover:translate-x-0.5 transition-all duration-300 inline-flex items-center">{l}</a>
+            {LEGAL_LINKS.map((l, i, arr) => (
+              <span key={l.label} className="flex items-center gap-4">
+                <button
+                  onClick={() => onNavigate && onNavigate(l.page)}
+                  className="text-slate-600 text-xs font-medium hover:text-[#BA0D0B] hover:translate-x-0.5 transition-all duration-300 inline-flex items-center"
+                >
+                  {l.label}
+                </button>
                 {i < arr.length - 1 && <span className="text-[#1F242A] text-xs">·</span>}
               </span>
             ))}

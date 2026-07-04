@@ -228,7 +228,7 @@ function PlanCard({ plan }) {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function PropertyManagement() {
+export default function PropertyManagement({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("All");
   const tabs = ["All", "Tenant", "Financial", "Maintenance", "Legal"];
 
@@ -417,7 +417,7 @@ export default function PropertyManagement() {
           <p className="text-center text-xs mt-5" style={{ color: "#495057" }}>
             All plans include GST. Custom pricing available for{" "}
             <span style={{ color: "#2C9DD5" }}>5+ properties</span>.{" "}
-            <a href="#" className="hover:underline" style={{ color: "#E87C02" }}>Contact us</a> for bulk rates.
+            <button onClick={() => onNavigate && onNavigate("contact")} className="hover:underline" style={{ color: "#E87C02" }}>Contact us</button> for bulk rates.
           </p>
         </div>
 

@@ -151,12 +151,12 @@ const NEWS_ITEMS = [
 ];
 
 const QUICK_GUIDES = [
-  { icon: "📋", label: "How to Buy a Property", link: "#" },
-  { icon: "🏦", label: "Apply for Home Loan", link: "#" },
-  { icon: "📝", label: "Property Registration Process", link: "#" },
-  { icon: "🔍", label: "What is RERA?", link: "#" },
-  { icon: "💰", label: "How to Calculate EMI", link: "#" },
-  { icon: "🏠", label: "How to Rent a Property", link: "#" },
+  { icon: "📋", label: "How to Buy a Property", page: "faq" },
+  { icon: "🏦", label: "Apply for Home Loan", page: "faq" },
+  { icon: "📝", label: "Property Registration Process", page: "faq" },
+  { icon: "🔍", label: "What is RERA?", page: "faq" },
+  { icon: "💰", label: "How to Calculate EMI", page: "faq" },
+  { icon: "🏠", label: "How to Rent a Property", page: "faq" },
 ];
 
 // ── Blog Card ─────────────────────────────────────────────────────────────────
@@ -329,7 +329,7 @@ function FeaturedArticle({ article }) {
 }
 
 // ── News Feed ─────────────────────────────────────────────────────────────────
-function NewsFeed() {
+function NewsFeed({ onNavigate }) {
   return (
     <div className="bg-[#FFFFFF] rounded-2xl border border-[#E5E8EB] overflow-hidden h-full">
       {/* Header */}
@@ -338,7 +338,7 @@ function NewsFeed() {
           <span className="w-2 h-2 bg-[#2C9DD5] rounded-full animate-pulse" />
           <h3 className="text-sm font-bold text-[#15191C]">Live Market News</h3>
         </div>
-        <a href="#" className="text-xs font-semibold text-[#2C9DD5] hover:underline">View all</a>
+        <button onClick={() => onNavigate && onNavigate("blog")} className="text-xs font-semibold text-[#2C9DD5] hover:underline">View all</button>
       </div>
 
       {/* News items */}
@@ -383,7 +383,7 @@ function NewsFeed() {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function BlogInsights() {
+export default function BlogInsights({ onNavigate }) {
   const [activeCategory, setActiveCategory] = useState("All");
 
   const filtered =
@@ -406,12 +406,12 @@ export default function BlogInsights() {
               Stay updated with real estate news, guides & market intelligence
             </p>
           </div>
-          <a href="#" className="flex items-center gap-1 text-sm font-semibold text-[#2C9DD5] hover:underline">
+          <button onClick={() => onNavigate && onNavigate("blog")} className="flex items-center gap-1 text-sm font-semibold text-[#2C9DD5] hover:underline">
             View all articles
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
-          </a>
+          </button>
         </div>
 
         {/* ── Category Filter ── */}
@@ -438,7 +438,7 @@ export default function BlogInsights() {
             <FeaturedArticle article={FEATURED_ARTICLE} />
           </div>
           <div className="lg:col-span-1">
-            <NewsFeed />
+            <NewsFeed onNavigate={onNavigate} />
           </div>
         </div>
 
@@ -463,10 +463,10 @@ export default function BlogInsights() {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {QUICK_GUIDES.map((g) => (
-              <a
+              <button
                 key={g.label}
-                href={g.link}
-                className="flex items-center gap-3 p-3 rounded-xl border border-[#E5E8EB] hover:border-[#2C9DD5] hover:bg-[#EAF4FB] transition group"
+                onClick={() => onNavigate && onNavigate(g.page)}
+                className="flex items-center gap-3 p-3 rounded-xl border border-[#E5E8EB] hover:border-[#2C9DD5] hover:bg-[#EAF4FB] transition group text-left w-full"
               >
                 <span className="text-xl shrink-0">{g.icon}</span>
                 <span className="text-sm font-semibold text-[#1F242A] group-hover:text-[#2C9DD5] transition leading-snug">
@@ -475,7 +475,7 @@ export default function BlogInsights() {
                 <svg className="w-4 h-4 text-[#495057] group-hover:text-[#2C9DD5] ml-auto shrink-0 transition" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
-              </a>
+              </button>
             ))}
           </div>
         </div>

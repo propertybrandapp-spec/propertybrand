@@ -59,12 +59,12 @@ const NAV_URL_MAP = {
   maintenanceCoordination: "property-management",
 
   // Help (per spec: FAQ + Contact)
-  howToBuy: "home",
-  howToRent: "home",
-  howToApplyLoan: "home",
-  whatIsRera: "home",
-  howToCalculateEmi: "home",
-  howToRentProperty: "home",
+  howToBuy: "faq",
+  howToRent: "faq",
+  howToApplyLoan: "faq",
+  whatIsRera: "faq",
+  howToCalculateEmi: "faq",
+  howToRentProperty: "faq",
   blog: "blog",
   contact: "contact",
 };
@@ -355,11 +355,11 @@ export default function Navbar({ onNavigate }) {
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #2C9DD5" }}>
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center">
-            <a href="/" className="flex items-center">
+            <button onClick={() => onNavigate && onNavigate("home")} className="flex items-center">
               <span className="font-extrabold text-[22px] tracking-tight leading-none" style={{ color: "#15191C" }}>
                 property<span style={{ color: "#2C9DD5" }}>Brands</span>
               </span>
-            </a>
+            </button>
             <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} isOpen={cityOpen}
               onToggle={() => { setCityOpen(!cityOpen); setActiveDropdown(null); }} />
           </div>
@@ -399,7 +399,7 @@ export default function Navbar({ onNavigate }) {
                   {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded leading-none" style={{ background: "#E87C02", color: "#FFFFFF" }}>{item.badge}</span>}
                   <ChevronDown className={activeDropdown === item.label ? "rotate-180" : ""} />
                 </button>
-                <DropdownMenu item={item} isOpen={activeDropdown === item.label} index={index} />
+                <DropdownMenu item={item} isOpen={activeDropdown === item.label} index={index} onNavigate={onNavigate} />
               </li>
             ))}
           </ul>

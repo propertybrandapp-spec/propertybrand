@@ -31,7 +31,7 @@ const BankCard = ({ bank }) => (
   </div>
 );
 
-export default function MagicLoansSection() {
+export default function MagicLoansSection({ onNavigate }) {
   const scrollRef = useRef(null);
   const [isPaused, setIsPaused] = useState(false);
   const animFrameRef = useRef(null);
@@ -171,12 +171,12 @@ export default function MagicLoansSection() {
 
             {/* CTA row */}
             <div className="flex items-center gap-6 mt-4">
-              <a
-                href="#"
+              <button
+                onClick={() => onNavigate && onNavigate("investment-advisory")}
                 className="text-[#e8303a] font-semibold text-sm flex items-center gap-1 hover:underline"
               >
                 Explore Bank Offers <span aria-hidden>→</span>
-              </a>
+              </button>
               <button
                 className="px-6 py-2.5 rounded-full text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 style={{

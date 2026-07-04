@@ -385,7 +385,7 @@ function SiteVisitBanner() {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function PreferredAgents() {
+export default function PreferredAgents({ onNavigate }) {
   const rowRef = useRef(null);
 
   function scroll(dir) {
@@ -404,12 +404,12 @@ export default function PreferredAgents() {
               <h2 className="text-xl font-bold text-[#15191C]">PB Preferred Agents in Ranchi</h2>
               <div className="w-10 h-0.5 bg-[#2C9DD5] rounded-full mt-1" />
             </div>
-            <a href="#" className="flex items-center gap-1 text-sm font-semibold text-[#2C9DD5] hover:underline">
+            <button onClick={() => onNavigate && onNavigate("agents")} className="flex items-center gap-1 text-sm font-semibold text-[#2C9DD5] hover:underline">
               See all
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
-            </a>
+            </button>
           </div>
 
           {/* Scrollable agent row */}
