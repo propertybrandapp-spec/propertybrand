@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabaseClient";
 import AdminLogin from "./AdminLogin";
 import AdminDashboard from "./AdminDashboard";
 import AdminListings from "./AdminListings";
+import AdminListingForm from "./AdminListingForm";
 import AdminLeads from "./AdminLeads";
 import AdminAgents from "./AdminAgents";
 
@@ -20,6 +21,15 @@ export default function AdminApp() {
   const [adminProfile, setAdminProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activePage, setActivePage] = useState("dashboard");
+  const [navPayload, setNavPayload] = useState(null);
+
+  // Second arg is optional — used by "listings-form" to know whether it's
+  // editing an existing listing (payload = the listing object) or creating
+  // a new one (payload = null).
+  function adminNavigate(pageId, payload) {
+    setActivePage(pageId);
+    setNavPayload(payload || null);
+  }
 
   useEffect(() => {
     // Check for an existing session on mount
@@ -81,13 +91,15 @@ export default function AdminApp() {
   }
 
   // ── Authenticated — route to the requested admin page ──
-  const pageProps = { onNavigate: setActivePage, adminProfile, onLogout: handleLogout };
+  const pageProps = { onNavigate: adminNavigate, adminProfile, onLogout: handleLogout };
 
   switch (activePage) {
     case "dashboard":
       return <AdminDashboard {...pageProps} />;
     case "listings":
       return <AdminListings {...pageProps} />;
+    case "listings-form":
+      return <AdminListingForm {...pageProps} editingListing={navPayload} />;
     case "leads":
       return <AdminLeads {...pageProps} />;
     case "agents":

@@ -72,3 +72,35 @@ export function validateImageFile(file, maxSizeMB = 5) {
   }
   return null;
 }
+
+/**
+ * Deletes one or more previously-uploaded files from R2. Pass the full public
+ * URLs you got back from uploadToR2() (e.g. a listing's `images` array) — the
+ * Worker converts these back into R2 object keys itself. Safe to call even if
+ * a URL is missing/malformed — it's just skipped.
+ * @param {string[]} publicUrls
+ * @returns {Promise<{deleted: string[]} | {error: string}>}
+ */
+export async function deleteFromR2(publicUrls) {
+  if (!WORKER_URL) return { error: "Missing VITE_R2_WORKER_URL — check your .env file." };
+  if (!publicUrls || publicUrls.length === 0) return { deleted: [] };
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return { error: "You must be logged in to delete files." };
+
+  const res = await fetch(`${WORKER_URL}/delete`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ urls: publicUrls.filter(Boolean) }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    return { error: err.error || "Failed to delete file(s)." };
+  }
+
+  return res.json();
+}

@@ -55,8 +55,8 @@ const FAQ = [
 ];
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function ContactUs({ onNavigate }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+export default function ContactUs({ onNavigate, initialSubject }) {
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: initialSubject || "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
@@ -164,6 +164,7 @@ export default function ContactUs({ onNavigate }) {
                   <option value="sell">Selling a Property</option>
                   <option value="invest">Investment Advisory</option>
                   <option value="partner">Channel Partner Program</option>
+                  <option value="prime">PB Prime Membership</option>
                   <option value="other">Something Else</option>
                 </select>
                 <textarea

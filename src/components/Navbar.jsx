@@ -33,19 +33,19 @@ const NAV_URL_MAP = {
   studentAccommodation: "search",
 
   // Investment Advisory (per spec)
-  highGrowthCorridors: "home",
-  rentalYieldOpportunities: "home",
-  commercialInvestments: "home",
-  landBanking: "home",
-  retirementHomes: "home",
-  nriInvestments: "home",
-  roiCalculator: "home",
-  rentalYieldCalculator: "home",
+  highGrowthCorridors: "investment-advisory",
+  rentalYieldOpportunities: "investment-advisory",
+  commercialInvestments: "investment-advisory",
+  landBanking: "investment-advisory",
+  retirementHomes: "investment-advisory",
+  nriInvestments: "investment-advisory",
+  roiCalculator: "investment-advisory",
+  rentalYieldCalculator: "investment-advisory",
 
   // Home Loan Assistance (per spec)
-  emiCalculator: "home",
-  eligibilityCheck: "home",
-  loanComparison: "home",
+  emiCalculator: "investment-advisory",
+  eligibilityCheck: "investment-advisory",
+  loanComparison: "investment-advisory",
 
   // Architects & Interior Design (per spec)
   housePlanning: "property-management",
@@ -76,21 +76,21 @@ const NAV_ITEMS = [
       {
         heading: "Residential Properties",
         links: [
-          { label: "Ready-to-Move Apartments", page: NAV_URL_MAP.readyToMove },
-          { label: "Under Construction Projects", page: NAV_URL_MAP.underConstruction },
-          { label: "Luxury Apartments", page: NAV_URL_MAP.luxuryApartments },
-          { label: "Affordable Housing", page: NAV_URL_MAP.affordableHousing },
-          { label: "Gated Communities", page: NAV_URL_MAP.gatedCommunities },
-          { label: "Villas & Row Houses", page: NAV_URL_MAP.villasRowHouses },
-          { label: "Residential Plots", page: NAV_URL_MAP.residentialPlots },
+          { label: "Ready-to-Move Apartments", page: NAV_URL_MAP.readyToMove, filters: { transactionType: "Buy", types: ["Apartment"], possession: ["Ready to Move"] } },
+          { label: "Under Construction Projects", page: NAV_URL_MAP.underConstruction, filters: { transactionType: "Buy", possession: ["Under Construction"] } },
+          { label: "Luxury Apartments", page: NAV_URL_MAP.luxuryApartments, filters: { transactionType: "Buy", types: ["Apartment"], tags: ["Luxury"] } },
+          { label: "Affordable Housing", page: NAV_URL_MAP.affordableHousing, filters: { transactionType: "Buy", tags: ["Affordable"] } },
+          { label: "Gated Communities", page: NAV_URL_MAP.gatedCommunities, filters: { transactionType: "Buy", tags: ["Gated Community"] } },
+          { label: "Villas & Row Houses", page: NAV_URL_MAP.villasRowHouses, filters: { transactionType: "Buy", types: ["Villa"] } },
+          { label: "Residential Plots", page: NAV_URL_MAP.residentialPlots, filters: { transactionType: "Buy", types: ["Plot"] } },
         ],
       },
       {
         heading: "Commercial Properties",
         links: [
-          { label: "Office Spaces", page: NAV_URL_MAP.officeSpaces },
-          { label: "Retail Spaces", page: NAV_URL_MAP.retailSpaces },
-          { label: "Industrial Properties", page: NAV_URL_MAP.industrialProperties },
+          { label: "Office Spaces", page: NAV_URL_MAP.officeSpaces, filters: { transactionType: "Buy", types: ["Commercial"], tags: ["Office"] } },
+          { label: "Retail Spaces", page: NAV_URL_MAP.retailSpaces, filters: { transactionType: "Buy", types: ["Commercial"], tags: ["Retail"] } },
+          { label: "Industrial Properties", page: NAV_URL_MAP.industrialProperties, filters: { transactionType: "Buy", types: ["Commercial"], tags: ["Industrial"] } },
         ],
       },
     ],
@@ -101,12 +101,12 @@ const NAV_ITEMS = [
       {
         heading: "Rental Properties",
         links: [
-          { label: "Apartments", page: NAV_URL_MAP.rentApartments },
-          { label: "Villas", page: NAV_URL_MAP.rentVillas },
-          { label: "Office Spaces", page: NAV_URL_MAP.rentOfficeSpaces },
-          { label: "Shops", page: NAV_URL_MAP.rentShops },
-          { label: "Co-living Spaces", page: NAV_URL_MAP.coLivingSpaces },
-          { label: "Student Accommodation", page: NAV_URL_MAP.studentAccommodation },
+          { label: "Apartments", page: NAV_URL_MAP.rentApartments, filters: { transactionType: "Rent", types: ["Apartment"] } },
+          { label: "Villas", page: NAV_URL_MAP.rentVillas, filters: { transactionType: "Rent", types: ["Villa"] } },
+          { label: "Office Spaces", page: NAV_URL_MAP.rentOfficeSpaces, filters: { transactionType: "Rent", types: ["Commercial"], tags: ["Office"] } },
+          { label: "Shops", page: NAV_URL_MAP.rentShops, filters: { transactionType: "Rent", types: ["Commercial"], tags: ["Retail"] } },
+          { label: "Co-living Spaces", page: NAV_URL_MAP.coLivingSpaces, filters: { transactionType: "Rent", tags: ["Co-living"] } },
+          { label: "Student Accommodation", page: NAV_URL_MAP.studentAccommodation, filters: { transactionType: "Rent", tags: ["Student Accommodation"] } },
         ],
       },
     ],
@@ -240,7 +240,7 @@ function DropdownMenu({ item, isOpen, onNavigate,index }) {
               <ul className="space-y-1.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <button onClick={() => onNavigate && onNavigate(link.page)} className="text-sm block py-0.5 transition-colors text-left w-full" style={{ color: "#495057" }}
+                    <button onClick={() => onNavigate && onNavigate(link.page, link.filters)} className="text-sm block py-0.5 transition-colors text-left w-full" style={{ color: "#495057" }}
                       onMouseEnter={e => e.target.style.color = "#2C9DD5"}
                       onMouseLeave={e => e.target.style.color = "#495057"}>
                       {link.label}
@@ -304,7 +304,7 @@ function MobileNavItem({ item, onNavigate, onLinkClick }) {
                 {col.links.map((link) => (
                   <li key={link.label}>
                     <button
-                      onClick={() => { onNavigate && onNavigate(link.page); onLinkClick && onLinkClick(); }}
+                      onClick={() => { onNavigate && onNavigate(link.page, link.filters); onLinkClick && onLinkClick(); }}
                       className="text-sm block py-0.5 transition text-left w-full"
                       style={{ color: "#495057" }}
                     >
@@ -364,14 +364,14 @@ export default function Navbar({ onNavigate }) {
               onToggle={() => { setCityOpen(!cityOpen); setActiveDropdown(null); }} />
           </div>
           <div className="hidden lg:flex items-center gap-4">
-            <button className="text-sm font-semibold transition" style={{ color: "#2C9DD5" }}>PB Prime</button>
+            <button onClick={() => onNavigate && onNavigate("contact", "prime")} className="text-sm font-semibold transition" style={{ color: "#2C9DD5" }}>PB Prime</button>
             <div className="w-px h-4" style={{ background: "#2C9DD5" }} />
             {isLoggedIn ? (
               <ClientAccountMenu onNavigate={onNavigate} />
             ) : (
               <button onClick={() => setAuthModalOpen(true)} className="text-sm font-semibold transition" style={{ color: "#15191C" }}>Login</button>
             )}
-            <button className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm transition"
+            <button onClick={() => onNavigate && onNavigate("contact", "sell")} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm transition"
               style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
               Post Property
               <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded" style={{ background: "#E87C02", color: "#FFFFFF" }}>FREE</span>
@@ -410,13 +410,13 @@ export default function Navbar({ onNavigate }) {
       <div className={`lg:hidden border-t overflow-hidden transition-all duration-300 ${mobileOpen ? "max-h-[85vh] overflow-y-auto" : "max-h-0"}`}
         style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }}>
         <div className="flex items-center justify-between px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }}>
-          <button className="text-sm font-semibold" style={{ color: "#2C9DD5" }}>PB Prime</button>
+          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("contact", "prime"); }} className="text-sm font-semibold" style={{ color: "#2C9DD5" }}>PB Prime</button>
           {isLoggedIn ? (
             <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("profile"); }} className="text-sm font-semibold" style={{ color: "#15191C" }}>My Account</button>
           ) : (
             <button onClick={() => { setMobileOpen(false); setAuthModalOpen(true); }} className="text-sm font-semibold" style={{ color: "#15191C" }}>Login</button>
           )}
-          <button className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
+          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("contact", "sell"); }} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
             Post Property <span className="text-[9px] font-extrabold px-1 py-0.5 rounded" style={{ background: "#E87C02", color: "#FFFFFF" }}>FREE</span>
           </button>
         </div>

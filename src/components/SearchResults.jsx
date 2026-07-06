@@ -1,6 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { fetchPublicListings } from "../lib/listings";
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Demo data ─────────────────────────────────────────────────────────────────
+// Shown until you connect real listings via the Admin Console (Supabase). The
+// moment you add your first "Live" listing there, this component automatically
+// switches over to showing real data instead — see the fetch below.
 
 const PROPERTIES = [
   {
@@ -11,12 +15,15 @@ const PROPERTIES = [
     area: "1865 sqft",
     location: "Harmu Housing Colony, Ranchi",
     type: "Apartment",
+    bhk: "3 BHK",
     status: "Ready to Move",
     postedBy: "Owner",
     postedDays: 2,
     imgCount: 20,
     verified: true,
     featured: true,
+    transactionType: "Buy",
+    tags: ["Gated Community"],
     amenities: ["Lift", "Power Backup", "Security", "Parking", "Gym"],
     floor: "8th of 12",
     facing: "East",
@@ -33,12 +40,15 @@ const PROPERTIES = [
     area: "3200 sqft",
     location: "Kanke Road, Ranchi",
     type: "Villa",
+    bhk: "4 BHK",
     status: "Under Construction",
     postedBy: "Builder",
     postedDays: 1,
     imgCount: 15,
     verified: true,
     featured: true,
+    transactionType: "Buy",
+    tags: [],
     amenities: ["Swimming Pool", "Garden", "Security", "Club House", "Power Backup"],
     floor: "Ground + 1",
     facing: "North",
@@ -55,12 +65,15 @@ const PROPERTIES = [
     area: "605 sqft",
     location: "Lalpur, Ranchi",
     type: "Apartment",
+    bhk: "1 BHK",
     status: "Ready to Move",
     postedBy: "Agent",
     postedDays: 5,
     imgCount: 8,
     verified: false,
     featured: false,
+    transactionType: "Buy",
+    tags: ["Affordable"],
     amenities: ["Lift", "Parking", "Power Backup"],
     floor: "3rd of 6",
     facing: "West",
@@ -77,12 +90,15 @@ const PROPERTIES = [
     area: "1400 sqft",
     location: "Ashok Nagar, Ranchi",
     type: "Apartment",
+    bhk: "3 BHK",
     status: "Ready to Move",
     postedBy: "Owner",
     postedDays: 3,
     imgCount: 11,
     verified: true,
     featured: false,
+    transactionType: "Buy",
+    tags: ["Gated Community"],
     amenities: ["Gym", "Lift", "Security", "Parking"],
     floor: "5th of 10",
     facing: "South",
@@ -99,12 +115,15 @@ const PROPERTIES = [
     area: "1050 sqft",
     location: "Morabadi, Ranchi",
     type: "Apartment",
+    bhk: "2 BHK",
     status: "Under Construction",
     postedBy: "Builder",
     postedDays: 0,
     imgCount: 22,
     verified: true,
     featured: true,
+    transactionType: "Buy",
+    tags: ["Affordable"],
     amenities: ["Lift", "Power Backup", "CCTV", "Parking", "Garden"],
     floor: "2nd of 8",
     facing: "East",
@@ -121,12 +140,15 @@ const PROPERTIES = [
     area: "2400 sqft",
     location: "Argora, Ranchi",
     type: "Plot",
+    bhk: null,
     status: "Ready to Move",
     postedBy: "Owner",
     postedDays: 7,
     imgCount: 6,
     verified: false,
     featured: false,
+    transactionType: "Buy",
+    tags: [],
     amenities: ["Corner Plot", "Main Road", "Gated"],
     floor: "—",
     facing: "North-East",
@@ -143,12 +165,15 @@ const PROPERTIES = [
     area: "2200 sqft",
     location: "Main Road, Ranchi",
     type: "Commercial",
+    bhk: null,
     status: "Ready to Move",
     postedBy: "Builder",
     postedDays: 4,
     imgCount: 14,
     verified: true,
     featured: false,
+    transactionType: "Buy",
+    tags: ["Office"],
     amenities: ["Lift", "Parking", "24x7 Security", "Power Backup", "Cafeteria"],
     floor: "4th of 10",
     facing: "North",
@@ -165,12 +190,15 @@ const PROPERTIES = [
     area: "6500 sqft",
     location: "Golf Course Road, Ranchi",
     type: "Villa",
+    bhk: "4+ BHK",
     status: "Ready to Move",
     postedBy: "Builder",
     postedDays: 2,
     imgCount: 34,
     verified: true,
     featured: true,
+    transactionType: "Buy",
+    tags: ["Luxury"],
     amenities: ["Private Pool", "Home Theatre", "Smart Home", "Spa", "Garden"],
     floor: "Ground + 2",
     facing: "East",
@@ -178,6 +206,231 @@ const PROPERTIES = [
     images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=380&fit=crop"],
     badge: "Luxury",
     badgeColor: "#E87C02",
+  },
+  {
+    id: 9,
+    title: "4 BHK Luxury Apartment",
+    price: "₹4.50 Cr",
+    priceRaw: 45000000,
+    area: "2650 sqft",
+    location: "Booty More, Ranchi",
+    type: "Apartment",
+    bhk: "4 BHK",
+    status: "Ready to Move",
+    postedBy: "Builder",
+    postedDays: 1,
+    imgCount: 28,
+    verified: true,
+    featured: true,
+    transactionType: "Buy",
+    tags: ["Luxury", "Gated Community"],
+    amenities: ["Club House", "Swimming Pool", "Gym", "Concierge", "Smart Home"],
+    floor: "12th of 18",
+    facing: "East",
+    age: "New",
+    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=380&fit=crop"],
+    badge: "Luxury",
+    badgeColor: "#E87C02",
+  },
+  {
+    id: 10,
+    title: "Retail Showroom Space",
+    price: "₹95 Lac",
+    priceRaw: 9500000,
+    area: "850 sqft",
+    location: "Main Road, Ranchi",
+    type: "Commercial",
+    bhk: null,
+    status: "Ready to Move",
+    postedBy: "Owner",
+    postedDays: 6,
+    imgCount: 9,
+    verified: true,
+    featured: false,
+    transactionType: "Buy",
+    tags: ["Retail"],
+    amenities: ["Main Road Facing", "Parking", "Power Backup"],
+    floor: "Ground",
+    facing: "West",
+    age: "4 years",
+    images: ["https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=380&fit=crop"],
+    badge: "Retail",
+    badgeColor: "#a78bfa",
+  },
+  {
+    id: 11,
+    title: "Industrial Warehouse Unit",
+    price: "₹1.85 Cr",
+    priceRaw: 18500000,
+    area: "8500 sqft",
+    location: "Namkum Industrial Area, Ranchi",
+    type: "Commercial",
+    bhk: null,
+    status: "Ready to Move",
+    postedBy: "Builder",
+    postedDays: 8,
+    imgCount: 12,
+    verified: true,
+    featured: false,
+    transactionType: "Buy",
+    tags: ["Industrial"],
+    amenities: ["Loading Dock", "24x7 Security", "Power Backup", "Wide Access Road"],
+    floor: "Ground",
+    facing: "South",
+    age: "2 years",
+    images: ["https://images.unsplash.com/photo-1553413077-190983bbd016?w=600&h=380&fit=crop"],
+    badge: "Industrial",
+    badgeColor: "#a78bfa",
+  },
+  {
+    id: 12,
+    title: "2 BHK Apartment for Rent",
+    price: "₹18,000/month",
+    priceRaw: 18000,
+    area: "980 sqft",
+    location: "Doranda, Ranchi",
+    type: "Apartment",
+    bhk: "2 BHK",
+    status: "Ready to Move",
+    postedBy: "Owner",
+    postedDays: 1,
+    imgCount: 10,
+    verified: true,
+    featured: false,
+    transactionType: "Rent",
+    tags: [],
+    amenities: ["Lift", "Parking", "Power Backup", "Security"],
+    floor: "4th of 7",
+    facing: "East",
+    age: "6 years",
+    images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=380&fit=crop"],
+    badge: "For Rent",
+    badgeColor: "#2C9DD5",
+  },
+  {
+    id: 13,
+    title: "4 BHK Villa for Rent",
+    price: "₹65,000/month",
+    priceRaw: 65000,
+    area: "3100 sqft",
+    location: "Kanke Road, Ranchi",
+    type: "Villa",
+    bhk: "4 BHK",
+    status: "Ready to Move",
+    postedBy: "Owner",
+    postedDays: 3,
+    imgCount: 16,
+    verified: true,
+    featured: true,
+    transactionType: "Rent",
+    tags: [],
+    amenities: ["Garden", "Security", "Parking", "Power Backup"],
+    floor: "Ground + 1",
+    facing: "North",
+    age: "5 years",
+    images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&h=380&fit=crop"],
+    badge: "For Rent",
+    badgeColor: "#2C9DD5",
+  },
+  {
+    id: 14,
+    title: "Furnished Office Space for Rent",
+    price: "₹1,20,000/month",
+    priceRaw: 120000,
+    area: "1800 sqft",
+    location: "Main Road, Ranchi",
+    type: "Commercial",
+    bhk: null,
+    status: "Ready to Move",
+    postedBy: "Builder",
+    postedDays: 2,
+    imgCount: 13,
+    verified: true,
+    featured: false,
+    transactionType: "Rent",
+    tags: ["Office"],
+    amenities: ["Lift", "Parking", "24x7 Security", "Power Backup", "Cafeteria"],
+    floor: "6th of 10",
+    facing: "North",
+    age: "3 years",
+    images: ["https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&h=380&fit=crop"],
+    badge: "For Rent",
+    badgeColor: "#2C9DD5",
+  },
+  {
+    id: 15,
+    title: "Retail Shop for Rent",
+    price: "₹45,000/month",
+    priceRaw: 45000,
+    area: "600 sqft",
+    location: "Upper Bazaar, Ranchi",
+    type: "Commercial",
+    bhk: null,
+    status: "Ready to Move",
+    postedBy: "Owner",
+    postedDays: 4,
+    imgCount: 7,
+    verified: false,
+    featured: false,
+    transactionType: "Rent",
+    tags: ["Retail"],
+    amenities: ["Main Road Facing", "Power Backup"],
+    floor: "Ground",
+    facing: "East",
+    age: "8 years",
+    images: ["https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600&h=380&fit=crop"],
+    badge: "For Rent",
+    badgeColor: "#2C9DD5",
+  },
+  {
+    id: 16,
+    title: "Co-living Private Room",
+    price: "₹9,500/month",
+    priceRaw: 9500,
+    area: "180 sqft",
+    location: "Kanke Road, Ranchi",
+    type: "Apartment",
+    bhk: "1 BHK",
+    status: "Ready to Move",
+    postedBy: "Agent",
+    postedDays: 0,
+    imgCount: 6,
+    verified: true,
+    featured: false,
+    transactionType: "Rent",
+    tags: ["Co-living"],
+    amenities: ["WiFi", "Housekeeping", "Power Backup", "Security"],
+    floor: "2nd of 4",
+    facing: "West",
+    age: "2 years",
+    images: ["https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=380&fit=crop"],
+    badge: "Co-living",
+    badgeColor: "#16a34a",
+  },
+  {
+    id: 17,
+    title: "Student PG Accommodation",
+    price: "₹7,000/month",
+    priceRaw: 7000,
+    area: "140 sqft",
+    location: "Near BIT Mesra, Ranchi",
+    type: "Apartment",
+    bhk: "1 BHK",
+    status: "Ready to Move",
+    postedBy: "Agent",
+    postedDays: 2,
+    imgCount: 5,
+    verified: true,
+    featured: false,
+    transactionType: "Rent",
+    tags: ["Student Accommodation"],
+    amenities: ["WiFi", "Housekeeping", "Meals Included", "Security"],
+    floor: "3rd of 5",
+    facing: "South",
+    age: "1 year",
+    images: ["https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&h=380&fit=crop"],
+    badge: "PG/Hostel",
+    badgeColor: "#16a34a",
   },
 ];
 
@@ -187,6 +440,10 @@ const POSTED_BY = ["Owner", "Builder", "Agent"];
 const AMENITIES_LIST = ["Lift", "Parking", "Power Backup", "Swimming Pool", "Gym", "Garden", "Security", "Club House"];
 const SORT_OPTIONS = ["Relevance", "Price: Low to High", "Price: High to Low", "Newest First", "Area: Large to Small"];
 const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "4+ BHK"];
+const TAGS_LIST = ["Luxury", "Affordable", "Gated Community", "Office", "Retail", "Industrial", "Co-living", "Student Accommodation"];
+
+// Default budget ceilings differ a lot between buying (crores) and renting (thousands/month)
+const BUDGET_MAX = { Buy: 100000000, Rent: 300000 };
 
 // ── Helper ─────────────────────────────────────────────────────────────────────
 function CheckBox({ label, checked, onChange }) {
@@ -212,14 +469,19 @@ function CheckBox({ label, checked, onChange }) {
 }
 
 // ── Price Range Slider ─────────────────────────────────────────────────────────
-function PriceRange({ min, max, value, onChange }) {
+function PriceRange({ min, max, value, onChange, mode = "Buy" }) {
+  const format = (n) => {
+    if (mode === "Rent") return `₹${n.toLocaleString("en-IN")}/mo`;
+    return n >= 10000000 ? `₹${(n / 10000000).toFixed(1)} Cr` : `₹${(n / 100000).toFixed(0)} Lac`;
+  };
+  const step = mode === "Rent" ? 1000 : 500000;
   return (
     <div>
       <div className="flex justify-between mb-2">
-        <span className="text-xs" style={{ color: "#495057" }}>Min: <span style={{ color: "#2C9DD5" }}>₹{(value[0] / 100000).toFixed(0)} Lac</span></span>
-        <span className="text-xs" style={{ color: "#495057" }}>Max: <span style={{ color: "#2C9DD5" }}>₹{value[1] >= 10000000 ? (value[1] / 10000000).toFixed(1) + " Cr" : (value[1] / 100000).toFixed(0) + " Lac"}</span></span>
+        <span className="text-xs" style={{ color: "#495057" }}>Min: <span style={{ color: "#2C9DD5" }}>{format(value[0])}</span></span>
+        <span className="text-xs" style={{ color: "#495057" }}>Max: <span style={{ color: "#2C9DD5" }}>{format(value[1])}</span></span>
       </div>
-      <input type="range" min={min} max={max} step={500000}
+      <input type="range" min={min} max={max} step={step}
         value={value[1]}
         onChange={e => onChange([value[0], Number(e.target.value)])}
         className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
@@ -242,6 +504,7 @@ function Sidebar({ filters, setFilters, onReset }) {
     { title: "Property Type", key: "types", options: PROPERTY_TYPES },
     { title: "BHK", key: "bhk", options: BHK_OPTIONS },
     { title: "Possession", key: "possession", options: POSSESSION },
+    { title: "Category", key: "tags", options: TAGS_LIST },
     { title: "Posted By", key: "postedBy", options: POSTED_BY },
     { title: "Amenities", key: "amenities", options: AMENITIES_LIST },
   ];
@@ -261,7 +524,7 @@ function Sidebar({ filters, setFilters, onReset }) {
           {/* Price Range */}
           <div>
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#495057" }}>Budget</p>
-            <PriceRange min={0} max={100000000} value={filters.budget}
+            <PriceRange min={0} max={BUDGET_MAX[filters.transactionType]} value={filters.budget} mode={filters.transactionType}
               onChange={val => setFilters(f => ({ ...f, budget: val }))} />
           </div>
 
@@ -292,9 +555,10 @@ function Sidebar({ filters, setFilters, onReset }) {
 }
 
 // ── Property Card (List View) ──────────────────────────────────────────────────
-function PropertyCardList({ property }) {
+function PropertyCardList({ property, onOpen, onNavigate }) {
   const [saved, setSaved] = useState(false);
   const [imgIdx, setImgIdx] = useState(0);
+  const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
 
   return (
     <div className="rounded-2xl overflow-hidden flex flex-col sm:flex-row transition-all duration-200 group cursor-pointer"
@@ -303,6 +567,7 @@ function PropertyCardList({ property }) {
         border: property.featured ? "1.5px solid #2C9DD540" : "1px solid #E5E8EB",
         boxShadow: property.featured ? "0 0 24px #2C9DD510" : "none",
       }}
+      onClick={() => onOpen && onOpen(property)}
       onMouseEnter={e => e.currentTarget.style.borderColor = "#2C9DD5"}
       onMouseLeave={e => e.currentTarget.style.borderColor = property.featured ? "#2C9DD540" : "#E5E8EB"}
     >
@@ -406,7 +671,8 @@ function PropertyCardList({ property }) {
             {property.postedDays === 0 ? "Today" : `${property.postedDays}d ago`}
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
+            <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", contactSubject); }}
+              className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
               style={{ background: "transparent", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#FFFFFF"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2C9DD5"; }}>
@@ -415,7 +681,8 @@ function PropertyCardList({ property }) {
               </svg>
               Contact
             </button>
-            <button className="text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
+            <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", contactSubject); }}
+              className="text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
               style={{ background: "#BA0D0B", color: "#FFFFFF" }}
               onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
               onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}>
@@ -429,12 +696,14 @@ function PropertyCardList({ property }) {
 }
 
 // ── Property Card (Grid View) ──────────────────────────────────────────────────
-function PropertyCardGrid({ property }) {
+function PropertyCardGrid({ property, onOpen, onNavigate }) {
   const [saved, setSaved] = useState(false);
+  const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
 
   return (
     <div className="rounded-2xl overflow-hidden flex flex-col transition-all duration-200 group cursor-pointer"
       style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+      onClick={() => onOpen && onOpen(property)}
       onMouseEnter={e => e.currentTarget.style.borderColor = "#2C9DD5"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "#E5E8EB"}>
 
@@ -492,7 +761,8 @@ function PropertyCardGrid({ property }) {
             <span style={{ color: "#1F242A" }}>{property.postedBy}</span>
             {" · "}{property.postedDays === 0 ? "Today" : `${property.postedDays}d ago`}
           </span>
-          <button className="text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
+          <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", contactSubject); }}
+            className="text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
             style={{ background: "#BA0D0B", color: "#FFFFFF" }}
             onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
             onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}>
@@ -505,33 +775,66 @@ function PropertyCardGrid({ property }) {
 }
 
 // ── Main Export ────────────────────────────────────────────────────────────────
-export default function SearchResults() {
+// ── Build the filters object, merging any nav-provided overrides over sensible defaults ──
+function buildFilters(overrides) {
+  const transactionType = overrides?.transactionType || "Buy";
+  return {
+    transactionType,
+    budget: overrides?.budget || [0, BUDGET_MAX[transactionType]],
+    types: overrides?.types || [],
+    bhk: overrides?.bhk || [],
+    possession: overrides?.possession || [],
+    postedBy: overrides?.postedBy || [],
+    amenities: overrides?.amenities || [],
+    tags: overrides?.tags || [],
+    verifiedOnly: overrides?.verifiedOnly || false,
+  };
+}
+
+export default function SearchResults({ initialFilters, onNavigate }) {
   const [viewMode, setViewMode] = useState("list"); // list | grid
   const [sortBy, setSortBy] = useState("Relevance");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [filters, setFilters] = useState({
-    budget: [0, 100000000],
-    types: [],
-    bhk: [],
-    possession: [],
-    postedBy: [],
-    amenities: [],
-    verifiedOnly: false,
-  });
+  const [filters, setFilters] = useState(() => buildFilters(initialFilters));
+  const [dbListings, setDbListings] = useState(null); // null = still loading, [] = loaded but empty
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchPublicListings().then(({ data }) => {
+      if (!cancelled) setDbListings(data);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Once you've added real "Live" listings in the Admin Console, they take
+  // over automatically. Until then, the bundled demo dataset keeps the page
+  // fully functional out of the box.
+  const ALL_PROPERTIES = dbListings && dbListings.length > 0 ? dbListings : PROPERTIES;
+
+  function openProperty(property) {
+    onNavigate && onNavigate("property-detail", { property, pool: ALL_PROPERTIES });
+  }
 
   function resetFilters() {
-    setFilters({ budget: [0, 100000000], types: [], bhk: [], possession: [], postedBy: [], amenities: [], verifiedOnly: false });
+    setFilters(buildFilters({ transactionType: filters.transactionType }));
+  }
+
+  function setTransactionType(tt) {
+    setFilters(buildFilters({ transactionType: tt }));
   }
 
   // Apply filters
-  const filtered = PROPERTIES.filter(p => {
+  const filtered = ALL_PROPERTIES.filter(p => {
+    if (p.transactionType !== filters.transactionType) return false;
     if (p.priceRaw > filters.budget[1]) return false;
     if (filters.types.length && !filters.types.includes(p.type)) return false;
+    if (filters.bhk.length && !filters.bhk.includes(p.bhk)) return false;
     if (filters.possession.length && !filters.possession.includes(p.status)) return false;
     if (filters.postedBy.length && !filters.postedBy.includes(p.postedBy)) return false;
     if (filters.verifiedOnly && !p.verified) return false;
     if (filters.amenities.length && !filters.amenities.some(a => p.amenities.includes(a))) return false;
+    if (filters.tags.length && !filters.tags.some(t => p.tags.includes(t))) return false;
     return true;
   });
 
@@ -545,11 +848,28 @@ export default function SearchResults() {
   });
 
   const activeFilterCount = filters.types.length + filters.bhk.length + filters.possession.length +
-    filters.postedBy.length + filters.amenities.length + (filters.verifiedOnly ? 1 : 0);
+    filters.postedBy.length + filters.amenities.length + filters.tags.length + (filters.verifiedOnly ? 1 : 0);
 
   return (
     <div style={{ background: "#FFFFFF", minHeight: "100vh" }} className="px-4 py-8">
       <div className="max-w-7xl mx-auto">
+
+        {/* ── Buy / Rent toggle ── */}
+        <div className="flex items-center gap-1 mb-5 p-1 rounded-xl w-fit" style={{ background: "#F2F4F6" }}>
+          {["Buy", "Rent"].map((tt) => (
+            <button
+              key={tt}
+              onClick={() => setTransactionType(tt)}
+              className="px-6 py-2 rounded-lg text-sm font-bold transition-all"
+              style={{
+                background: filters.transactionType === tt ? "#2C9DD5" : "transparent",
+                color: filters.transactionType === tt ? "#FFFFFF" : "#495057",
+              }}
+            >
+              {tt === "Buy" ? "For Sale" : "For Rent"}
+            </button>
+          ))}
+        </div>
 
         {/* ── Search Bar (top) ── */}
         <div className="rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-3"
@@ -591,7 +911,7 @@ export default function SearchResults() {
         <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div>
             <h1 className="text-lg font-bold" style={{ color: "#15191C" }}>
-              Properties in <span style={{ color: "#2C9DD5" }}>Ranchi</span>
+              {filters.transactionType === "Rent" ? "Properties for Rent in" : "Properties for Sale in"} <span style={{ color: "#2C9DD5" }}>Ranchi</span>
             </h1>
             <p className="text-xs mt-0.5" style={{ color: "#495057" }}>
               {sorted.length} properties found
@@ -680,11 +1000,11 @@ export default function SearchResults() {
               </div>
             ) : viewMode === "list" ? (
               <div className="space-y-4">
-                {sorted.map(p => <PropertyCardList key={p.id} property={p} />)}
+                {sorted.map(p => <PropertyCardList key={p.id} property={p} onOpen={openProperty} onNavigate={onNavigate} />)}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {sorted.map(p => <PropertyCardGrid key={p.id} property={p} />)}
+                {sorted.map(p => <PropertyCardGrid key={p.id} property={p} onOpen={openProperty} onNavigate={onNavigate} />)}
               </div>
             )}
 

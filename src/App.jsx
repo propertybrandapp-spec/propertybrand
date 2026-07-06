@@ -10,6 +10,7 @@ import Testimonials from "./components/Testimonials";
 import ChannelPartner from "./components/ChannelPartner";
 import PropertyManagement from "./components/PropertyManagement";
 import SearchResults from "./components/SearchResults";
+import PropertyDetail from "./components/PropertyDetail";
 import Footer from "./components/Footer";
 import AdminApp from "./components/admin/AdminApp";
 import AboutUs from "./components/AboutUs";
@@ -32,9 +33,21 @@ import Sitemap from "./components/Sitemap";
 
 function AppContent() {
   const [page, setPage] = useState("home");
+  const [navNonce, setNavNonce] = useState(0);
+  const [searchFilters, setSearchFilters] = useState(null);
+  const [contactSubject, setContactSubject] = useState(null);
+  const [viewingProperty, setViewingProperty] = useState(null);
 
-  function navigate(to) {
+  // `payload` is optional and its meaning depends on the destination:
+  //  - "search"           → an initial filters object (transactionType, types, tags, possession, etc.)
+  //  - "contact"          → a subject value to preselect in the contact form dropdown
+  //  - "property-detail"  → { property, pool } — the clicked property + the list it came from (for "Similar Properties")
+  function navigate(to, payload) {
     setPage(to);
+    setNavNonce((n) => n + 1);
+    if (to === "search") setSearchFilters(payload || null);
+    if (to === "contact") setContactSubject(payload || null);
+    if (to === "property-detail") setViewingProperty(payload || null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -120,7 +133,11 @@ function AppContent() {
           </>
         )}
 
-        {page === "search" && <SearchResults />}
+        {page === "search" && <SearchResults key={navNonce} initialFilters={searchFilters} onNavigate={navigate} />}
+
+        {page === "property-detail" && (
+          <PropertyDetail key={navNonce} property={viewingProperty?.property} pool={viewingProperty?.pool} onNavigate={navigate} />
+        )}
 
         {page === "channel-partner" && <ChannelPartner onNavigate={navigate} />}
 
@@ -132,7 +149,7 @@ function AppContent() {
 
         {page === "about" && <AboutUs onNavigate={navigate} />}
 
-        {page === "contact" && <ContactUs onNavigate={navigate} />}
+        {page === "contact" && <ContactUs key={navNonce} onNavigate={navigate} initialSubject={contactSubject} />}
 
         {page === "careers" && <Careers onNavigate={navigate} />}
 

@@ -252,7 +252,7 @@ function ImageCarousel({ images, imgCount, badge, badgeColor }) {
 }
 
 // ── Property Card ─────────────────────────────────────────────────────────────
-function PropertyCard({ property }) {
+function PropertyCard({ property, onOpen, onNavigate }) {
   const {
     id, images, imgCount, badge, badgeColor,
     title, price, area, location,
@@ -261,7 +261,10 @@ function PropertyCard({ property }) {
   } = property;
 
   return (
-    <div className="relative bg-[#FFFFFF] rounded-xl border border-[#E5E8EB] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64">
+    <div
+      onClick={() => onOpen && onOpen(property)}
+      className="relative bg-[#FFFFFF] rounded-xl border border-[#E5E8EB] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64"
+    >
       {featured && (
         <div className="absolute -top-px left-0 right-0 h-0.5 bg-gradient-to-r from-yellow-400 via-[#2C9DD5] to-yellow-400 rounded-t-xl z-10" />
       )}
@@ -324,7 +327,10 @@ function PropertyCard({ property }) {
             {" · "}
             {postedDays === 0 ? "Today" : `${postedDays}d ago`}
           </div>
-          <button className="flex items-center gap-1 text-[11px] font-bold text-[#2C9DD5] hover:underline">
+          <button
+            onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate("contact", "buy"); }}
+            className="flex items-center gap-1 text-[11px] font-bold text-[#2C9DD5] hover:underline"
+          >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V5z" />
             </svg>
@@ -355,7 +361,7 @@ function SectionHeader({ title, seeAllLabel = "See all Properties", onNavigate }
 }
 
 // ── Scroll Row ────────────────────────────────────────────────────────────────
-function ScrollRow({ properties }) {
+function ScrollRow({ properties, onOpen, onNavigate }) {
   const rowRef = useRef(null);
 
   function scroll(dir) {
@@ -382,7 +388,7 @@ function ScrollRow({ properties }) {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {properties.map((p) => (
-          <PropertyCard key={p.id} property={p} />
+          <PropertyCard key={p.id} property={p} onOpen={onOpen} onNavigate={onNavigate} />
         ))}
       </div>
 
@@ -411,6 +417,10 @@ export default function PopularProperties({ onNavigate }) {
   const ownerProperties = filtered.filter((p) => p.postedBy === "Owner");
   const builderProperties = filtered.filter((p) => p.postedBy === "Builder");
 
+  function openProperty(property) {
+    onNavigate && onNavigate("property-detail", { property, pool: PROPERTIES });
+  }
+
   return (
     <section className="bg-[#FFFFFF] py-10 px-4">
       <div className="max-w-7xl mx-auto">
@@ -437,7 +447,7 @@ export default function PopularProperties({ onNavigate }) {
         {ownerProperties.length > 0 && (
           <div className="mb-10">
             <SectionHeader title="Popular Owner Properties" onNavigate={onNavigate} />
-            <ScrollRow properties={ownerProperties} />
+            <ScrollRow properties={ownerProperties} onOpen={openProperty} onNavigate={onNavigate} />
           </div>
         )}
 
@@ -445,7 +455,7 @@ export default function PopularProperties({ onNavigate }) {
         {builderProperties.length > 0 && (
           <div className="mb-10">
             <SectionHeader title="Featured Projects" seeAllLabel="See all Projects" onNavigate={onNavigate} />
-            <ScrollRow properties={builderProperties} />
+            <ScrollRow properties={builderProperties} onOpen={openProperty} onNavigate={onNavigate} />
           </div>
         )}
 

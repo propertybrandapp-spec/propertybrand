@@ -44,7 +44,25 @@ create table public.listings (
   posted_by_user_id uuid references auth.users(id),
   views integer default 0,
   image_emoji text default '🏠',       -- placeholder until real image upload is added
-  image_url text,                       -- for when you wire up Supabase Storage
+  image_url text,                       -- legacy single-image column; kept for back-compat, mirrors images[0]
+
+  -- Rich detail fields (power the public Property Detail page + Admin listing form)
+  transaction_type text not null default 'Buy' check (transaction_type in ('Buy', 'Rent')),
+  possession text check (possession in ('Ready to Move', 'Under Construction')),
+  bhk text,                             -- e.g. "3 BHK" — null for Plot/Commercial
+  area_sqft integer,
+  floor text,                           -- e.g. "8th of 12"
+  facing text,                          -- e.g. "East"
+  age text,                             -- e.g. "2 years", "New"
+  description text,                     -- long-form copy for the detail page
+  tags text[] default '{}',             -- Luxury, Affordable, Gated Community, Office, Retail, Industrial, Co-living, Student Accommodation
+  amenities text[] default '{}',        -- Lift, Parking, Gym, Security, ...
+  images text[] default '{}',           -- ordered array of R2 public URLs (gallery)
+  featured boolean default false,
+  verified boolean default false,
+  badge text,                           -- e.g. "New Launch", "Luxury"
+  badge_color text,                     -- hex color for the badge
+
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -165,6 +183,8 @@ alter table public.admin_profiles add column if not exists is_active boolean def
 
 -- ── Helpful indexes for dashboard performance ─────────────────────────────────
 create index idx_listings_status on public.listings(status);
+create index idx_listings_transaction_type on public.listings(transaction_type);
+create index idx_listings_property_type on public.listings(property_type);
 create index idx_leads_stage on public.leads(stage);
 create index idx_agents_status on public.agents(status);
 create index idx_blog_posts_status on public.blog_posts(status);
