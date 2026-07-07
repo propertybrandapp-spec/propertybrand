@@ -19,12 +19,21 @@ export default function ClientAccountMenu({ onNavigate }) {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 transition"
       >
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-          style={{ background: "#2C9DD5", color: "#FFFFFF" }}
-        >
-          {initials}
-        </div>
+        {profile?.avatar_url ? (
+          <img
+            src={profile.avatar_url}
+            alt={displayName}
+            className="w-8 h-8 rounded-full object-cover shrink-0"
+            style={{ border: "1.5px solid #E5E8EB" }}
+          />
+        ) : (
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+            style={{ background: "#2C9DD5", color: "#FFFFFF" }}
+          >
+            {initials}
+          </div>
+        )}
         <span className="hidden sm:inline text-sm font-semibold" style={{ color: "#15191C" }}>
           {displayName}
         </span>
@@ -44,9 +53,18 @@ export default function ClientAccountMenu({ onNavigate }) {
             className="absolute right-0 top-full mt-2 w-56 rounded-xl shadow-2xl z-50 overflow-hidden"
             style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
           >
-            <div className="px-4 py-3" style={{ borderBottom: "1px solid #E5E8EB" }}>
-              <p className="text-sm font-bold truncate" style={{ color: "#15191C" }}>{displayName}</p>
-              <p className="text-xs truncate" style={{ color: "#495057" }}>{session?.user?.email}</p>
+            <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: "1px solid #E5E8EB" }}>
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={displayName} className="w-10 h-10 rounded-full object-cover shrink-0" />
+              ) : (
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "#2C9DD5", color: "#FFFFFF" }}>
+                  {initials}
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-bold truncate" style={{ color: "#15191C" }}>{displayName}</p>
+                <p className="text-xs truncate" style={{ color: "#495057" }}>{session?.user?.email}</p>
+              </div>
             </div>
             {[
               { label: "My Profile", page: "profile", icon: "👤" },

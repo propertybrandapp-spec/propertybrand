@@ -322,7 +322,7 @@ function MobileNavItem({ item, onNavigate, onLinkClick }) {
 }
 
 export default function Navbar({ onNavigate }) {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, profile } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [cityOpen, setCityOpen] = useState(false);
@@ -412,7 +412,12 @@ export default function Navbar({ onNavigate }) {
         <div className="flex items-center justify-between px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }}>
           <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("contact", "prime"); }} className="text-sm font-semibold" style={{ color: "#2C9DD5" }}>PB Prime</button>
           {isLoggedIn ? (
-            <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("profile"); }} className="text-sm font-semibold" style={{ color: "#15191C" }}>My Account</button>
+            <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("profile"); }} className="flex items-center gap-2 text-sm font-semibold" style={{ color: "#15191C" }}>
+              {profile?.avatar_url && (
+                <img src={profile.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
+              )}
+              My Account
+            </button>
           ) : (
             <button onClick={() => { setMobileOpen(false); setAuthModalOpen(true); }} className="text-sm font-semibold" style={{ color: "#15191C" }}>Login</button>
           )}
