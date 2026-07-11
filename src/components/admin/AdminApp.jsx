@@ -4,6 +4,9 @@ import AdminLogin from "./AdminLogin";
 import AdminDashboard from "./AdminDashboard";
 import AdminListings from "./AdminListings";
 import AdminListingForm from "./AdminListingForm";
+import AdminBlog from "./AdminBlog";
+import AdminBlogForm from "./AdminBlogForm";
+import AdminUsers from "./AdminUsers";
 import AdminLeads from "./AdminLeads";
 import AdminAgents from "./AdminAgents";
 
@@ -104,8 +107,12 @@ export default function AdminApp() {
       return <AdminLeads {...pageProps} />;
     case "agents":
       return <AdminAgents {...pageProps} />;
-    // case "blog":  -> <AdminBlog {...pageProps} />       (not yet built)
-    // case "users": -> <AdminUsers {...pageProps} />      (not yet built)
+    case "blog":
+      return <AdminBlog {...pageProps} />;
+    case "blog-form":
+      return <AdminBlogForm {...pageProps} editingListing={navPayload} />;
+    case "users":
+      return <AdminUsers {...pageProps} />;
     default:
       return <AdminDashboard {...pageProps} />;
   }

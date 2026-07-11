@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { fetchPublicListings } from "../lib/listings";
+import { useSavedItems } from "../lib/SavedItemsContext";
 
 // ── Demo data ─────────────────────────────────────────────────────────────────
 // Shown until you connect real listings via the Admin Console (Supabase). The
@@ -556,7 +557,8 @@ function Sidebar({ filters, setFilters, onReset }) {
 
 // ── Property Card (List View) ──────────────────────────────────────────────────
 function PropertyCardList({ property, onOpen, onNavigate }) {
-  const [saved, setSaved] = useState(false);
+  const { isPropertySaved, toggleSaveProperty } = useSavedItems();
+  const saved = isPropertySaved(property.dbId || property.id);
   const [imgIdx, setImgIdx] = useState(0);
   const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
 
@@ -584,7 +586,7 @@ function PropertyCardList({ property, onOpen, onNavigate }) {
         </span>
 
         {/* Save */}
-        <button onClick={e => { e.stopPropagation(); setSaved(!saved); }}
+        <button onClick={e => { e.stopPropagation(); toggleSaveProperty(property); }}
           className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110"
           style={{ background: "rgba(11,11,11,0.8)" }}>
           <svg className="w-3.5 h-3.5" fill={saved ? "#BA0D0B" : "none"} stroke={saved ? "#BA0D0B" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
@@ -697,7 +699,8 @@ function PropertyCardList({ property, onOpen, onNavigate }) {
 
 // ── Property Card (Grid View) ──────────────────────────────────────────────────
 function PropertyCardGrid({ property, onOpen, onNavigate }) {
-  const [saved, setSaved] = useState(false);
+  const { isPropertySaved, toggleSaveProperty } = useSavedItems();
+  const saved = isPropertySaved(property.dbId || property.id);
   const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
 
   return (
@@ -715,7 +718,7 @@ function PropertyCardGrid({ property, onOpen, onNavigate }) {
           style={{ background: property.badgeColor, color: "#FFFFFF" }}>
           {property.badge}
         </span>
-        <button onClick={e => { e.stopPropagation(); setSaved(!saved); }}
+        <button onClick={e => { e.stopPropagation(); toggleSaveProperty(property); }}
           className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
           style={{ background: "rgba(11,11,11,0.8)" }}>
           <svg className="w-3.5 h-3.5" fill={saved ? "#BA0D0B" : "none"} stroke={saved ? "#BA0D0B" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">

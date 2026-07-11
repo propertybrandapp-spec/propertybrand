@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useSavedItems } from "../lib/SavedItemsContext";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -170,13 +171,14 @@ const PROPERTIES = [
 ];
 
 // ── Heart / Wishlist Button ────────────────────────────────────────────────────
-function HeartBtn({ id }) {
-  const [liked, setLiked] = useState(false);
+function HeartBtn({ property }) {
+  const { isPropertySaved, toggleSaveProperty } = useSavedItems();
+  const liked = isPropertySaved(property.dbId || property.id);
   return (
     <button
       onClick={(e) => {
         e.stopPropagation();
-        setLiked(!liked);
+        toggleSaveProperty(property);
       }}
       className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-[#FFFFFF]/90 backdrop-blur flex items-center justify-center shadow hover:scale-110 transition z-10"
     >
@@ -275,7 +277,7 @@ function PropertyCard({ property, onOpen, onNavigate }) {
         badge={badge}
         badgeColor={badgeColor}
       />
-      <HeartBtn id={id} />
+      <HeartBtn property={property} />
 
       <div className="p-3.5">
         {/* Title + Price */}

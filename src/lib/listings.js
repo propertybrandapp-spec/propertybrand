@@ -112,6 +112,15 @@ export async function fetchListingById(id) {
   return { data: normalizeListing(data), error: null };
 }
 
+// Used by the Saved Properties page — fetches full listing rows for a set of
+// previously-saved ids (the SavedItemsContext only tracks the ids themselves).
+export async function fetchListingsByIds(ids) {
+  if (!ids || ids.length === 0) return { data: [], error: null };
+  const { data, error } = await supabase.from("listings").select("*").in("id", ids);
+  if (error) return { data: [], error };
+  return { data: (data || []).map(normalizeListing), error: null };
+}
+
 export async function createListing(property) {
   const { data: { session } } = await supabase.auth.getSession();
   const payload = denormalizeListing(property);

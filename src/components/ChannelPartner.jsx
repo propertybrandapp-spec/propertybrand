@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { submitPartnerApplication } from "../lib/agents";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -180,9 +181,27 @@ function TierCard({ tier }) {
 function PartnerForm({ onNavigate }) {
   const [form, setForm] = useState({ name: "", phone: "", email: "", city: "", rera: "", experience: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit() {
-    if (form.name && form.phone && form.email) setSubmitted(true);
+  async function handleSubmit() {
+    if (!(form.name && form.phone && form.email)) return;
+    setSubmitting(true);
+    setError("");
+    const { error } = await submitPartnerApplication({
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      city: form.city,
+      experience: form.experience,
+      reraNumber: form.rera,
+    });
+    setSubmitting(false);
+    if (error) {
+      setError("Something went wrong submitting your application. Please try again.");
+      return;
+    }
+    setSubmitted(true);
   }
 
   if (submitted) {
@@ -248,13 +267,16 @@ function PartnerForm({ onNavigate }) {
         onFocus={e => e.target.style.borderColor = "#2C9DD5"}
         onBlur={e => e.target.style.borderColor = "#E5E8EB"}
       />
-      <button onClick={handleSubmit}
-        className="w-full py-3 rounded-xl text-sm font-bold transition-all"
+      {error && (
+        <p className="text-xs font-semibold text-center" style={{ color: "#BA0D0B" }}>{error}</p>
+      )}
+      <button onClick={handleSubmit} disabled={submitting}
+        className="w-full py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-60"
         style={{ background: "#BA0D0B", color: "#FFFFFF" }}
         onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
         onMouseLeave={e => e.currentTarget.style.background = "#BA0D0B"}
       >
-        Submit Partner Application
+        {submitting ? "Submitting..." : "Submit Partner Application"}
       </button>
       <p className="text-center text-xs" style={{ color: "#495057" }}>
         By submitting you agree to our{" "}

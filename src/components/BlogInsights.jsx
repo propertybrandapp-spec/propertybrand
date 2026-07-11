@@ -1,6 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchPublicPosts } from "../lib/blogPosts";
+import { useSavedItems } from "../lib/SavedItemsContext";
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Demo data ─────────────────────────────────────────────────────────────────
+// Shown until you publish real posts via the Admin Console (Supabase). The
+// moment you publish your first one, this component automatically switches
+// over to showing real posts instead — see the fetch below.
 
 const BLOG_CATEGORIES = [
   { label: "All", icon: "🏠" },
@@ -161,7 +166,8 @@ const QUICK_GUIDES = [
 
 // ── Blog Card ─────────────────────────────────────────────────────────────────
 function BlogCard({ post }) {
-  const [bookmarked, setBookmarked] = useState(false);
+  const { isPostSaved, toggleSavePost } = useSavedItems();
+  const bookmarked = isPostSaved(post.dbId || post.id);
 
   return (
     <div className="bg-[#FFFFFF] rounded-xl border border-[#E5E8EB] overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer group flex flex-col">
@@ -177,7 +183,7 @@ function BlogCard({ post }) {
           {post.category}
         </span>
         <button
-          onClick={(e) => { e.stopPropagation(); setBookmarked(!bookmarked); }}
+          onClick={(e) => { e.stopPropagation(); toggleSavePost(post); }}
           className="absolute top-3 right-3 w-7 h-7 rounded-full bg-[#FFFFFF]/90 flex items-center justify-center hover:scale-110 transition"
         >
           <svg
@@ -298,7 +304,7 @@ function FeaturedArticle({ article }) {
               </p>
 
               <p className="text-slate-400 text-[10px]">
-                {article.authorRole}
+                {article.authorRole || "Contributor"}
               </p>
             </div>
           </div>
@@ -385,11 +391,24 @@ function NewsFeed({ onNavigate }) {
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function BlogInsights({ onNavigate }) {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [dbPosts, setDbPosts] = useState(null); // null = still loading, [] = loaded but empty
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchPublicPosts().then(({ data }) => {
+      if (!cancelled) setDbPosts(data);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const hasRealPosts = dbPosts && dbPosts.length > 0;
+  const featuredArticle = hasRealPosts ? dbPosts[0] : FEATURED_ARTICLE;
+  const gridPosts = hasRealPosts ? dbPosts.slice(1) : BLOG_POSTS;
 
   const filtered =
     activeCategory === "All"
-      ? BLOG_POSTS
-      : BLOG_POSTS.filter((p) => p.category === activeCategory);
+      ? gridPosts
+      : gridPosts.filter((p) => p.category === activeCategory);
 
   return (
     <section className="bg-[#FFFFFF] py-10 px-4">
@@ -435,7 +454,7 @@ export default function BlogInsights({ onNavigate }) {
         {/* ── Featured Article + News Feed ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <FeaturedArticle article={FEATURED_ARTICLE} />
+            <FeaturedArticle article={featuredArticle} />
           </div>
           <div className="lg:col-span-1">
             <NewsFeed onNavigate={onNavigate} />

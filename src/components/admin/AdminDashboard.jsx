@@ -265,7 +265,7 @@ export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
           <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
             <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #E5E8EB" }}>
               <h3 className="text-base font-bold" style={{ color: "#15191C" }}>Recent Activity</h3>
-              <button className="text-xs font-semibold" style={{ color: "#2C9DD5" }}>View all</button>
+              <button onClick={() => onNavigate("leads")} className="text-xs font-semibold" style={{ color: "#2C9DD5" }}>View all</button>
             </div>
             <div>
               {(recentActivity.length ? recentActivity : RECENT_ACTIVITY).map((item, i) => (

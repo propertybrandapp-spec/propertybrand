@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../lib/AuthContext";
-import { supabase } from "../lib/supabaseClient";
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { useSavedItems } from "../lib/SavedItemsContext";
 
 // ── Mini card used in the "Similar Properties" strip ─────────────────────────
 function SimilarCard({ property, onOpen }) {
@@ -33,10 +30,8 @@ function SimilarCard({ property, onOpen }) {
 
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function PropertyDetail({ property, pool = [], onNavigate }) {
-  const { session } = useAuth();
+  const { isPropertySaved, toggleSaveProperty } = useSavedItems();
   const [activeImage, setActiveImage] = useState(0);
-  const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   if (!property) {
     return (
@@ -51,29 +46,11 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
 
   const images = property.images?.length ? property.images : [];
   const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
-  const isRealListing = typeof property.dbId === "string" && UUID_RE.test(property.dbId);
+  const saved = isPropertySaved(property.dbId || property.id);
 
   const similar = pool
     .filter((p) => p.id !== property.id && p.type === property.type)
     .slice(0, 4);
-
-  async function toggleSave() {
-    // Best-effort persistence: only real Supabase-backed listings + a logged-in
-    // client can be saved to the saved_properties table. Otherwise it's just
-    // a local UI toggle (e.g. while browsing the bundled demo listings).
-    if (!isRealListing || !session) {
-      setSaved((s) => !s);
-      return;
-    }
-    setSaving(true);
-    if (!saved) {
-      await supabase.from("saved_properties").insert({ client_id: session.user.id, listing_id: property.dbId });
-    } else {
-      await supabase.from("saved_properties").delete().eq("client_id", session.user.id).eq("listing_id", property.dbId);
-    }
-    setSaved((s) => !s);
-    setSaving(false);
-  }
 
   function openSimilar(p) {
     onNavigate && onNavigate("property-detail", { property: p, pool });
@@ -231,8 +208,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   Schedule a Site Visit
                 </button>
                 <button
-                  onClick={toggleSave}
-                  disabled={saving}
+                  onClick={() => toggleSaveProperty(property)}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
                   style={{ background: "#F7F8FA", color: saved ? "#BA0D0B" : "#15191C", border: "1px solid #E5E8EB" }}
                 >

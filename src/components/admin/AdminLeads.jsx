@@ -1,122 +1,90 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "./AdminLayout";
+import { fetchAdminLeads, updateLeadStage, deleteLead } from "../../lib/leads";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
+const STAGES = ["New", "Contacted", "Site Visit", "Negotiation", "Closed Won", "Closed Lost"];
 
-const LEADS = [
-  { id: 1, name: "Rakesh Gupta", phone: "+91 94301 12345", email: "rakesh.g@email.com", interest: "3 BHK Flat, Harmu Colony", budget: "₹2 - 2.5 Cr", stage: "New", source: "Website", date: "Jun 17, 2026", assignedTo: "Rajesh Kumar" },
-  { id: 2, name: "Neha Singhania", phone: "+91 98765 11223", email: "neha.s@email.com", interest: "Commercial Space, Main Road", budget: "₹1.5 Cr", stage: "Contacted", source: "Referral", date: "Jun 16, 2026", assignedTo: "Anil Mehta" },
-  { id: 3, name: "Suresh Mahato", phone: "+91 90123 45678", email: "suresh.m@email.com", interest: "2 BHK Apartment, Morabadi", budget: "₹70 - 80 Lac", stage: "Site Visit", source: "Website", date: "Jun 15, 2026", assignedTo: "Priya Sharma" },
-  { id: 4, name: "Anita Poddar", phone: "+91 91234 56789", email: "anita.p@email.com", interest: "Interior Design Service", budget: "₹8 - 10 Lac", stage: "Negotiation", source: "WhatsApp", date: "Jun 14, 2026", assignedTo: "Sunita Verma" },
-  { id: 5, name: "Vikram Agarwal", phone: "+91 88001 23456", email: "vikram.a@email.com", interest: "Residential Plot, Argora", budget: "₹85 Lac - 1 Cr", stage: "Closed Won", source: "Referral", date: "Jun 10, 2026", assignedTo: "Deepak Singh" },
-  { id: 6, name: "Priya Das", phone: "+91 99887 65432", email: "priya.d@email.com", interest: "Office Spaces (5 units)", budget: "₹6 Cr", stage: "Negotiation", source: "Cold Call", date: "Jun 13, 2026", assignedTo: "Anil Mehta" },
-  { id: 7, name: "Manish Tiwari", phone: "+91 97765 43210", email: "manish.t@email.com", interest: "Project Partnership - Kanke Road", budget: "—", stage: "Closed Lost", source: "Website", date: "Jun 5, 2026", assignedTo: "Rajesh Kumar" },
-  { id: 8, name: "Arvind Sharma", phone: "+91 96655 44332", email: "arvind.s@email.com", interest: "Sell 2 BHK, Lalpur", budget: "₹40 - 45 Lac", stage: "New", source: "Website", date: "Jun 17, 2026", assignedTo: "Unassigned" },
-];
+const STAGE_STYLES = {
+  "New": { bg: "#EAF4FB", color: "#2C9DD5" },
+  "Contacted": { bg: "#FDF1E5", color: "#E87C02" },
+  "Site Visit": { bg: "#F3E8FF", color: "#a855f7" },
+  "Negotiation": { bg: "#FEF9C3", color: "#ca8a04" },
+  "Closed Won": { bg: "#EAF8EC", color: "#16a34a" },
+  "Closed Lost": { bg: "#FCEAEA", color: "#BA0D0B" },
+};
 
-const STAGES = [
-  { id: "New", color: "#2C9DD5", bg: "#EAF4FB" },
-  { id: "Contacted", color: "#E87C02", bg: "#FDF1E5" },
-  { id: "Site Visit", color: "#a78bfa", bg: "#F0EAFB" },
-  { id: "Negotiation", color: "#E87C02", bg: "#FDF1E5" },
-  { id: "Closed Won", color: "#16a34a", bg: "#EAF8EC" },
-  { id: "Closed Lost", color: "#BA0D0B", bg: "#FCEAEA" },
-];
+function StageBadge({ stage }) {
+  const s = STAGE_STYLES[stage] || STAGE_STYLES.New;
+  return <span className="text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap" style={{ background: s.bg, color: s.color }}>{stage}</span>;
+}
 
-// ── Lead Detail Drawer ────────────────────────────────────────────────────────
-function LeadDrawer({ lead, onClose }) {
-  if (!lead) return null;
-  const stage = STAGES.find((s) => s.id === lead.stage);
+// ── Lead Drawer ───────────────────────────────────────────────────────────────
+function LeadDrawer({ lead, onClose, onStageChange, onDelete }) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div
-        className="absolute right-0 top-0 bottom-0 w-full sm:w-96 overflow-y-auto"
-        style={{ background: "#FFFFFF", borderLeft: "1px solid #E5E8EB" }}
-      >
-        <div
-          className="sticky top-0 flex items-center justify-between px-6 py-4"
-          style={{ background: "#FFFFFF", borderBottom: "1px solid #E5E8EB" }}
-        >
-          <h3 className="text-base font-bold" style={{ color: "#15191C" }}>Lead Details</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg" style={{ color: "#495057" }}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+    <div className="fixed inset-0 z-50 flex justify-end" style={{ background: "rgba(21,25,28,0.5)" }} onClick={onClose}>
+      <div className="w-full sm:w-96 h-full overflow-y-auto p-6" style={{ background: "#FFFFFF" }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-bold" style={{ color: "#15191C" }}>Lead Details</h2>
+          <button onClick={onClose} className="text-2xl leading-none" style={{ color: "#495057" }}>×</button>
         </div>
 
-        <div className="p-6 space-y-5">
-          {/* Avatar + name */}
-          <div className="flex items-center gap-3">
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-lg shrink-0"
-              style={{ background: "#2C9DD5", color: "#FFFFFF" }}
-            >
-              {lead.name.split(" ").map((n) => n[0]).join("")}
-            </div>
-            <div>
-              <p className="text-base font-bold" style={{ color: "#15191C" }}>{lead.name}</p>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: stage.bg, color: stage.color }}>
-                {lead.stage}
-              </span>
-            </div>
-          </div>
+        <div className="mb-6">
+          <p className="text-base font-bold" style={{ color: "#15191C" }}>{lead.name}</p>
+          <StageBadge stage={lead.stage} />
+        </div>
 
-          {/* Contact info */}
-          <div className="space-y-3">
-            {[
-              { label: "Phone", value: lead.phone },
-              { label: "Email", value: lead.email },
-              { label: "Interested In", value: lead.interest },
-              { label: "Budget", value: lead.budget },
-              { label: "Source", value: lead.source },
-              { label: "Date", value: lead.date },
-              { label: "Assigned To", value: lead.assignedTo },
-            ].map((row) => (
-              <div key={row.label} className="flex justify-between items-start gap-3 py-2" style={{ borderBottom: "1px solid #F2F4F6" }}>
-                <span className="text-xs shrink-0" style={{ color: "#495057" }}>{row.label}</span>
-                <span className="text-sm font-medium text-right" style={{ color: "#15191C" }}>{row.value}</span>
-              </div>
-            ))}
-          </div>
+        <div className="space-y-3 text-sm mb-6">
+          <div className="flex justify-between"><span style={{ color: "#495057" }}>Phone</span><span style={{ color: "#15191C" }}>{lead.phone}</span></div>
+          {lead.email && <div className="flex justify-between"><span style={{ color: "#495057" }}>Email</span><span style={{ color: "#15191C" }}>{lead.email}</span></div>}
+          {lead.interest && <div className="flex justify-between gap-4"><span style={{ color: "#495057" }} className="shrink-0">Interest</span><span className="text-right" style={{ color: "#15191C" }}>{lead.interest}</span></div>}
+          {lead.budget && <div className="flex justify-between"><span style={{ color: "#495057" }}>Budget</span><span style={{ color: "#15191C" }}>{lead.budget}</span></div>}
+          <div className="flex justify-between"><span style={{ color: "#495057" }}>Source</span><span style={{ color: "#15191C" }}>{lead.source}</span></div>
+          <div className="flex justify-between"><span style={{ color: "#495057" }}>Assigned To</span><span style={{ color: "#15191C" }}>{lead.assignedTo}</span></div>
+          <div className="flex justify-between"><span style={{ color: "#495057" }}>Received</span><span style={{ color: "#15191C" }}>{lead.date}</span></div>
+        </div>
 
-          {/* Stage updater */}
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: "#495057" }}>Update Stage</p>
-            <div className="flex flex-wrap gap-2">
-              {STAGES.map((s) => (
-                <button
-                  key={s.id}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-full transition-all"
-                  style={{
-                    background: lead.stage === s.id ? s.color : "#F2F4F6",
-                    color: lead.stage === s.id ? "#FFFFFF" : "#495057",
-                  }}
-                >
-                  {s.id}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-2 pt-2">
-            <button
-              className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
-              style={{ background: "#BA0D0B", color: "#FFFFFF" }}
-            >
-              Call Now
-            </button>
-            <button
-              className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
-              style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
-            >
+        {/* Real actions — actually opens the phone/email app */}
+        <div className="flex gap-2 mb-6">
+          <a href={`tel:${lead.phone}`} className="flex-1 text-center py-2.5 rounded-xl text-sm font-bold" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
+            Call Now
+          </a>
+          {lead.email && (
+            <a href={`mailto:${lead.email}`} className="flex-1 text-center py-2.5 rounded-xl text-sm font-bold" style={{ background: "#EAF4FB", color: "#2C9DD5" }}>
               Send Email
-            </button>
-          </div>
+            </a>
+          )}
         </div>
+
+        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#495057" }}>Move to Stage</p>
+        <div className="flex flex-wrap gap-2 mb-6">
+          {STAGES.map((s) => (
+            <button
+              key={s}
+              onClick={() => onStageChange(lead, s)}
+              disabled={s === lead.stage}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg transition-all disabled:opacity-40"
+              style={{
+                background: s === lead.stage ? (STAGE_STYLES[s] || STAGE_STYLES.New).bg : "#F2F4F6",
+                color: s === lead.stage ? (STAGE_STYLES[s] || STAGE_STYLES.New).color : "#495057",
+              }}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+
+        {confirmDelete ? (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold" style={{ color: "#BA0D0B" }}>Delete this lead?</span>
+            <button onClick={() => onDelete(lead)} className="text-xs font-bold px-3 py-1.5 rounded-lg" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>Yes, delete</button>
+            <button onClick={() => setConfirmDelete(false)} className="text-xs font-bold px-3 py-1.5 rounded-lg" style={{ background: "#F2F4F6", color: "#495057" }}>Cancel</button>
+          </div>
+        ) : (
+          <button onClick={() => setConfirmDelete(true)} className="text-xs font-bold hover:underline" style={{ color: "#BA0D0B" }}>Delete Lead</button>
+        )}
       </div>
     </div>
   );
@@ -124,178 +92,149 @@ function LeadDrawer({ lead, onClose }) {
 
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function AdminLeads({ onNavigate, onLogout, adminProfile }) {
-  const [activeStage, setActiveStage] = useState("All");
-  const [selectedLead, setSelectedLead] = useState(null);
-  const [viewMode, setViewMode] = useState("table");
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const [viewingLead, setViewingLead] = useState(null);
+  const [busyIds, setBusyIds] = useState([]);
 
-  const filtered = activeStage === "All" ? LEADS : LEADS.filter((l) => l.stage === activeStage);
+  useEffect(() => { load(); }, []);
+
+  async function load() {
+    setLoading(true);
+    const { data, error } = await fetchAdminLeads();
+    setLeads(data);
+    setErrorMsg(error ? (error.message || "Couldn't load leads — check your Supabase connection (see SETUP.md).") : "");
+    setLoading(false);
+  }
+
+  const filtered = leads.filter((l) => {
+    if (activeFilter !== "All" && l.stage !== activeFilter) return false;
+    if (search && !l.name.toLowerCase().includes(search.toLowerCase()) && !l.phone.includes(search)) return false;
+    return true;
+  });
+
+  const counts = { All: leads.length };
+  STAGES.forEach((s) => { counts[s] = leads.filter((l) => l.stage === s).length; });
+
+  async function handleStageChange(lead, stage) {
+    setBusyIds((b) => [...b, lead.id]);
+    await updateLeadStage(lead.dbId, stage);
+    await load();
+    setBusyIds((b) => b.filter((x) => x !== lead.id));
+    setViewingLead(null);
+  }
+
+  async function handleDelete(lead) {
+    setBusyIds((b) => [...b, lead.id]);
+    await deleteLead(lead.dbId);
+    await load();
+    setViewingLead(null);
+  }
 
   return (
-    <AdminLayout activePage="leads" onNavigate={onNavigate} onLogout={onLogout} adminProfile={adminProfile} title="Leads & Inquiries" subtitle="Track and manage every customer inquiry">
+    <AdminLayout activePage="leads" onNavigate={onNavigate} onLogout={onLogout} adminProfile={adminProfile} title="Leads" subtitle="Track and manage inquiries from every source">
       <div className="space-y-5">
 
-        {/* ── Stage Pipeline Summary ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <button
-            onClick={() => setActiveStage("All")}
-            className="rounded-xl p-3.5 text-left transition-all"
-            style={{
-              background: activeStage === "All" ? "#15191C" : "#FFFFFF",
-              border: `1px solid ${activeStage === "All" ? "#15191C" : "#E5E8EB"}`,
-            }}
-          >
-            <p className="text-xl font-extrabold" style={{ color: activeStage === "All" ? "#FFFFFF" : "#15191C" }}>{LEADS.length}</p>
-            <p className="text-xs mt-0.5" style={{ color: activeStage === "All" ? "#D6DADD" : "#495057" }}>All Leads</p>
-          </button>
-          {STAGES.map((stage) => {
-            const count = LEADS.filter((l) => l.stage === stage.id).length;
-            const active = activeStage === stage.id;
-            return (
-              <button
-                key={stage.id}
-                onClick={() => setActiveStage(stage.id)}
-                className="rounded-xl p-3.5 text-left transition-all"
-                style={{
-                  background: active ? stage.color : "#FFFFFF",
-                  border: `1px solid ${active ? stage.color : "#E5E8EB"}`,
-                }}
-              >
-                <p className="text-xl font-extrabold" style={{ color: active ? "#FFFFFF" : "#15191C" }}>{count}</p>
-                <p className="text-xs mt-0.5 truncate" style={{ color: active ? "rgba(255,255,255,0.85)" : "#495057" }}>{stage.id}</p>
-              </button>
-            );
-          })}
+        {errorMsg && (
+          <div className="px-4 py-3 rounded-xl text-sm font-semibold" style={{ background: "#FCEAEA", color: "#BA0D0B" }}>{errorMsg}</div>
+        )}
+
+        <div
+          className="flex items-center gap-2 rounded-xl px-3.5 py-2.5 w-full sm:w-72"
+          style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+        >
+          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#495057" }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+          </svg>
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or phone..."
+            className="flex-1 text-sm bg-transparent focus:outline-none" style={{ color: "#15191C" }} />
         </div>
 
-        {/* ── View toggle ── */}
-        <div className="flex items-center justify-between">
-          <p className="text-sm" style={{ color: "#495057" }}>
-            <span className="font-bold" style={{ color: "#15191C" }}>{filtered.length}</span> leads
-          </p>
-          <div className="flex rounded-xl overflow-hidden" style={{ border: "1px solid #E5E8EB" }}>
-            {["table", "cards"].map((mode) => (
-              <button
-                key={mode}
-                onClick={() => setViewMode(mode)}
-                className="px-4 py-2 text-xs font-semibold capitalize transition-all"
-                style={{
-                  background: viewMode === mode ? "#2C9DD5" : "#FFFFFF",
-                  color: viewMode === mode ? "#FFFFFF" : "#495057",
-                }}
-              >
-                {mode}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+          {["All", ...STAGES].map((tab) => (
+            <button key={tab} onClick={() => setActiveFilter(tab)}
+              className="shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all"
+              style={{
+                background: activeFilter === tab ? "#2C9DD5" : "#FFFFFF",
+                color: activeFilter === tab ? "#FFFFFF" : "#495057",
+                border: `1px solid ${activeFilter === tab ? "#2C9DD5" : "#E5E8EB"}`,
+              }}>
+              {tab}
+              <span className="text-[10px] font-bold px-1.5 rounded-full"
+                style={{ background: activeFilter === tab ? "rgba(255,255,255,0.25)" : "#F2F4F6", color: activeFilter === tab ? "#FFFFFF" : "#495057" }}>
+                {counts[tab] || 0}
+              </span>
+            </button>
+          ))}
         </div>
 
-        {/* ── Table view ── */}
-        {viewMode === "table" && (
-          <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
+        <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
+          {loading ? (
+            <div className="flex items-center justify-center py-16 gap-3">
+              <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" style={{ color: "#2C9DD5" }}>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
+                <path d="M22 12a10 10 0 00-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+              </svg>
+              <span className="text-sm" style={{ color: "#495057" }}>Loading leads...</span>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <span className="text-4xl mb-3">📋</span>
+              <p className="text-sm font-bold" style={{ color: "#15191C" }}>{leads.length === 0 ? "No leads yet" : "No leads match this filter"}</p>
+              <p className="text-xs mt-1" style={{ color: "#495057" }}>
+                {leads.length === 0 ? "Submissions from the Contact form and site-wide inquiry box will show up here." : "Try a different filter or search."}
+              </p>
+            </div>
+          ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ background: "#F2F4F6", borderBottom: "1px solid #E5E8EB" }}>
                     <th className="px-5 py-3.5 text-left font-bold" style={{ color: "#15191C" }}>Name</th>
-                    <th className="px-3 py-3.5 text-left font-bold hidden md:table-cell" style={{ color: "#15191C" }}>Interested In</th>
-                    <th className="px-3 py-3.5 text-left font-bold hidden lg:table-cell" style={{ color: "#15191C" }}>Budget</th>
-                    <th className="px-3 py-3.5 text-left font-bold" style={{ color: "#15191C" }}>Stage</th>
-                    <th className="px-3 py-3.5 text-left font-bold hidden lg:table-cell" style={{ color: "#15191C" }}>Source</th>
-                    <th className="px-3 py-3.5 text-left font-bold hidden md:table-cell" style={{ color: "#15191C" }}>Assigned</th>
+                    <th className="px-3 py-3.5 text-left font-bold hidden sm:table-cell" style={{ color: "#15191C" }}>Phone</th>
+                    <th className="px-3 py-3.5 text-left font-bold hidden lg:table-cell" style={{ color: "#15191C" }}>Interest</th>
+                    <th className="px-3 py-3.5 text-left font-bold hidden md:table-cell" style={{ color: "#15191C" }}>Source</th>
+                    <th className="px-3 py-3.5 text-left font-bold">Stage</th>
+                    <th className="px-3 py-3.5 text-left font-bold hidden md:table-cell" style={{ color: "#15191C" }}>Received</th>
                     <th className="px-5 py-3.5 text-right font-bold" style={{ color: "#15191C" }}></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((lead, i) => {
-                    const stage = STAGES.find((s) => s.id === lead.stage);
-                    return (
-                      <tr
-                        key={lead.id}
-                        className="cursor-pointer transition-colors"
-                        style={{ borderBottom: i < filtered.length - 1 ? "1px solid #F2F4F6" : "none" }}
-                        onClick={() => setSelectedLead(lead)}
-                        onMouseEnter={(e) => e.currentTarget.style.background = "#FAFBFC"}
-                        onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-                      >
-                        <td className="px-5 py-3.5">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                              style={{ background: "#2C9DD5", color: "#FFFFFF" }}
-                            >
-                              {lead.name.split(" ").map((n) => n[0]).join("")}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-semibold truncate" style={{ color: "#15191C" }}>{lead.name}</p>
-                              <p className="text-xs truncate" style={{ color: "#495057" }}>{lead.phone}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3.5 hidden md:table-cell truncate max-w-[200px]" style={{ color: "#495057" }}>{lead.interest}</td>
-                        <td className="px-3 py-3.5 hidden lg:table-cell font-semibold" style={{ color: "#15191C" }}>{lead.budget}</td>
-                        <td className="px-3 py-3.5">
-                          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: stage.bg, color: stage.color }}>
-                            {lead.stage}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3.5 hidden lg:table-cell" style={{ color: "#495057" }}>{lead.source}</td>
-                        <td className="px-3 py-3.5 hidden md:table-cell" style={{ color: "#495057" }}>{lead.assignedTo}</td>
-                        <td className="px-5 py-3.5 text-right">
-                          <span className="text-xs font-semibold" style={{ color: "#2C9DD5" }}>View →</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {filtered.map((lead, i) => (
+                    <tr key={lead.id}
+                      style={{ borderBottom: i < filtered.length - 1 ? "1px solid #F2F4F6" : "none", opacity: busyIds.includes(lead.id) ? 0.5 : 1 }}
+                      className="transition-colors cursor-pointer"
+                      onClick={() => setViewingLead(lead)}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "#FAFBFC"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                    >
+                      <td className="px-5 py-3.5 font-semibold" style={{ color: "#15191C" }}>{lead.name}</td>
+                      <td className="px-3 py-3.5 hidden sm:table-cell" style={{ color: "#495057" }}>{lead.phone}</td>
+                      <td className="px-3 py-3.5 hidden lg:table-cell truncate max-w-[220px]" style={{ color: "#495057" }}>{lead.interest || "—"}</td>
+                      <td className="px-3 py-3.5 hidden md:table-cell" style={{ color: "#495057" }}>{lead.source}</td>
+                      <td className="px-3 py-3.5"><StageBadge stage={lead.stage} /></td>
+                      <td className="px-3 py-3.5 hidden md:table-cell" style={{ color: "#495057" }}>{lead.date}</td>
+                      <td className="px-5 py-3.5 text-right">
+                        <a href={`tel:${lead.phone}`} onClick={(e) => e.stopPropagation()}
+                          className="text-xs font-bold px-2.5 py-1.5 rounded-lg" style={{ background: "#FCEAEA", color: "#BA0D0B" }}>
+                          Call
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-          </div>
-        )}
-
-        {/* ── Cards view ── */}
-        {viewMode === "cards" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((lead) => {
-              const stage = STAGES.find((s) => s.id === lead.stage);
-              return (
-                <div
-                  key={lead.id}
-                  onClick={() => setSelectedLead(lead)}
-                  className="rounded-2xl p-5 cursor-pointer transition-shadow hover:shadow-lg"
-                  style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
-                        style={{ background: "#2C9DD5", color: "#FFFFFF" }}
-                      >
-                        {lead.name.split(" ").map((n) => n[0]).join("")}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold" style={{ color: "#15191C" }}>{lead.name}</p>
-                        <p className="text-xs" style={{ color: "#495057" }}>{lead.phone}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: stage.bg, color: stage.color }}>
-                      {lead.stage}
-                    </span>
-                  </div>
-                  <p className="text-xs mb-1" style={{ color: "#495057" }}>Interested in:</p>
-                  <p className="text-sm font-semibold mb-3" style={{ color: "#15191C" }}>{lead.interest}</p>
-                  <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid #F2F4F6" }}>
-                    <span className="text-xs" style={{ color: "#495057" }}>Budget: <span className="font-semibold" style={{ color: "#15191C" }}>{lead.budget}</span></span>
-                    <span className="text-xs" style={{ color: "#495057" }}>{lead.date}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
+          )}
+        </div>
       </div>
 
-      <LeadDrawer lead={selectedLead} onClose={() => setSelectedLead(null)} />
+      {viewingLead && (
+        <LeadDrawer lead={viewingLead} onClose={() => setViewingLead(null)} onStageChange={handleStageChange} onDelete={handleDelete} />
+      )}
     </AdminLayout>
   );
 }

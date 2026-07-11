@@ -30,6 +30,13 @@ create policy "Super admins can update admin profiles"
     auth.uid() in (select id from public.admin_profiles where role = 'super_admin')
   );
 
+-- Only super_admins can revoke another admin's access
+create policy "Super admins can remove admin profiles"
+  on public.admin_profiles for delete
+  using (
+    auth.uid() in (select id from public.admin_profiles where role = 'super_admin')
+  );
+
 
 -- ── 2. PROPERTY LISTINGS ──────────────────────────────────────────────────────
 create table public.listings (
@@ -121,6 +128,9 @@ create table public.agents (
   agency text,
   phone text not null,
   email text not null,
+  city text,
+  experience text,
+  rera_number text,
   tier text not null default 'Associate' check (tier in ('Associate', 'Silver', 'Gold')),
   status text not null default 'Pending' check (status in ('Verified', 'Pending', 'Suspended')),
   deals_closed integer default 0,
@@ -141,6 +151,11 @@ create policy "Admins can manage all agents"
   on public.agents for all
   using (auth.uid() in (select id from public.admin_profiles));
 
+-- Anyone can submit a partner application (can only ever insert as Pending)
+create policy "Anyone can submit a partner application"
+  on public.agents for insert
+  with check (status = 'Pending');
+
 
 -- ── 5. BLOG POSTS ─────────────────────────────────────────────────────────────
 create table public.blog_posts (
@@ -152,6 +167,8 @@ create table public.blog_posts (
   content text,                         -- full article body (markdown or HTML)
   author_name text not null,
   cover_image_url text,
+  tags text[] default '{}',
+  read_time_minutes integer,
   status text not null default 'Draft' check (status in ('Draft', 'Published', 'Archived')),
   views integer default 0,
   published_at timestamptz,
@@ -272,6 +289,32 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_client_user();
 
 create index idx_saved_properties_client on public.saved_properties(client_id);
+
+
+-- ── 9. SAVED POSTS (bookmark icon on blog/article cards) ─────────────────────
+create table public.saved_posts (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid references public.client_profiles(id) not null,
+  post_id uuid references public.blog_posts(id) not null,
+  created_at timestamptz default now(),
+  unique (client_id, post_id)
+);
+
+alter table public.saved_posts enable row level security;
+
+create policy "Clients can view own saved posts"
+  on public.saved_posts for select
+  using (auth.uid() = client_id);
+
+create policy "Clients can save posts"
+  on public.saved_posts for insert
+  with check (auth.uid() = client_id);
+
+create policy "Clients can unsave posts"
+  on public.saved_posts for delete
+  using (auth.uid() = client_id);
+
+create index idx_saved_posts_client on public.saved_posts(client_id);
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- After running this file:

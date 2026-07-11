@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { submitLead } from "../lib/leads";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -100,9 +101,31 @@ function QuickInquiry() {
     name: "", phone: "", email: "", requirement: "", location: "", budget: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit() {
-    if (form.name && form.phone) setSubmitted(true);
+  const REQUIREMENT_LABELS = { buy: "Buy", rent: "Rent", invest: "Investment", sell: "Sell" };
+
+  async function handleSubmit() {
+    if (!(form.name && form.phone)) return;
+    setSubmitting(true);
+    setError("");
+    const interestParts = [REQUIREMENT_LABELS[form.requirement] || "General Inquiry"];
+    if (form.location) interestParts.push(`in ${form.location}`);
+    const { error } = await submitLead({
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      interest: interestParts.join(" "),
+      budget: form.budget,
+      source: "Website",
+    });
+    setSubmitting(false);
+    if (error) {
+      setError("Something went wrong. Please try again.");
+      return;
+    }
+    setSubmitted(true);
   }
 
   if (submitted) {
@@ -165,11 +188,13 @@ function QuickInquiry() {
           className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#495057] focus:outline-none focus:border-white/60 transition"
         />
       </div>
+      {error && <p className="text-xs font-semibold text-red-200">{error}</p>}
       <button
         onClick={handleSubmit}
-        className="w-full bg-[#FFFFFF] text-[#2C9DD5] font-bold py-2.5 rounded-lg hover:bg-[#F2F4F6] transition text-sm shadow"
+        disabled={submitting}
+        className="w-full bg-[#FFFFFF] text-[#2C9DD5] font-bold py-2.5 rounded-lg hover:bg-[#F2F4F6] transition text-sm shadow disabled:opacity-60"
       >
-        Send Inquiry
+        {submitting ? "Sending..." : "Send Inquiry"}
       </button>
     </div>
   );

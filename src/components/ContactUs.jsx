@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { submitLead } from "../lib/leads";
 
 // ── Contact Info ──────────────────────────────────────────────────────────────
 
@@ -54,14 +55,40 @@ const FAQ = [
   { q: "Can NRIs invest through PropertyBrands?", a: "Yes — we have a dedicated NRI desk that handles property visits, legal checks, loan paperwork, and registration remotely." },
 ];
 
+const SUBJECT_LABELS = {
+  buy: "Buying a Property",
+  rent: "Renting a Property",
+  sell: "Selling a Property",
+  invest: "Investment Advisory",
+  partner: "Channel Partner Program",
+  prime: "PB Prime Membership",
+  other: "Something Else",
+};
+
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function ContactUs({ onNavigate, initialSubject }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: initialSubject || "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
 
-  function handleSubmit() {
-    if (form.name && form.phone && form.message) setSubmitted(true);
+  async function handleSubmit() {
+    if (!(form.name && form.phone && form.message)) return;
+    setSubmitting(true);
+    setError("");
+    const { error } = await submitLead({
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      interest: `${SUBJECT_LABELS[form.subject] || "General Inquiry"} — ${form.message}`,
+    });
+    setSubmitting(false);
+    if (error) {
+      setError("Something went wrong sending your message. Please try again.");
+      return;
+    }
+    setSubmitted(true);
   }
 
   return (
@@ -175,14 +202,18 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
                   onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
                 />
+                {error && (
+                  <p className="text-xs font-semibold" style={{ color: "#BA0D0B" }}>{error}</p>
+                )}
                 <button
                   onClick={handleSubmit}
-                  className="w-full py-3 rounded-xl text-sm font-bold transition-all"
+                  disabled={submitting}
+                  className="w-full py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-60"
                   style={{ background: "#BA0D0B", color: "#FFFFFF" }}
                   onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
                   onMouseLeave={(e) => e.currentTarget.style.background = "#BA0D0B"}
                 >
-                  Send Message
+                  {submitting ? "Sending..." : "Send Message"}
                 </button>
               </div>
             )}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AuthProvider } from "./lib/AuthContext";
+import { SavedItemsProvider } from "./lib/SavedItemsContext";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import PopularProperties from "./components/PopularProperties";
@@ -181,7 +182,9 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <SavedItemsProvider>
+        <AppContent />
+      </SavedItemsProvider>
     </AuthProvider>
   );
 }
