@@ -134,8 +134,25 @@ function Sidebar({ activePage, onNavigate, collapsed, setCollapsed, mobileOpen, 
           })}
         </nav>
 
+        {/* Return to main site */}
+        <div className="p-3" style={{ borderTop: "1px solid #E5E8EB" }}>
+          <a
+            href="/"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${collapsed ? "justify-center" : ""}`}
+            style={{ color: "#495057" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#F2F4F6"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+            title={collapsed ? "Return to Main Site" : undefined}
+          >
+            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {!collapsed && <span className="truncate">Return to Main Site</span>}
+          </a>
+        </div>
+
         {/* Collapse toggle (desktop only) */}
-        <div className="hidden lg:block p-3" style={{ borderTop: "1px solid #E5E8EB" }}>
+        <div className="hidden lg:block p-3 pt-0" style={{ borderTop: "1px solid #E5E8EB" }}>
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold transition-colors"

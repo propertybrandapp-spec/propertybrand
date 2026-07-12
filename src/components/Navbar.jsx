@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useAuth } from "../lib/AuthContext";
 import AuthModal from "./AuthModal";
 import ClientAccountMenu from "./ClientAccountMenu";
@@ -211,14 +211,33 @@ function ChevronDown({ className = "" }) {
   );
 }
 
-function DropdownMenu({ item, isOpen, onNavigate,index }) {
+function DropdownMenu({ item, isOpen, onNavigate, index }) {
+  const panelRef = useRef(null);
+  const [align, setAlign] = useState("left");
+
+  useLayoutEffect(() => {
+    if (!isOpen || !panelRef.current) return;
+    // Default to left-aligned, then measure against the viewport and flip to
+    // right-aligned only if it would actually overflow — this stays correct
+    // regardless of label length, font rendering, or viewport width, instead
+    // of guessing at pixel positions per nav item.
+    setAlign("left");
+    const raf = requestAnimationFrame(() => {
+      if (!panelRef.current) return;
+      const rect = panelRef.current.getBoundingClientRect();
+      if (rect.right > window.innerWidth - 12) {
+        setAlign("right");
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [isOpen]);
+
   if (!isOpen || !item.columns) return null;
   return (
 <div
+  ref={panelRef}
   className={`absolute top-full mt-0 z-50 min-w-max ${
-    index <= 1
-      ? "left-0"
-      : "left-1/2 -translate-x-1/2"
+    align === "right" ? "right-0" : "left-0"
   }`}
 >
         <div
@@ -227,7 +246,9 @@ function DropdownMenu({ item, isOpen, onNavigate,index }) {
       ? "justify-start pl-8"
       : index === 1
       ? "justify-start pl-9"
-      : "justify-center"
+      : align === "right"
+      ? "justify-end pr-8"
+      : "justify-start pl-8"
   }`}
 >
         <div className="w-3 h-3 rotate-45 -mb-1.5 z-10 relative border-l border-t" style={{ background: "#FFFFFF", borderColor: "#2C9DD5" }} />
@@ -371,7 +392,7 @@ export default function Navbar({ onNavigate }) {
             ) : (
               <button onClick={() => setAuthModalOpen(true)} className="text-sm font-semibold transition" style={{ color: "#15191C" }}>Login</button>
             )}
-            <button onClick={() => onNavigate && onNavigate("contact", "sell")} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm transition"
+            <button onClick={() => onNavigate && onNavigate("post-property")} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm transition"
               style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
               Post Property
               <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded" style={{ background: "#E87C02", color: "#FFFFFF" }}>FREE</span>
@@ -421,7 +442,7 @@ export default function Navbar({ onNavigate }) {
           ) : (
             <button onClick={() => { setMobileOpen(false); setAuthModalOpen(true); }} className="text-sm font-semibold" style={{ color: "#15191C" }}>Login</button>
           )}
-          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("contact", "sell"); }} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
+          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("post-property"); }} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
             Post Property <span className="text-[9px] font-extrabold px-1 py-0.5 rounded" style={{ background: "#E87C02", color: "#FFFFFF" }}>FREE</span>
           </button>
         </div>

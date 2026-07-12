@@ -25,6 +25,7 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
 import TermsConditions from "./components/TermsConditions";
 import Disclaimer from "./components/Disclaimer";
 import Sitemap from "./components/Sitemap";
+import PostProperty from "./components/PostProperty";
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"
@@ -101,6 +102,7 @@ function AppContent() {
           { id: "profile", label: "👤 My Profile" },
           { id: "saved", label: "❤️ Saved Properties" },
           { id: "inquiries", label: "📋 My Inquiries" },
+          { id: "post-property", label: "🏷️ Post Property" },
           { id: "admin", label: "🔐 Admin Console" },
         ].map((p) => (
           <button
@@ -130,7 +132,7 @@ function AppContent() {
             <PropertyManagement onNavigate={navigate} />
             <ChannelPartner onNavigate={navigate} />
             <BlogInsights onNavigate={navigate} />
-            <Testimonials />
+            <Testimonials onNavigate={navigate} />
           </>
         )}
 
@@ -165,6 +167,8 @@ function AppContent() {
         {page === "disclaimer" && <Disclaimer onNavigate={navigate} />}
 
         {page === "sitemap" && <Sitemap onNavigate={navigate} />}
+
+        {page === "post-property" && <PostProperty key={navNonce} onNavigate={navigate} />}
 
         {page === "profile" && <ClientProfile onNavigate={navigate} />}
 

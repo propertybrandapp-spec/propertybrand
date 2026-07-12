@@ -81,6 +81,12 @@ create policy "Public can view live listings"
   on public.listings for select
   using (status = 'Live');
 
+-- Logged-in users can submit their own property, always as Pending — they
+-- can never publish it themselves or post on someone else's behalf
+create policy "Authenticated users can submit a property listing"
+  on public.listings for insert
+  with check (status = 'Pending' and posted_by_user_id = auth.uid());
+
 -- Admins can view, insert, update, delete everything
 create policy "Admins can manage all listings"
   on public.listings for all
