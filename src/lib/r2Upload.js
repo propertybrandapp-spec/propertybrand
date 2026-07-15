@@ -19,43 +19,47 @@ export async function uploadToR2(file, folder) {
 
   if (!file) return { error: "No file provided." };
 
-  // Get the current Supabase session token to authenticate the presign request
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return { error: "You must be logged in to upload files." };
+  try {
+    // Get the current Supabase session token to authenticate the presign request
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { error: "You must be logged in to upload files." };
 
-  // Step 1 — ask the Worker for a presigned upload URL
-  const presignRes = await fetch(`${WORKER_URL}/presign`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify({
-      fileName: file.name,
-      fileType: file.type,
-      folder,
-    }),
-  });
+    // Step 1 — ask the Worker for a presigned upload URL
+    const presignRes = await fetch(`${WORKER_URL}/presign`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({
+        fileName: file.name,
+        fileType: file.type,
+        folder,
+      }),
+    });
 
-  if (!presignRes.ok) {
-    const err = await presignRes.json().catch(() => ({}));
-    return { error: err.error || "Failed to get upload URL." };
+    if (!presignRes.ok) {
+      const err = await presignRes.json().catch(() => ({}));
+      return { error: err.error || "Failed to get upload URL." };
+    }
+
+    const { uploadUrl, publicUrl } = await presignRes.json();
+
+    // Step 2 — upload the actual file bytes directly to R2 using that URL
+    const uploadRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": file.type },
+      body: file,
+    });
+
+    if (!uploadRes.ok) {
+      return { error: "Upload to storage failed. Please try again." };
+    }
+
+    return { url: publicUrl };
+  } catch (err) {
+    return { error: err?.message || "Network error — please check your connection and try again." };
   }
-
-  const { uploadUrl, publicUrl } = await presignRes.json();
-
-  // Step 2 — upload the actual file bytes directly to R2 using that URL
-  const uploadRes = await fetch(uploadUrl, {
-    method: "PUT",
-    headers: { "Content-Type": file.type },
-    body: file,
-  });
-
-  if (!uploadRes.ok) {
-    return { error: "Upload to storage failed. Please try again." };
-  }
-
-  return { url: publicUrl };
 }
 
 /**
@@ -85,22 +89,26 @@ export async function deleteFromR2(publicUrls) {
   if (!WORKER_URL) return { error: "Missing VITE_R2_WORKER_URL — check your .env file." };
   if (!publicUrls || publicUrls.length === 0) return { deleted: [] };
 
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return { error: "You must be logged in to delete files." };
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { error: "You must be logged in to delete files." };
 
-  const res = await fetch(`${WORKER_URL}/delete`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    body: JSON.stringify({ urls: publicUrls.filter(Boolean) }),
-  });
+    const res = await fetch(`${WORKER_URL}/delete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ urls: publicUrls.filter(Boolean) }),
+    });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    return { error: err.error || "Failed to delete file(s)." };
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { error: err.error || "Failed to delete file(s)." };
+    }
+
+    return await res.json();
+  } catch (err) {
+    return { error: err?.message || "Network error while deleting file(s)." };
   }
-
-  return res.json();
 }

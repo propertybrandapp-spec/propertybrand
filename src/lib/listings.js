@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase, safeQuery } from "./supabaseClient";
 import { deleteFromR2 } from "./r2Upload";
 
 // Shown when a listing has no photos yet (e.g. just created, images still uploading)
@@ -9,12 +9,15 @@ const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1560518883-ce09059e
 // PropertyDetail, the Admin listings screen + form) goes through this file
 // instead of calling `supabase.from("listings")` directly. That keeps the
 // DB <-> UI field-name mapping (snake_case <-> camelCase) in exactly one place.
+//
+// Every function below resolves via safeQuery(), so a network-level failure
+// (offline, misconfigured .env, Supabase outage) always comes back as a
+// normal { data, error } result instead of throwing — callers just check
+// `error` the same way they'd check a regular DB/RLS error.
 
 // ── DB row -> UI shape ────────────────────────────────────────────────────────
 // The UI (PropertyCardList/Grid, PropertyDetail, filters, etc.) always works
-// with this shape, whether the data came from Supabase or the bundled demo
-// dataset in SearchResults.jsx — so every component that renders a property
-// stays agnostic of where it came from.
+// with this shape.
 export function normalizeListing(row) {
   return {
     id: row.id,
@@ -85,29 +88,24 @@ function daysAgo(isoDate) {
 
 // ── Public site: only ever see moderation-approved ("Live") listings ────────
 export async function fetchPublicListings() {
-  const { data, error } = await supabase
-    .from("listings")
-    .select("*")
-    .eq("status", "Live")
-    .order("created_at", { ascending: false });
-
+  const { data, error } = await safeQuery(
+    supabase.from("listings").select("*").eq("status", "Live").order("created_at", { ascending: false })
+  );
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizeListing), error: null };
 }
 
 // ── Admin console: sees every listing regardless of moderation status ───────
 export async function fetchAdminListings() {
-  const { data, error } = await supabase
-    .from("listings")
-    .select("*")
-    .order("created_at", { ascending: false });
-
+  const { data, error } = await safeQuery(
+    supabase.from("listings").select("*").order("created_at", { ascending: false })
+  );
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizeListing), error: null };
 }
 
 export async function fetchListingById(id) {
-  const { data, error } = await supabase.from("listings").select("*").eq("id", id).single();
+  const { data, error } = await safeQuery(supabase.from("listings").select("*").eq("id", id).single());
   if (error) return { data: null, error };
   return { data: normalizeListing(data), error: null };
 }
@@ -116,35 +114,42 @@ export async function fetchListingById(id) {
 // previously-saved ids (the SavedItemsContext only tracks the ids themselves).
 export async function fetchListingsByIds(ids) {
   if (!ids || ids.length === 0) return { data: [], error: null };
-  const { data, error } = await supabase.from("listings").select("*").in("id", ids);
+  const { data, error } = await safeQuery(supabase.from("listings").select("*").in("id", ids));
+  if (error) return { data: [], error };
+  return { data: (data || []).map(normalizeListing), error: null };
+}
+
+// Used by the "My Properties" page — every listing the current user has ever
+// submitted, regardless of moderation status, so they can track it.
+export async function fetchMyListings(userId) {
+  const { data, error } = await safeQuery(
+    supabase.from("listings").select("*").eq("posted_by_user_id", userId).order("created_at", { ascending: false })
+  );
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizeListing), error: null };
 }
 
 export async function createListing(property) {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: sessionData } = await safeQuery(supabase.auth.getSession());
   const payload = denormalizeListing(property);
-  if (session) payload.posted_by_user_id = session.user.id;
+  if (sessionData?.session) payload.posted_by_user_id = sessionData.session.user.id;
 
-  const { data, error } = await supabase.from("listings").insert(payload).select().single();
+  const { data, error } = await safeQuery(supabase.from("listings").insert(payload).select().single());
   if (error) return { data: null, error };
   return { data: normalizeListing(data), error: null };
 }
 
 export async function updateListing(id, property) {
   const payload = denormalizeListing(property);
-  const { data, error } = await supabase.from("listings").update(payload).eq("id", id).select().single();
+  const { data, error } = await safeQuery(supabase.from("listings").update(payload).eq("id", id).select().single());
   if (error) return { data: null, error };
   return { data: normalizeListing(data), error: null };
 }
 
 export async function updateListingStatus(id, status) {
-  const { data, error } = await supabase
-    .from("listings")
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select()
-    .single();
+  const { data, error } = await safeQuery(
+    supabase.from("listings").update({ status, updated_at: new Date().toISOString() }).eq("id", id).select().single()
+  );
   if (error) return { data: null, error };
   return { data: normalizeListing(data), error: null };
 }
@@ -154,6 +159,6 @@ export async function deleteListing(id, images) {
   if (images && images.length) {
     await deleteFromR2(images); // best-effort — a failed image cleanup shouldn't block deleting the listing
   }
-  const { error } = await supabase.from("listings").delete().eq("id", id);
+  const { error } = await safeQuery(supabase.from("listings").delete().eq("id", id));
   return { error };
 }

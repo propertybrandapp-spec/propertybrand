@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase, safeQuery } from "./supabaseClient";
 
 // ── Blog Posts Data Layer ─────────────────────────────────────────────────────
 
@@ -67,26 +67,23 @@ export function slugify(title) {
 }
 
 export async function fetchPublicPosts() {
-  const { data, error } = await supabase
-    .from("blog_posts")
-    .select("*")
-    .eq("status", "Published")
-    .order("published_at", { ascending: false });
+  const { data, error } = await safeQuery(
+    supabase.from("blog_posts").select("*").eq("status", "Published").order("published_at", { ascending: false })
+  );
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizePost), error: null };
 }
 
 export async function fetchAdminPosts() {
-  const { data, error } = await supabase
-    .from("blog_posts")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const { data, error } = await safeQuery(
+    supabase.from("blog_posts").select("*").order("created_at", { ascending: false })
+  );
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizePost), error: null };
 }
 
 export async function fetchPostBySlug(slug) {
-  const { data, error } = await supabase.from("blog_posts").select("*").eq("slug", slug).single();
+  const { data, error } = await safeQuery(supabase.from("blog_posts").select("*").eq("slug", slug).single());
   if (error) return { data: null, error };
   return { data: normalizePost(data), error: null };
 }
@@ -94,19 +91,21 @@ export async function fetchPostBySlug(slug) {
 // Used by the Saved Properties page's "Articles" tab.
 export async function fetchPostsByIds(ids) {
   if (!ids || ids.length === 0) return { data: [], error: null };
-  const { data, error } = await supabase.from("blog_posts").select("*").in("id", ids);
+  const { data, error } = await safeQuery(supabase.from("blog_posts").select("*").in("id", ids));
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizePost), error: null };
 }
 
 export async function createPost(post) {
-  const { data, error } = await supabase.from("blog_posts").insert(denormalizePost(post)).select().single();
+  const { data, error } = await safeQuery(supabase.from("blog_posts").insert(denormalizePost(post)).select().single());
   if (error) return { data: null, error };
   return { data: normalizePost(data), error: null };
 }
 
 export async function updatePost(id, post) {
-  const { data, error } = await supabase.from("blog_posts").update(denormalizePost(post)).eq("id", id).select().single();
+  const { data, error } = await safeQuery(
+    supabase.from("blog_posts").update(denormalizePost(post)).eq("id", id).select().single()
+  );
   if (error) return { data: null, error };
   return { data: normalizePost(data), error: null };
 }
@@ -114,12 +113,12 @@ export async function updatePost(id, post) {
 export async function updatePostStatus(id, status) {
   const payload = { status, updated_at: new Date().toISOString() };
   if (status === "Published") payload.published_at = new Date().toISOString();
-  const { data, error } = await supabase.from("blog_posts").update(payload).eq("id", id).select().single();
+  const { data, error } = await safeQuery(supabase.from("blog_posts").update(payload).eq("id", id).select().single());
   if (error) return { data: null, error };
   return { data: normalizePost(data), error: null };
 }
 
 export async function deletePost(id) {
-  const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+  const { error } = await safeQuery(supabase.from("blog_posts").delete().eq("id", id));
   return { error };
 }

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase, safeQuery } from "./supabaseClient";
 
 // ── Auth Context ─────────────────────────────────────────────────────────────
 // Wraps the entire public site (see App.jsx wiring instructions). Any
@@ -16,7 +16,8 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     // Check for an existing session on first load (so refresh doesn't log you out)
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    safeQuery(supabase.auth.getSession()).then(async ({ data }) => {
+      const session = data?.session || null;
       setSession(session);
       if (session) await fetchProfile(session.user.id);
       setLoading(false);
@@ -36,54 +37,58 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function fetchProfile(userId) {
-    const { data } = await supabase
-      .from("client_profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
+    const { data } = await safeQuery(
+      supabase.from("client_profiles").select("*").eq("id", userId).single()
+    );
     setProfile(data);
   }
 
   // ── Sign up: creates the auth.users row; the DB trigger (see schema.sql)
   // automatically creates the matching client_profiles row.
   async function signUp({ email, password, fullName, phone }) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, phone },
-      },
-    });
+    const { data, error } = await safeQuery(
+      supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName, phone },
+        },
+      })
+    );
     return { data, error };
   }
 
   async function signIn({ email, password }) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await safeQuery(supabase.auth.signInWithPassword({ email, password }));
     return { data, error };
   }
 
   async function signInWithGoogle() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin },
-    });
+    const { data, error } = await safeQuery(
+      supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin },
+      })
+    );
     return { data, error };
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
+    await safeQuery(supabase.auth.signOut());
     setSession(null);
     setProfile(null);
   }
 
   async function updateProfile(updates) {
     if (!session) return { error: new Error("Not logged in") };
-    const { data, error } = await supabase
-      .from("client_profiles")
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq("id", session.user.id)
-      .select()
-      .single();
+    const { data, error } = await safeQuery(
+      supabase
+        .from("client_profiles")
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq("id", session.user.id)
+        .select()
+        .single()
+    );
     if (!error) setProfile(data);
     return { data, error };
   }

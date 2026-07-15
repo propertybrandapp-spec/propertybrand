@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../lib/AuthContext";
-import { supabase } from "../lib/supabaseClient";
+import { supabase, safeQuery } from "../lib/supabaseClient";
 
 const STAGE_STYLES = {
   New: { color: "#2C9DD5", bg: "#EAF4FB" },
@@ -26,11 +26,13 @@ export default function MyInquiries({ onNavigate }) {
     // Leads are matched by email/phone since the public inquiry form (Footer
     // quick-inquiry, "Contact Agent" buttons) doesn't require login to submit —
     // we link them to the account post-hoc by matching contact details.
-    const { data } = await supabase
-      .from("leads")
-      .select("*")
-      .or(`email.eq.${session.user.email}${profile?.phone ? `,phone.eq.${profile.phone}` : ""}`)
-      .order("created_at", { ascending: false });
+    const { data } = await safeQuery(
+      supabase
+        .from("leads")
+        .select("*")
+        .or(`email.eq.${session.user.email}${profile?.phone ? `,phone.eq.${profile.phone}` : ""}`)
+        .order("created_at", { ascending: false })
+    );
     setInquiries(data || []);
     setLoading(false);
   }

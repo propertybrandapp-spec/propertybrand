@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase, safeQuery } from "./supabaseClient";
 
 // ── Agents Data Layer ─────────────────────────────────────────────────────────
 
@@ -23,21 +23,27 @@ export function normalizeAgent(row) {
 }
 
 export async function fetchAdminAgents() {
-  const { data, error } = await supabase
-    .from("agents")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const { data, error } = await safeQuery(
+    supabase.from("agents").select("*").order("created_at", { ascending: false })
+  );
+  if (error) return { data: [], error };
+  return { data: (data || []).map(normalizeAgent), error: null };
+}
+
+// Public-facing (homepage "Preferred Agents", /agents page) — only Verified
+// agents are shown, matching the "Public can view verified agents" RLS policy.
+export async function fetchPublicAgents() {
+  const { data, error } = await safeQuery(
+    supabase.from("agents").select("*").eq("status", "Verified").order("rating", { ascending: false })
+  );
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizeAgent), error: null };
 }
 
 export async function updateAgentStatus(id, status) {
-  const { data, error } = await supabase
-    .from("agents")
-    .update({ status })
-    .eq("id", id)
-    .select()
-    .single();
+  const { data, error } = await safeQuery(
+    supabase.from("agents").update({ status }).eq("id", id).select().single()
+  );
   if (error) return { data: null, error };
   return { data: normalizeAgent(data), error: null };
 }
@@ -55,13 +61,13 @@ export async function createAgent(agent) {
     status: agent.status || "Pending",
     member_since: agent.since || new Date().getFullYear().toString(),
   };
-  const { data, error } = await supabase.from("agents").insert(payload).select().single();
+  const { data, error } = await safeQuery(supabase.from("agents").insert(payload).select().single());
   if (error) return { data: null, error };
   return { data: normalizeAgent(data), error: null };
 }
 
 export async function deleteAgent(id) {
-  const { error } = await supabase.from("agents").delete().eq("id", id);
+  const { error } = await safeQuery(supabase.from("agents").delete().eq("id", id));
   return { error };
 }
 
@@ -69,16 +75,18 @@ export async function deleteAgent(id) {
 // RLS only allows inserting with status='Pending' — applicants can never
 // self-approve.
 export async function submitPartnerApplication({ name, phone, email, city, experience, reraNumber }) {
-  const { error } = await supabase.from("agents").insert({
-    name,
-    phone,
-    email,
-    city: city || null,
-    experience: experience || null,
-    rera_number: reraNumber || null,
-    tier: "Associate",
-    status: "Pending",
-    member_since: new Date().getFullYear().toString(),
-  });
+  const { error } = await safeQuery(
+    supabase.from("agents").insert({
+      name,
+      phone,
+      email,
+      city: city || null,
+      experience: experience || null,
+      rera_number: reraNumber || null,
+      tier: "Associate",
+      status: "Pending",
+      member_since: new Date().getFullYear().toString(),
+    })
+  );
   return { error };
 }

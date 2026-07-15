@@ -12,35 +12,38 @@ export default function AdminLogin({ onLoginSuccess }) {
     setError("");
     setLoading(true);
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (authError) {
-      setError(authError.message);
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      // Confirm this user actually has an admin_profiles row (i.e. is an admin,
+      // not just any Supabase auth user — important since auth and admin
+      // authorization are two separate concerns).
+      const { data: profile, error: profileError } = await supabase
+        .from("admin_profiles")
+        .select("*")
+        .eq("id", data.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        setError("This account does not have admin access.");
+        await supabase.auth.signOut();
+        return;
+      }
+
+      onLoginSuccess(profile);
+    } catch (err) {
+      setError(err?.message || "Network error — please check your connection and try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Confirm this user actually has an admin_profiles row (i.e. is an admin,
-    // not just any Supabase auth user — important since auth and admin
-    // authorization are two separate concerns).
-    const { data: profile, error: profileError } = await supabase
-      .from("admin_profiles")
-      .select("*")
-      .eq("id", data.user.id)
-      .single();
-
-    if (profileError || !profile) {
-      setError("This account does not have admin access.");
-      await supabase.auth.signOut();
-      setLoading(false);
-      return;
-    }
-
-    setLoading(false);
-    onLoginSuccess(profile);
   }
 
   return (

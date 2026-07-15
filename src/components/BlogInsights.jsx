@@ -2,10 +2,7 @@ import { useState, useEffect } from "react";
 import { fetchPublicPosts } from "../lib/blogPosts";
 import { useSavedItems } from "../lib/SavedItemsContext";
 
-// ── Demo data ─────────────────────────────────────────────────────────────────
-// Shown until you publish real posts via the Admin Console (Supabase). The
-// moment you publish your first one, this component automatically switches
-// over to showing real posts instead — see the fetch below.
+// ── Static content (categories for the filter UI, market news ticker) ───────
 
 const BLOG_CATEGORIES = [
   { label: "All", icon: "🏠" },
@@ -14,102 +11,6 @@ const BLOG_CATEGORIES = [
   { label: "Project Reviews", icon: "🏢" },
   { label: "Home & Lifestyle", icon: "🛋️" },
   { label: "Market Reports", icon: "📊" },
-];
-
-const FEATURED_ARTICLE = {
-  id: 0,
-  category: "Market Reports",
-  categoryColor: "bg-blue-600",
-  title: "Ranchi Real Estate 2025: Market Trends, Growth Corridors & Investment Hotspots",
-  excerpt:
-    "Ranchi's real estate market is witnessing unprecedented growth driven by infrastructure development, smart city initiatives, and rising demand from IT professionals and NRIs. Here's everything you need to know before investing.",
-  author: "Aarav Mishra",
-  authorRole: "Senior Market Analyst",
-  date: "June 12, 2025",
-  readTime: "8 min read",
-  image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&h=460&fit=crop",
-  tags: ["Market Trends", "Investment", "Ranchi"],
-};
-
-const BLOG_POSTS = [
-  {
-    id: 1,
-    category: "Buying Guide",
-    categoryColor: "bg-[#16a34a]",
-    title: "First-Time Home Buyer's Complete Guide for 2025",
-    excerpt: "Everything you need to know about buying your first home — from loan eligibility to registration.",
-    author: "Priya Verma",
-    date: "June 10, 2025",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=240&fit=crop",
-    tags: ["Home Loan", "RERA", "First-Time Buyer"],
-    views: "12.4K",
-  },
-  {
-    id: 2,
-    category: "Investment Insights",
-    categoryColor: "bg-purple-600",
-    title: "Top 5 High-Growth Corridors for Real Estate Investment in Jharkhand",
-    excerpt: "Discover which micro-markets are delivering the best appreciation and rental yields right now.",
-    author: "Rohit Sharma",
-    date: "June 8, 2025",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=240&fit=crop",
-    tags: ["ROI", "Rental Yield", "Appreciation"],
-    views: "9.1K",
-  },
-  {
-    id: 3,
-    category: "Home & Lifestyle",
-    categoryColor: "bg-[#E87C02]",
-    title: "Vastu Tips for Your New Home: A Practical 2025 Guide",
-    excerpt: "Modern Vastu principles that work with contemporary architecture for positivity and prosperity.",
-    author: "Sunita Nair",
-    date: "June 5, 2025",
-    readTime: "4 min read",
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=240&fit=crop",
-    tags: ["Vastu", "Interior", "Lifestyle"],
-    views: "7.8K",
-  },
-  {
-    id: 4,
-    category: "Project Reviews",
-    categoryColor: "bg-[#2C9DD5]",
-    title: "Project Review: Emerald Heights, Kanke Road — Worth the Investment?",
-    excerpt: "We visited the site, spoke to existing buyers and developers. Here's our unbiased review.",
-    author: "Deepak Singh",
-    date: "June 3, 2025",
-    readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=240&fit=crop",
-    tags: ["Project Review", "Kanke Road", "Luxury"],
-    views: "15.2K",
-  },
-  {
-    id: 5,
-    category: "Buying Guide",
-    categoryColor: "bg-[#16a34a]",
-    title: "Home Loan Documents Checklist: Everything Banks Need in 2025",
-    excerpt: "A complete list of documents required for home loan approval with tips to speed up the process.",
-    author: "Kavitha Menon",
-    date: "June 1, 2025",
-    readTime: "3 min read",
-    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&h=240&fit=crop",
-    tags: ["Home Loan", "Documentation", "Banks"],
-    views: "8.3K",
-  },
-  {
-    id: 6,
-    category: "Market Reports",
-    categoryColor: "bg-blue-600",
-    title: "Smart City Impact: How Infrastructure is Driving Property Values in Ranchi",
-    excerpt: "New roads, metro plans, and smart city projects are reshaping real estate micro-markets.",
-    author: "Aarav Mishra",
-    date: "May 28, 2025",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=240&fit=crop",
-    tags: ["Infrastructure", "Smart City", "Growth"],
-    views: "11.6K",
-  },
 ];
 
 const NEWS_ITEMS = [
@@ -401,9 +302,10 @@ export default function BlogInsights({ onNavigate }) {
     return () => { cancelled = true; };
   }, []);
 
-  const hasRealPosts = dbPosts && dbPosts.length > 0;
-  const featuredArticle = hasRealPosts ? dbPosts[0] : FEATURED_ARTICLE;
-  const gridPosts = hasRealPosts ? dbPosts.slice(1) : BLOG_POSTS;
+  const isLoading = dbPosts === null;
+  const posts = dbPosts || [];
+  const featuredArticle = posts[0] || null;
+  const gridPosts = posts.slice(1);
 
   const filtered =
     activeCategory === "All"
@@ -452,27 +354,42 @@ export default function BlogInsights({ onNavigate }) {
         </div>
 
         {/* ── Featured Article + News Feed ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <FeaturedArticle article={featuredArticle} />
+        {isLoading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 h-80 rounded-2xl animate-pulse" style={{ background: "#F2F4F6" }} />
+            <div className="lg:col-span-1 h-80 rounded-2xl animate-pulse" style={{ background: "#F2F4F6" }} />
           </div>
-          <div className="lg:col-span-1">
-            <NewsFeed onNavigate={onNavigate} />
+        ) : posts.length === 0 ? (
+          <div className="rounded-2xl flex flex-col items-center justify-center py-20 text-center" style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}>
+            <span className="text-4xl mb-3">📰</span>
+            <p className="text-sm font-bold" style={{ color: "#15191C" }}>No articles published yet</p>
+            <p className="text-xs mt-1" style={{ color: "#495057" }}>Check back soon for real estate news, guides & market insights.</p>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <FeaturedArticle article={featuredArticle} />
+              </div>
+              <div className="lg:col-span-1">
+                <NewsFeed onNavigate={onNavigate} />
+              </div>
+            </div>
 
-        {/* ── Blog Grid ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((post) => (
-            <BlogCard key={post.id} post={post} />
-          ))}
-        </div>
+            {/* ── Blog Grid ── */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtered.map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
 
-        {filtered.length === 0 && (
-          <div className="text-center py-16 text-[#495057]">
-            <p className="text-4xl mb-3">📭</p>
-            <p className="text-sm font-medium">No articles in this category yet.</p>
-          </div>
+            {filtered.length === 0 && (
+              <div className="text-center py-16 text-[#495057]">
+                <p className="text-4xl mb-3">📭</p>
+                <p className="text-sm font-medium">No articles in this category yet.</p>
+              </div>
+            )}
+          </>
         )}
 
         {/* ── Quick Guides Strip ── */}

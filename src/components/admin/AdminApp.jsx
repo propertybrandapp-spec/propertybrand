@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabaseClient";
+import { supabase, safeQuery } from "../../lib/supabaseClient";
 import AdminLogin from "./AdminLogin";
 import AdminDashboard from "./AdminDashboard";
 import AdminListings from "./AdminListings";
@@ -36,13 +36,12 @@ export default function AdminApp() {
 
   useEffect(() => {
     // Check for an existing session on mount
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    safeQuery(supabase.auth.getSession()).then(async ({ data }) => {
+      const session = data?.session || null;
       if (session) {
-        const { data: profile } = await supabase
-          .from("admin_profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
+        const { data: profile } = await safeQuery(
+          supabase.from("admin_profiles").select("*").eq("id", session.user.id).single()
+        );
         if (profile) {
           setSession(session);
           setAdminProfile(profile);

@@ -1,111 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { fetchPublicAgents } from "../lib/agents";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-
-const AGENTS = [
-  {
-    id: 1,
-    name: "Rajesh Kumar",
-    agency: "Kumar Properties",
-    avatar: "RK",
-    avatarBg: "bg-blue-600",
-    badge: "PB Preferred",
-    operatingSince: 2008,
-    buyerServed: "8500+",
-    propertiesForSale: 42,
-    propertiesForRent: 31,
-    rating: 4.8,
-    reviews: 214,
-    specialization: ["Residential", "Plots"],
-    phone: "+91 94301 12345",
-    verified: true,
-  },
-  {
-    id: 2,
-    name: "Priya Sharma",
-    agency: "Sharma Realty",
-    avatar: "PS",
-    avatarBg: "bg-rose-600",
-    badge: "PB Preferred",
-    operatingSince: 2012,
-    buyerServed: "5200+",
-    propertiesForSale: 28,
-    propertiesForRent: 19,
-    rating: 4.7,
-    reviews: 178,
-    specialization: ["Luxury", "Villas"],
-    phone: "+91 98765 54321",
-    verified: true,
-  },
-  {
-    id: 3,
-    name: "Anil Mehta",
-    agency: "Mehta Associates",
-    avatar: "AM",
-    avatarBg: "bg-emerald-600",
-    badge: "PB Preferred",
-    operatingSince: 2005,
-    buyerServed: "12000+",
-    propertiesForSale: 67,
-    propertiesForRent: 44,
-    rating: 4.9,
-    reviews: 390,
-    specialization: ["Commercial", "Office"],
-    phone: "+91 90123 67890",
-    verified: true,
-  },
-  {
-    id: 4,
-    name: "Sunita Verma",
-    agency: "Verma Homes",
-    avatar: "SV",
-    avatarBg: "bg-violet-600",
-    badge: "PB Preferred",
-    operatingSince: 2015,
-    buyerServed: "3100+",
-    propertiesForSale: 21,
-    propertiesForRent: 14,
-    rating: 4.6,
-    reviews: 92,
-    specialization: ["Affordable", "Apartments"],
-    phone: "+91 91234 78901",
-    verified: true,
-  },
-  {
-    id: 5,
-    name: "Deepak Singh",
-    agency: "Singh & Sons Realty",
-    avatar: "DS",
-    avatarBg: "bg-[#E87C02]",
-    badge: "PB Preferred",
-    operatingSince: 2010,
-    buyerServed: "6700+",
-    propertiesForSale: 35,
-    propertiesForRent: 22,
-    rating: 4.7,
-    reviews: 261,
-    specialization: ["Residential", "NRI"],
-    phone: "+91 88001 23456",
-    verified: true,
-  },
-  {
-    id: 6,
-    name: "Kavitha Nair",
-    agency: "Nair Properties",
-    avatar: "KN",
-    avatarBg: "bg-pink-600",
-    badge: "PB Preferred",
-    operatingSince: 2018,
-    buyerServed: "1800+",
-    propertiesForSale: 16,
-    propertiesForRent: 11,
-    rating: 4.5,
-    reviews: 73,
-    specialization: ["Interior", "Apartments"],
-    phone: "+91 99887 65432",
-    verified: true,
-  },
-];
 
 const NEW_PROJECT_FEATURES = [
   {
@@ -147,6 +43,15 @@ const SITE_VISIT_STEPS = [
   { num: "04", label: "Evaluate & Decide", desc: "Our expert joins you to help assess the property" },
 ];
 
+const AVATAR_COLORS = ["bg-blue-600", "bg-rose-600", "bg-emerald-600", "bg-violet-600", "bg-[#E87C02]", "bg-pink-600"];
+function avatarColorFor(name) {
+  const hash = [...(name || "")].reduce((h, c) => h + c.charCodeAt(0), 0);
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
+function initialsFor(name) {
+  return (name || "").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+}
+
 // ── Star Rating ───────────────────────────────────────────────────────────────
 function Stars({ rating }) {
   return (
@@ -176,61 +81,44 @@ function AgentCard({ agent }) {
           <svg className="w-3 h-3 fill-[#2C9DD5]" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
-          {agent.badge}
+          {agent.tier} Partner
         </span>
-        {/* Agency logo placeholder */}
-        <div className="w-8 h-8 rounded-md bg-[#F2F4F6] flex items-center justify-center text-[8px] font-bold text-[#495057] border border-[#E5E8EB]">
-          LOGO
-        </div>
       </div>
 
       {/* Avatar + Name */}
       <div className="flex items-center gap-3 mb-3">
-        <div className={`w-12 h-12 rounded-full ${agent.avatarBg} flex items-center justify-center text-white font-bold text-sm shrink-0 ring-2 ring-white shadow`}>
-          {agent.avatar}
+        <div className={`w-12 h-12 rounded-full ${avatarColorFor(agent.name)} flex items-center justify-center text-white font-bold text-sm shrink-0 ring-2 ring-white shadow`}>
+          {initialsFor(agent.name)}
         </div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-[#15191C] truncate">{agent.name}</p>
-          <p className="text-[11px] text-[#495057] truncate">{agent.agency}</p>
-          <div className="flex items-center gap-1 mt-0.5">
-            <Stars rating={agent.rating} />
-            <span className="text-[10px] text-[#495057]">({agent.reviews})</span>
-          </div>
+          <p className="text-[11px] text-[#495057] truncate">{agent.agency || agent.city || "Independent Agent"}</p>
+          {agent.rating > 0 && (
+            <div className="flex items-center gap-1 mt-0.5">
+              <Stars rating={agent.rating} />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Meta row */}
-      <div className="text-[11px] text-[#495057] mb-3 flex items-center gap-1">
-        <svg className="w-3 h-3 text-[#495057] shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        Operating Since <span className="font-semibold text-[#1F242A] ml-0.5">{agent.operatingSince}</span>
-        <span className="mx-1 text-[#495057]">|</span>
-        <svg className="w-3 h-3 text-[#495057] shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        Buyers <span className="font-semibold text-[#1F242A] ml-0.5">{agent.buyerServed}</span>
+      <div className="text-[11px] text-[#495057] mb-3 flex items-center gap-1 flex-wrap">
+        {agent.since && agent.since !== "—" && (
+          <>
+            <svg className="w-3 h-3 text-[#495057] shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Since <span className="font-semibold text-[#1F242A] ml-0.5">{agent.since}</span>
+          </>
+        )}
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-2 mb-3">
-        <div className="bg-[#FFFFFF] rounded-lg p-2 text-center">
-          <p className="text-base font-extrabold text-[#15191C]">{agent.propertiesForSale}</p>
-          <p className="text-[10px] text-[#495057] font-medium leading-tight">Properties<br />for Sale</p>
+      <div className="grid grid-cols-1 gap-2 mb-3">
+        <div className="bg-[#F7F8FA] rounded-lg p-2 text-center">
+          <p className="text-base font-extrabold text-[#15191C]">{agent.deals}</p>
+          <p className="text-[10px] text-[#495057] font-medium leading-tight">Deals Closed</p>
         </div>
-        <div className="bg-[#FFFFFF] rounded-lg p-2 text-center">
-          <p className="text-base font-extrabold text-[#15191C]">{agent.propertiesForRent}</p>
-          <p className="text-[10px] text-[#495057] font-medium leading-tight">Properties<br />for Rent</p>
-        </div>
-      </div>
-
-      {/* Specialization tags */}
-      <div className="flex gap-1.5 flex-wrap mb-3">
-        {agent.specialization.map((s) => (
-          <span key={s} className="text-[10px] bg-[#EAF4FB] text-[#2C9DD5] border border-[#2C9DD5]/30 px-2 py-0.5 rounded-full font-semibold">
-            {s}
-          </span>
-        ))}
       </div>
 
       {/* Contact Button */}
@@ -387,6 +275,16 @@ function SiteVisitBanner() {
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function PreferredAgents({ onNavigate }) {
   const rowRef = useRef(null);
+  const [agents, setAgents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchPublicAgents().then(({ data }) => {
+      if (!cancelled) { setAgents(data); setLoading(false); }
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   function scroll(dir) {
     if (!rowRef.current) return;
@@ -401,7 +299,7 @@ export default function PreferredAgents({ onNavigate }) {
         <div>
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-xl font-bold text-[#15191C]">PB Preferred Agents in Ranchi</h2>
+              <h2 className="text-xl font-bold text-[#15191C]">PB Preferred Agents</h2>
               <div className="w-10 h-0.5 bg-[#2C9DD5] rounded-full mt-1" />
             </div>
             <button onClick={() => onNavigate && onNavigate("agents")} className="flex items-center gap-1 text-sm font-semibold text-[#2C9DD5] hover:underline">
@@ -412,36 +310,48 @@ export default function PreferredAgents({ onNavigate }) {
             </button>
           </div>
 
-          {/* Scrollable agent row */}
-          <div className="relative group/agents">
-            <button
-              onClick={() => scroll(-1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#495057] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/agents:opacity-100 transition"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            <div
-              ref={rowRef}
-              className="flex gap-4 overflow-x-auto scroll-smooth pb-2"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {AGENTS.map((agent) => (
-                <AgentCard key={agent.id} agent={agent} />
-              ))}
+          {loading ? (
+            <div className="flex gap-4 overflow-hidden">
+              {[1, 2, 3].map((i) => <div key={i} className="w-64 h-64 rounded-xl shrink-0 animate-pulse" style={{ background: "#F2F4F6" }} />)}
             </div>
+          ) : agents.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-14 text-center rounded-2xl" style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}>
+              <span className="text-4xl mb-3">🧑‍💼</span>
+              <p className="text-sm font-bold" style={{ color: "#15191C" }}>No preferred agents yet</p>
+              <p className="text-xs mt-1" style={{ color: "#495057" }}>Verified partner agents will appear here as they join.</p>
+            </div>
+          ) : (
+            /* Scrollable agent row */
+            <div className="relative group/agents">
+              <button
+                onClick={() => scroll(-1)}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#495057] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/agents:opacity-100 transition"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
 
-            <button
-              onClick={() => scroll(1)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#495057] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/agents:opacity-100 transition"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
+              <div
+                ref={rowRef}
+                className="flex gap-4 overflow-x-auto scroll-smooth pb-2"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                {agents.map((agent) => (
+                  <AgentCard key={agent.id} agent={agent} />
+                ))}
+              </div>
+
+              <button
+                onClick={() => scroll(1)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E5E8EB] shadow-lg flex items-center justify-center text-[#495057] hover:text-[#2C9DD5] hover:border-[#2C9DD5] opacity-0 group-hover/agents:opacity-100 transition"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ── New Projects Encyclopedia ── */}

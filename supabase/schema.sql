@@ -87,6 +87,16 @@ create policy "Authenticated users can submit a property listing"
   on public.listings for insert
   with check (status = 'Pending' and posted_by_user_id = auth.uid());
 
+-- Users can see and withdraw their own submissions regardless of moderation
+-- status (this is what powers the "My Properties" page)
+create policy "Users can view their own listings"
+  on public.listings for select
+  using (posted_by_user_id = auth.uid());
+
+create policy "Users can withdraw their own pending listings"
+  on public.listings for delete
+  using (posted_by_user_id = auth.uid() and status = 'Pending');
+
 -- Admins can view, insert, update, delete everything
 create policy "Admins can manage all listings"
   on public.listings for all
@@ -248,6 +258,17 @@ create policy "Clients can update own profile"
 create policy "Admins can view all client profiles"
   on public.client_profiles for select
   using (auth.uid() in (select id from public.admin_profiles));
+
+-- Users can view their own inquiries (leads matching their email/phone) —
+-- this powers the "My Inquiries" page. Placed here (not with the other leads
+-- policies above) because it references client_profiles, which must already
+-- exist for this policy to be created.
+create policy "Users can view their own inquiries"
+  on public.leads for select
+  using (
+    email = (auth.jwt() ->> 'email')
+    or phone = (select phone from public.client_profiles where id = auth.uid())
+  );
 
 
 -- ── 8. SAVED PROPERTIES (wishlist / heart-icon favorites) ────────────────────

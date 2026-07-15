@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
+import { fetchPublicListings } from "../lib/listings";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -12,162 +13,6 @@ const FILTER_TABS = [
   "Budget Homes",
   "Luxury",
   "New Projects",
-];
-
-const PROPERTIES = [
-  {
-    id: 1,
-    images: [
-      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=500&h=320&fit=crop",
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=500&h=320&fit=crop",
-    ],
-    badge: "Owner",
-    badgeColor: "bg-[#16a34a]",
-    type: "Apartments",
-    title: "3 BHK Flat",
-    price: "₹2.40 Cr",
-    area: "1865 sqft",
-    location: "Harmu Housing Colony, Ranchi",
-    amenities: ["Lift", "Power Backup", "Security", "Parking"],
-    postedBy: "Owner",
-    postedDays: 2,
-    imgCount: 20,
-    verified: true,
-    featured: false,
-  },
-  {
-    id: 2,
-    images: [
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=320&fit=crop",
-    ],
-    badge: "New",
-    badgeColor: "bg-[#BA0D0B]",
-    type: "Villas",
-    title: "4 BHK Villa",
-    price: "₹3.80 Cr",
-    area: "3200 sqft",
-    location: "Kanke Road, Ranchi",
-    amenities: ["Swimming Pool", "Garden", "Security", "Club House"],
-    postedBy: "Builder",
-    postedDays: 1,
-    imgCount: 15,
-    verified: true,
-    featured: true,
-  },
-  {
-    id: 3,
-    images: [
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&h=320&fit=crop",
-    ],
-    badge: "Budget",
-    badgeColor: "bg-blue-600",
-    type: "Budget Homes",
-    title: "1 BHK Flat",
-    price: "₹42 Lac",
-    area: "605 sqft",
-    location: "Lalpur, Ranchi",
-    amenities: ["Lift", "Parking", "Power Backup"],
-    postedBy: "Agent",
-    postedDays: 5,
-    imgCount: 8,
-    verified: false,
-    featured: false,
-  },
-  {
-    id: 4,
-    images: [
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=500&h=320&fit=crop",
-    ],
-    badge: "Owner",
-    badgeColor: "bg-[#16a34a]",
-    type: "Apartments",
-    title: "3 BHK Flat",
-    price: "₹1.10 Cr",
-    area: "1400 sqft",
-    location: "Ashok Nagar, Ranchi",
-    amenities: ["Gym", "Lift", "Security", "Parking"],
-    postedBy: "Owner",
-    postedDays: 3,
-    imgCount: 11,
-    verified: true,
-    featured: false,
-  },
-  {
-    id: 5,
-    images: [
-      "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=500&h=320&fit=crop",
-    ],
-    badge: "New",
-    badgeColor: "bg-[#BA0D0B]",
-    type: "New Projects",
-    title: "2 BHK Apartment",
-    price: "₹68 Lac",
-    area: "1050 sqft",
-    location: "Morabadi, Ranchi",
-    amenities: ["Lift", "Power Backup", "CCTV", "Parking"],
-    postedBy: "Builder",
-    postedDays: 0,
-    imgCount: 22,
-    verified: true,
-    featured: true,
-  },
-  {
-    id: 6,
-    images: [
-      "https://images.unsplash.com/photo-1448630360428-65456885c650?w=500&h=320&fit=crop",
-    ],
-    badge: "Plot",
-    badgeColor: "bg-[#E87C02]",
-    type: "Plots",
-    title: "Residential Plot",
-    price: "₹85 Lac",
-    area: "2400 sqft",
-    location: "Argora, Ranchi",
-    amenities: ["Corner Plot", "Main Road", "Gated"],
-    postedBy: "Owner",
-    postedDays: 7,
-    imgCount: 6,
-    verified: false,
-    featured: false,
-  },
-  {
-    id: 7,
-    images: [
-      "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=500&h=320&fit=crop",
-    ],
-    badge: "Commercial",
-    badgeColor: "bg-purple-600",
-    type: "Commercial",
-    title: "Office Space",
-    price: "₹1.50 Cr",
-    area: "2200 sqft",
-    location: "Main Road, Ranchi",
-    amenities: ["Lift", "Parking", "24x7 Security", "Power Backup"],
-    postedBy: "Builder",
-    postedDays: 4,
-    imgCount: 14,
-    verified: true,
-    featured: false,
-  },
-  {
-    id: 8,
-    images: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&h=320&fit=crop",
-    ],
-    badge: "Luxury",
-    badgeColor: "bg-yellow-600",
-    type: "Luxury",
-    title: "5 BHK Luxury Villa",
-    price: "₹7.20 Cr",
-    area: "6500 sqft",
-    location: "Golf Course Road, Ranchi",
-    amenities: ["Private Pool", "Home Theatre", "Smart Home", "Spa"],
-    postedBy: "Builder",
-    postedDays: 2,
-    imgCount: 34,
-    verified: true,
-    featured: true,
-  },
 ];
 
 // ── Heart / Wishlist Button ────────────────────────────────────────────────────
@@ -410,17 +255,38 @@ function ScrollRow({ properties, onOpen, onNavigate }) {
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function PopularProperties({ onNavigate }) {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [listings, setListings] = useState(null); // null = loading, [] = loaded but empty
 
-  const filtered =
-    activeFilter === "All"
-      ? PROPERTIES
-      : PROPERTIES.filter((p) => p.type === activeFilter);
+  useEffect(() => {
+    let cancelled = false;
+    fetchPublicListings().then(({ data }) => {
+      if (!cancelled) setListings(data);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const ALL_PROPERTIES = listings || [];
+  const isLoading = listings === null;
+
+  function matchesFilter(p, tab) {
+    if (tab === "All") return true;
+    if (tab === "Apartments") return p.type === "Apartment";
+    if (tab === "Villas") return p.type === "Villa";
+    if (tab === "Plots") return p.type === "Plot";
+    if (tab === "Commercial") return p.type === "Commercial";
+    if (tab === "Budget Homes") return p.tags?.includes("Affordable");
+    if (tab === "Luxury") return p.tags?.includes("Luxury");
+    if (tab === "New Projects") return p.postedBy === "Builder";
+    return true;
+  }
+
+  const filtered = ALL_PROPERTIES.filter((p) => matchesFilter(p, activeFilter));
 
   const ownerProperties = filtered.filter((p) => p.postedBy === "Owner");
-  const builderProperties = filtered.filter((p) => p.postedBy === "Builder");
+  const builderProperties = filtered.filter((p) => p.postedBy === "Builder" || p.postedBy === "Agent");
 
   function openProperty(property) {
-    onNavigate && onNavigate("property-detail", { property, pool: PROPERTIES });
+    onNavigate && onNavigate("property-detail", { property, pool: ALL_PROPERTIES });
   }
 
   return (
@@ -445,33 +311,50 @@ export default function PopularProperties({ onNavigate }) {
           ))}
         </div>
 
-        {/* ── Owner Properties Row ── */}
-        {ownerProperties.length > 0 && (
-          <div className="mb-10">
-            <SectionHeader title="Popular Owner Properties" onNavigate={onNavigate} />
-            <ScrollRow properties={ownerProperties} onOpen={openProperty} onNavigate={onNavigate} />
+        {isLoading ? (
+          <div className="flex gap-4 overflow-hidden mb-10">
+            {[1, 2, 3, 4].map((i) => <div key={i} className="w-64 h-72 rounded-xl shrink-0 animate-pulse" style={{ background: "#F2F4F6" }} />)}
           </div>
-        )}
+        ) : ALL_PROPERTIES.length === 0 ? (
+          <div className="mb-10 rounded-2xl flex flex-col items-center justify-center py-16 text-center" style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}>
+            <span className="text-4xl mb-3">🏠</span>
+            <p className="text-sm font-bold" style={{ color: "#15191C" }}>No properties listed yet</p>
+            <p className="text-xs mt-1 mb-4" style={{ color: "#495057" }}>Be the first to list a property on PropertyBrands.</p>
+            <button onClick={() => onNavigate && onNavigate("post-property")} className="text-xs font-bold px-4 py-2 rounded-lg" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
+              Post a Property
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* ── Owner Properties Row ── */}
+            {ownerProperties.length > 0 && (
+              <div className="mb-10">
+                <SectionHeader title="Popular Owner Properties" onNavigate={onNavigate} />
+                <ScrollRow properties={ownerProperties} onOpen={openProperty} onNavigate={onNavigate} />
+              </div>
+            )}
 
-        {/* ── Builder / Featured Projects Row ── */}
-        {builderProperties.length > 0 && (
-          <div className="mb-10">
-            <SectionHeader title="Featured Projects" seeAllLabel="See all Projects" onNavigate={onNavigate} />
-            <ScrollRow properties={builderProperties} onOpen={openProperty} onNavigate={onNavigate} />
-          </div>
-        )}
+            {/* ── Builder / Featured Projects Row ── */}
+            {builderProperties.length > 0 && (
+              <div className="mb-10">
+                <SectionHeader title="Featured Projects" seeAllLabel="See all Projects" onNavigate={onNavigate} />
+                <ScrollRow properties={builderProperties} onOpen={openProperty} onNavigate={onNavigate} />
+              </div>
+            )}
 
-        {/* ── All Properties (fallback when filter shows mixed) ── */}
-        {ownerProperties.length === 0 && builderProperties.length === 0 && (
-          <div className="mb-10">
-            <SectionHeader title={`${activeFilter} Properties`} onNavigate={onNavigate} />
-            <div className="text-center py-16 text-[#495057]">
-              <svg className="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              <p className="text-sm font-medium">No properties found for this filter.</p>
-            </div>
-          </div>
+            {/* ── No results for this specific filter ── */}
+            {ownerProperties.length === 0 && builderProperties.length === 0 && (
+              <div className="mb-10">
+                <SectionHeader title={`${activeFilter} Properties`} onNavigate={onNavigate} />
+                <div className="text-center py-16 text-[#495057]">
+                  <svg className="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  <p className="text-sm font-medium">No properties found for this filter.</p>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* ── Bottom CTA Banner ── */}

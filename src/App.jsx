@@ -26,6 +26,7 @@ import TermsConditions from "./components/TermsConditions";
 import Disclaimer from "./components/Disclaimer";
 import Sitemap from "./components/Sitemap";
 import PostProperty from "./components/PostProperty";
+import MyProperties from "./components/MyProperties";
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"
@@ -103,6 +104,7 @@ function AppContent() {
           { id: "saved", label: "❤️ Saved Properties" },
           { id: "inquiries", label: "📋 My Inquiries" },
           { id: "post-property", label: "🏷️ Post Property" },
+          { id: "my-properties", label: "📦 My Properties" },
           { id: "admin", label: "🔐 Admin Console" },
         ].map((p) => (
           <button
@@ -169,6 +171,8 @@ function AppContent() {
         {page === "sitemap" && <Sitemap onNavigate={navigate} />}
 
         {page === "post-property" && <PostProperty key={navNonce} onNavigate={navigate} />}
+
+        {page === "my-properties" && <MyProperties key={navNonce} onNavigate={navigate} />}
 
         {page === "profile" && <ClientProfile onNavigate={navigate} />}
 

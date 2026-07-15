@@ -19,3 +19,20 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// ── Safe query wrapper ────────────────────────────────────────────────────────
+// supabase-js resolves with { data, error } for normal DB/RLS errors, but a
+// transport-level failure (offline, DNS failure, misconfigured URL, Supabase
+// outage) makes the underlying fetch() reject instead — which, left
+// unhandled, turns into an unhandled promise rejection and leaves whatever
+// page was loading stuck in its loading state forever. Every data-layer
+// function in src/lib wraps its query in this so a failure always resolves
+// to a normal { data: null, error } shape that callers already know how to
+// handle (show an error/empty state) instead of hanging indefinitely.
+export async function safeQuery(builder) {
+  try {
+    return await builder;
+  } catch (err) {
+    return { data: null, error: { message: err?.message || "Network error — please check your connection." } };
+  }
+}

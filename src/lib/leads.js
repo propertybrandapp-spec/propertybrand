@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase, safeQuery } from "./supabaseClient";
 
 // ── Leads Data Layer ──────────────────────────────────────────────────────────
 // Note: leads.assigned_to references auth.users(id) directly (not
@@ -34,8 +34,8 @@ export function normalizeLead(row, adminsById) {
 
 export async function fetchAdminLeads() {
   const [{ data: leads, error }, { data: admins }] = await Promise.all([
-    supabase.from("leads").select("*").order("created_at", { ascending: false }),
-    supabase.from("admin_profiles").select("id, full_name"),
+    safeQuery(supabase.from("leads").select("*").order("created_at", { ascending: false })),
+    safeQuery(supabase.from("admin_profiles").select("id, full_name")),
   ]);
 
   if (error) return { data: [], error };
@@ -47,42 +47,38 @@ export async function fetchAdminLeads() {
 }
 
 export async function updateLeadStage(id, stage) {
-  const { data, error } = await supabase
-    .from("leads")
-    .update({ stage, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select()
-    .single();
+  const { data, error } = await safeQuery(
+    supabase.from("leads").update({ stage, updated_at: new Date().toISOString() }).eq("id", id).select().single()
+  );
   if (error) return { data: null, error };
   return { data, error: null };
 }
 
 export async function assignLead(id, adminUserId) {
-  const { data, error } = await supabase
-    .from("leads")
-    .update({ assigned_to: adminUserId, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select()
-    .single();
+  const { data, error } = await safeQuery(
+    supabase.from("leads").update({ assigned_to: adminUserId, updated_at: new Date().toISOString() }).eq("id", id).select().single()
+  );
   return { data, error };
 }
 
 export async function deleteLead(id) {
-  const { error } = await supabase.from("leads").delete().eq("id", id);
+  const { error } = await safeQuery(supabase.from("leads").delete().eq("id", id));
   return { error };
 }
 
 // Used by public forms (ContactUs.jsx, Footer's quick inquiry) — RLS allows
 // anyone, even logged-out visitors, to insert a lead.
 export async function submitLead({ name, phone, email, interest, budget, source = "Website" }) {
-  const { error } = await supabase.from("leads").insert({
-    name,
-    phone,
-    email: email || null,
-    interest: interest || null,
-    budget_label: budget || null,
-    source,
-    stage: "New",
-  });
+  const { error } = await safeQuery(
+    supabase.from("leads").insert({
+      name,
+      phone,
+      email: email || null,
+      interest: interest || null,
+      budget_label: budget || null,
+      source,
+      stage: "New",
+    })
+  );
   return { error };
 }

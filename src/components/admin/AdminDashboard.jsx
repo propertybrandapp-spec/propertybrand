@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../lib/supabaseClient";
+import { supabase, safeQuery } from "../../lib/supabaseClient";
 import AdminLayout from "./AdminLayout";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -12,42 +12,25 @@ const KPI_CONFIG = [
   { key: "pendingApprovals", label: "Pending Approvals", icon: "⏳", color: "#BA0D0B", bg: "#FCEAEA" },
 ];
 
-const RECENT_ACTIVITY = [
-  { type: "listing", text: "New listing submitted — 3 BHK Flat, Harmu Colony", time: "12 min ago", color: "#2C9DD5" },
-  { type: "lead", text: "Lead converted — Rajesh Kumar, Kanke Road Villa", time: "45 min ago", color: "#4ade80" },
-  { type: "agent", text: "Agent verification requested — Priya Sharma", time: "1 hour ago", color: "#E87C02" },
-  { type: "blog", text: "Blog post published — 'Ranchi Real Estate 2025'", time: "2 hours ago", color: "#2C9DD5" },
-  { type: "alert", text: "Listing flagged for review — duplicate images", time: "3 hours ago", color: "#BA0D0B" },
-  { type: "lead", text: "New inquiry — Office Space, Main Road", time: "4 hours ago", color: "#4ade80" },
-];
-
-const TOP_LISTINGS = [
-  { title: "5 BHK Luxury Villa", location: "Golf Course Road", views: "2,840", leads: 34, price: "₹7.20 Cr" },
-  { title: "3 BHK Apartment", location: "Harmu Colony", views: "2,140", leads: 28, price: "₹2.40 Cr" },
-  { title: "2 BHK Apartment", location: "Morabadi", views: "1,820", leads: 22, price: "₹68 Lac" },
-  { title: "4 BHK Villa", location: "Kanke Road", views: "1,650", leads: 19, price: "₹3.80 Cr" },
-];
-
-const CHART_DATA = [42, 58, 49, 65, 72, 68, 80, 75, 88, 92, 85, 96];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const TYPE_COLORS = { Apartment: "#2C9DD5", Villa: "#E87C02", Plot: "#BA0D0B", Commercial: "#4ade80" };
 
 // ── Bar Chart (lightweight, no deps) ──────────────────────────────────────────
-function MiniBarChart() {
-  const max = Math.max(...CHART_DATA);
+function MiniBarChart({ data, labels }) {
+  const max = Math.max(...data, 1);
   return (
     <div className="flex items-end gap-2 h-40">
-      {CHART_DATA.map((val, i) => (
+      {data.map((val, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
           <div className="w-full flex flex-col items-center justify-end h-32 relative">
             <div
               className="w-full rounded-t-md transition-all duration-300 group-hover:opacity-80"
               style={{
                 height: `${(val / max) * 100}%`,
-                background: i === CHART_DATA.length - 1 ? "#2C9DD5" : "#EAF4FB",
+                background: i === data.length - 1 ? "#2C9DD5" : "#EAF4FB",
               }}
             />
           </div>
-          <span className="text-[10px]" style={{ color: "#495057" }}>{MONTHS[i]}</span>
+          <span className="text-[10px]" style={{ color: "#495057" }}>{labels[i]}</span>
         </div>
       ))}
     </div>
@@ -55,13 +38,7 @@ function MiniBarChart() {
 }
 
 // ── Donut (lightweight) ────────────────────────────────────────────────────────
-function MiniDonut() {
-  const segments = [
-    { label: "Apartments", value: 45, color: "#2C9DD5" },
-    { label: "Villas", value: 25, color: "#E87C02" },
-    { label: "Plots", value: 18, color: "#BA0D0B" },
-    { label: "Commercial", value: 12, color: "#4ade80" },
-  ];
+function MiniDonut({ segments, total }) {
   let cumulative = 0;
   return (
     <div className="flex items-center gap-6">
@@ -84,7 +61,7 @@ function MiniDonut() {
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <p className="text-xl font-extrabold" style={{ color: "#15191C" }}>1,284</p>
+          <p className="text-xl font-extrabold" style={{ color: "#15191C" }}>{total}</p>
           <p className="text-[10px]" style={{ color: "#495057" }}>Total</p>
         </div>
       </div>
@@ -107,6 +84,8 @@ export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
   const [kpis, setKpis] = useState({ totalListings: 0, activeLeads: 0, revenue: "₹0", pendingApprovals: 0 });
   const [recentActivity, setRecentActivity] = useState([]);
   const [topListings, setTopListings] = useState([]);
+  const [typeSegments, setTypeSegments] = useState([]);
+  const [monthlyGrowth, setMonthlyGrowth] = useState({ data: [0,0,0,0,0,0,0,0,0,0,0,0], labels: [], thisMonth: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -117,37 +96,36 @@ export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
     setLoading(true);
 
     // Total listings count
-    const { count: totalListings } = await supabase
-      .from("listings")
-      .select("*", { count: "exact", head: true });
+    const { count: totalListings } = await safeQuery(
+      supabase.from("listings").select("*", { count: "exact", head: true })
+    );
 
     // Active leads (everything not closed)
-    const { count: activeLeads } = await supabase
-      .from("leads")
-      .select("*", { count: "exact", head: true })
-      .not("stage", "in", '("Closed Won","Closed Lost")');
+    const { count: activeLeads } = await safeQuery(
+      supabase.from("leads").select("*", { count: "exact", head: true }).not("stage", "in", '("Closed Won","Closed Lost")')
+    );
 
     // Pending approvals
-    const { count: pendingApprovals } = await supabase
-      .from("listings")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "Pending");
+    const { count: pendingApprovals } = await safeQuery(
+      supabase.from("listings").select("*", { count: "exact", head: true }).eq("status", "Pending")
+    );
 
     // Top 4 listings by views
-    const { data: topListingsData } = await supabase
-      .from("listings")
-      .select("title, location, price_label, views")
-      .eq("status", "Live")
-      .order("views", { ascending: false })
-      .limit(4);
+    const { data: topListingsData } = await safeQuery(
+      supabase.from("listings").select("title, location, price_label, views").eq("status", "Live").order("views", { ascending: false }).limit(4)
+    );
+
+    // All listings' type + created_at — powers the "Listings by Type" donut
+    // and the "Listings Growth" bar chart below, both computed from real data.
+    const { data: allListingsMeta } = await safeQuery(
+      supabase.from("listings").select("property_type, created_at")
+    );
 
     // Recent leads as a simple activity feed (extend with a dedicated
     // activity_log table later if you want richer event tracking)
-    const { data: recentLeadsData } = await supabase
-      .from("leads")
-      .select("name, interest, created_at, stage")
-      .order("created_at", { ascending: false })
-      .limit(6);
+    const { data: recentLeadsData } = await safeQuery(
+      supabase.from("leads").select("name, interest, created_at, stage").order("created_at", { ascending: false }).limit(6)
+    );
 
     setKpis({
       totalListings: totalListings || 0,
@@ -173,6 +151,39 @@ export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
         color: l.stage === "New" ? "#2C9DD5" : "#4ade80",
       }))
     );
+
+    // ── Listings by Type (real counts, not fabricated percentages) ──
+    const meta = allListingsMeta || [];
+    const typeCounts = {};
+    meta.forEach((l) => { typeCounts[l.property_type] = (typeCounts[l.property_type] || 0) + 1; });
+    const totalForPct = meta.length || 1;
+    setTypeSegments(
+      Object.entries(typeCounts).map(([label, count]) => ({
+        label,
+        value: Math.round((count / totalForPct) * 100),
+        color: TYPE_COLORS[label] || "#495057",
+      }))
+    );
+
+    // ── Listings Growth — real new-listings-per-month for the last 12 months ──
+    const now = new Date();
+    const buckets = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString("en-US", { month: "short" }), count: 0 });
+    }
+    meta.forEach((l) => {
+      if (!l.created_at) return;
+      const d = new Date(l.created_at);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      const bucket = buckets.find((b) => b.key === key);
+      if (bucket) bucket.count += 1;
+    });
+    setMonthlyGrowth({
+      data: buckets.map((b) => b.count),
+      labels: buckets.map((b) => b.label),
+      thisMonth: buckets[buckets.length - 1].count,
+    });
 
     setLoading(false);
   }
@@ -242,10 +253,10 @@ export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
                 <p className="text-xs mt-0.5" style={{ color: "#495057" }}>Monthly new listings added</p>
               </div>
               <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "#EAF4FB", color: "#2C9DD5" }}>
-                +96 this month
+                +{monthlyGrowth.thisMonth} this month
               </span>
             </div>
-            <MiniBarChart />
+            <MiniBarChart data={monthlyGrowth.data} labels={monthlyGrowth.labels} />
           </div>
 
           {/* Donut */}
@@ -255,7 +266,11 @@ export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
           >
             <h3 className="text-base font-bold mb-1" style={{ color: "#15191C" }}>Listings by Type</h3>
             <p className="text-xs mb-5" style={{ color: "#495057" }}>Distribution across categories</p>
-            <MiniDonut />
+            {typeSegments.length === 0 ? (
+              <p className="text-sm py-8 text-center" style={{ color: "#495057" }}>No listings yet</p>
+            ) : (
+              <MiniDonut segments={typeSegments} total={kpis.totalListings} />
+            )}
           </div>
         </div>
 
@@ -267,21 +282,25 @@ export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
               <h3 className="text-base font-bold" style={{ color: "#15191C" }}>Recent Activity</h3>
               <button onClick={() => onNavigate("leads")} className="text-xs font-semibold" style={{ color: "#2C9DD5" }}>View all</button>
             </div>
-            <div>
-              {(recentActivity.length ? recentActivity : RECENT_ACTIVITY).map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 px-6 py-3.5"
-                  style={{ borderBottom: i < RECENT_ACTIVITY.length - 1 ? "1px solid #F2F4F6" : "none" }}
-                >
-                  <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: item.color }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm" style={{ color: "#15191C" }}>{item.text}</p>
-                    <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.time}</p>
+            {recentActivity.length === 0 ? (
+              <p className="text-sm py-10 text-center" style={{ color: "#495057" }}>{loading ? "Loading..." : "No recent activity yet"}</p>
+            ) : (
+              <div>
+                {recentActivity.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 px-6 py-3.5"
+                    style={{ borderBottom: i < recentActivity.length - 1 ? "1px solid #F2F4F6" : "none" }}
+                  >
+                    <span className="w-2 h-2 rounded-full shrink-0 mt-1.5" style={{ background: item.color }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm" style={{ color: "#15191C" }}>{item.text}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.time}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Top Listings */}
@@ -296,30 +315,34 @@ export default function AdminDashboard({ onNavigate, onLogout, adminProfile }) {
                 View all
               </button>
             </div>
-            <div>
-              {(topListings.length ? topListings : TOP_LISTINGS).map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-4 px-6 py-3.5"
-                  style={{ borderBottom: i < TOP_LISTINGS.length - 1 ? "1px solid #F2F4F6" : "none" }}
-                >
-                  <span
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
-                    style={{ background: "#F2F4F6", color: "#495057" }}
+            {topListings.length === 0 ? (
+              <p className="text-sm py-10 text-center" style={{ color: "#495057" }}>{loading ? "Loading..." : "No live listings yet"}</p>
+            ) : (
+              <div>
+                {topListings.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 px-6 py-3.5"
+                    style={{ borderBottom: i < topListings.length - 1 ? "1px solid #F2F4F6" : "none" }}
                   >
-                    {i + 1}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate" style={{ color: "#15191C" }}>{item.title}</p>
-                    <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.location} · {item.price}</p>
+                    <span
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
+                      style={{ background: "#F2F4F6", color: "#495057" }}
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate" style={{ color: "#15191C" }}>{item.title}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.location} · {item.price}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xs font-bold" style={{ color: "#2C9DD5" }}>{item.views} views</p>
+                      <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.leads} leads</p>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-xs font-bold" style={{ color: "#2C9DD5" }}>{item.views} views</p>
-                    <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{item.leads} leads</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

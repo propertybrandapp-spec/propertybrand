@@ -136,8 +136,8 @@ export default function PostProperty({ onNavigate }) {
           Our team will verify the details and publish it within 24 hours. You can track its status from your profile.
         </p>
         <div className="flex gap-3">
-          <button onClick={() => onNavigate && onNavigate("inquiries")} className="px-5 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#EAF4FB", color: "#2C9DD5" }}>
-            My Inquiries
+          <button onClick={() => onNavigate && onNavigate("my-properties")} className="px-5 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#EAF4FB", color: "#2C9DD5" }}>
+            My Properties
           </button>
           <button onClick={() => { setForm(EMPTY_FORM); setSubmitted(false); }} className="px-5 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#BA0D0B", color: "#FFFFFF" }}>
             Post Another

@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase, safeQuery } from "./supabaseClient";
 
 // ── Admin Users Data Layer ────────────────────────────────────────────────────
 // Note: admin_profiles rows can only be created via direct Supabase Dashboard
@@ -19,26 +19,22 @@ export function normalizeAdminUser(row) {
 }
 
 export async function fetchAdminUsers() {
-  const { data, error } = await supabase
-    .from("admin_profiles")
-    .select("*")
-    .order("created_at", { ascending: true });
+  const { data, error } = await safeQuery(
+    supabase.from("admin_profiles").select("*").order("created_at", { ascending: true })
+  );
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizeAdminUser), error: null };
 }
 
 export async function updateAdminRole(id, role) {
-  const { data, error } = await supabase
-    .from("admin_profiles")
-    .update({ role })
-    .eq("id", id)
-    .select()
-    .single();
+  const { data, error } = await safeQuery(
+    supabase.from("admin_profiles").update({ role }).eq("id", id).select().single()
+  );
   if (error) return { data: null, error };
   return { data: normalizeAdminUser(data), error: null };
 }
 
 export async function removeAdminUser(id) {
-  const { error } = await supabase.from("admin_profiles").delete().eq("id", id);
+  const { error } = await safeQuery(supabase.from("admin_profiles").delete().eq("id", id));
   return { error };
 }

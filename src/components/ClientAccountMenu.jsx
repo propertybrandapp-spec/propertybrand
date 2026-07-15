@@ -68,6 +68,7 @@ export default function ClientAccountMenu({ onNavigate }) {
             </div>
             {[
               { label: "My Profile", page: "profile", icon: "👤" },
+              { label: "My Properties", page: "my-properties", icon: "🏷️" },
               { label: "Saved Properties", page: "saved", icon: "❤️" },
               { label: "My Inquiries", page: "inquiries", icon: "📋" },
             ].map((item) => (
