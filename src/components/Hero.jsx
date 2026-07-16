@@ -65,7 +65,7 @@ const PROMO_CARD = {
   badge: "Free Consultation",
 };
 
-export default function Hero() {
+export default function Hero({ onNavigate }) {
   const [activeTab, setActiveTab] = useState("Buy");
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState("Flat +1");
@@ -234,7 +234,7 @@ export default function Hero() {
                 <div className="p-4">
                   <p className="text-xs text-[#495057] font-medium mb-0.5">Get Home Interiors from</p>
                   <p className="text-sm font-bold text-[#15191C] mb-3">Top Architects & Designers</p>
-                  <button className="w-full bg-[#BA0D0B] text-white text-xs font-bold py-2 rounded hover:bg-[#5C0B03] transition">
+                  <button onClick={() => onNavigate && onNavigate("architects-design")} className="w-full bg-[#BA0D0B] text-white text-xs font-bold py-2 rounded hover:bg-[#5C0B03] transition">
                     Check Offers
                   </button>
                   <div className="flex justify-center gap-1.5 mt-3">

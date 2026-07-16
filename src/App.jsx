@@ -27,6 +27,7 @@ import Disclaimer from "./components/Disclaimer";
 import Sitemap from "./components/Sitemap";
 import PostProperty from "./components/PostProperty";
 import MyProperties from "./components/MyProperties";
+import ArchitectsDesign from "./components/ArchitectsDesign";
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"
@@ -89,6 +90,7 @@ function AppContent() {
           { id: "search", label: "🔍 Search Results" },
           { id: "channel-partner", label: "🤝 Channel Partner" },
           { id: "property-management", label: "🏢 Property Management" },
+          { id: "architects-design", label: "📐 Architects & Design" },
           { id: "investment-advisory", label: "📈 Investment Advisory" },
           { id: "agents", label: "🧑‍💼 Preferred Agents" },
           { id: "about", label: "📖 About Us" },
@@ -147,6 +149,8 @@ function AppContent() {
         {page === "channel-partner" && <ChannelPartner onNavigate={navigate} />}
 
         {page === "property-management" && <PropertyManagement onNavigate={navigate} />}
+
+        {page === "architects-design" && <ArchitectsDesign onNavigate={navigate} />}
 
         {page === "investment-advisory" && <InvestmentAdvisory onNavigate={navigate} />}
 

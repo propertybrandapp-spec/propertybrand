@@ -48,10 +48,10 @@ const NAV_URL_MAP = {
   loanComparison: "investment-advisory",
 
   // Architects & Interior Design (per spec)
-  housePlanning: "property-management",
-  residentialDesign: "property-management",
-  modularKitchen: "property-management",
-  interiorPackages: "property-management",
+  housePlanning: "architects-design",
+  residentialDesign: "architects-design",
+  modularKitchen: "architects-design",
+  interiorPackages: "architects-design",
 
   // Property Management (per spec)
   tenantManagement: "property-management",
