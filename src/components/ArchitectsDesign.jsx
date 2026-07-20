@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -91,9 +92,18 @@ const GALLERY = [
   "https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=400&h=300&fit=crop",
 ];
 
+// Maps each service card's title to the anchor id its navbar link points at
+const SERVICE_ANCHORS = {
+  "House Planning": "house-planning",
+  "Residential Design": "residential-design",
+  "Modular Kitchen Design": "modular-kitchen",
+  "Interior Packages": "interior-packages",
+};
+
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function ArchitectsDesign({ onNavigate }) {
+export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
   const [activePackage, setActivePackage] = useState("Complete Home");
+  const highlighted = useScrollToAnchor(scrollTo, [navKey]);
 
   return (
     <div style={{ background: "#FFFFFF" }}>
@@ -141,15 +151,24 @@ export default function ArchitectsDesign({ onNavigate }) {
             <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#2C9DD5" }} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {SERVICES.map((s) => (
-              <div key={s.title} className="rounded-2xl overflow-hidden transition-all duration-200"
-                style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+            {SERVICES.map((s) => {
+              const anchorId = SERVICE_ANCHORS[s.title];
+              const isHighlighted = anchorId && highlighted === anchorId;
+              return (
+              <div key={s.title} id={anchorId} className="rounded-2xl overflow-hidden transition-all duration-200"
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #E5E8EB",
+                  boxShadow: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.boxShadow : "none",
+                  transition: ANCHOR_HIGHLIGHT_STYLE.transition,
+                  scrollMarginTop: "100px",
+                }}
                 onMouseEnter={(e) => e.currentTarget.style.borderColor = "#2C9DD5"}
                 onMouseLeave={(e) => e.currentTarget.style.borderColor = "#E5E8EB"}>
                 <div className="h-40 overflow-hidden">
                   <img src={s.image} alt={s.title} className="w-full h-full object-cover" />
                 </div>
-                <div className="p-5">
+                <div className="p-5" style={{ background: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.background : "transparent" }}>
                   <div className="flex items-center gap-2 mb-2" style={{ color: s.tagColor }}>
                     {s.icon}
                     <h3 className="text-base font-bold" style={{ color: "#15191C" }}>{s.title}</h3>
@@ -160,7 +179,8 @@ export default function ArchitectsDesign({ onNavigate }) {
                   </span>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

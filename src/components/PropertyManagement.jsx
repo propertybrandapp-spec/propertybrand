@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -227,10 +228,18 @@ function PlanCard({ plan }) {
   );
 }
 
+// Maps each service card's title to the anchor id its navbar link points at
+const SERVICE_ANCHORS = {
+  "Tenant Management": "tenant-management",
+  "Rent Collection": "rent-collection",
+  "Maintenance Coordination": "maintenance-coordination",
+};
+
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function PropertyManagement({ onNavigate }) {
+export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
   const [activeTab, setActiveTab] = useState("All");
   const tabs = ["All", "Tenant", "Financial", "Maintenance", "Legal"];
+  const highlighted = useScrollToAnchor(scrollTo, [navKey]);
 
   const filtered = activeTab === "All" ? SERVICES : SERVICES.filter((s) => {
     const map = { Tenant: "Tenant Management", Financial: "Rent Collection", Maintenance: "Maintenance Coordination", Legal: "Legal & Documentation" };
@@ -317,10 +326,20 @@ export default function PropertyManagement({ onNavigate }) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {SERVICES.map((service) => (
+            {SERVICES.map((service) => {
+              const anchorId = SERVICE_ANCHORS[service.title];
+              const isHighlighted = anchorId && highlighted === anchorId;
+              return (
               <div key={service.title}
+                id={anchorId}
                 className="rounded-2xl p-6 group transition-all duration-200 cursor-pointer"
-                style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+                style={{
+                  background: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.background : "#FFFFFF",
+                  border: "1px solid #E5E8EB",
+                  boxShadow: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.boxShadow : "none",
+                  transition: ANCHOR_HIGHLIGHT_STYLE.transition,
+                  scrollMarginTop: "100px",
+                }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = "#2C9DD5"}
                 onMouseLeave={e => e.currentTarget.style.borderColor = "#E5E8EB"}>
                 <div className="flex items-start justify-between mb-4">
@@ -336,7 +355,8 @@ export default function PropertyManagement({ onNavigate }) {
                 <h3 className="text-sm font-bold mb-2" style={{ color: "#15191C" }}>{service.title}</h3>
                 <p className="text-xs leading-relaxed" style={{ color: "#495057" }}>{service.desc}</p>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

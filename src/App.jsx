@@ -41,17 +41,23 @@ function AppContent() {
   const [searchFilters, setSearchFilters] = useState(null);
   const [contactSubject, setContactSubject] = useState(null);
   const [viewingProperty, setViewingProperty] = useState(null);
+  const [pageAnchor, setPageAnchor] = useState(null);
+
+  const ANCHOR_PAGES = ["investment-advisory", "property-management", "architects-design", "faq"];
 
   // `payload` is optional and its meaning depends on the destination:
   //  - "search"           → an initial filters object (transactionType, types, tags, possession, etc.)
   //  - "contact"          → a subject value to preselect in the contact form dropdown
   //  - "property-detail"  → { property, pool } — the clicked property + the list it came from (for "Similar Properties")
+  //  - investment-advisory / property-management / architects-design / faq
+  //                       → an anchor id string — scrolls to and briefly highlights that exact section
   function navigate(to, payload) {
     setPage(to);
     setNavNonce((n) => n + 1);
     if (to === "search") setSearchFilters(payload || null);
     if (to === "contact") setContactSubject(payload || null);
     if (to === "property-detail") setViewingProperty(payload || null);
+    if (ANCHOR_PAGES.includes(to)) setPageAnchor(payload || null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -148,11 +154,11 @@ function AppContent() {
 
         {page === "channel-partner" && <ChannelPartner onNavigate={navigate} />}
 
-        {page === "property-management" && <PropertyManagement onNavigate={navigate} />}
+        {page === "property-management" && <PropertyManagement onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
 
-        {page === "architects-design" && <ArchitectsDesign onNavigate={navigate} />}
+        {page === "architects-design" && <ArchitectsDesign onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
 
-        {page === "investment-advisory" && <InvestmentAdvisory onNavigate={navigate} />}
+        {page === "investment-advisory" && <InvestmentAdvisory onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
 
         {page === "agents" && <PreferredAgents onNavigate={navigate} />}
 
@@ -164,7 +170,7 @@ function AppContent() {
 
         {page === "blog" && <BlogInsights onNavigate={navigate} />}
 
-        {page === "faq" && <Faq onNavigate={navigate} />}
+        {page === "faq" && <Faq onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
 
         {page === "privacy-policy" && <PrivacyPolicy onNavigate={navigate} />}
 

@@ -117,19 +117,19 @@ const NAV_ITEMS = [
       {
         heading: "Investment Options",
         links: [
-          { label: "High Growth Corridors", page: NAV_URL_MAP.highGrowthCorridors },
-          { label: "Rental Yield Opportunities", page: NAV_URL_MAP.rentalYieldOpportunities },
-          { label: "Commercial Investments", page: NAV_URL_MAP.commercialInvestments },
-          { label: "Land Banking Opportunities", page: NAV_URL_MAP.landBanking },
-          { label: "Retirement Homes", page: NAV_URL_MAP.retirementHomes },
-          { label: "NRI Investments", page: NAV_URL_MAP.nriInvestments },
+          { label: "High Growth Corridors", page: NAV_URL_MAP.highGrowthCorridors, anchor: "high-growth-corridors" },
+          { label: "Rental Yield Opportunities", page: NAV_URL_MAP.rentalYieldOpportunities, anchor: "rental-yield-opportunities" },
+          { label: "Commercial Investments", page: NAV_URL_MAP.commercialInvestments, anchor: "commercial-investments" },
+          { label: "Land Banking Opportunities", page: NAV_URL_MAP.landBanking, anchor: "land-banking" },
+          { label: "Retirement Homes", page: NAV_URL_MAP.retirementHomes, anchor: "retirement-homes" },
+          { label: "NRI Investments", page: NAV_URL_MAP.nriInvestments, anchor: "nri-investments" },
         ],
       },
       {
         heading: "Investment Tools",
         links: [
-          { label: "ROI Calculator", page: NAV_URL_MAP.roiCalculator },
-          { label: "Rental Yield Calculator", page: NAV_URL_MAP.rentalYieldCalculator },
+          { label: "ROI Calculator", page: NAV_URL_MAP.roiCalculator, anchor: "roi-calculator" },
+          { label: "Rental Yield Calculator", page: NAV_URL_MAP.rentalYieldCalculator, anchor: "rental-yield-calculator" },
         ],
       },
     ],
@@ -140,9 +140,9 @@ const NAV_ITEMS = [
       {
         heading: "Home Loan Assistance",
         links: [
-          { label: "EMI Calculator", page: NAV_URL_MAP.emiCalculator },
-          { label: "Eligibility Check", page: NAV_URL_MAP.eligibilityCheck },
-          { label: "Loan Comparison", page: NAV_URL_MAP.loanComparison },
+          { label: "EMI Calculator", page: NAV_URL_MAP.emiCalculator, anchor: "emi-calculator" },
+          { label: "Eligibility Check", page: NAV_URL_MAP.eligibilityCheck, anchor: "eligibility-check" },
+          { label: "Loan Comparison", page: NAV_URL_MAP.loanComparison, anchor: "loan-comparison" },
         ],
       },
     ],
@@ -153,15 +153,15 @@ const NAV_ITEMS = [
       {
         heading: "Architects & Design Consultation",
         links: [
-          { label: "House Planning", page: NAV_URL_MAP.housePlanning },
-          { label: "Residential Design", page: NAV_URL_MAP.residentialDesign },
+          { label: "House Planning", page: NAV_URL_MAP.housePlanning, anchor: "house-planning" },
+          { label: "Residential Design", page: NAV_URL_MAP.residentialDesign, anchor: "residential-design" },
         ],
       },
       {
         heading: "Interior Design Services",
         links: [
-          { label: "Modular Kitchen Design", page: NAV_URL_MAP.modularKitchen },
-          { label: "Interior Packages", page: NAV_URL_MAP.interiorPackages },
+          { label: "Modular Kitchen Design", page: NAV_URL_MAP.modularKitchen, anchor: "modular-kitchen" },
+          { label: "Interior Packages", page: NAV_URL_MAP.interiorPackages, anchor: "interior-packages" },
         ],
       },
     ],
@@ -172,9 +172,9 @@ const NAV_ITEMS = [
       {
         heading: "Complete Property Care",
         links: [
-          { label: "Tenant Management", page: NAV_URL_MAP.tenantManagement },
-          { label: "Rent Collection", page: NAV_URL_MAP.rentCollection },
-          { label: "Maintenance Coordination", page: NAV_URL_MAP.maintenanceCoordination },
+          { label: "Tenant Management", page: NAV_URL_MAP.tenantManagement, anchor: "tenant-management" },
+          { label: "Rent Collection", page: NAV_URL_MAP.rentCollection, anchor: "rent-collection" },
+          { label: "Maintenance Coordination", page: NAV_URL_MAP.maintenanceCoordination, anchor: "maintenance-coordination" },
         ],
       },
     ],
@@ -185,11 +185,11 @@ const NAV_ITEMS = [
       {
         heading: "FAQ",
         links: [
-          { label: "How to Buy a Property", page: NAV_URL_MAP.howToBuy },
-          { label: "How to Apply for a Home Loan", page: NAV_URL_MAP.howToApplyLoan },
-          { label: "What is RERA?", page: NAV_URL_MAP.whatIsRera },
-          { label: "How to Calculate EMI", page: NAV_URL_MAP.howToCalculateEmi },
-          { label: "How to Rent a Property", page: NAV_URL_MAP.howToRentProperty },
+          { label: "How to Buy a Property", page: NAV_URL_MAP.howToBuy, anchor: "how-to-buy" },
+          { label: "How to Apply for a Home Loan", page: NAV_URL_MAP.howToApplyLoan, anchor: "how-to-apply-loan" },
+          { label: "What is RERA?", page: NAV_URL_MAP.whatIsRera, anchor: "what-is-rera" },
+          { label: "How to Calculate EMI", page: NAV_URL_MAP.howToCalculateEmi, anchor: "how-to-calculate-emi" },
+          { label: "How to Rent a Property", page: NAV_URL_MAP.howToRentProperty, anchor: "how-to-rent" },
         ],
       },
       {
@@ -261,7 +261,7 @@ function DropdownMenu({ item, isOpen, onNavigate, index }) {
               <ul className="space-y-1.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <button onClick={() => onNavigate && onNavigate(link.page, link.filters)} className="text-sm block py-0.5 transition-colors text-left w-full" style={{ color: "#495057" }}
+                    <button onClick={() => onNavigate && onNavigate(link.page, link.filters || link.anchor)} className="text-sm block py-0.5 transition-colors text-left w-full" style={{ color: "#495057" }}
                       onMouseEnter={e => e.target.style.color = "#2C9DD5"}
                       onMouseLeave={e => e.target.style.color = "#495057"}>
                       {link.label}
@@ -325,7 +325,7 @@ function MobileNavItem({ item, onNavigate, onLinkClick }) {
                 {col.links.map((link) => (
                   <li key={link.label}>
                     <button
-                      onClick={() => { onNavigate && onNavigate(link.page, link.filters); onLinkClick && onLinkClick(); }}
+                      onClick={() => { onNavigate && onNavigate(link.page, link.filters || link.anchor); onLinkClick && onLinkClick(); }}
                       className="text-sm block py-0.5 transition text-left w-full"
                       style={{ color: "#495057" }}
                     >
