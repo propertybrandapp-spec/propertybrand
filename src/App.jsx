@@ -13,7 +13,6 @@ import PropertyManagement from "./components/PropertyManagement";
 import SearchResults from "./components/SearchResults";
 import PropertyDetail from "./components/PropertyDetail";
 import Footer from "./components/Footer";
-import AdminApp from "./components/admin/AdminApp";
 import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
 import Careers from "./components/Careers";
@@ -33,7 +32,11 @@ import ArchitectsDesign from "./components/ArchitectsDesign";
 // Pages: "home" | "search" | "channel-partner" | "property-management"
 //      | "investment-advisory" | "agents" | "about" | "contact" | "careers"
 //      | "blog" | "faq" | "privacy-policy" | "terms-conditions" | "disclaimer"
-//      | "sitemap" | "admin" | "profile" | "saved" | "inquiries"
+//      | "sitemap" | "profile" | "saved" | "inquiries"
+//
+// The admin console used to render here (page === "admin") but now lives in
+// its own separate project/deployment — see /admin-console (or wherever you
+// deployed it) instead. Nothing in this file talks to it anymore.
 
 function AppContent() {
   const [page, setPage] = useState("home");
@@ -59,12 +62,6 @@ function AppContent() {
     if (to === "property-detail") setViewingProperty(payload || null);
     if (ANCHOR_PAGES.includes(to)) setPageAnchor(payload || null);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  // ── Admin console renders standalone — no public Navbar/Footer/dev-strip.
-  // AdminApp handles its own auth gate, sidebar, and topbar internally.
-  if (page === "admin") {
-    return <AdminApp />;
   }
 
   return (
@@ -113,7 +110,6 @@ function AppContent() {
           { id: "inquiries", label: "📋 My Inquiries" },
           { id: "post-property", label: "🏷️ Post Property" },
           { id: "my-properties", label: "📦 My Properties" },
-          { id: "admin", label: "🔐 Admin Console" },
         ].map((p) => (
           <button
             key={p.id}

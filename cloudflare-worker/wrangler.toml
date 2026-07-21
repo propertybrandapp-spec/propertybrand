@@ -19,4 +19,11 @@ bucket_name = "propertybrands-media"
 #   wrangler secret put R2_SECRET_ACCESS_KEY
 #   wrangler secret put R2_BUCKET_NAME
 #   wrangler secret put R2_PUBLIC_BASE_URL
-#   wrangler secret put ALLOWED_ORIGIN
+#
+#   wrangler secret put ALLOWED_ORIGINS
+#     This Worker is shared by both the public site and the separate admin
+#     console, so this is a COMMA-SEPARATED list of every origin allowed to
+#     call it, e.g.:
+#       https://propertybrands.in,https://admin.propertybrands.in
+#     (no spaces, no trailing slashes). The older singular ALLOWED_ORIGIN
+#     secret still works as a single-origin fallback if you don't set this.
