@@ -68,7 +68,13 @@ export async function deleteLead(id) {
 
 // Used by public forms (ContactUs.jsx, Footer's quick inquiry) — RLS allows
 // anyone, even logged-out visitors, to insert a lead.
-export async function submitLead({ name, phone, email, interest, budget, source = "Website" }) {
+//
+// listingId links this lead to a specific property (see PropertyDetail.jsx's
+// "Contact"/"Schedule a Site Visit" buttons) so the admin can see exactly
+// which listing it's about, with full specs/photos, from the Leads screen.
+// stage defaults to "New" but "Schedule a Site Visit" passes "Site Visit"
+// directly so it's immediately distinguishable in the pipeline.
+export async function submitLead({ name, phone, email, interest, budget, source = "Website", listingId, stage }) {
   const { error } = await safeQuery(
     supabase.from("leads").insert({
       name,
@@ -77,7 +83,8 @@ export async function submitLead({ name, phone, email, interest, budget, source 
       interest: interest || null,
       budget_label: budget || null,
       source,
-      stage: "New",
+      stage: stage || "New",
+      listing_id: listingId || null,
     })
   );
   return { error };

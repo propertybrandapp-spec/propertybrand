@@ -192,7 +192,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
 
               <div className="flex flex-col gap-2.5">
                 <button
-                  onClick={() => onNavigate && onNavigate("contact", contactSubject)}
+                  onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "contact" })}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all"
                   style={{ background: "#BA0D0B", color: "#FFFFFF" }}
                   onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
@@ -201,7 +201,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   Contact {property.postedBy || "Owner"}
                 </button>
                 <button
-                  onClick={() => onNavigate && onNavigate("contact", contactSubject)}
+                  onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "site-visit" })}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all"
                   style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
                 >

@@ -240,7 +240,7 @@ function PropertyCardList({ property, onOpen, onNavigate }) {
             {property.postedDays === 0 ? "Today" : `${property.postedDays}d ago`}
           </div>
           <div className="flex gap-2">
-            <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", contactSubject); }}
+            <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "contact" }); }}
               className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
               style={{ background: "transparent", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#2C9DD5"; e.currentTarget.style.color = "#FFFFFF"; }}
@@ -250,7 +250,7 @@ function PropertyCardList({ property, onOpen, onNavigate }) {
               </svg>
               Contact
             </button>
-            <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", contactSubject); }}
+            <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "site-visit" }); }}
               className="text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
               style={{ background: "#BA0D0B", color: "#FFFFFF" }}
               onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}
@@ -331,7 +331,7 @@ function PropertyCardGrid({ property, onOpen, onNavigate }) {
             <span style={{ color: "#1F242A" }}>{property.postedBy}</span>
             {" · "}{property.postedDays === 0 ? "Today" : `${property.postedDays}d ago`}
           </span>
-          <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", contactSubject); }}
+          <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "contact" }); }}
             className="text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
             style={{ background: "#BA0D0B", color: "#FFFFFF" }}
             onMouseEnter={e => e.currentTarget.style.background = "#5C0B03"}

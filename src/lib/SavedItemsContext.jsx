@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useAuth } from "./AuthContext";
+import AuthModal from "../components/AuthModal";
 import {
   fetchSavedPropertyIds, saveProperty, unsaveProperty,
   fetchSavedPostIds, savePost, unsavePost,
@@ -13,11 +14,15 @@ const isUuid = (v) => typeof v === "string" && UUID_RE.test(v);
 // (articles) stay in sync everywhere they appear — homepage, search results,
 // the detail pages, and the Saved page itself — without prop-drilling.
 //
-// Real, Supabase-backed listings/posts (a genuine UUID id) persist to
-// saved_properties / saved_posts. Bundled demo items (small integer ids,
-// shown before you've added real content) still toggle visually for the
-// current session, they just aren't written anywhere — there's nothing in
-// the database for them to reference.
+// Logged-out visitors get a sign-in prompt (see the shared <AuthModal>
+// rendered below) instead of a save happening — there's no per-visitor
+// identity to save against until they've signed in.
+//
+// Once logged in: real, Supabase-backed listings/posts (a genuine UUID id)
+// persist to saved_properties / saved_posts. Bundled demo items (small
+// integer ids, shown before you've added real content) just toggle
+// visually for the current session, since there's nothing in the database
+// for them to reference.
 
 const SavedItemsContext = createContext(null);
 
@@ -28,6 +33,10 @@ export function SavedItemsProvider({ children }) {
   const [localPropertyIds, setLocalPropertyIds] = useState(new Set()); // demo-only, session-scoped
   const [localPostIds, setLocalPostIds] = useState(new Set());          // demo-only, session-scoped
   const [loading, setLoading] = useState(false);
+  // Centralized here (rather than in every heart/bookmark button) so every
+  // "save" action anywhere in the app opens the same sign-in prompt when
+  // logged out, instead of each place needing its own <AuthModal>.
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -60,9 +69,17 @@ export function SavedItemsProvider({ children }) {
   );
 
   async function toggleSaveProperty(property) {
+    if (!isLoggedIn) {
+      setAuthModalOpen(true);
+      return;
+    }
+
     const id = property.dbId || property.id;
 
-    if (!isUuid(id) || !isLoggedIn) {
+    if (!isUuid(id)) {
+      // Bundled demo listing — nothing in the DB to reference, so just
+      // toggle visually for this session (still requires being logged in
+      // first, so the experience matches saving a real listing).
       setLocalPropertyIds((prev) => {
         const next = new Set(prev);
         next.has(id) ? next.delete(id) : next.add(id);
@@ -94,9 +111,14 @@ export function SavedItemsProvider({ children }) {
   }
 
   async function toggleSavePost(post) {
+    if (!isLoggedIn) {
+      setAuthModalOpen(true);
+      return;
+    }
+
     const id = post.dbId || post.id;
 
-    if (!isUuid(id) || !isLoggedIn) {
+    if (!isUuid(id)) {
       setLocalPostIds((prev) => {
         const next = new Set(prev);
         next.has(id) ? next.delete(id) : next.add(id);
@@ -135,7 +157,12 @@ export function SavedItemsProvider({ children }) {
     savedPostIds,
   };
 
-  return <SavedItemsContext.Provider value={value}>{children}</SavedItemsContext.Provider>;
+  return (
+    <SavedItemsContext.Provider value={value}>
+      {children}
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} initialMode="login" />
+    </SavedItemsContext.Provider>
+  );
 }
 
 export function useSavedItems() {

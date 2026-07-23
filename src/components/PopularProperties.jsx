@@ -175,7 +175,7 @@ function PropertyCard({ property, onOpen, onNavigate }) {
             {postedDays === 0 ? "Today" : `${postedDays}d ago`}
           </div>
           <button
-            onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate("contact", "buy"); }}
+            onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: property.transactionType === "Rent" ? "rent" : "buy", property, intent: "contact" }); }}
             className="flex items-center gap-1 text-[11px] font-bold text-[#2C9DD5] hover:underline"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">

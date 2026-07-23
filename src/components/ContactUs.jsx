@@ -66,8 +66,28 @@ const SUBJECT_LABELS = {
 };
 
 // ── Main Export ───────────────────────────────────────────────────────────────
+// `initialSubject` is either a bare subject string (most callers — "buy",
+// "invest", "prime", etc.) or a richer object from a specific property's
+// Contact/Schedule Visit buttons: { subject, property, intent }. The latter
+// links the resulting lead back to that exact listing (see submitLead call
+// below) so the admin can see exactly which property this inquiry is about,
+// with full specs/photos, instead of a generic message.
 export default function ContactUs({ onNavigate, initialSubject }) {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: initialSubject || "", message: "" });
+  const isRichPayload = initialSubject && typeof initialSubject === "object";
+  const subjectValue = isRichPayload ? initialSubject.subject : initialSubject;
+  const property = isRichPayload ? initialSubject.property : null;
+  const intent = isRichPayload ? initialSubject.intent : null; // "contact" | "site-visit"
+
+  function defaultMessage() {
+    if (!property) return "";
+    const specs = [property.bhk, property.area, property.type].filter(Boolean).join(", ");
+    if (intent === "site-visit") {
+      return `I'd like to schedule a site visit for "${property.title}"${property.location ? ` in ${property.location}` : ""}${specs ? ` (${specs})` : ""}. Please share available slots.`;
+    }
+    return `I'm interested in "${property.title}"${property.location ? ` in ${property.location}` : ""}${specs ? ` (${specs})` : ""} and would like more details.`;
+  }
+
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: subjectValue || "", message: defaultMessage() });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -77,11 +97,22 @@ export default function ContactUs({ onNavigate, initialSubject }) {
     if (!(form.name && form.phone && form.message)) return;
     setSubmitting(true);
     setError("");
+
+    // When this came from a specific property, weave its details into the
+    // interest text and link the lead to it directly (listingId) so it
+    // shows up with full specs/photos wherever leads are reviewed.
+    const interest = property
+      ? `${intent === "site-visit" ? "Site Visit Request" : SUBJECT_LABELS[form.subject] || "Property Inquiry"} — ${property.title}, ${property.location}, ${property.price}${property.bhk ? `, ${property.bhk}` : ""}${property.area ? `, ${property.area}` : ""} — ${form.message}`
+      : `${SUBJECT_LABELS[form.subject] || "General Inquiry"} — ${form.message}`;
+
     const { error } = await submitLead({
       name: form.name,
       phone: form.phone,
       email: form.email,
-      interest: `${SUBJECT_LABELS[form.subject] || "General Inquiry"} — ${form.message}`,
+      interest,
+      budget: property?.price,
+      listingId: property?.dbId,
+      stage: intent === "site-visit" ? "Site Visit" : undefined,
     });
     setSubmitting(false);
     if (error) {
@@ -138,6 +169,21 @@ export default function ContactUs({ onNavigate, initialSubject }) {
           <div className="rounded-2xl p-6 lg:p-8" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
             <h2 className="text-xl font-bold mb-1" style={{ color: "#15191C" }}>Send Us a Message</h2>
             <p className="text-sm mb-6" style={{ color: "#495057" }}>Fill out the form and we'll get back to you shortly.</p>
+
+            {property && !submitted && (
+              <div className="flex items-center gap-3 mb-6 p-3 rounded-xl" style={{ background: "#EAF4FB", border: "1px solid #2C9DD5" }}>
+                {property.images?.[0] && (
+                  <img src={property.images[0]} alt={property.title} className="w-14 h-14 rounded-lg object-cover shrink-0" />
+                )}
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#2C9DD5" }}>
+                    {intent === "site-visit" ? "Scheduling a visit for" : "Inquiring about"}
+                  </p>
+                  <p className="text-sm font-bold truncate" style={{ color: "#15191C" }}>{property.title}</p>
+                  <p className="text-xs truncate" style={{ color: "#495057" }}>{property.location} · {property.price}</p>
+                </div>
+              </div>
+            )}
 
             {submitted ? (
               <div className="flex flex-col items-center justify-center py-14 text-center">
