@@ -31,7 +31,7 @@ const VALUES = [
 ];
 
 const TIMELINE = [
-  { year: "2008", title: "Founded in Ranchi", desc: "Started as a small brokerage helping families find their first homes." },
+  { year: "2008", title: "Founded in Bhubaneswar", desc: "Started as a small brokerage helping families find their first homes." },
   { year: "2014", title: "Expanded to Commercial", desc: "Added office spaces, retail, and industrial properties to our portfolio." },
   { year: "2018", title: "Launched Investment Advisory", desc: "Began offering data-driven investment guidance for high-growth corridors." },
   { year: "2021", title: "Digital Transformation", desc: "Built our PropTech platform with AI-powered search and virtual tours." },
@@ -40,9 +40,9 @@ const TIMELINE = [
 ];
 
 const LEADERSHIP = [
-  { name: "Arjun Verma", role: "Founder & CEO", avatar: "AV", bg: "linear-gradient(135deg, #2C9DD5, #1a5f85)" },
-  { name: "Meera Kapoor", role: "Chief Operating Officer", avatar: "MK", bg: "linear-gradient(135deg, #E87C02, #b85f00)" },
-  { name: "Rohan Bose", role: "Head of Investment Advisory", avatar: "RB", bg: "linear-gradient(135deg, #16a34a, #0f7a32)" },
+  { name: "Arjun Verma", role: "Founder & CEO", avatar: "AV", bg: "linear-gradient(135deg, #1E88E5, #0F2D52)" },
+  { name: "Meera Kapoor", role: "Chief Operating Officer", avatar: "MK", bg: "linear-gradient(135deg, #F59E0B, #b85f00)" },
+  { name: "Rohan Bose", role: "Head of Investment Advisory", avatar: "RB", bg: "linear-gradient(135deg, #16A34A, #0f7a32)" },
   { name: "Ananya Iyer", role: "Head of Technology", avatar: "AI", bg: "linear-gradient(135deg, #a78bfa, #7c5cd6)" },
 ];
 
@@ -52,18 +52,18 @@ export default function AboutUs({ onNavigate }) {
     <div style={{ background: "#FFFFFF" }}>
 
       {/* ── Hero ── */}
-      <section className="px-4 py-16 lg:py-20" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EAF4FB 100%)" }}>
+      <section className="px-4 py-16 lg:py-20" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <div className="max-w-4xl mx-auto text-center">
           <span
             className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-            style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1px solid #2C9DD5" }}
+            style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
           >
             About PropertyBrands
           </span>
-          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-5" style={{ color: "#15191C" }}>
+          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-5" style={{ color: "#1F2937" }}>
             Building Trust, One Property<br />at a Time
           </h1>
-          <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: "#495057" }}>
+          <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: "#6B7280" }}>
             PropertyBrands Realty Services is a next-generation PropTech company connecting homebuyers, investors, developers, and service providers through a seamless digital ecosystem.
           </p>
         </div>
@@ -72,11 +72,11 @@ export default function AboutUs({ onNavigate }) {
       {/* ── Stats ── */}
       <section className="px-4 py-12 -mt-8">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 rounded-2xl p-6 lg:p-8" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB", boxShadow: "0 20px 40px rgba(21,25,28,0.08)" }}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 rounded-2xl p-6 lg:p-8" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", boxShadow: "0 20px 40px rgba(31,41,55,0.08)" }}>
             {STATS.map((s) => (
               <div key={s.label} className="text-center">
-                <p className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#2C9DD5" }}>{s.value}</p>
-                <p className="text-sm mt-1" style={{ color: "#495057" }}>{s.label}</p>
+                <p className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1E88E5" }}>{s.value}</p>
+                <p className="text-sm mt-1" style={{ color: "#6B7280" }}>{s.label}</p>
               </div>
             ))}
           </div>
@@ -87,33 +87,33 @@ export default function AboutUs({ onNavigate }) {
       <section className="px-4 py-12 lg:py-16">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
-            <h2 className="text-2xl lg:text-3xl font-extrabold mb-4" style={{ color: "#15191C" }}>Who We Are</h2>
-            <p className="text-base leading-relaxed mb-4" style={{ color: "#495057" }}>
+            <h2 className="text-2xl lg:text-3xl font-extrabold mb-4" style={{ color: "#1F2937" }}>Who We Are</h2>
+            <p className="text-base leading-relaxed mb-4" style={{ color: "#6B7280" }}>
               We combine technology, market intelligence, and an extensive network of developers and channel partners to help customers make informed real estate decisions.
             </p>
-            <p className="text-base leading-relaxed mb-6" style={{ color: "#495057" }}>
+            <p className="text-base leading-relaxed mb-6" style={{ color: "#6B7280" }}>
               From residential apartments to commercial spaces, plotted developments to investment advisory — we offer end-to-end real estate solutions under one roof, backed by a dedicated relationship manager for every client.
             </p>
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => onNavigate && onNavigate("home")}
                 className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#BA0D0B", color: "#FFFFFF" }}
-                onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
-                onMouseLeave={(e) => e.currentTarget.style.background = "#BA0D0B"}
+                style={{ background: "#1E88E5", color: "#FFFFFF" }}
+                onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
+                onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
               >
                 Explore Properties
               </button>
               <button
                 onClick={() => onNavigate && onNavigate("contact")}
                 className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
+                style={{ background: "#FFFFFF", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
               >
                 Talk to Us
               </button>
             </div>
           </div>
-          <div className="rounded-2xl overflow-hidden h-72 lg:h-96" style={{ border: "1px solid #E5E8EB" }}>
+          <div className="rounded-2xl overflow-hidden h-72 lg:h-96" style={{ border: "1px solid #E2E8F0" }}>
             <img
               src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=700&h=500&fit=crop"
               alt="Our office"
@@ -124,22 +124,22 @@ export default function AboutUs({ onNavigate }) {
       </section>
 
       {/* ── Values ── */}
-      <section className="px-4 py-12 lg:py-16" style={{ background: "#F7F8FA" }}>
+      <section className="px-4 py-12 lg:py-16" style={{ background: "#F8FAFC" }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#15191C" }}>What Drives Us</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#2C9DD5" }} />
+            <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>What Drives Us</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {VALUES.map((v) => (
               <div
                 key={v.title}
                 className="rounded-2xl p-6 transition-all duration-200 hover:-translate-y-1"
-                style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+                style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
               >
                 <span className="text-3xl block mb-3">{v.icon}</span>
-                <h3 className="text-sm font-bold mb-2" style={{ color: "#15191C" }}>{v.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: "#495057" }}>{v.desc}</p>
+                <h3 className="text-sm font-bold mb-2" style={{ color: "#1F2937" }}>{v.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>{v.desc}</p>
               </div>
             ))}
           </div>
@@ -150,8 +150,8 @@ export default function AboutUs({ onNavigate }) {
       <section className="px-4 py-12 lg:py-16">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#15191C" }}>Our Journey</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#2C9DD5" }} />
+            <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>Our Journey</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
           </div>
           <div className="space-y-0">
             {TIMELINE.map((item, i) => (
@@ -159,16 +159,16 @@ export default function AboutUs({ onNavigate }) {
                 <div className="flex flex-col items-center shrink-0">
                   <div
                     className="w-3 h-3 rounded-full shrink-0"
-                    style={{ background: i === TIMELINE.length - 1 ? "#BA0D0B" : "#2C9DD5" }}
+                    style={{ background: i === TIMELINE.length - 1 ? "#1E88E5" : "#1E88E5" }}
                   />
                   {i < TIMELINE.length - 1 && (
-                    <div className="w-px flex-1" style={{ background: "#E5E8EB", minHeight: "40px" }} />
+                    <div className="w-px flex-1" style={{ background: "#E2E8F0", minHeight: "40px" }} />
                   )}
                 </div>
                 <div className="pb-8">
-                  <span className="text-sm font-extrabold" style={{ color: "#2C9DD5" }}>{item.year}</span>
-                  <h3 className="text-base font-bold mt-1" style={{ color: "#15191C" }}>{item.title}</h3>
-                  <p className="text-sm mt-1" style={{ color: "#495057" }}>{item.desc}</p>
+                  <span className="text-sm font-extrabold" style={{ color: "#1E88E5" }}>{item.year}</span>
+                  <h3 className="text-base font-bold mt-1" style={{ color: "#1F2937" }}>{item.title}</h3>
+                  <p className="text-sm mt-1" style={{ color: "#6B7280" }}>{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -177,23 +177,23 @@ export default function AboutUs({ onNavigate }) {
       </section>
 
       {/* ── Leadership ── */}
-      <section className="px-4 py-12 lg:py-16" style={{ background: "#F7F8FA" }}>
+      <section className="px-4 py-12 lg:py-16" style={{ background: "#F8FAFC" }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#15191C" }}>Leadership Team</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#2C9DD5" }} />
+            <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>Leadership Team</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {LEADERSHIP.map((p) => (
-              <div key={p.name} className="rounded-2xl p-6 text-center" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
+              <div key={p.name} className="rounded-2xl p-6 text-center" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
                 <div
                   className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center font-bold text-lg"
                   style={{ background: p.bg, color: "#FFFFFF" }}
                 >
                   {p.avatar}
                 </div>
-                <p className="text-sm font-bold" style={{ color: "#15191C" }}>{p.name}</p>
-                <p className="text-xs mt-0.5" style={{ color: "#495057" }}>{p.role}</p>
+                <p className="text-sm font-bold" style={{ color: "#1F2937" }}>{p.name}</p>
+                <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{p.role}</p>
               </div>
             ))}
           </div>
@@ -204,7 +204,7 @@ export default function AboutUs({ onNavigate }) {
       <section className="px-4 py-14">
         <div
           className="max-w-5xl mx-auto rounded-3xl p-10 lg:p-14 text-center"
-          style={{ background: "linear-gradient(135deg, #BA0D0B 0%, #5C0B03 100%)" }}
+          style={{ background: "linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)" }}
         >
           <h2 className="text-2xl lg:text-3xl font-extrabold text-white mb-3">Ready to Get Started?</h2>
           <p className="text-sm lg:text-base text-white/85 mb-7 max-w-lg mx-auto">
@@ -214,7 +214,7 @@ export default function AboutUs({ onNavigate }) {
             <button
               onClick={() => onNavigate && onNavigate("home")}
               className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-              style={{ background: "#FFFFFF", color: "#BA0D0B" }}
+              style={{ background: "#FFFFFF", color: "#1E88E5" }}
             >
               Explore Properties
             </button>

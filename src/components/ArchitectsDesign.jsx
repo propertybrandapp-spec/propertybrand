@@ -13,7 +13,7 @@ const SERVICES = [
     title: "House Planning",
     desc: "Vaastu-compliant floor plans, structural layouts, and 3D elevation designs tailored to your plot size and family needs.",
     tag: "Starts at ₹8/sqft",
-    tagColor: "#2C9DD5",
+    tagColor: "#1E88E5",
     image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500&h=320&fit=crop",
   },
   {
@@ -25,7 +25,7 @@ const SERVICES = [
     title: "Residential Design",
     desc: "Complete interior design for homes and apartments — space planning, material selection, lighting, and furniture layout.",
     tag: "Starts at ₹150/sqft",
-    tagColor: "#E87C02",
+    tagColor: "#F59E0B",
     image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=500&h=320&fit=crop",
   },
   {
@@ -109,33 +109,33 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
     <div style={{ background: "#FFFFFF" }}>
 
       {/* ── Hero ── */}
-      <section className="px-4 py-16 lg:py-20 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EAF4FB 100%)" }}>
+      <section className="px-4 py-16 lg:py-20 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1px solid #2C9DD5" }}
+          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
         >
           Architects &amp; Interior Design
         </span>
-        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#15191C" }}>
-          Design Your <span style={{ color: "#2C9DD5" }}>Dream Space</span>
+        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#1F2937" }}>
+          Design Your <span style={{ color: "#1E88E5" }}>Dream Space</span>
         </h1>
-        <p className="text-base mt-3 max-w-xl mx-auto" style={{ color: "#495057" }}>
+        <p className="text-base mt-3 max-w-xl mx-auto" style={{ color: "#6B7280" }}>
           From house planning to move-in-ready interiors — work with vetted architects and designers, all coordinated through one team.
         </p>
         <div className="flex flex-wrap justify-center gap-3 mt-7">
           <button
             onClick={() => onNavigate && onNavigate("contact", "other")}
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#BA0D0B", color: "#FFFFFF" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#BA0D0B"}
+            style={{ background: "#1E88E5", color: "#FFFFFF" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
           >
             Get a Free Consultation
           </button>
           <a
             href="#packages"
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
+            style={{ background: "#FFFFFF", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
           >
             View Packages
           </a>
@@ -147,8 +147,8 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
         {/* ── Services ── */}
         <div>
           <div className="mb-8">
-            <h2 className="text-xl font-bold" style={{ color: "#15191C" }}>What We Offer</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#2C9DD5" }} />
+            <h2 className="text-xl font-bold" style={{ color: "#1F2937" }}>What We Offer</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {SERVICES.map((s) => {
@@ -158,22 +158,22 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
               <div key={s.title} id={anchorId} className="rounded-2xl overflow-hidden transition-all duration-200"
                 style={{
                   background: "#FFFFFF",
-                  border: "1px solid #E5E8EB",
+                  border: "1px solid #E2E8F0",
                   boxShadow: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.boxShadow : "none",
                   transition: ANCHOR_HIGHLIGHT_STYLE.transition,
                   scrollMarginTop: "100px",
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.borderColor = "#2C9DD5"}
-                onMouseLeave={(e) => e.currentTarget.style.borderColor = "#E5E8EB"}>
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = "#1E88E5"}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = "#E2E8F0"}>
                 <div className="h-40 overflow-hidden">
                   <img src={s.image} alt={s.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-5" style={{ background: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.background : "transparent" }}>
                   <div className="flex items-center gap-2 mb-2" style={{ color: s.tagColor }}>
                     {s.icon}
-                    <h3 className="text-base font-bold" style={{ color: "#15191C" }}>{s.title}</h3>
+                    <h3 className="text-base font-bold" style={{ color: "#1F2937" }}>{s.title}</h3>
                   </div>
-                  <p className="text-sm leading-relaxed mb-3" style={{ color: "#495057" }}>{s.desc}</p>
+                  <p className="text-sm leading-relaxed mb-3" style={{ color: "#6B7280" }}>{s.desc}</p>
                   <span className="inline-block text-xs font-bold px-3 py-1 rounded-full" style={{ background: `${s.tagColor}15`, color: s.tagColor, border: `1px solid ${s.tagColor}30` }}>
                     {s.tag}
                   </span>
@@ -187,15 +187,15 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
         {/* ── Process ── */}
         <div>
           <div className="mb-8">
-            <h2 className="text-xl font-bold" style={{ color: "#15191C" }}>How It Works</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#2C9DD5" }} />
+            <h2 className="text-xl font-bold" style={{ color: "#1F2937" }}>How It Works</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {PROCESS_STEPS.map((p) => (
-              <div key={p.step} className="rounded-2xl p-6" style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}>
-                <span className="text-3xl font-black" style={{ color: "#2C9DD5", opacity: 0.3 }}>{p.step}</span>
-                <h3 className="text-sm font-bold mt-2 mb-1.5" style={{ color: "#15191C" }}>{p.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: "#495057" }}>{p.desc}</p>
+              <div key={p.step} className="rounded-2xl p-6" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                <span className="text-3xl font-black" style={{ color: "#1E88E5", opacity: 0.3 }}>{p.step}</span>
+                <h3 className="text-sm font-bold mt-2 mb-1.5" style={{ color: "#1F2937" }}>{p.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>{p.desc}</p>
               </div>
             ))}
           </div>
@@ -204,8 +204,8 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
         {/* ── Gallery ── */}
         <div>
           <div className="mb-8">
-            <h2 className="text-xl font-bold" style={{ color: "#15191C" }}>Recent Work</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#2C9DD5" }} />
+            <h2 className="text-xl font-bold" style={{ color: "#1F2937" }}>Recent Work</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {GALLERY.map((img, i) => (
@@ -219,9 +219,9 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
         {/* ── Packages ── */}
         <div id="packages">
           <div className="mb-8 text-center">
-            <h2 className="text-xl font-bold" style={{ color: "#15191C" }}>Interior Packages</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#2C9DD5" }} />
-            <p className="text-sm mt-3" style={{ color: "#495057" }}>Transparent, all-inclusive pricing — no hidden costs.</p>
+            <h2 className="text-xl font-bold" style={{ color: "#1F2937" }}>Interior Packages</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
+            <p className="text-sm mt-3" style={{ color: "#6B7280" }}>Transparent, all-inclusive pricing — no hidden costs.</p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {PACKAGES.map((pkg) => (
@@ -230,23 +230,23 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
                 onClick={() => setActivePackage(pkg.name)}
                 className="rounded-2xl p-7 cursor-pointer transition-all duration-200"
                 style={{
-                  background: pkg.highlighted ? "#15191C" : "#FFFFFF",
-                  border: pkg.highlighted ? "1px solid #15191C" : activePackage === pkg.name ? "1.5px solid #2C9DD5" : "1px solid #E5E8EB",
+                  background: pkg.highlighted ? "#1F2937" : "#FFFFFF",
+                  border: pkg.highlighted ? "1px solid #1F2937" : activePackage === pkg.name ? "1.5px solid #1E88E5" : "1px solid #E2E8F0",
                   transform: pkg.highlighted ? "scale(1.03)" : "scale(1)",
                 }}
               >
                 {pkg.highlighted && (
-                  <span className="inline-block text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4" style={{ background: "#2C9DD5", color: "#FFFFFF" }}>
+                  <span className="inline-block text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
                     Most Popular
                   </span>
                 )}
-                <h3 className="text-lg font-bold mb-1" style={{ color: pkg.highlighted ? "#FFFFFF" : "#15191C" }}>{pkg.name}</h3>
-                <p className="text-xs mb-4" style={{ color: pkg.highlighted ? "#D6DADD" : "#495057" }}>{pkg.desc}</p>
-                <p className="text-2xl font-extrabold mb-5" style={{ color: pkg.highlighted ? "#FFFFFF" : "#2C9DD5" }}>{pkg.price}</p>
+                <h3 className="text-lg font-bold mb-1" style={{ color: pkg.highlighted ? "#FFFFFF" : "#1F2937" }}>{pkg.name}</h3>
+                <p className="text-xs mb-4" style={{ color: pkg.highlighted ? "#E2E8F0" : "#6B7280" }}>{pkg.desc}</p>
+                <p className="text-2xl font-extrabold mb-5" style={{ color: pkg.highlighted ? "#FFFFFF" : "#1E88E5" }}>{pkg.price}</p>
                 <div className="space-y-2.5 mb-6">
                   {pkg.features.map((f) => (
-                    <div key={f} className="flex items-center gap-2 text-sm" style={{ color: pkg.highlighted ? "#EAF4FB" : "#495057" }}>
-                      <svg className="w-4 h-4 shrink-0" fill="none" stroke={pkg.highlighted ? "#2C9DD5" : "#2C9DD5"} strokeWidth={2.5} viewBox="0 0 24 24">
+                    <div key={f} className="flex items-center gap-2 text-sm" style={{ color: pkg.highlighted ? "#EFF6FF" : "#6B7280" }}>
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke={pkg.highlighted ? "#1E88E5" : "#1E88E5"} strokeWidth={2.5} viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                       {f}
@@ -256,7 +256,7 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
                 <button
                   onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate("contact", "other"); }}
                   className="w-full py-2.5 rounded-xl text-sm font-bold transition-all"
-                  style={{ background: pkg.highlighted ? "#2C9DD5" : "#EAF4FB", color: pkg.highlighted ? "#FFFFFF" : "#2C9DD5" }}
+                  style={{ background: pkg.highlighted ? "#1E88E5" : "#EFF6FF", color: pkg.highlighted ? "#FFFFFF" : "#1E88E5" }}
                 >
                   Get a Quote
                 </button>
@@ -266,15 +266,15 @@ export default function ArchitectsDesign({ onNavigate, scrollTo, navKey }) {
         </div>
 
         {/* ── Final CTA ── */}
-        <div className="rounded-2xl p-8 text-center" style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}>
-          <p className="text-lg font-bold" style={{ color: "#15191C" }}>Not sure where to start?</p>
-          <p className="text-sm mt-1 mb-5" style={{ color: "#495057" }}>Talk to a design consultant — it's free, and there's no obligation.</p>
+        <div className="rounded-2xl p-8 text-center" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+          <p className="text-lg font-bold" style={{ color: "#1F2937" }}>Not sure where to start?</p>
+          <p className="text-sm mt-1 mb-5" style={{ color: "#6B7280" }}>Talk to a design consultant — it's free, and there's no obligation.</p>
           <button
             onClick={() => onNavigate && onNavigate("contact", "other")}
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#BA0D0B", color: "#FFFFFF" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#BA0D0B"}
+            style={{ background: "#1E88E5", color: "#FFFFFF" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
           >
             Talk to a Design Consultant
           </button>

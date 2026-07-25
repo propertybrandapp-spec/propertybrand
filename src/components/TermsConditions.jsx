@@ -57,7 +57,7 @@ const SECTIONS = [
   {
     title: "9. Governing Law",
     body: [
-      "These Terms are governed by the laws of India, and any disputes shall be subject to the exclusive jurisdiction of the courts in Ranchi, Jharkhand.",
+      "These Terms are governed by the laws of India, and any disputes shall be subject to the exclusive jurisdiction of the courts in Bhubaneswar, Odisha.",
     ],
   },
   {
@@ -74,21 +74,21 @@ export default function TermsConditions({ onNavigate }) {
     <div style={{ background: "#FFFFFF" }}>
 
       {/* ── Hero ── */}
-      <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EAF4FB 100%)" }}>
+      <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1px solid #2C9DD5" }}
+          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
         >
           Legal
         </span>
-        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#15191C" }}>Terms & Conditions</h1>
-        <p className="text-sm mt-3" style={{ color: "#495057" }}>Last updated: June 1, 2026 · Includes Channel Partner Program Terms</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#1F2937" }}>Terms & Conditions</h1>
+        <p className="text-sm mt-3" style={{ color: "#6B7280" }}>Last updated: June 1, 2026 · Includes Channel Partner Program Terms</p>
       </section>
 
       {/* ── Intro ── */}
       <section className="px-4 pt-12">
         <div className="max-w-3xl mx-auto">
-          <p className="text-base leading-relaxed" style={{ color: "#495057" }}>
+          <p className="text-base leading-relaxed" style={{ color: "#6B7280" }}>
             These Terms & Conditions govern your use of the PropertyBrands platform, including our website,
             mobile app, property listings, investment advisory tools, and Channel Partner Program. Please read
             them carefully before using our services.
@@ -101,10 +101,10 @@ export default function TermsConditions({ onNavigate }) {
         <div className="max-w-3xl mx-auto space-y-10">
           {SECTIONS.map((s) => (
             <div key={s.title} id={s.title.toLowerCase().includes("channel partner") ? "channel-partner-terms" : undefined}>
-              <h2 className="text-xl font-extrabold mb-3" style={{ color: "#15191C" }}>{s.title}</h2>
+              <h2 className="text-xl font-extrabold mb-3" style={{ color: "#1F2937" }}>{s.title}</h2>
               <div className="space-y-3">
                 {s.body.map((p, i) => (
-                  <p key={i} className="text-sm leading-relaxed" style={{ color: "#495057" }}>{p}</p>
+                  <p key={i} className="text-sm leading-relaxed" style={{ color: "#6B7280" }}>{p}</p>
                 ))}
               </div>
             </div>
@@ -114,17 +114,17 @@ export default function TermsConditions({ onNavigate }) {
 
       {/* ── Contact CTA ── */}
       <section className="px-4 pb-16">
-        <div className="max-w-3xl mx-auto rounded-2xl p-8 text-center" style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}>
-          <p className="text-lg font-bold" style={{ color: "#15191C" }}>Have a question about these terms?</p>
-          <p className="text-sm mt-1 mb-5" style={{ color: "#495057" }}>
+        <div className="max-w-3xl mx-auto rounded-2xl p-8 text-center" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+          <p className="text-lg font-bold" style={{ color: "#1F2937" }}>Have a question about these terms?</p>
+          <p className="text-sm mt-1 mb-5" style={{ color: "#6B7280" }}>
             We're happy to clarify anything before you sign up or list a property.
           </p>
           <button
             onClick={() => onNavigate && onNavigate("contact")}
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#BA0D0B", color: "#FFFFFF" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#BA0D0B"}
+            style={{ background: "#1E88E5", color: "#FFFFFF" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
           >
             Contact Us
           </button>

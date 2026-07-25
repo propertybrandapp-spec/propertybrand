@@ -81,7 +81,7 @@ const SOCIAL_LINKS = [
         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
       </svg>
     ),
-    bg: "hover:bg-[#1a5f85]",
+    bg: "hover:bg-[#0F2D52]",
   },
   {
     name: "YouTube",
@@ -91,7 +91,7 @@ const SOCIAL_LINKS = [
         <path d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805zM9.609 15.601V8.408l6.264 3.602z" />
       </svg>
     ),
-    bg: "hover:bg-red-600",
+    bg: "hover:bg-sky-600",
   },
 ];
 
@@ -137,8 +137,8 @@ function QuickInquiry() {
           </svg>
         </div>
         <p className="text-white font-bold text-base mb-1">Inquiry Submitted!</p>
-        <p className="text-[#495057] text-sm">Our expert will call you within 24 hours.</p>
-        <button onClick={() => setSubmitted(false)} className="mt-4 text-xs text-[#495057] hover:text-white underline">
+        <p className="text-[#6B7280] text-sm">Our expert will call you within 24 hours.</p>
+        <button onClick={() => setSubmitted(false)} className="mt-4 text-xs text-[#6B7280] hover:text-white underline">
           Submit another
         </button>
       </div>
@@ -158,7 +158,7 @@ function QuickInquiry() {
           placeholder={field.placeholder}
           value={form[field.key]}
           onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
-          className="w-full bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#495057] focus:outline-none focus:border-white/60 transition"
+          className="w-full bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#6B7280] focus:outline-none focus:border-white/60 transition"
         />
       ))}
       <select
@@ -166,11 +166,11 @@ function QuickInquiry() {
         onChange={(e) => setForm({ ...form, requirement: e.target.value })}
         className="w-full bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-white/60 transition"
       >
-        <option value="" className="text-[#15191C]">Property Requirement</option>
-        <option value="buy" className="text-[#15191C]">Buy</option>
-        <option value="rent" className="text-[#15191C]">Rent</option>
-        <option value="invest" className="text-[#15191C]">Investment</option>
-        <option value="sell" className="text-[#15191C]">Sell</option>
+        <option value="" className="text-[#1F2937]">Property Requirement</option>
+        <option value="buy" className="text-[#1F2937]">Buy</option>
+        <option value="rent" className="text-[#1F2937]">Rent</option>
+        <option value="invest" className="text-[#1F2937]">Investment</option>
+        <option value="sell" className="text-[#1F2937]">Sell</option>
       </select>
       <div className="grid grid-cols-2 gap-2">
         <input
@@ -178,21 +178,21 @@ function QuickInquiry() {
           placeholder="Preferred Location"
           value={form.location}
           onChange={(e) => setForm({ ...form, location: e.target.value })}
-          className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#495057] focus:outline-none focus:border-white/60 transition"
+          className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#6B7280] focus:outline-none focus:border-white/60 transition"
         />
         <input
           type="text"
           placeholder="Budget"
           value={form.budget}
           onChange={(e) => setForm({ ...form, budget: e.target.value })}
-          className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#495057] focus:outline-none focus:border-white/60 transition"
+          className="bg-[#FFFFFF]/15 border border-white/25 rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#6B7280] focus:outline-none focus:border-white/60 transition"
         />
       </div>
-      {error && <p className="text-xs font-semibold text-red-200">{error}</p>}
+      {error && <p className="text-xs font-semibold text-sky-200">{error}</p>}
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full bg-[#FFFFFF] text-[#2C9DD5] font-bold py-2.5 rounded-lg hover:bg-[#F2F4F6] transition text-sm shadow disabled:opacity-60"
+        className="w-full bg-[#FFFFFF] text-[#1E88E5] font-bold py-2.5 rounded-lg hover:bg-[#F1F5F9] transition text-sm shadow disabled:opacity-60"
       >
         {submitting ? "Sending..." : "Send Inquiry"}
       </button>
@@ -207,18 +207,18 @@ export default function Footer({ onNavigate }) {
   return (
     <footer>
       {/* ── Get in Touch Band ── */}
-      <div className="bg-[radial-gradient(circle_at_top_right,_rgba(186,13,11,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] px-4 py-16">
+      <div className="bg-[radial-gradient(circle_at_top_right,_rgba(30,136,229,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] px-4 py-16">
         <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
       
       {/* Left – Contact Info */}
         <div>
-          <span className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest mb-2 block">
+          <span className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest mb-2 block">
           Get in Touch
           </span>
 
-          <h2 className="text-[#15191C] text-3xl font-extrabold leading-tight mb-8">
-          property<span className="text-[#E87C02]">Brands</span> Realty Services
+          <h2 className="text-[#1F2937] text-3xl font-extrabold leading-tight mb-8">
+          property<span className="text-[#F59E0B]">Brands</span> Realty Services
           </h2>
 
         <div className="space-y-5">
@@ -231,7 +231,7 @@ export default function Footer({ onNavigate }) {
                 </svg>
               ),
               label: "Corporate Office",
-              value: "PropertyBrands Realty Services, Ranchi, Jharkhand — 834001",
+              value: "PropertyBrands Realty Services, Bhubaneswar, Odisha — 751001",
             },
             {
               icon: (
@@ -262,16 +262,16 @@ export default function Footer({ onNavigate }) {
             },
           ].map((item) => (
             <div key={item.label} className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-[#BA0D0B] shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#1E88E5] shrink-0">
                 {item.icon}
               </div>
 
               <div>
-                <p className="text-[#BA0D0B] text-[11px] font-bold uppercase tracking-wider">
+                <p className="text-[#1E88E5] text-[11px] font-bold uppercase tracking-wider">
                   {item.label}
                 </p>
 
-                <p className="text-[#15191C] text-sm font-medium mt-1">
+                <p className="text-[#1F2937] text-sm font-medium mt-1">
                   {item.value}
                 </p>
               </div>
@@ -281,7 +281,7 @@ export default function Footer({ onNavigate }) {
 
         {/* Social Icons */}
         <div className="mt-8">
-          <p className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest mb-3">
+          <p className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest mb-3">
             Follow Us
           </p>
 
@@ -291,7 +291,7 @@ export default function Footer({ onNavigate }) {
                 key={s.name}
                 href={s.href}
                 aria-label={s.name}
-                className="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-[#BA0D0B] text-slate-600 transition-all duration-300 flex items-center justify-center"
+                className="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-[#1E88E5] text-slate-600 transition-all duration-300 flex items-center justify-center"
               >
                 {s.icon}
               </a>
@@ -302,11 +302,11 @@ export default function Footer({ onNavigate }) {
 
       {/* Right – Inquiry Form */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8">
-        <p className="text-[#BA0D0B] text-xs font-bold uppercase tracking-widest mb-2">
+        <p className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest mb-2">
           Quick Inquiry
         </p>
 
-        <h3 className="text-[#15191C] font-bold text-2xl mb-6">
+        <h3 className="text-[#1F2937] font-bold text-2xl mb-6">
           Tell us what you're looking for
         </h3>
 
@@ -325,8 +325,8 @@ export default function Footer({ onNavigate }) {
 
           {/* Brand column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
-            <div className="text-[#15191C] font-extrabold text-xl tracking-tight mb-3">
-              property<span className="text-[#E87C02]">Brands</span>
+            <div className="text-[#1F2937] font-extrabold text-xl tracking-tight mb-3">
+              property<span className="text-[#F59E0B]">Brands</span>
             </div>
 
             <p className="text-slate-600 text-xs leading-relaxed mb-4">
@@ -367,7 +367,7 @@ export default function Footer({ onNavigate }) {
               <span key={l.label} className="flex items-center gap-1">
                 <button
                   onClick={() => onNavigate && onNavigate(l.page)}
-                  className="text-slate-600 text-xs hover:text-[#BA0D0B] transition"
+                  className="text-slate-600 text-xs hover:text-[#1E88E5] transition"
                 >
                   {l.label}
                 </button>
@@ -385,7 +385,7 @@ export default function Footer({ onNavigate }) {
       {/* ── Bottom Bar ── */}
       <div className="bg-[#FFFFFF] px-4 py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[#495057] text-xs text-center sm:text-left">
+          <p className="text-[#6B7280] text-xs text-center sm:text-left">
             © {currentYear} PropertyBrands Realty Services. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
@@ -393,11 +393,11 @@ export default function Footer({ onNavigate }) {
               <span key={l.label} className="flex items-center gap-4">
                 <button
                   onClick={() => onNavigate && onNavigate(l.page)}
-                  className="text-slate-600 text-xs font-medium hover:text-[#BA0D0B] hover:translate-x-0.5 transition-all duration-300 inline-flex items-center"
+                  className="text-slate-600 text-xs font-medium hover:text-[#1E88E5] hover:translate-x-0.5 transition-all duration-300 inline-flex items-center"
                 >
                   {l.label}
                 </button>
-                {i < arr.length - 1 && <span className="text-[#1F242A] text-xs">·</span>}
+                {i < arr.length - 1 && <span className="text-[#1F2937] text-xs">·</span>}
               </span>
             ))}
           </div>

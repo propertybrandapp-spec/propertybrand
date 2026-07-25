@@ -12,7 +12,7 @@ const CONTACT_INFO = [
       </svg>
     ),
     label: "Corporate Office",
-    value: "PropertyBrands Realty Services, Ranchi, Jharkhand — 834001",
+    value: "PropertyBrands Realty Services, Bhubaneswar, Odisha — 751001",
   },
   {
     icon: (
@@ -44,7 +44,7 @@ const CONTACT_INFO = [
 ];
 
 const OFFICES = [
-  { city: "Ranchi", address: "Main Road, Ranchi, Jharkhand 834001", phone: "+91 94301 00000" },
+  { city: "Bhubaneswar", address: "Main Road, Bhubaneswar, Odisha 751001", phone: "+91 94301 00000" },
   { city: "Delhi", address: "Connaught Place, New Delhi 110001", phone: "+91 98765 00001" },
   { city: "Bangalore", address: "MG Road, Bangalore, Karnataka 560001", phone: "+91 98765 00002" },
 ];
@@ -126,15 +126,15 @@ export default function ContactUs({ onNavigate, initialSubject }) {
     <div style={{ background: "#FFFFFF" }}>
 
       {/* ── Hero ── */}
-      <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EAF4FB 100%)" }}>
+      <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1px solid #2C9DD5" }}
+          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
         >
           Get in Touch
         </span>
-        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#15191C" }}>We're Here to Help</h1>
-        <p className="text-base mt-3 max-w-xl mx-auto" style={{ color: "#495057" }}>
+        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#1F2937" }}>We're Here to Help</h1>
+        <p className="text-base mt-3 max-w-xl mx-auto" style={{ color: "#6B7280" }}>
           Questions about buying, renting, investing, or our services? Reach out — our team typically responds within a few hours.
         </p>
       </section>
@@ -146,16 +146,16 @@ export default function ContactUs({ onNavigate, initialSubject }) {
             <div
               key={item.label}
               className="rounded-2xl p-5"
-              style={{ background: "#FFFFFF", border: "1px solid #E5E8EB", boxShadow: "0 12px 28px rgba(21,25,28,0.06)" }}
+              style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", boxShadow: "0 12px 28px rgba(31,41,55,0.06)" }}
             >
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                style={{ background: "#EAF4FB", color: "#2C9DD5" }}
+                style={{ background: "#EFF6FF", color: "#1E88E5" }}
               >
                 {item.icon}
               </div>
-              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#495057" }}>{item.label}</p>
-              <p className="text-sm font-semibold mt-1" style={{ color: "#15191C" }}>{item.value}</p>
+              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#6B7280" }}>{item.label}</p>
+              <p className="text-sm font-semibold mt-1" style={{ color: "#1F2937" }}>{item.value}</p>
             </div>
           ))}
         </div>
@@ -166,35 +166,35 @@ export default function ContactUs({ onNavigate, initialSubject }) {
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* Form */}
-          <div className="rounded-2xl p-6 lg:p-8" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
-            <h2 className="text-xl font-bold mb-1" style={{ color: "#15191C" }}>Send Us a Message</h2>
-            <p className="text-sm mb-6" style={{ color: "#495057" }}>Fill out the form and we'll get back to you shortly.</p>
+          <div className="rounded-2xl p-6 lg:p-8" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+            <h2 className="text-xl font-bold mb-1" style={{ color: "#1F2937" }}>Send Us a Message</h2>
+            <p className="text-sm mb-6" style={{ color: "#6B7280" }}>Fill out the form and we'll get back to you shortly.</p>
 
             {property && !submitted && (
-              <div className="flex items-center gap-3 mb-6 p-3 rounded-xl" style={{ background: "#EAF4FB", border: "1px solid #2C9DD5" }}>
+              <div className="flex items-center gap-3 mb-6 p-3 rounded-xl" style={{ background: "#EFF6FF", border: "1px solid #1E88E5" }}>
                 {property.images?.[0] && (
                   <img src={property.images[0]} alt={property.title} className="w-14 h-14 rounded-lg object-cover shrink-0" />
                 )}
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#2C9DD5" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#1E88E5" }}>
                     {intent === "site-visit" ? "Scheduling a visit for" : "Inquiring about"}
                   </p>
-                  <p className="text-sm font-bold truncate" style={{ color: "#15191C" }}>{property.title}</p>
-                  <p className="text-xs truncate" style={{ color: "#495057" }}>{property.location} · {property.price}</p>
+                  <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{property.title}</p>
+                  <p className="text-xs truncate" style={{ color: "#6B7280" }}>{property.location} · {property.price}</p>
                 </div>
               </div>
             )}
 
             {submitted ? (
               <div className="flex flex-col items-center justify-center py-14 text-center">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EAF8EC" }}>
-                  <svg className="w-8 h-8" fill="none" stroke="#16a34a" strokeWidth={2.5} viewBox="0 0 24 24">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#F0FDF4" }}>
+                  <svg className="w-8 h-8" fill="none" stroke="#16A34A" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="font-bold text-lg" style={{ color: "#15191C" }}>Message Sent!</p>
-                <p className="text-sm mt-1" style={{ color: "#495057" }}>We'll respond within 24 hours.</p>
-                <button onClick={() => setSubmitted(false)} className="mt-5 text-xs font-semibold underline" style={{ color: "#2C9DD5" }}>
+                <p className="font-bold text-lg" style={{ color: "#1F2937" }}>Message Sent!</p>
+                <p className="text-sm mt-1" style={{ color: "#6B7280" }}>We'll respond within 24 hours.</p>
+                <button onClick={() => setSubmitted(false)} className="mt-5 text-xs font-semibold underline" style={{ color: "#1E88E5" }}>
                   Send another message
                 </button>
               </div>
@@ -205,31 +205,31 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                     type="text" placeholder="Full Name *" value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-                    style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-                    onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
-                    onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
+                    style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+                    onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                    onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                   />
                   <input
                     type="tel" placeholder="Phone Number *" value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-                    style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-                    onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
-                    onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
+                    style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+                    onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                    onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                   />
                 </div>
                 <input
                   type="email" placeholder="Email Address" value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-                  style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-                  onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
-                  onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
+                  style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+                  onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                  onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
                 <select
                   value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-                  style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: form.subject ? "#15191C" : "#495057" }}
+                  style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: form.subject ? "#1F2937" : "#6B7280" }}
                 >
                   <option value="">What can we help with?</option>
                   <option value="buy">Buying a Property</option>
@@ -244,20 +244,20 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   placeholder="Your Message *" rows={4} value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition resize-none"
-                  style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-                  onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
-                  onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
+                  style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+                  onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                  onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
                 {error && (
-                  <p className="text-xs font-semibold" style={{ color: "#BA0D0B" }}>{error}</p>
+                  <p className="text-xs font-semibold" style={{ color: "#1E88E5" }}>{error}</p>
                 )}
                 <button
                   onClick={handleSubmit}
                   disabled={submitting}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-60"
-                  style={{ background: "#BA0D0B", color: "#FFFFFF" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "#BA0D0B"}
+                  style={{ background: "#1E88E5", color: "#FFFFFF" }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
+                  onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
                 >
                   {submitting ? "Sending..." : "Send Message"}
                 </button>
@@ -267,7 +267,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
 
           {/* Map + Offices */}
           <div className="space-y-5">
-            <div className="rounded-2xl overflow-hidden h-56" style={{ border: "1px solid #E5E8EB" }}>
+            <div className="rounded-2xl overflow-hidden h-56" style={{ border: "1px solid #E2E8F0" }}>
               <img
                 src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=700&h=400&fit=crop"
                 alt="Office location map"
@@ -275,15 +275,15 @@ export default function ContactUs({ onNavigate, initialSubject }) {
               />
             </div>
             {OFFICES.map((office) => (
-              <div key={office.city} className="rounded-2xl p-5" style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}>
+              <div key={office.city} className="rounded-2xl p-5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-bold" style={{ color: "#15191C" }}>{office.city} Office</p>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EAF4FB", color: "#2C9DD5" }}>
+                  <p className="text-sm font-bold" style={{ color: "#1F2937" }}>{office.city} Office</p>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
                     Open
                   </span>
                 </div>
-                <p className="text-xs" style={{ color: "#495057" }}>{office.address}</p>
-                <p className="text-xs mt-1 font-semibold" style={{ color: "#15191C" }}>{office.phone}</p>
+                <p className="text-xs" style={{ color: "#6B7280" }}>{office.address}</p>
+                <p className="text-xs mt-1 font-semibold" style={{ color: "#1F2937" }}>{office.phone}</p>
               </div>
             ))}
           </div>
@@ -295,28 +295,28 @@ export default function ContactUs({ onNavigate, initialSubject }) {
       <section className="px-4 pb-16">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-extrabold" style={{ color: "#15191C" }}>Frequently Asked Questions</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#2C9DD5" }} />
+            <h2 className="text-2xl font-extrabold" style={{ color: "#1F2937" }}>Frequently Asked Questions</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
           </div>
           <div className="space-y-3">
             {FAQ.map((item, i) => (
-              <div key={i} className="rounded-xl overflow-hidden" style={{ border: "1px solid #E5E8EB" }}>
+              <div key={i} className="rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
                   style={{ background: "#FFFFFF" }}
                 >
-                  <span className="text-sm font-semibold" style={{ color: "#15191C" }}>{item.q}</span>
+                  <span className="text-sm font-semibold" style={{ color: "#1F2937" }}>{item.q}</span>
                   <svg
                     className="w-4 h-4 shrink-0 transition-transform"
-                    style={{ color: "#2C9DD5", transform: openFaq === i ? "rotate(180deg)" : "rotate(0deg)" }}
+                    style={{ color: "#1E88E5", transform: openFaq === i ? "rotate(180deg)" : "rotate(0deg)" }}
                     fill="currentColor" viewBox="0 0 20 20"
                   >
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                   </svg>
                 </button>
                 {openFaq === i && (
-                  <div className="px-5 pb-4 text-sm" style={{ color: "#495057", background: "#FFFFFF" }}>
+                  <div className="px-5 pb-4 text-sm" style={{ color: "#6B7280", background: "#FFFFFF" }}>
                     {item.a}
                   </div>
                 )}

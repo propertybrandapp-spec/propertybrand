@@ -37,24 +37,24 @@ export default function Disclaimer({ onNavigate }) {
     <div style={{ background: "#FFFFFF" }}>
 
       {/* ── Hero ── */}
-      <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #FDF1E5 100%)" }}>
+      <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #FEF3C7 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#E87C02", border: "1px solid #E87C02" }}
+          style={{ background: "#FFFFFF", color: "#F59E0B", border: "1px solid #F59E0B" }}
         >
           Legal
         </span>
-        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#15191C" }}>Disclaimer</h1>
-        <p className="text-sm mt-3" style={{ color: "#495057" }}>Last updated: June 1, 2026</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#1F2937" }}>Disclaimer</h1>
+        <p className="text-sm mt-3" style={{ color: "#6B7280" }}>Last updated: June 1, 2026</p>
       </section>
 
       {/* ── Sections ── */}
       <section className="px-4 py-12">
         <div className="max-w-3xl mx-auto space-y-8">
           {SECTIONS.map((s) => (
-            <div key={s.title} className="rounded-2xl p-6" style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}>
-              <h2 className="text-lg font-extrabold mb-2" style={{ color: "#15191C" }}>{s.title}</h2>
-              <p className="text-sm leading-relaxed" style={{ color: "#495057" }}>{s.body}</p>
+            <div key={s.title} className="rounded-2xl p-6" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+              <h2 className="text-lg font-extrabold mb-2" style={{ color: "#1F2937" }}>{s.title}</h2>
+              <p className="text-sm leading-relaxed" style={{ color: "#6B7280" }}>{s.body}</p>
             </div>
           ))}
         </div>
@@ -62,15 +62,15 @@ export default function Disclaimer({ onNavigate }) {
 
       {/* ── Contact CTA ── */}
       <section className="px-4 pb-16">
-        <div className="max-w-3xl mx-auto rounded-2xl p-8 text-center" style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}>
-          <p className="text-lg font-bold" style={{ color: "#15191C" }}>Need clarification on something?</p>
-          <p className="text-sm mt-1 mb-5" style={{ color: "#495057" }}>Our team is happy to explain anything in detail.</p>
+        <div className="max-w-3xl mx-auto rounded-2xl p-8 text-center" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+          <p className="text-lg font-bold" style={{ color: "#1F2937" }}>Need clarification on something?</p>
+          <p className="text-sm mt-1 mb-5" style={{ color: "#6B7280" }}>Our team is happy to explain anything in detail.</p>
           <button
             onClick={() => onNavigate && onNavigate("contact")}
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#BA0D0B", color: "#FFFFFF" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#BA0D0B"}
+            style={{ background: "#1E88E5", color: "#FFFFFF" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
           >
             Contact Us
           </button>

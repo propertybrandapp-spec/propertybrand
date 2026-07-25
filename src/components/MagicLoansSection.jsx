@@ -6,11 +6,11 @@ const banks = [
   { id: 2,  name: "LIC Housing Finance",    abbr: "LIC",    bgColor: "bg-green-700",  rate: "7.8%"  },
   { id: 3,  name: "SBI",                    abbr: "SBI",    bgColor: "bg-sky-600",    rate: "7.25%" },
   { id: 4,  name: "Canara Bank",            abbr: "CAN",    bgColor: "bg-blue-800",   rate: "7.15%" },
-  { id: 5,  name: "Bank of Baroda",         abbr: "BoB",    bgColor: "bg-red-700",    rate: "7.2%"  },
-  { id: 6,  name: "HDFC Bank",              abbr: "HDFC",   bgColor: "bg-red-800",    rate: "7.35%" },
+  { id: 5,  name: "Bank of Baroda",         abbr: "BoB",    bgColor: "bg-sky-700",    rate: "7.2%"  },
+  { id: 6,  name: "HDFC Bank",              abbr: "HDFC",   bgColor: "bg-sky-800",    rate: "7.35%" },
   { id: 7,  name: "ICICI Bank",             abbr: "ICICI",  bgColor: "bg-orange-600", rate: "7.4%"  },
   { id: 8,  name: "Axis Bank",              abbr: "AXIS",   bgColor: "bg-purple-700", rate: "7.5%"  },
-  { id: 9,  name: "Kotak Mahindra",         abbr: "KMB",    bgColor: "bg-red-600",    rate: "7.6%"  },
+  { id: 9,  name: "Kotak Mahindra",         abbr: "KMB",    bgColor: "bg-sky-600",    rate: "7.6%"  },
   { id: 10, name: "Punjab National Bank",   abbr: "PNB",    bgColor: "bg-indigo-700", rate: "7.3%"  },
 ];
 

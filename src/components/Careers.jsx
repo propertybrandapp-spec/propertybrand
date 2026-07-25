@@ -14,13 +14,13 @@ const PERKS = [
 const DEPARTMENTS = ["All Departments", "Sales", "Technology", "Marketing", "Operations", "Customer Success"];
 
 const OPENINGS = [
-  { id: 1, title: "Senior Sales Manager", dept: "Sales", location: "Ranchi", type: "Full-time", exp: "5+ years" },
+  { id: 1, title: "Senior Sales Manager", dept: "Sales", location: "Bhubaneswar", type: "Full-time", exp: "5+ years" },
   { id: 2, title: "Frontend Engineer (React)", dept: "Technology", location: "Remote", type: "Full-time", exp: "2-4 years" },
   { id: 3, title: "Digital Marketing Specialist", dept: "Marketing", location: "Bangalore", type: "Full-time", exp: "2+ years" },
   { id: 4, title: "Investment Advisory Analyst", dept: "Sales", location: "Delhi", type: "Full-time", exp: "3+ years" },
-  { id: 5, title: "Customer Success Associate", dept: "Customer Success", location: "Ranchi", type: "Full-time", exp: "0-2 years" },
+  { id: 5, title: "Customer Success Associate", dept: "Customer Success", location: "Bhubaneswar", type: "Full-time", exp: "0-2 years" },
   { id: 6, title: "Backend Engineer (Node.js)", dept: "Technology", location: "Remote", type: "Full-time", exp: "3+ years" },
-  { id: 7, title: "Operations Manager", dept: "Operations", location: "Ranchi", type: "Full-time", exp: "4+ years" },
+  { id: 7, title: "Operations Manager", dept: "Operations", location: "Bhubaneswar", type: "Full-time", exp: "4+ years" },
   { id: 8, title: "Content Writer (Real Estate)", dept: "Marketing", location: "Remote", type: "Part-time", exp: "1+ years" },
 ];
 
@@ -35,17 +35,17 @@ export default function Careers({ onNavigate }) {
     <div style={{ background: "#FFFFFF" }}>
 
       {/* ── Hero ── */}
-      <section className="px-4 py-16 lg:py-20 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #FDF1E5 100%)" }}>
+      <section className="px-4 py-16 lg:py-20 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #FEF3C7 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#E87C02", border: "1px solid #E87C02" }}
+          style={{ background: "#FFFFFF", color: "#F59E0B", border: "1px solid #F59E0B" }}
         >
           We're Hiring
         </span>
-        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-5" style={{ color: "#15191C" }}>
+        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-5" style={{ color: "#1F2937" }}>
           Build the Future of<br />Real Estate With Us
         </h1>
-        <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: "#495057" }}>
+        <p className="text-base md:text-lg max-w-2xl mx-auto" style={{ color: "#6B7280" }}>
           Join a team that's redefining how India buys, sells, and invests in property — through technology, trust, and relentless customer focus.
         </p>
       </section>
@@ -54,19 +54,19 @@ export default function Careers({ onNavigate }) {
       <section className="px-4 py-14">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#15191C" }}>Why Work With Us</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#2C9DD5" }} />
+            <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>Why Work With Us</h2>
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {PERKS.map((p) => (
               <div
                 key={p.title}
                 className="rounded-2xl p-6 transition-all duration-200 hover:-translate-y-1"
-                style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+                style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
               >
                 <span className="text-3xl block mb-3">{p.icon}</span>
-                <h3 className="text-base font-bold mb-2" style={{ color: "#15191C" }}>{p.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "#495057" }}>{p.desc}</p>
+                <h3 className="text-base font-bold mb-2" style={{ color: "#1F2937" }}>{p.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#6B7280" }}>{p.desc}</p>
               </div>
             ))}
           </div>
@@ -74,15 +74,15 @@ export default function Careers({ onNavigate }) {
       </section>
 
       {/* ── Open Positions ── */}
-      <section className="px-4 py-14" style={{ background: "#F7F8FA" }}>
+      <section className="px-4 py-14" style={{ background: "#F8FAFC" }}>
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#15191C" }}>Open Positions</h2>
-              <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#2C9DD5" }} />
+              <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>Open Positions</h2>
+              <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
             </div>
-            <p className="text-sm" style={{ color: "#495057" }}>
-              <span className="font-bold" style={{ color: "#15191C" }}>{filtered.length}</span> open roles
+            <p className="text-sm" style={{ color: "#6B7280" }}>
+              <span className="font-bold" style={{ color: "#1F2937" }}>{filtered.length}</span> open roles
             </p>
           </div>
 
@@ -94,9 +94,9 @@ export default function Careers({ onNavigate }) {
                 onClick={() => setActiveDept(dept)}
                 className="shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-all"
                 style={{
-                  background: activeDept === dept ? "#2C9DD5" : "#FFFFFF",
-                  color: activeDept === dept ? "#FFFFFF" : "#495057",
-                  border: `1px solid ${activeDept === dept ? "#2C9DD5" : "#E5E8EB"}`,
+                  background: activeDept === dept ? "#1E88E5" : "#FFFFFF",
+                  color: activeDept === dept ? "#FFFFFF" : "#6B7280",
+                  border: `1px solid ${activeDept === dept ? "#1E88E5" : "#E2E8F0"}`,
                 }}
               >
                 {dept}
@@ -110,16 +110,16 @@ export default function Careers({ onNavigate }) {
               <div
                 key={job.id}
                 className="rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-shadow hover:shadow-lg"
-                style={{ background: "#FFFFFF", border: "1px solid #E5E8EB" }}
+                style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
               >
                 <div>
                   <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <h3 className="text-base font-bold" style={{ color: "#15191C" }}>{job.title}</h3>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EAF4FB", color: "#2C9DD5" }}>
+                    <h3 className="text-base font-bold" style={{ color: "#1F2937" }}>{job.title}</h3>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
                       {job.dept}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs flex-wrap" style={{ color: "#495057" }}>
+                  <div className="flex items-center gap-3 text-xs flex-wrap" style={{ color: "#6B7280" }}>
                     <span className="flex items-center gap-1">
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
@@ -137,8 +137,8 @@ export default function Careers({ onNavigate }) {
                   disabled={appliedJob === job.id}
                   className="shrink-0 px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
                   style={{
-                    background: appliedJob === job.id ? "#EAF8EC" : "#BA0D0B",
-                    color: appliedJob === job.id ? "#16a34a" : "#FFFFFF",
+                    background: appliedJob === job.id ? "#F0FDF4" : "#1E88E5",
+                    color: appliedJob === job.id ? "#16A34A" : "#FFFFFF",
                   }}
                 >
                   {appliedJob === job.id ? "✓ Applied" : "Apply Now"}
@@ -148,7 +148,7 @@ export default function Careers({ onNavigate }) {
           </div>
 
           {filtered.length === 0 && (
-            <div className="text-center py-14" style={{ color: "#495057" }}>
+            <div className="text-center py-14" style={{ color: "#6B7280" }}>
               No openings in this department right now. Check back soon!
             </div>
           )}
@@ -157,12 +157,12 @@ export default function Careers({ onNavigate }) {
 
       {/* ── CTA ── */}
       <section className="px-4 py-14 text-center">
-        <p className="text-base mb-2" style={{ color: "#15191C" }}>Don't see a role that fits?</p>
-        <p className="text-sm mb-6" style={{ color: "#495057" }}>We're always looking for great talent. Send us your resume anyway.</p>
+        <p className="text-base mb-2" style={{ color: "#1F2937" }}>Don't see a role that fits?</p>
+        <p className="text-sm mb-6" style={{ color: "#6B7280" }}>We're always looking for great talent. Send us your resume anyway.</p>
         <button
           onClick={() => onNavigate && onNavigate("contact")}
           className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-          style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1.5px solid #2C9DD5" }}
+          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
         >
           Send Your Resume
         </button>

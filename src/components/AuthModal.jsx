@@ -85,14 +85,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
       {/* Modal */}
       <div
         className="relative w-full max-w-md rounded-2xl overflow-hidden"
-        style={{ background: "#FFFFFF", boxShadow: "0 28px 56px rgba(21,25,28,0.25)" }}
+        style={{ background: "#FFFFFF", boxShadow: "0 28px 56px rgba(31,41,55,0.25)" }}
       >
         {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full z-10 transition-colors"
-          style={{ color: "#495057" }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#F2F4F6"}
+          style={{ color: "#6B7280" }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "#F1F5F9"}
           onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -103,13 +103,13 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
         <div className="p-8">
           {/* Logo */}
           <div className="text-center mb-6">
-            <span className="font-extrabold text-xl tracking-tight" style={{ color: "#15191C" }}>
-              property<span style={{ color: "#2C9DD5" }}>Brands</span>
+            <span className="font-extrabold text-xl tracking-tight" style={{ color: "#1F2937" }}>
+              property<span style={{ color: "#1E88E5" }}>Brands</span>
             </span>
           </div>
 
           {/* Tabs */}
-          <div className="flex rounded-xl p-1 mb-6" style={{ background: "#F2F4F6" }}>
+          <div className="flex rounded-xl p-1 mb-6" style={{ background: "#F1F5F9" }}>
             {["login", "signup"].map((m) => (
               <button
                 key={m}
@@ -117,8 +117,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
                 className="flex-1 py-2 rounded-lg text-sm font-bold transition-all capitalize"
                 style={{
                   background: mode === m ? "#FFFFFF" : "transparent",
-                  color: mode === m ? "#15191C" : "#495057",
-                  boxShadow: mode === m ? "0 1px 3px rgba(21,25,28,0.08)" : "none",
+                  color: mode === m ? "#1F2937" : "#6B7280",
+                  boxShadow: mode === m ? "0 1px 3px rgba(31,41,55,0.08)" : "none",
                 }}
               >
                 {m === "login" ? "Log In" : "Sign Up"}
@@ -126,10 +126,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
             ))}
           </div>
 
-          <h2 className="text-lg font-bold mb-1" style={{ color: "#15191C" }}>
+          <h2 className="text-lg font-bold mb-1" style={{ color: "#1F2937" }}>
             {mode === "login" ? "Welcome back" : "Create your account"}
           </h2>
-          <p className="text-sm mb-5" style={{ color: "#495057" }}>
+          <p className="text-sm mb-5" style={{ color: "#6B7280" }}>
             {mode === "login"
               ? "Log in to save properties, track inquiries, and more."
               : "Join PropertyBrands to save listings, schedule visits, and track your inquiries."}
@@ -140,18 +140,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
             onClick={handleGoogle}
             disabled={loading}
             className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl text-sm font-bold mb-4 transition-all"
-            style={{ background: "#FFFFFF", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-            onMouseEnter={(e) => e.currentTarget.style.borderColor = "#2C9DD5"}
-            onMouseLeave={(e) => e.currentTarget.style.borderColor = "#E5E8EB"}
+            style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = "#1E88E5"}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = "#E2E8F0"}
           >
             <GoogleIcon />
             Continue with Google
           </button>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px" style={{ background: "#E5E8EB" }} />
-            <span className="text-xs" style={{ color: "#495057" }}>or</span>
-            <div className="flex-1 h-px" style={{ background: "#E5E8EB" }} />
+            <div className="flex-1 h-px" style={{ background: "#E2E8F0" }} />
+            <span className="text-xs" style={{ color: "#6B7280" }}>or</span>
+            <div className="flex-1 h-px" style={{ background: "#E2E8F0" }} />
           </div>
 
           {/* Form */}
@@ -163,9 +163,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
                 value={form.fullName}
                 onChange={(e) => update("fullName", e.target.value)}
                 className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-                style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-                onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
-                onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
+                style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+                onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
               />
             )}
             <input
@@ -174,9 +174,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
               className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-              style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-              onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
-              onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
+              style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+              onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+              onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
             />
             {mode === "signup" && (
               <input
@@ -185,9 +185,9 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
                 value={form.phone}
                 onChange={(e) => update("phone", e.target.value)}
                 className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-                style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-                onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
-                onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
+                style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+                onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
               />
             )}
             <input
@@ -196,18 +196,18 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
               value={form.password}
               onChange={(e) => update("password", e.target.value)}
               className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
-              style={{ background: "#F7F8FA", border: "1.5px solid #E5E8EB", color: "#15191C" }}
-              onFocus={(e) => e.target.style.borderColor = "#2C9DD5"}
-              onBlur={(e) => e.target.style.borderColor = "#E5E8EB"}
+              style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+              onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+              onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
             />
 
             {error && (
-              <div className="text-sm rounded-xl px-4 py-3" style={{ background: "#FCEAEA", color: "#BA0D0B" }}>
+              <div className="text-sm rounded-xl px-4 py-3" style={{ background: "#FEE2E2", color: "#DC2626" }}>
                 {error}
               </div>
             )}
             {successMsg && (
-              <div className="text-sm rounded-xl px-4 py-3" style={{ background: "#EAF8EC", color: "#16a34a" }}>
+              <div className="text-sm rounded-xl px-4 py-3" style={{ background: "#F0FDF4", color: "#16A34A" }}>
                 {successMsg}
               </div>
             )}
@@ -216,24 +216,24 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
               type="submit"
               disabled={loading}
               className="w-full py-3 rounded-xl text-sm font-bold transition-all"
-              style={{ background: loading ? "#5C0B03" : "#BA0D0B", color: "#FFFFFF", opacity: loading ? 0.7 : 1 }}
+              style={{ background: loading ? "#1565C0" : "#1E88E5", color: "#FFFFFF", opacity: loading ? 0.7 : 1 }}
             >
               {loading ? "Please wait..." : mode === "login" ? "Log In" : "Create Account"}
             </button>
           </form>
 
-          <p className="text-center text-xs mt-5" style={{ color: "#495057" }}>
+          <p className="text-center text-xs mt-5" style={{ color: "#6B7280" }}>
             {mode === "login" ? (
               <>
                 Don't have an account?{" "}
-                <button onClick={() => setMode("signup")} className="font-semibold" style={{ color: "#2C9DD5" }}>
+                <button onClick={() => setMode("signup")} className="font-semibold" style={{ color: "#1E88E5" }}>
                   Sign up
                 </button>
               </>
             ) : (
               <>
                 Already have an account?{" "}
-                <button onClick={() => setMode("login")} className="font-semibold" style={{ color: "#2C9DD5" }}>
+                <button onClick={() => setMode("login")} className="font-semibold" style={{ color: "#1E88E5" }}>
                   Log in
                 </button>
               </>

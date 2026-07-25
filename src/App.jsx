@@ -67,7 +67,7 @@ function AppContent() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: "#FFFFFF", color: "#15191C" }}
+      style={{ background: "#FFFFFF", color: "#1F2937" }}
     >
       {/* ── Navbar always visible ── */}
       <Navbar onNavigate={navigate} currentPage={page} />
@@ -77,14 +77,14 @@ function AppContent() {
         className="px-4 py-2.5 overflow-x-auto"
         style={{
           background: "#FFFFFF",
-          borderBottom: "1px solid #E5E8EB",
+          borderBottom: "1px solid #E2E8F0",
           scrollbarWidth: "none",
         }}
       >
         <div className="max-w-7xl mx-auto flex items-center gap-2.5">
         <span
           className="text-[11px] font-bold uppercase tracking-widest shrink-0"
-          style={{ color: "#5B6670" }}
+          style={{ color: "#6B7280" }}
         >
           Pages:
         </span>
@@ -116,9 +116,9 @@ function AppContent() {
             onClick={() => navigate(p.id)}
             className="shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all"
             style={{
-              background: page === p.id ? "#2C9DD5" : "transparent",
-              color: page === p.id ? "#FFFFFF" : "#15191C",
-              border: `1px solid ${page === p.id ? "#2C9DD5" : "#E5E8EB"}`,
+              background: page === p.id ? "#1E88E5" : "transparent",
+              color: page === p.id ? "#FFFFFF" : "#1F2937",
+              border: `1px solid ${page === p.id ? "#1E88E5" : "#E2E8F0"}`,
             }}
           >
             {p.label}

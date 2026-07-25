@@ -74,17 +74,17 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
     <div style={{ background: "#FFFFFF" }}>
 
       {/* ── Hero ── */}
-      <section className="px-4 py-16 lg:py-20 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EAF4FB 100%)" }}>
+      <section className="px-4 py-16 lg:py-20 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#2C9DD5", border: "1px solid #2C9DD5" }}
+          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
         >
           Help Center
         </span>
-        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#15191C" }}>
+        <h1 className="text-3xl md:text-4xl font-extrabold" style={{ color: "#1F2937" }}>
           Everything You Need to Know
         </h1>
-        <p className="text-base mt-3 max-w-xl mx-auto" style={{ color: "#495057" }}>
+        <p className="text-base mt-3 max-w-xl mx-auto" style={{ color: "#6B7280" }}>
           Guides on buying, renting, home loans, EMIs, and RERA — written by our real estate experts to help you move forward with confidence.
         </p>
       </section>
@@ -98,9 +98,9 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
               onClick={() => { setActiveCategory(cat); setOpenSlug(null); }}
               className="px-4 py-1.5 rounded-full text-sm font-semibold border transition-all"
               style={{
-                background: activeCategory === cat ? "#2C9DD5" : "#FFFFFF",
-                color: activeCategory === cat ? "#FFFFFF" : "#495057",
-                borderColor: activeCategory === cat ? "#2C9DD5" : "#E5E8EB",
+                background: activeCategory === cat ? "#1E88E5" : "#FFFFFF",
+                color: activeCategory === cat ? "#FFFFFF" : "#6B7280",
+                borderColor: activeCategory === cat ? "#1E88E5" : "#E2E8F0",
               }}
             >
               {cat}
@@ -118,7 +118,7 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
             return (
             <div key={item.q} id={item.slug} className="rounded-2xl overflow-hidden"
               style={{
-                border: isHighlighted ? "none" : "1px solid #E5E8EB",
+                border: isHighlighted ? "none" : "1px solid #E2E8F0",
                 boxShadow: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.boxShadow : "none",
                 transition: ANCHOR_HIGHLIGHT_STYLE.transition,
                 scrollMarginTop: "100px",
@@ -130,18 +130,18 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
               >
                 <span className="flex items-center gap-3">
                   <span className="text-xl shrink-0">{item.icon}</span>
-                  <span className="text-sm md:text-base font-bold" style={{ color: "#15191C" }}>{item.q}</span>
+                  <span className="text-sm md:text-base font-bold" style={{ color: "#1F2937" }}>{item.q}</span>
                 </span>
                 <svg
                   className="w-4 h-4 shrink-0 transition-transform"
-                  style={{ color: "#2C9DD5", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                  style={{ color: "#1E88E5", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
                   fill="currentColor" viewBox="0 0 20 20"
                 >
                   <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
               </button>
               {isOpen && (
-                <div className="px-5 pb-5 text-sm leading-relaxed" style={{ color: "#495057", background: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.background : "#FFFFFF" }}>
+                <div className="px-5 pb-5 text-sm leading-relaxed" style={{ color: "#6B7280", background: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.background : "#FFFFFF" }}>
                   {item.a}
                 </div>
               )}
@@ -155,18 +155,18 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
       <section className="px-4 pb-16">
         <div
           className="max-w-3xl mx-auto rounded-2xl p-8 text-center"
-          style={{ background: "#F7F8FA", border: "1px solid #E5E8EB" }}
+          style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}
         >
-          <p className="text-lg font-bold" style={{ color: "#15191C" }}>Still have questions?</p>
-          <p className="text-sm mt-1 mb-5" style={{ color: "#495057" }}>
+          <p className="text-lg font-bold" style={{ color: "#1F2937" }}>Still have questions?</p>
+          <p className="text-sm mt-1 mb-5" style={{ color: "#6B7280" }}>
             Our team is happy to walk you through any part of the process.
           </p>
           <button
             onClick={() => onNavigate && onNavigate("contact")}
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#BA0D0B", color: "#FFFFFF" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#5C0B03"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#BA0D0B"}
+            style={{ background: "#1E88E5", color: "#FFFFFF" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
           >
             Talk to Our Team
           </button>
