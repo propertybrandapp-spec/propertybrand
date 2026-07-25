@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { submitPartnerApplication } from "../lib/agents";
+import { fetchPartnerTiers } from "../lib/siteContent";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -66,7 +67,8 @@ const BENEFITS = [
   },
 ];
 
-const TIERS = [
+// Shown until real tiers are added in the admin console ("Site Content" → Partner Tiers)
+const DEMO_TIERS = [
   {
     name: "Associate",
     color: "#6B7280",
@@ -288,6 +290,18 @@ function PartnerForm({ onNavigate }) {
 
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function ChannelPartner({ onNavigate }) {
+  const [tiers, setTiers] = useState(null); // null = loading
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchPartnerTiers().then(({ data }) => {
+      if (!cancelled) setTiers(data && data.length > 0 ? data : DEMO_TIERS);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const TIERS = tiers || DEMO_TIERS;
+
   return (
     <section style={{ background: "#FFFFFF" }} className="py-12 px-4">
       <div className="max-w-7xl mx-auto space-y-14">

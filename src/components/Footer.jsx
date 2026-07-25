@@ -325,8 +325,11 @@ export default function Footer({ onNavigate }) {
 
           {/* Brand column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
-            <div className="text-[#1F2937] font-extrabold text-xl tracking-tight mb-3">
-              property<span className="text-[#F59E0B]">Brands</span>
+            <div className="flex items-center gap-2 mb-3">
+              <img src="/logo-icon.webp" alt="PropertyBrands" className="w-8 h-8 rounded-full object-cover" />
+              <div className="text-[#1F2937] font-extrabold text-xl tracking-tight">
+                property<span className="text-[#F59E0B]">Brands</span>
+              </div>
             </div>
 
             <p className="text-slate-600 text-xs leading-relaxed mb-4">

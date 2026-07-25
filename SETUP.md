@@ -27,6 +27,8 @@ page and Admin form need (BHK, images, tags, amenities, etc).
 2. Paste the entire contents of `supabase/migration_002_listing_details.sql` and run it.
 3. It's safe to run even if you're not sure — every statement is `IF NOT EXISTS`, so it only adds what's missing and never touches existing data.
 
+Also run `supabase/migration_007_site_content.sql` the same way — it adds four tables (Partner Tiers, Client Reviews, Subscription Plans, Investment Opportunities) that back the "Site Content" section of the admin console. Until you add real rows there, the public site keeps showing its built-in demo content for these sections, same as listings do.
+
 ## Step 2 — Admin console
 
 The admin console is a **separate project/deployment** (not part of this

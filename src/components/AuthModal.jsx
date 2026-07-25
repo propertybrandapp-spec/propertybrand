@@ -103,9 +103,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }) {
         <div className="p-8">
           {/* Logo */}
           <div className="text-center mb-6">
-            <span className="font-extrabold text-xl tracking-tight" style={{ color: "#1F2937" }}>
-              property<span style={{ color: "#1E88E5" }}>Brands</span>
-            </span>
+            <img src="/logo.webp" alt="PropertyBrands" className="h-14 mx-auto object-contain" />
           </div>
 
           {/* Tabs */}

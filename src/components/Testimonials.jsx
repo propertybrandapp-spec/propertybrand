@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { fetchClientReviews } from "../lib/siteContent";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -9,7 +10,8 @@ const STATS = [
   { label: "Expert Advisors", value: 320, suffix: "+", icon: "👨‍💼" },
 ];
 
-const TESTIMONIALS = [
+// Shown until real reviews are added in the admin console ("Site Content" → Client Reviews)
+const DEMO_TESTIMONIALS = [
   {
     id: 1,
     name: "Rakesh Gupta",
@@ -124,7 +126,10 @@ const TESTIMONIALS = [
   },
 ];
 
-const CATEGORY_FILTERS = ["All", "Home Buyers", "Investors", "NRIs", "Developers", "Corporate Clients"];
+// Fallback category list shown while reviews are still loading; once loaded,
+// the categories shown are derived from the actual review data (see below),
+// so any category an admin types in "Site Content" → Client Reviews works.
+const DEFAULT_CATEGORY_FILTERS = ["All", "Home Buyers", "Investors", "NRIs", "Developers", "Corporate Clients"];
 
 const PARTNER_LOGOS = [
   { name: "SBI", color: "#1d4ed8", bg: "#eff6ff" },
@@ -255,6 +260,20 @@ function TestimonialCard({ t, featured = false }) {
 export default function Testimonials({ onNavigate }) {
   const [activeFilter, setActiveFilter] = useState("All");
   const [current, setCurrent] = useState(0);
+  const [reviews, setReviews] = useState(null); // null = loading
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchClientReviews().then(({ data }) => {
+      if (!cancelled) setReviews(data && data.length > 0 ? data : DEMO_TESTIMONIALS);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const TESTIMONIALS = reviews || DEMO_TESTIMONIALS;
+  const CATEGORY_FILTERS = reviews
+    ? ["All", ...new Set(TESTIMONIALS.map((t) => t.category).filter(Boolean))]
+    : DEFAULT_CATEGORY_FILTERS;
 
   const filtered =
     activeFilter === "All"

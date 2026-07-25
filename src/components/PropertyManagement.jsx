@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
+import { fetchSubscriptionPlans } from "../lib/siteContent";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -73,7 +74,8 @@ const SERVICES = [
   },
 ];
 
-const PLANS = [
+// Shown until real plans are added in the admin console ("Site Content" → Subscription Plans)
+const DEMO_PLANS = [
   {
     name: "Basic",
     price: "₹2,999",
@@ -240,6 +242,17 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
   const [activeTab, setActiveTab] = useState("All");
   const tabs = ["All", "Tenant", "Financial", "Maintenance", "Legal"];
   const highlighted = useScrollToAnchor(scrollTo, [navKey]);
+  const [plans, setPlans] = useState(null); // null = loading
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchSubscriptionPlans().then(({ data }) => {
+      if (!cancelled) setPlans(data && data.length > 0 ? data : DEMO_PLANS);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const PLANS = plans || DEMO_PLANS;
 
   const filtered = activeTab === "All" ? SERVICES : SERVICES.filter((s) => {
     const map = { Tenant: "Tenant Management", Financial: "Rent Collection", Maintenance: "Maintenance Coordination", Legal: "Legal & Documentation" };

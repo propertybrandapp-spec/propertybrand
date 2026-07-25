@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MagicLoansSection from "./MagicLoansSection";
 import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
+import { fetchInvestmentOpportunities } from "../lib/siteContent";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -20,7 +21,8 @@ const LOAN_SERVICES = [
   { icon: "⚡", label: "Fast Approval", desc: "Get approval within 48 hours" },
 ];
 
-const INVESTMENT_CORRIDORS = [
+// Shown until real opportunities are added in the admin console ("Site Content" → Investment Opportunities)
+const DEMO_INVESTMENT_CORRIDORS = [
   {
     id: 1,
     city: "Bhubaneswar",
@@ -600,6 +602,17 @@ function CorridorCard({ corridor }) {
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
   const highlighted = useScrollToAnchor(scrollTo, [navKey]);
+  const [corridors, setCorridors] = useState(null); // null = loading
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchInvestmentOpportunities().then(({ data }) => {
+      if (!cancelled) setCorridors(data && data.length > 0 ? data : DEMO_INVESTMENT_CORRIDORS);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const INVESTMENT_CORRIDORS = corridors || DEMO_INVESTMENT_CORRIDORS;
 
   const yieldSorted = [...INVESTMENT_CORRIDORS].filter((c) => c.rentalYield !== "—").sort((a, b) => parseFloat(b.rentalYield) - parseFloat(a.rentalYield));
   const commercialCorridors = INVESTMENT_CORRIDORS.filter((c) => c.type === "Commercial");
