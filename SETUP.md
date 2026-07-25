@@ -29,6 +29,8 @@ page and Admin form need (BHK, images, tags, amenities, etc).
 
 Also run `supabase/migration_007_site_content.sql` the same way — it adds four tables (Partner Tiers, Client Reviews, Subscription Plans, Investment Opportunities) that back the "Site Content" section of the admin console. Until you add real rows there, the public site keeps showing its built-in demo content for these sections, same as listings do.
 
+Then run `supabase/migration_008_seed_site_content.sql` — this copies that same built-in demo content (the tiers, reviews, plans, and investment corridors the public site was already showing) into those four tables as real rows, so the admin console shows and can edit the actual live content immediately instead of an empty list. It only inserts if a table is completely empty, so it's safe to run even if you've already added your own rows — it won't create duplicates or touch anything you've edited.
+
 ## Step 2 — Admin console
 
 The admin console is a **separate project/deployment** (not part of this
