@@ -377,7 +377,7 @@ export default function Navbar({ onNavigate }) {
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center">
             <button onClick={() => onNavigate && onNavigate("home")} className="flex items-center gap-2">
-              <img src="public/logo.webp" alt="PropertyBrands" className="h-10 w-auto object-contain" />
+              <img src="/logo.webp" alt="PropertyBrands" className="h-10 w-auto object-contain" />
             </button>
             <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} isOpen={cityOpen}
               onToggle={() => { setCityOpen(!cityOpen); setActiveDropdown(null); }} />
