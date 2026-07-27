@@ -23,7 +23,7 @@ const banks = [
     abbr: "LIC",
     bgColor: "bg-green-700",
     rate: "7.8%",
-    logo: "/banks/lic.png",
+    logo: "/banks/lic.svg",
   },
   {
     id: 3,
@@ -31,7 +31,7 @@ const banks = [
     abbr: "SBI",
     bgColor: "bg-sky-600",
     rate: "7.25%",
-    logo: "/banks/sbi.svg",
+    logo: "/banks/sbi.png",
   },
   {
     id: 4,
@@ -39,7 +39,7 @@ const banks = [
     abbr: "CAN",
     bgColor: "bg-blue-800",
     rate: "7.15%",
-    logo: "/banks/canara.png",
+    logo: "/banks/canara.webp",
   },
   {
     id: 5,
@@ -47,7 +47,7 @@ const banks = [
     abbr: "BoB",
     bgColor: "bg-red-700",
     rate: "7.2%",
-    logo: "/banks/bob.webp",
+    logo: "/banks/bob.svg",
   },
   {
     id: 6,
@@ -71,7 +71,7 @@ const banks = [
     abbr: "AXIS",
     bgColor: "bg-purple-700",
     rate: "7.5%",
-    logo: "/banks/axis.svg",
+    logo: "/banks/axis.webp",
   },
   {
     id: 9,
@@ -79,7 +79,7 @@ const banks = [
     abbr: "KMB",
     bgColor: "bg-red-600",
     rate: "7.6%",
-    logo: "/banks/kotak.webp",
+    logo: "/banks/kotak.svg",
   },
   {
     id: 10,
@@ -87,14 +87,9 @@ const banks = [
     abbr: "PNB",
     bgColor: "bg-indigo-700",
     rate: "7.3%",
-    logo: "/banks/pnb.png",
+    logo: "/banks/pnb.webp",
   },
 ];
-
-const infiniteBanks = [...banks, ...banks, ...banks];
-const logoUrl = (domain) => `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-
-const banks = rawBanks.map((b) => ({ ...b, logo: logoUrl(b.domain) }));
 
 // Duplicate banks array for seamless infinite loop
 const infiniteBanks = [...banks, ...banks, ...banks];
@@ -143,7 +138,7 @@ const BankCard = ({ bank, onSelect }) => {
             loading="lazy"
             draggable={false}
             onError={() => setImgError(true)}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain p-1"
           />
         ) : (
           <div
