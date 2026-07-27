@@ -387,9 +387,9 @@ export default function Navbar({ onNavigate }) {
         className="flex items-center py-1 transition hover:opacity-90"
       >
         <img
-          src="/logo.webp"
+          src="/cropped_logo.png"
           alt="PropertyBrands"
-          className="h-11 w-auto object-contain"
+          className="h-14 w-auto object-contain"
         />
       </button>
 
