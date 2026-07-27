@@ -15,7 +15,7 @@ const banks = [
     abbr: "L&T",
     bgColor: "bg-blue-900",
     rate: "7.9%",
-    logo: "/banks/lt.webp",
+    logo: "/banks/lt.png",
   },
   {
     id: 2,
@@ -23,7 +23,7 @@ const banks = [
     abbr: "LIC",
     bgColor: "bg-green-700",
     rate: "7.8%",
-    logo: "/banks/lic.svg",
+    logo: "/banks/lic.png",
   },
   {
     id: 3,
@@ -39,7 +39,7 @@ const banks = [
     abbr: "CAN",
     bgColor: "bg-blue-800",
     rate: "7.15%",
-    logo: "/banks/canara.webp",
+    logo: "/banks/canara.png",
   },
   {
     id: 5,
@@ -47,7 +47,7 @@ const banks = [
     abbr: "BoB",
     bgColor: "bg-red-700",
     rate: "7.2%",
-    logo: "/banks/bob.svg",
+    logo: "/banks/bob.png",
   },
   {
     id: 6,
@@ -55,7 +55,7 @@ const banks = [
     abbr: "HDFC",
     bgColor: "bg-red-800",
     rate: "7.35%",
-    logo: "/banks/hdfc.svg",
+    logo: "/banks/hdfc.png",
   },
   {
     id: 7,
@@ -71,7 +71,7 @@ const banks = [
     abbr: "AXIS",
     bgColor: "bg-purple-700",
     rate: "7.5%",
-    logo: "/banks/axis.webp",
+    logo: "/banks/axis.png",
   },
   {
     id: 9,
@@ -79,7 +79,7 @@ const banks = [
     abbr: "KMB",
     bgColor: "bg-red-600",
     rate: "7.6%",
-    logo: "/banks/kotak.svg",
+    logo: "/banks/kotak.png",
   },
   {
     id: 10,
@@ -87,7 +87,7 @@ const banks = [
     abbr: "PNB",
     bgColor: "bg-indigo-700",
     rate: "7.3%",
-    logo: "/banks/pnb.webp",
+    logo: "/banks/pnb.png",
   },
 ];
 
@@ -112,25 +112,25 @@ const BankCard = ({ bank, onSelect }) => {
       style={{ minWidth: "120px" }}
     >
       <div
-        className="
-          w-24
-          h-16
-          bg-white
-          rounded-xl
-          border
-          border-gray-200
-          shadow-sm
-          flex
-          items-center
-          justify-center
-          p-3
-          overflow-hidden
-          transition-all
-          duration-300
-          group-hover:shadow-lg
-          group-hover:-translate-y-1
-        "
-      >
+  className="
+    w-36
+    h-20
+    bg-white
+    rounded-xl
+    border
+    border-gray-200
+    shadow-sm
+    flex
+    items-center
+    justify-center
+    p-3
+    overflow-hidden
+    transition-all
+    duration-300
+    group-hover:shadow-lg
+    group-hover:-translate-y-1
+  "
+>
         {!imgError ? (
           <img
             src={bank.logo}
@@ -138,7 +138,7 @@ const BankCard = ({ bank, onSelect }) => {
             loading="lazy"
             draggable={false}
             onError={() => setImgError(true)}
-            className="w-full h-full object-contain p-1"
+            className="max-w-full max-h-full object-contain"
           />
         ) : (
           <div
