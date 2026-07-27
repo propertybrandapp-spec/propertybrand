@@ -373,38 +373,116 @@ export default function Navbar({ onNavigate }) {
   return (
     <header ref={navRef} className="sticky top-0 z-50">
       {/* Top Bar */}
-      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #1E88E5" }}>
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
-          <div className="flex items-center">
-            <button onClick={() => onNavigate && onNavigate("home")} className="flex items-center gap-2">
-              <img src="/logo.webp" alt="PropertyBrands" className="h-10 w-auto object-contain" />
-            </button>
-            <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} isOpen={cityOpen}
-              onToggle={() => { setCityOpen(!cityOpen); setActiveDropdown(null); }} />
-          </div>
-          <div className="hidden lg:flex items-center gap-4">
-            <button onClick={() => onNavigate && onNavigate("contact", "prime")} className="text-sm font-semibold transition" style={{ color: "#1E88E5" }}>PB Prime</button>
-            <div className="w-px h-4" style={{ background: "#1E88E5" }} />
-            {isLoggedIn ? (
-              <ClientAccountMenu onNavigate={onNavigate} />
-            ) : (
-              <button onClick={() => setAuthModalOpen(true)} className="text-sm font-semibold transition" style={{ color: "#1F2937" }}>Login</button>
-            )}
-            <button onClick={() => onNavigate && onNavigate("post-property")} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm transition"
-              style={{ background: "#1E88E5", color: "#FFFFFF" }}>
-              Post Property
-              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded" style={{ background: "#F59E0B", color: "#FFFFFF" }}>FREE</span>
-            </button>
-          </div>
-          <button className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5" onClick={() => setMobileOpen(!mobileOpen)}>
-            {[0,1,2].map((i) => (
-              <span key={i} className="block w-5 h-0.5 transition-all duration-300" style={{ background: "#1F2937",
-                transform: mobileOpen ? (i===0?"rotate(45deg) translateY(8px)":i===2?"rotate(-45deg) translateY(-8px)":""):"",
-                opacity: mobileOpen && i===1 ? 0 : 1 }} />
-            ))}
-          </button>
-        </div>
-      </div>
+      <div
+  className="bg-white border-b shadow-sm"
+  style={{ borderBottomColor: "#1E88E5" }}
+>
+  <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
+
+    {/* Left */}
+    <div className="flex items-center gap-6">
+
+      <button
+        onClick={() => onNavigate && onNavigate("home")}
+        className="flex items-center py-1 transition hover:opacity-90"
+      >
+        <img
+          src="/logo.webp"
+          alt="PropertyBrands"
+          className="h-11 w-auto object-contain"
+        />
+      </button>
+
+      <CityDropdown
+        selectedCity={selectedCity}
+        onSelect={handleCitySelect}
+        isOpen={cityOpen}
+        onToggle={() => {
+          setCityOpen(!cityOpen);
+          setActiveDropdown(null);
+        }}
+      />
+    </div>
+
+    {/* Right */}
+    <div className="hidden lg:flex items-center gap-6">
+
+      <button
+        onClick={() => onNavigate && onNavigate("contact", "prime")}
+        className="px-3 py-1 rounded-full text-sm font-semibold transition"
+        style={{
+          background: "#E3F2FD",
+          color: "#1E88E5",
+        }}
+      >
+        PB Prime
+      </button>
+
+      <div
+        className="w-px h-6"
+        style={{ background: "#D1D5DB" }}
+      />
+
+      {isLoggedIn ? (
+        <ClientAccountMenu onNavigate={onNavigate} />
+      ) : (
+        <button
+          onClick={() => setAuthModalOpen(true)}
+          className="text-sm font-semibold text-gray-800 hover:text-blue-600 transition"
+        >
+          Login
+        </button>
+      )}
+
+      <button
+        onClick={() => onNavigate && onNavigate("post-property")}
+        className="flex items-center gap-2 rounded-lg px-5 py-2 font-semibold shadow-sm transition hover:shadow-md"
+        style={{
+          background: "#1E88E5",
+          color: "#FFFFFF",
+        }}
+      >
+        Post Property
+
+        <span
+          className="rounded px-1.5 py-0.5 text-[9px] font-extrabold"
+          style={{
+            background: "#F59E0B",
+            color: "#FFFFFF",
+          }}
+        >
+          FREE
+        </span>
+      </button>
+
+    </div>
+
+    {/* Mobile Menu */}
+    <button
+      className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5"
+      onClick={() => setMobileOpen(!mobileOpen)}
+    >
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="block w-5 h-0.5 transition-all duration-300"
+          style={{
+            background: "#1F2937",
+            transform: mobileOpen
+              ? i === 0
+                ? "rotate(45deg) translateY(8px)"
+                : i === 2
+                ? "rotate(-45deg) translateY(-8px)"
+                : ""
+              : "",
+            opacity: mobileOpen && i === 1 ? 0 : 1,
+          }}
+        />
+      ))}
+    </button>
+
+  </div>
+</div>
 
       {/* Secondary Nav */}
       <nav className="hidden lg:block border-b" style={{ background: "#FFFFFF", borderColor: "#1E88E5" }}>
