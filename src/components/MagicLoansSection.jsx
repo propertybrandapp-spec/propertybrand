@@ -23,7 +23,7 @@ const banks = [
     abbr: "LIC",
     bgColor: "bg-green-700",
     rate: "7.8%",
-    logo: "/banks/lic.png",
+    logo: "/banks/lic.svg",
   },
   {
     id: 3,
@@ -31,7 +31,7 @@ const banks = [
     abbr: "SBI",
     bgColor: "bg-sky-600",
     rate: "7.25%",
-    logo: "/banks/sbi.png",
+    logo: "/banks/sbi.webp",
   },
   {
     id: 4,
@@ -63,7 +63,7 @@ const banks = [
     abbr: "ICICI",
     bgColor: "bg-orange-600",
     rate: "7.4%",
-    logo: "/banks/icici.png",
+    logo: "/banks/icici.webp",
   },
   {
     id: 8,
@@ -71,7 +71,7 @@ const banks = [
     abbr: "AXIS",
     bgColor: "bg-purple-700",
     rate: "7.5%",
-    logo: "/banks/axis.png",
+    logo: "/banks/axis.webp",
   },
   {
     id: 9,
@@ -79,7 +79,7 @@ const banks = [
     abbr: "KMB",
     bgColor: "bg-red-600",
     rate: "7.6%",
-    logo: "/banks/kotak.png",
+    logo: "/banks/kotak.webp",
   },
   {
     id: 10,
@@ -87,7 +87,7 @@ const banks = [
     abbr: "PNB",
     bgColor: "bg-indigo-700",
     rate: "7.3%",
-    logo: "/banks/pnb.png",
+    logo: "/banks/pnb.webp",
   },
 ];
 
