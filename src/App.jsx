@@ -73,59 +73,6 @@ function AppContent() {
       <Navbar onNavigate={navigate} currentPage={page} />
 
       {/* ── Dev nav strip (remove in production) ── */}
-      <div
-        className="px-4 py-2.5 overflow-x-auto"
-        style={{
-          background: "#FFFFFF",
-          borderBottom: "1px solid #E2E8F0",
-          scrollbarWidth: "none",
-        }}
-      >
-        <div className="max-w-7xl mx-auto flex items-center gap-2.5">
-        <span
-          className="text-[11px] font-bold uppercase tracking-widest shrink-0"
-          style={{ color: "#6B7280" }}
-        >
-          Pages:
-        </span>
-        {[
-          { id: "home", label: "Home" },
-          { id: "search", label: "Search Results" },
-          { id: "channel-partner", label: "Channel Partner" },
-          { id: "property-management", label: "Property Management" },
-          { id: "architects-design", label: "Architects & Design" },
-          { id: "investment-advisory", label: "Investment Advisory" },
-          { id: "agents", label: "Preferred Agents" },
-          { id: "about", label: "About Us" },
-          { id: "contact", label: "Contact Us" },
-          { id: "careers", label: "Careers" },
-          { id: "blog", label: "Blog" },
-          { id: "faq", label: "Help / FAQ" },
-          { id: "privacy-policy", label: "Privacy Policy" },
-          { id: "terms-conditions", label: "Terms & Conditions" },
-          { id: "disclaimer", label: "Disclaimer" },
-          { id: "sitemap", label: "Sitemap" },
-          { id: "profile", label: "My Profile" },
-          { id: "saved", label: "Saved Properties" },
-          { id: "inquiries", label: "My Inquiries" },
-          { id: "post-property", label: "Post Property" },
-          { id: "my-properties", label: "My Properties" },
-        ].map((p) => (
-          <button
-            key={p.id}
-            onClick={() => navigate(p.id)}
-            className="shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all"
-            style={{
-              background: page === p.id ? "#1E88E5" : "transparent",
-              color: page === p.id ? "#FFFFFF" : "#1F2937",
-              border: `1px solid ${page === p.id ? "#1E88E5" : "#E2E8F0"}`,
-            }}
-          >
-            {p.label}
-          </button>
-        ))}
-        </div>
-      </div>
 
       {/* ── Page rendering ── */}
       <main>
@@ -148,81 +95,43 @@ function AppContent() {
           <PropertyDetail key={navNonce} property={viewingProperty?.property} pool={viewingProperty?.pool} onNavigate={navigate} />
         )}
 
+        {page === "channel-partner" && <ChannelPartner onNavigate={navigate} />}
 
-        {/* Footer Links */}
+        {page === "property-management" && <PropertyManagement onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
+
+        {page === "architects-design" && <ArchitectsDesign onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
+
+        {page === "investment-advisory" && <InvestmentAdvisory onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
+
+        {page === "agents" && <PreferredAgents onNavigate={navigate} />}
 
         {page === "about" && <AboutUs onNavigate={navigate} />}
 
-{page === "contact" && (
-  <ContactUs
-    key={navNonce}
-    initialSubject={contactSubject}
-    onNavigate={navigate}
-  />
-)}
+        {page === "contact" && <ContactUs key={navNonce} onNavigate={navigate} initialSubject={contactSubject} />}
 
-{page === "careers" && <Careers onNavigate={navigate} />}
+        {page === "careers" && <Careers onNavigate={navigate} />}
 
-{page === "blog" && <BlogInsights onNavigate={navigate} />}
+        {page === "blog" && <BlogInsights onNavigate={navigate} />}
 
-{page === "faq" && (
-  <Faq
-    key={navNonce}
-    initialAnchor={pageAnchor}
-    onNavigate={navigate}
-  />
-)}
+        {page === "faq" && <Faq onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
 
-{page === "privacy-policy" && <PrivacyPolicy />}
+        {page === "privacy-policy" && <PrivacyPolicy onNavigate={navigate} />}
 
-{page === "terms-conditions" && <TermsConditions />}
+        {page === "terms-conditions" && <TermsConditions onNavigate={navigate} />}
 
-{page === "disclaimer" && <Disclaimer />}
+        {page === "disclaimer" && <Disclaimer onNavigate={navigate} />}
 
-{page === "sitemap" && <Sitemap onNavigate={navigate} />}
+        {page === "sitemap" && <Sitemap onNavigate={navigate} />}
 
-{page === "profile" && <ClientProfile onNavigate={navigate} />}
+        {page === "post-property" && <PostProperty key={navNonce} onNavigate={navigate} />}
 
-{page === "saved" && <SavedProperties onNavigate={navigate} />}
+        {page === "my-properties" && <MyProperties key={navNonce} onNavigate={navigate} />}
 
-{page === "inquiries" && <MyInquiries onNavigate={navigate} />}
+        {page === "profile" && <ClientProfile onNavigate={navigate} />}
 
-{page === "post-property" && <PostProperty onNavigate={navigate} />}
+        {page === "saved" && <SavedProperties onNavigate={navigate} />}
 
-{page === "my-properties" && <MyProperties onNavigate={navigate} />}
-
-{page === "architects-design" && (
-  <ArchitectsDesign
-    key={navNonce}
-    initialAnchor={pageAnchor}
-    onNavigate={navigate}
-  />
-)}
-
-{page === "investment-advisory" && (
-  <InvestmentAdvisory
-    key={navNonce}
-    initialAnchor={pageAnchor}
-    onNavigate={navigate}
-  />
-)}
-
-{page === "property-management" && (
-  <PropertyManagement
-    key={navNonce}
-    initialAnchor={pageAnchor}
-    onNavigate={navigate}
-  />
-)}
-
-{page === "channel-partner" && (
-  <ChannelPartner onNavigate={navigate} />
-)}
-
-{page === "agents" && (
-  <PreferredAgents onNavigate={navigate} />
-)}
-
+        {page === "inquiries" && <MyInquiries onNavigate={navigate} />}
       </main>
 
       {/* ── Footer always visible ── */}
