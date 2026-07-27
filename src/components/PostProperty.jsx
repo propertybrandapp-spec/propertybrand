@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../lib/AuthContext";
 import { createListing } from "../lib/listings";
 import { uploadToR2, validateImageFile } from "../lib/r2Upload";
+import { fetchListingFieldOptions } from "../lib/listingOptions";
 import AuthModal from "./AuthModal";
 
-const PROPERTY_TYPES = ["Apartment", "Villa", "Plot", "Commercial"];
-const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "4+ BHK"];
+// Fallback defaults — used until the dynamic options load (or if the
+// "Site Content" → Listing Options table is still empty). Admins can add
+// more of these from the admin console without a code change.
+const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land"];
+const DEFAULT_BHK_OPTIONS = ["1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK", "5+ BHK"];
+const DEFAULT_AMENITIES = ["Lift", "Parking", "Visitor Parking", "Power Backup", "Security", "24x7 Security", "CCTV", "Intercom", "Swimming Pool", "Gym", "Garden", "Club House", "Multipurpose Hall", "Indoor Games", "Kids Play Area", "Jogging Track", "Amphitheatre", "Yoga / Meditation Area", "Senior Citizen Sitout", "Cafeteria", "WiFi", "Housekeeping", "Fire Safety", "Rain Water Harvesting", "Sewage Treatment Plant", "Solar Water Heating", "EV Charging Point", "Water Softener Plant", "Vaastu Compliant", "Pet Friendly", "Gated Community"];
 const POSSESSION_OPTIONS = ["Ready to Move", "Under Construction"];
 
 const EMPTY_FORM = {
@@ -14,22 +19,26 @@ const EMPTY_FORM = {
   type: "Apartment",
   transactionType: "Buy",
   priceRaw: "",
-  bhk: "",
+  bhk: [],
+  amenities: [],
   area: "",
   status: "Ready to Move",
   description: "",
+  googleMapsLink: "",
+  videoUrls: [],
   images: [],
 };
 
 const inputStyle = { background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" };
 
-function Field({ label, children, required }) {
+function Field({ label, children, required, hint }) {
   return (
     <div>
       <label className="block text-xs font-bold uppercase tracking-wide mb-1.5" style={{ color: "#6B7280" }}>
         {label}{required && <span style={{ color: "#DC2626" }}> *</span>}
       </label>
       {children}
+      {hint && <p className="text-xs mt-1.5" style={{ color: "#6B7280" }}>{hint}</p>}
     </div>
   );
 }
@@ -42,11 +51,30 @@ function Select({ children, ...props }) {
   return <select {...props} className="w-full text-sm px-3.5 py-2.5 rounded-xl focus:outline-none focus:ring-2" style={inputStyle}>{children}</select>;
 }
 
+function Chip({ label, active, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+      style={{
+        background: active ? "#1E88E5" : "#F1F5F9",
+        color: active ? "#FFFFFF" : "#6B7280",
+        border: active ? "1px solid #1E88E5" : "1px solid #E2E8F0",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function PostProperty({ onNavigate }) {
   const { isLoggedIn } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [options, setOptions] = useState(null); // null = loading
+  const [videoDraft, setVideoDraft] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -55,6 +83,33 @@ export default function PostProperty({ onNavigate }) {
 
   function set(key, value) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchListingFieldOptions().then(({ data }) => { if (!cancelled) setOptions(data); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const PROPERTY_TYPES = options?.propertyTypes?.length ? options.propertyTypes : DEFAULT_PROPERTY_TYPES;
+  const BHK_OPTIONS = options?.bhkOptions?.length ? options.bhkOptions : DEFAULT_BHK_OPTIONS;
+  const AMENITIES = options?.amenities?.length ? options.amenities : DEFAULT_AMENITIES;
+
+  function toggleInArray(key, value) {
+    setForm((f) => ({
+      ...f,
+      [key]: f[key].includes(value) ? f[key].filter((v) => v !== value) : [...f[key], value],
+    }));
+  }
+
+  function addVideoUrl() {
+    if (!videoDraft.trim()) return;
+    set("videoUrls", [...form.videoUrls, videoDraft.trim()]);
+    setVideoDraft("");
+  }
+
+  function removeVideoUrl(url) {
+    set("videoUrls", form.videoUrls.filter((u) => u !== url));
   }
 
   async function handleFilesSelected(e) {
@@ -176,7 +231,7 @@ export default function PostProperty({ onNavigate }) {
               <TextInput value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="e.g. Patia, Bhubaneswar" required />
             </Field>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <Field label="Listing Type">
                 <Select value={form.transactionType} onChange={(e) => set("transactionType", e.target.value)}>
                   <option value="Buy">For Sale</option>
@@ -188,18 +243,25 @@ export default function PostProperty({ onNavigate }) {
                   {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                 </Select>
               </Field>
-              <Field label="BHK">
-                <Select value={form.bhk} onChange={(e) => set("bhk", e.target.value)}>
-                  <option value="">— N/A —</option>
-                  {BHK_OPTIONS.map((b) => <option key={b} value={b}>{b}</option>)}
-                </Select>
-              </Field>
               <Field label="Possession">
                 <Select value={form.status} onChange={(e) => set("status", e.target.value)}>
                   {POSSESSION_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
                 </Select>
               </Field>
             </div>
+
+            <Field label="BHK" hint="Select all that apply — e.g. a project offering both 2 BHK and 3 BHK units.">
+              <div className="flex flex-wrap gap-2">
+                {BHK_OPTIONS.map((b) => (
+                  <Chip key={b} label={b} active={form.bhk.includes(b)} onClick={() => toggleInArray("bhk", b)} />
+                ))}
+              </div>
+            </Field>
+
+            <Field label="Google Maps Location">
+              <TextInput value={form.googleMapsLink} onChange={(e) => set("googleMapsLink", e.target.value)}
+                placeholder="Paste a Google Maps share link (optional)" />
+            </Field>
 
             <div className="grid grid-cols-2 gap-4">
               <Field label={`Price (${form.transactionType === "Rent" ? "₹ / month" : "₹ total"})`} required>
@@ -221,6 +283,32 @@ export default function PostProperty({ onNavigate }) {
                 placeholder="Tell buyers or tenants a bit about the property..."
                 className="w-full text-sm px-3.5 py-2.5 rounded-xl focus:outline-none focus:ring-2 resize-none" style={inputStyle} />
             </Field>
+
+            <Field label="Amenities">
+              <div className="flex flex-wrap gap-2">
+                {AMENITIES.map((a) => (
+                  <Chip key={a} label={a} active={form.amenities.includes(a)} onClick={() => toggleInArray("amenities", a)} />
+                ))}
+              </div>
+            </Field>
+          </div>
+
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+            <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Videos</h2>
+            <p className="text-xs" style={{ color: "#6B7280" }}>Paste a link to a walkthrough video (YouTube, Vimeo, etc.) — optional.</p>
+            <div className="flex flex-wrap gap-2">
+              {form.videoUrls.map((url) => (
+                <span key={url} className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ background: "#F1F5F9", color: "#1F2937" }}>
+                  {url.length > 40 ? url.slice(0, 40) + "…" : url}
+                  <button type="button" onClick={() => removeVideoUrl(url)} className="font-bold" style={{ color: "#DC2626" }}>×</button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <TextInput value={videoDraft} onChange={(e) => setVideoDraft(e.target.value)} placeholder="https://youtube.com/watch?v=..."
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addVideoUrl(); } }} />
+              <button type="button" onClick={addVideoUrl} className="text-xs font-bold px-4 rounded-xl shrink-0" style={{ background: "#1E88E5", color: "#FFFFFF" }}>Add</button>
+            </div>
           </div>
 
           <div className="rounded-2xl p-6 space-y-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>

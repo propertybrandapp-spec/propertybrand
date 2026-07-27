@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { fetchPublicListings } from "../lib/listings";
+import { fetchListingFieldOptions } from "../lib/listingOptions";
 import { useSavedItems } from "../lib/SavedItemsContext";
 
-const PROPERTY_TYPES = ["Apartment", "Villa", "Plot", "Commercial"];
+// Fallback defaults for the filter sidebar — kept in sync with "Site
+// Content" → Listing Options in the admin console (see the fetch below).
+const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land"];
 const POSSESSION = ["Ready to Move", "Under Construction"];
 const POSTED_BY = ["Owner", "Builder", "Agent"];
-const AMENITIES_LIST = ["Lift", "Parking", "Power Backup", "Swimming Pool", "Gym", "Garden", "Security", "Club House"];
+const DEFAULT_AMENITIES_LIST = ["Lift", "Parking", "Visitor Parking", "Power Backup", "Security", "24x7 Security", "CCTV", "Intercom", "Swimming Pool", "Gym", "Garden", "Club House", "Multipurpose Hall", "Indoor Games", "Kids Play Area", "Jogging Track", "Amphitheatre", "Yoga / Meditation Area", "Senior Citizen Sitout", "Cafeteria", "WiFi", "Housekeeping", "Fire Safety", "Rain Water Harvesting", "Sewage Treatment Plant", "Solar Water Heating", "EV Charging Point", "Water Softener Plant", "Vaastu Compliant", "Pet Friendly", "Gated Community"];
 const SORT_OPTIONS = ["Relevance", "Price: Low to High", "Price: High to Low", "Newest First", "Area: Large to Small"];
-const BHK_OPTIONS = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "4+ BHK"];
-const TAGS_LIST = ["Luxury", "Affordable", "Gated Community", "Office", "Retail", "Industrial", "Co-living", "Student Accommodation"];
+const DEFAULT_BHK_OPTIONS = ["1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK", "5+ BHK"];
+const DEFAULT_TAGS_LIST = ["Luxury", "Affordable", "Gated Community", "Office", "Retail", "Industrial", "Co-living", "Student Accommodation", "New Launch", "Ready to Move", "RERA Approved", "Corner Plot", "Investment Opportunity"];
 
 // Default budget ceilings differ a lot between buying (crores) and renting (thousands/month)
 const BUDGET_MAX = { Buy: 100000000, Rent: 300000 };
@@ -369,6 +372,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
   const [filters, setFilters] = useState(() => buildFilters(initialFilters));
   const [listings, setListings] = useState(null); // null = still loading, [] = loaded but empty
   const [loadError, setLoadError] = useState("");
+  const [fieldOptions, setFieldOptions] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -377,8 +381,14 @@ export default function SearchResults({ initialFilters, onNavigate }) {
       setListings(data);
       if (error) setLoadError(error.message || "Couldn't load properties right now.");
     });
+    fetchListingFieldOptions().then(({ data }) => { if (!cancelled) setFieldOptions(data); });
     return () => { cancelled = true; };
   }, []);
+
+  const PROPERTY_TYPES = fieldOptions?.propertyTypes?.length ? fieldOptions.propertyTypes : DEFAULT_PROPERTY_TYPES;
+  const BHK_OPTIONS = fieldOptions?.bhkOptions?.length ? fieldOptions.bhkOptions : DEFAULT_BHK_OPTIONS;
+  const AMENITIES_LIST = fieldOptions?.amenities?.length ? fieldOptions.amenities : DEFAULT_AMENITIES_LIST;
+  const TAGS_LIST = fieldOptions?.tags?.length ? fieldOptions.tags : DEFAULT_TAGS_LIST;
 
   const ALL_PROPERTIES = listings || [];
   const isLoading = listings === null;
@@ -400,7 +410,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
     if (p.transactionType !== filters.transactionType) return false;
     if (p.priceRaw > filters.budget[1]) return false;
     if (filters.types.length && !filters.types.includes(p.type)) return false;
-    if (filters.bhk.length && !filters.bhk.includes(p.bhk)) return false;
+    if (filters.bhk.length && !filters.bhk.some(b => p.bhk.includes(b))) return false;
     if (filters.possession.length && !filters.possession.includes(p.status)) return false;
     if (filters.postedBy.length && !filters.postedBy.includes(p.postedBy)) return false;
     if (filters.verifiedOnly && !p.verified) return false;

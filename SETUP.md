@@ -31,6 +31,14 @@ Also run `supabase/migration_007_site_content.sql` the same way — it adds four
 
 Then run `supabase/migration_008_seed_site_content.sql` — this copies that same built-in demo content (the tiers, reviews, plans, and investment corridors the public site was already showing) into those four tables as real rows, so the admin console shows and can edit the actual live content immediately instead of an empty list. It only inserts if a table is completely empty, so it's safe to run even if you've already added your own rows — it won't create duplicates or touch anything you've edited.
 
+Also run `supabase/migration_009_site_settings.sql` — adds a Contact & Social settings panel (phone, email, address, social links) and an Office Locations list to the admin console, both seeded with the values the Footer/Contact Us page already showed.
+
+Finally, run `supabase/migration_010_listing_options.sql`. This changes how listings work in a few ways:
+- A listing's BHK is now a list instead of a single value, so one listing (e.g. a builder project) can be "2 BHK, 3 BHK" — existing listings' single BHK values carry over automatically.
+- Property types are no longer locked to a fixed list — admins add/remove them from "Site Content" → Listing Options instead.
+- Adds a Google Maps link and video links to each listing.
+- Seeds a much bigger default set of property types, BHK options, amenities, and tags than the site shipped with originally.
+
 ## Step 2 — Admin console
 
 The admin console is a **separate project/deployment** (not part of this

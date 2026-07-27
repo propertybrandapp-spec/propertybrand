@@ -115,7 +115,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
 
   function defaultMessage() {
     if (!property) return "";
-    const specs = [property.bhk, property.area, property.type].filter(Boolean).join(", ");
+    const specs = [property.bhkLabel, property.area, property.type].filter(Boolean).join(", ");
     if (intent === "site-visit") {
       return `I'd like to schedule a site visit for "${property.title}"${property.location ? ` in ${property.location}` : ""}${specs ? ` (${specs})` : ""}. Please share available slots.`;
     }
@@ -137,7 +137,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
     // interest text and link the lead to it directly (listingId) so it
     // shows up with full specs/photos wherever leads are reviewed.
     const interest = property
-      ? `${intent === "site-visit" ? "Site Visit Request" : SUBJECT_LABELS[form.subject] || "Property Inquiry"} — ${property.title}, ${property.location}, ${property.price}${property.bhk ? `, ${property.bhk}` : ""}${property.area ? `, ${property.area}` : ""} — ${form.message}`
+      ? `${intent === "site-visit" ? "Site Visit Request" : SUBJECT_LABELS[form.subject] || "Property Inquiry"} — ${property.title}, ${property.location}, ${property.price}${property.bhkLabel ? `, ${property.bhkLabel}` : ""}${property.area ? `, ${property.area}` : ""} — ${form.message}`
       : `${SUBJECT_LABELS[form.subject] || "General Inquiry"} — ${form.message}`;
 
     const { error } = await submitLead({

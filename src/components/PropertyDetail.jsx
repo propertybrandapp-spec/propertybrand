@@ -1,6 +1,27 @@
 import { useState } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 
+// Converts a YouTube/Vimeo share link into an embeddable iframe URL. Returns
+// null for anything else (Google Drive links, direct .mp4 links, etc.) so
+// those just render as a plain "Watch Video" link instead of a broken embed.
+function toEmbeddableVideoUrl(url) {
+  if (!url) return null;
+  const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/);
+  if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  return null;
+}
+
+// Falls back to a Google Maps search built from the location text if no
+// explicit share link was set on the listing — so there's always a usable
+// "View on Map" link either way.
+function googleMapsUrl(property) {
+  if (property.googleMapsLink) return property.googleMapsLink;
+  if (!property.location) return null;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.location)}`;
+}
+
 // ── Mini card used in the "Similar Properties" strip ─────────────────────────
 function SimilarCard({ property, onOpen }) {
   return (
@@ -106,13 +127,21 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
             {/* Title block (mobile-visible here, desktop shown in right rail too) */}
             <div className="mb-6 lg:hidden">
               <h1 className="text-xl font-extrabold" style={{ color: "#1F2937" }}>{property.title}</h1>
-              <p className="text-sm mt-1" style={{ color: "#6B7280" }}>{property.location}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
+                {googleMapsUrl(property) && (
+                  <a href={googleMapsUrl(property)} target="_blank" rel="noopener noreferrer"
+                    className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
+                    View on Map
+                  </a>
+                )}
+              </div>
             </div>
 
             {/* Quick facts */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
-                property.bhk && { label: "Configuration", value: property.bhk },
+                property.bhkLabel && { label: "Configuration", value: property.bhkLabel },
                 property.area && { label: "Area", value: property.area },
                 property.floor && { label: "Floor", value: property.floor },
                 property.facing && { label: "Facing", value: property.facing },
@@ -132,7 +161,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
             <div className="mb-8">
               <h2 className="text-base font-bold mb-2" style={{ color: "#1F2937" }}>About this property</h2>
               <p className="text-sm leading-relaxed" style={{ color: "#6B7280" }}>
-                {property.description || `This ${property.bhk ? property.bhk + " " : ""}${property.type?.toLowerCase() || "property"} in ${property.location} is listed ${property.transactionType === "Rent" ? "for rent" : "for sale"} by a ${property.postedBy?.toLowerCase() || "verified"} on PropertyBrands${property.area ? `, spanning ${property.area}` : ""}. Reach out below to schedule a visit or speak with our team for more details.`}
+                {property.description || `This ${property.bhkLabel ? property.bhkLabel + " " : ""}${property.type?.toLowerCase() || "property"} in ${property.location} is listed ${property.transactionType === "Rent" ? "for rent" : "for sale"} by a ${property.postedBy?.toLowerCase() || "verified"} on PropertyBrands${property.area ? `, spanning ${property.area}` : ""}. Reach out below to schedule a visit or speak with our team for more details.`}
               </p>
             </div>
 
@@ -149,6 +178,33 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                       {a}
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Videos */}
+            {property.videoUrls?.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Videos</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {property.videoUrls.map((url) => {
+                    const embedUrl = toEmbeddableVideoUrl(url);
+                    return embedUrl ? (
+                      <div key={url} className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                        <iframe src={embedUrl} title="Property video" className="w-full h-full" allowFullScreen />
+                      </div>
+                    ) : (
+                      <a key={url} href={url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline"
+                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1E88E5" }}>
+                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Watch Video
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -179,7 +235,15 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                     </span>
                   )}
                 </div>
-                <p className="text-sm mt-1" style={{ color: "#6B7280" }}>{property.location}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
+                  {googleMapsUrl(property) && (
+                    <a href={googleMapsUrl(property)} target="_blank" rel="noopener noreferrer"
+                      className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
+                      View on Map
+                    </a>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-baseline gap-2 mb-1">
