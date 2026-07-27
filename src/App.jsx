@@ -147,6 +147,82 @@ function AppContent() {
         {page === "property-detail" && (
           <PropertyDetail key={navNonce} property={viewingProperty?.property} pool={viewingProperty?.pool} onNavigate={navigate} />
         )}
+
+
+        {/* Footer Links */}
+
+        {page === "about" && <AboutUs onNavigate={navigate} />}
+
+{page === "contact" && (
+  <ContactUs
+    key={navNonce}
+    initialSubject={contactSubject}
+    onNavigate={navigate}
+  />
+)}
+
+{page === "careers" && <Careers onNavigate={navigate} />}
+
+{page === "blog" && <BlogInsights onNavigate={navigate} />}
+
+{page === "faq" && (
+  <Faq
+    key={navNonce}
+    initialAnchor={pageAnchor}
+    onNavigate={navigate}
+  />
+)}
+
+{page === "privacy-policy" && <PrivacyPolicy />}
+
+{page === "terms-conditions" && <TermsConditions />}
+
+{page === "disclaimer" && <Disclaimer />}
+
+{page === "sitemap" && <Sitemap onNavigate={navigate} />}
+
+{page === "profile" && <ClientProfile onNavigate={navigate} />}
+
+{page === "saved" && <SavedProperties onNavigate={navigate} />}
+
+{page === "inquiries" && <MyInquiries onNavigate={navigate} />}
+
+{page === "post-property" && <PostProperty onNavigate={navigate} />}
+
+{page === "my-properties" && <MyProperties onNavigate={navigate} />}
+
+{page === "architects-design" && (
+  <ArchitectsDesign
+    key={navNonce}
+    initialAnchor={pageAnchor}
+    onNavigate={navigate}
+  />
+)}
+
+{page === "investment-advisory" && (
+  <InvestmentAdvisory
+    key={navNonce}
+    initialAnchor={pageAnchor}
+    onNavigate={navigate}
+  />
+)}
+
+{page === "property-management" && (
+  <PropertyManagement
+    key={navNonce}
+    initialAnchor={pageAnchor}
+    onNavigate={navigate}
+  />
+)}
+
+{page === "channel-partner" && (
+  <ChannelPartner onNavigate={navigate} />
+)}
+
+{page === "agents" && (
+  <PreferredAgents onNavigate={navigate} />
+)}
+
       </main>
 
       {/* ── Footer always visible ── */}
