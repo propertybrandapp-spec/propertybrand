@@ -63,7 +63,15 @@ function PriceRange({ min, max, value, onChange, mode = "Buy" }) {
 }
 
 // ── Sidebar Filters ────────────────────────────────────────────────────────────
-function Sidebar({ filters, setFilters, onReset }) {
+function Sidebar({
+  filters,
+  setFilters,
+  onReset,
+  propertyTypes,
+  bhkOptions,
+  amenitiesList,
+  tagsList,
+}) {
   const toggle = (key, val) => {
     setFilters(f => ({
       ...f,
@@ -72,12 +80,12 @@ function Sidebar({ filters, setFilters, onReset }) {
   };
 
   const sections = [
-    { title: "Property Type", key: "types", options: PROPERTY_TYPES },
-    { title: "BHK", key: "bhk", options: BHK_OPTIONS },
+    { title: "Property Type", key: "types", options: propertyTypes },
+    { title: "BHK", key: "bhk", options: bhkOptions },
     { title: "Possession", key: "possession", options: POSSESSION },
-    { title: "Category", key: "tags", options: TAGS_LIST },
+    { title: "Category", key: "tags", options: tagsList },
     { title: "Posted By", key: "postedBy", options: POSTED_BY },
-    { title: "Amenities", key: "amenities", options: AMENITIES_LIST },
+    { title: "Amenities", key: "amenities", options: amenitiesList },
   ];
 
   return (
@@ -563,7 +571,15 @@ export default function SearchResults({ initialFilters, onNavigate }) {
 
         {/* ── Main Layout ── */}
         <div className="flex gap-6">
-          <Sidebar filters={filters} setFilters={setFilters} onReset={resetFilters} />
+          <Sidebar
+  filters={filters}
+  setFilters={setFilters}
+  onReset={resetFilters}
+  propertyTypes={PROPERTY_TYPES}
+  bhkOptions={BHK_OPTIONS}
+  amenitiesList={AMENITIES_LIST}
+  tagsList={TAGS_LIST}
+/>
 
           {/* Results */}
           <div className="flex-1 min-w-0">
@@ -647,7 +663,15 @@ export default function SearchResults({ initialFilters, onNavigate }) {
                 </div>
               </div>
               <div className="p-5">
-                <Sidebar filters={filters} setFilters={setFilters} onReset={resetFilters} />
+                <Sidebar
+  filters={filters}
+  setFilters={setFilters}
+  onReset={resetFilters}
+  propertyTypes={PROPERTY_TYPES}
+  bhkOptions={BHK_OPTIONS}
+  amenitiesList={AMENITIES_LIST}
+  tagsList={TAGS_LIST}
+/>
               </div>
               <div className="sticky bottom-0 px-5 py-4" style={{ background: "#FFFFFF", borderTop: "1px solid #E2E8F0" }}>
                 <button onClick={() => setShowMobileFilters(false)}
