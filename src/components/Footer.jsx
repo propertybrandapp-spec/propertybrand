@@ -9,6 +9,7 @@ import { fetchSiteSettings } from "../lib/siteContent";
 // external links (legal pages, social) use the href values below directly.
 // To point a link elsewhere, just change the value on the right.
 
+
 const SERVICES = [
   { label: "Buy Property", page: "search" },
   { label: "Rent Property", page: "search" },
@@ -402,71 +403,9 @@ export default function Footer({ onNavigate }) {
 
           {/* Brand column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
-
-          {/* Services */}
-<div>
-  <h4 className="font-bold text-[#1F2937] mb-4">Services</h4>
-
-  <div className="space-y-3">
-    {SERVICES.map((link) => (
-      <button
-        key={link.label}
-        onClick={() => onNavigate && onNavigate(link.page)}
-        className="block text-sm text-slate-600 hover:text-[#1E88E5] transition"
-      >
-        {link.label}
-      </button>
-    ))}
-  </div>
-</div>
-
-{/* Company */}
-<div>
-  <h4 className="font-bold text-[#1F2937] mb-4">Company</h4>
-
-  <div className="space-y-3">
-    {COMPANY.map((link) => (
-      <button
-        key={link.label}
-        onClick={() => onNavigate && onNavigate(link.page)}
-        className="block text-sm text-slate-600 hover:text-[#1E88E5] transition"
-      >
-        {link.label}
-      </button>
-    ))}
-  </div>
-</div>
-
-{/* Support */}
-<div>
-  <h4 className="font-bold text-[#1F2937] mb-4">Support</h4>
-
-  <div className="space-y-3">
-    {SUPPORT.map((link) => (
-      <button
-        key={link.label}
-        onClick={() => onNavigate && onNavigate(link.page)}
-        className="block text-sm text-slate-600 hover:text-[#1E88E5] transition"
-      >
-        {link.label}
-      </button>
-    ))}
-  </div>
-</div>
-
-{/* Contact */}
-<div>
-  <h4 className="font-bold text-[#1F2937] mb-4">Contact</h4>
-
-  <div className="space-y-3 text-sm text-slate-600">
-    <p>{info.phone}</p>
-    <p>{info.email}</p>
-    <p>{info.address}</p>
-  </div>
-</div>
-
             <div className="flex items-center gap-2 mb-3">
-              <img src="/cropped_logo.png " alt="PropertyBrands" className="h-12 w-auto object-cover" />
+              <img src="/cropped_logo.png" alt="PropertyBrands" className="h-12 w-auto object-cover" />
+              
             </div>
 
             <p className="text-slate-600 text-xs leading-relaxed mb-4">
@@ -492,7 +431,84 @@ export default function Footer({ onNavigate }) {
             </div>
           </div>
 
-          {/* Link columns */}
+          {/* Services */}
+<div>
+  <h4 className="font-bold text-[#1F2937] mb-4">Services</h4>
+
+  <div className="space-y-3">
+    {[
+      { label: "Buy Property", page: "search" },
+      { label: "Rent Property", page: "search" },
+      { label: "Sell Property", page: "search" },
+      { label: "Home Loans", page: "investment-advisory" },
+      { label: "Property Management", page: "property-management" },
+    ].map((item) => (
+      <button
+        key={item.label}
+        onClick={() => onNavigate?.(item.page)}
+        className="block text-sm text-slate-600 hover:text-[#1E88E5]"
+      >
+        {item.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+{/* Company */}
+<div>
+  <h4 className="font-bold text-[#1F2937] mb-4">Company</h4>
+
+  <div className="space-y-3">
+    {[
+      { label: "About Us", page: "about" },
+      { label: "Careers", page: "careers" },
+      { label: "Blogs", page: "blog" },
+      { label: "Contact", page: "contact" },
+    ].map((item) => (
+      <button
+        key={item.label}
+        onClick={() => onNavigate?.(item.page)}
+        className="block text-sm text-slate-600 hover:text-[#1E88E5]"
+      >
+        {item.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+{/* Support */}
+<div>
+  <h4 className="font-bold text-[#1F2937] mb-4">Support</h4>
+
+  <div className="space-y-3">
+    {[
+      { label: "Privacy Policy", page: "privacy-policy" },
+      { label: "Terms & Conditions", page: "terms-conditions" },
+      { label: "Disclaimer", page: "disclaimer" },
+      { label: "Sitemap", page: "sitemap" },
+    ].map((item) => (
+      <button
+        key={item.label}
+        onClick={() => onNavigate?.(item.page)}
+        className="block text-sm text-slate-600 hover:text-[#1E88E5]"
+      >
+        {item.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+{/* Contact */}
+<div>
+  <h4 className="font-bold text-[#1F2937] mb-4">Contact</h4>
+
+  <div className="space-y-3 text-sm text-slate-600">
+    <p>{info.phone}</p>
+    <p>{info.email}</p>
+    <p>{info.website}</p>
+    <p>{info.address}</p>
+  </div>
+</div>
           
         </div>
 
