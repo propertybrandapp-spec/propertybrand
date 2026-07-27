@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { submitLead } from "../lib/leads";
+import { fetchSiteSettings, fetchOfficeLocations } from "../lib/siteContent";
 
 // ── Contact Info ──────────────────────────────────────────────────────────────
 
-const CONTACT_INFO = [
+// Icon + label only — the actual values come from live settings (see the
+// component below), with these as sensible defaults until migration_009 has
+// been run / settings have been saved in the admin console.
+const CONTACT_ICON_DEFS = [
   {
+    key: "address",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -12,38 +17,46 @@ const CONTACT_INFO = [
       </svg>
     ),
     label: "Corporate Office",
-    value: "PropertyBrands Realty Services, Bhubaneswar, Odisha — 751001",
   },
   {
+    key: "phone",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V5z" />
       </svg>
     ),
     label: "Phone & WhatsApp",
-    value: "+91 94301 00000",
   },
   {
+    key: "email",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
     ),
     label: "Email",
-    value: "info@propertybrands.in",
   },
   {
+    key: "businessHours",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
     label: "Business Hours",
-    value: "Mon – Sat, 9:00 AM – 7:00 PM",
   },
 ];
 
-const OFFICES = [
+const DEFAULT_SETTINGS = {
+  address: "PropertyBrands Realty Services, Bhubaneswar, Odisha — 751001",
+  phone: "+91 94301 00000",
+  whatsapp: "+91 98765 00000",
+  email: "info@propertybrands.in",
+  businessHours: "Mon – Sat, 9:00 AM – 7:00 PM",
+};
+
+// Shown until real offices are added in the admin console ("Site Content" → Office Locations)
+const DEMO_OFFICES = [
   { city: "Bhubaneswar", address: "Main Road, Bhubaneswar, Odisha 751001", phone: "+91 94301 00000" },
   { city: "Delhi", address: "Connaught Place, New Delhi 110001", phone: "+91 98765 00001" },
   { city: "Bangalore", address: "MG Road, Bangalore, Karnataka 560001", phone: "+91 98765 00002" },
@@ -77,6 +90,28 @@ export default function ContactUs({ onNavigate, initialSubject }) {
   const subjectValue = isRichPayload ? initialSubject.subject : initialSubject;
   const property = isRichPayload ? initialSubject.property : null;
   const intent = isRichPayload ? initialSubject.intent : null; // "contact" | "site-visit"
+
+  const [settings, setSettings] = useState(null);
+  const [offices, setOffices] = useState(null); // null = loading
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchSiteSettings().then(({ data }) => { if (!cancelled) setSettings(data); });
+    fetchOfficeLocations().then(({ data }) => {
+      if (!cancelled) setOffices(data && data.length > 0 ? data : DEMO_OFFICES);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const info = { ...DEFAULT_SETTINGS, ...(settings || {}) };
+  const OFFICES = offices || DEMO_OFFICES;
+  const CONTACT_HREFS = {
+    address: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.address)}`,
+    phone: `tel:${(info.phone || "").replace(/[^\d+]/g, "")}`,
+    email: `mailto:${info.email}`,
+    businessHours: null,
+  };
+  const CONTACT_INFO = CONTACT_ICON_DEFS.map((def) => ({ ...def, value: info[def.key], href: CONTACT_HREFS[def.key] }));
 
   function defaultMessage() {
     if (!property) return "";
@@ -155,7 +190,19 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                 {item.icon}
               </div>
               <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#6B7280" }}>{item.label}</p>
-              <p className="text-sm font-semibold mt-1" style={{ color: "#1F2937" }}>{item.value}</p>
+              {item.href ? (
+                <a
+                  href={item.href}
+                  target={item.href.startsWith("http") ? "_blank" : undefined}
+                  rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="text-sm font-semibold mt-1 block hover:underline"
+                  style={{ color: "#1F2937" }}
+                >
+                  {item.value}
+                </a>
+              ) : (
+                <p className="text-sm font-semibold mt-1" style={{ color: "#1F2937" }}>{item.value}</p>
+              )}
             </div>
           ))}
         </div>
@@ -275,7 +322,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
               />
             </div>
             {OFFICES.map((office) => (
-              <div key={office.city} className="rounded-2xl p-5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+              <div key={office.id || office.city} className="rounded-2xl p-5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-bold" style={{ color: "#1F2937" }}>{office.city} Office</p>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
@@ -283,7 +330,11 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   </span>
                 </div>
                 <p className="text-xs" style={{ color: "#6B7280" }}>{office.address}</p>
-                <p className="text-xs mt-1 font-semibold" style={{ color: "#1F2937" }}>{office.phone}</p>
+                {office.phone && (
+                  <a href={`tel:${office.phone.replace(/[^\d+]/g, "")}`} className="text-xs mt-1 font-semibold block hover:underline" style={{ color: "#1F2937" }}>
+                    {office.phone}
+                  </a>
+                )}
               </div>
             ))}
           </div>

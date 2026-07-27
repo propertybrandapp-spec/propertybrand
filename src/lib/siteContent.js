@@ -103,3 +103,40 @@ export async function fetchInvestmentOpportunities() {
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizeInvestmentOpportunity), error: null };
 }
+
+function normalizeSiteSettings(row) {
+  if (!row) return null;
+  return {
+    phone: row.phone,
+    whatsapp: row.whatsapp,
+    email: row.email,
+    website: row.website_url,
+    address: row.corporate_address,
+    businessHours: row.business_hours,
+    facebook: row.facebook_url,
+    instagram: row.instagram_url,
+    linkedin: row.linkedin_url,
+    youtube: row.youtube_url,
+  };
+}
+
+// Singleton — always at most one row. Returns null if the migration hasn't
+// been run yet or the row was somehow deleted; callers fall back to their
+// own hardcoded defaults in that case (see Footer.jsx, ContactUs.jsx).
+export async function fetchSiteSettings() {
+  const { data, error } = await safeQuery(supabase.from("site_settings").select("*").limit(1));
+  if (error || !data || data.length === 0) return { data: null, error };
+  return { data: normalizeSiteSettings(data[0]), error: null };
+}
+
+function normalizeOfficeLocation(row) {
+  return { id: row.id, city: row.city, address: row.address, phone: row.phone };
+}
+
+export async function fetchOfficeLocations() {
+  const { data, error } = await safeQuery(
+    supabase.from("office_locations").select("*").eq("is_active", true).order("display_order", { ascending: true })
+  );
+  if (error) return { data: [], error };
+  return { data: (data || []).map(normalizeOfficeLocation), error: null };
+}
