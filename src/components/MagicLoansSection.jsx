@@ -8,19 +8,90 @@ import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 // service most tutorials reference) was shut down in Dec 2025. For a real
 // production app, swap `domain` for a hosted logo asset from each bank's own
 // brand kit (with permission) rather than hot-linking a third-party service.
-const rawBanks = [
-  { id: 1,  name: "L&T Financial Services", abbr: "L&T",    bgColor: "bg-blue-900",   rate: "7.9%",  domain: "ltfs.com" },
-  { id: 2,  name: "LIC Housing Finance",    abbr: "LIC",    bgColor: "bg-green-700",  rate: "7.8%",  domain: "lichousing.com" },
-  { id: 3,  name: "SBI",                    abbr: "SBI",    bgColor: "bg-sky-600",    rate: "7.25%", domain: "bank.sbi" },
-  { id: 4,  name: "Canara Bank",            abbr: "CAN",    bgColor: "bg-blue-800",   rate: "7.15%", domain: "canarabank.com" },
-  { id: 5,  name: "Bank of Baroda",         abbr: "BoB",    bgColor: "bg-red-700",    rate: "7.2%",  domain: "bankofbaroda.in" },
-  { id: 6,  name: "HDFC Bank",              abbr: "HDFC",   bgColor: "bg-red-800",    rate: "7.35%", domain: "hdfcbank.com" },
-  { id: 7,  name: "ICICI Bank",             abbr: "ICICI",  bgColor: "bg-orange-600", rate: "7.4%",  domain: "icicibank.com" },
-  { id: 8,  name: "Axis Bank",              abbr: "AXIS",   bgColor: "bg-purple-700", rate: "7.5%",  domain: "axisbank.com" },
-  { id: 9,  name: "Kotak Mahindra",         abbr: "KMB",    bgColor: "bg-red-600",    rate: "7.6%",  domain: "kotak.com" },
-  { id: 10, name: "Punjab National Bank",   abbr: "PNB",    bgColor: "bg-indigo-700", rate: "7.3%",  domain: "pnbindia.in" },
+const banks = [
+  {
+    id: 1,
+    name: "L&T Financial Services",
+    abbr: "L&T",
+    bgColor: "bg-blue-900",
+    rate: "7.9%",
+    logo: "/banks/lt.webp",
+  },
+  {
+    id: 2,
+    name: "LIC Housing Finance",
+    abbr: "LIC",
+    bgColor: "bg-green-700",
+    rate: "7.8%",
+    logo: "/banks/lic.png",
+  },
+  {
+    id: 3,
+    name: "State Bank of India",
+    abbr: "SBI",
+    bgColor: "bg-sky-600",
+    rate: "7.25%",
+    logo: "/banks/sbi.svg",
+  },
+  {
+    id: 4,
+    name: "Canara Bank",
+    abbr: "CAN",
+    bgColor: "bg-blue-800",
+    rate: "7.15%",
+    logo: "/banks/canara.png",
+  },
+  {
+    id: 5,
+    name: "Bank of Baroda",
+    abbr: "BoB",
+    bgColor: "bg-red-700",
+    rate: "7.2%",
+    logo: "/banks/bob.webp",
+  },
+  {
+    id: 6,
+    name: "HDFC Bank",
+    abbr: "HDFC",
+    bgColor: "bg-red-800",
+    rate: "7.35%",
+    logo: "/banks/hdfc.svg",
+  },
+  {
+    id: 7,
+    name: "ICICI Bank",
+    abbr: "ICICI",
+    bgColor: "bg-orange-600",
+    rate: "7.4%",
+    logo: "/banks/icici.png",
+  },
+  {
+    id: 8,
+    name: "Axis Bank",
+    abbr: "AXIS",
+    bgColor: "bg-purple-700",
+    rate: "7.5%",
+    logo: "/banks/axis.svg",
+  },
+  {
+    id: 9,
+    name: "Kotak Mahindra Bank",
+    abbr: "KMB",
+    bgColor: "bg-red-600",
+    rate: "7.6%",
+    logo: "/banks/kotak.webp",
+  },
+  {
+    id: 10,
+    name: "Punjab National Bank",
+    abbr: "PNB",
+    bgColor: "bg-indigo-700",
+    rate: "7.3%",
+    logo: "/banks/pnb.png",
+  },
 ];
 
+const infiniteBanks = [...banks, ...banks, ...banks];
 const logoUrl = (domain) => `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 
 const banks = rawBanks.map((b) => ({ ...b, logo: logoUrl(b.domain) }));
@@ -42,29 +113,56 @@ const BankCard = ({ bank, onSelect }) => {
           onSelect(bank);
         }
       }}
-      aria-label={`View ${bank.name} home loan offer, starting at ${bank.rate}`}
-      className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8303a] focus-visible:ring-offset-2"
-      style={{ minWidth: "110px" }}
+      className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group rounded-xl"
+      style={{ minWidth: "120px" }}
     >
-      <div className="w-20 h-16 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-center group-hover:shadow-md group-hover:-translate-y-0.5 transition-all overflow-hidden p-2.5">
+      <div
+        className="
+          w-24
+          h-16
+          bg-white
+          rounded-xl
+          border
+          border-gray-200
+          shadow-sm
+          flex
+          items-center
+          justify-center
+          p-3
+          overflow-hidden
+          transition-all
+          duration-300
+          group-hover:shadow-lg
+          group-hover:-translate-y-1
+        "
+      >
         {!imgError ? (
           <img
             src={bank.logo}
-            alt={`${bank.name} logo`}
-            className="max-w-full max-h-full object-contain"
+            alt={bank.name}
+            loading="lazy"
             draggable={false}
             onError={() => setImgError(true)}
+            className="w-full h-full object-contain"
           />
         ) : (
-          <div className={`w-14 h-12 rounded-lg flex items-center justify-center text-white text-sm font-extrabold tracking-wide ${bank.bgColor}`}>
+          <div
+            className={`w-14 h-12 rounded-lg flex items-center justify-center text-white text-sm font-extrabold tracking-wide ${bank.bgColor}`}
+          >
             {bank.abbr}
           </div>
         )}
       </div>
-      <span className="text-[11px] text-gray-500 font-medium text-center leading-tight">
-        Starts at{" "}
-        <span className="text-gray-800 font-bold">{bank.rate}</span>
-      </span>
+
+      <div className="text-center">
+        <p className="text-[11px] text-gray-600 leading-tight">
+          {bank.name}
+        </p>
+
+        <p className="text-[11px] font-bold text-gray-900">
+          Starts at {bank.rate}
+        </p>
+      </div>
     </div>
   );
 };
