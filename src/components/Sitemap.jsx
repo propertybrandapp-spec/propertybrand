@@ -4,43 +4,43 @@ const SITEMAP = [
   {
     heading: "Explore",
     links: [
-      { icon: "🏠", label: "Home", page: "home" },
-      { icon: "🔍", label: "Search Properties", page: "search" },
-      { icon: "📰", label: "Blog & Market Insights", page: "blog" },
+      { icon: "", label: "Home", page: "home" },
+      { icon: "", label: "Search Properties", page: "search" },
+      { icon: "", label: "Blog & Market Insights", page: "blog" },
     ],
   },
   {
     heading: "Services",
     links: [
-      { icon: "📈", label: "Investment Advisory & Home Loans", page: "investment-advisory" },
-      { icon: "🏢", label: "Property Management", page: "property-management" },
-      { icon: "🤝", label: "Channel Partner Program", page: "channel-partner" },
-      { icon: "🧑‍💼", label: "Preferred Agents", page: "agents" },
+      { icon: "", label: "Investment Advisory & Home Loans", page: "investment-advisory" },
+      { icon: "", label: "Property Management", page: "property-management" },
+      { icon: "", label: "Channel Partner Program", page: "channel-partner" },
+      { icon: "", label: "Preferred Agents", page: "agents" },
     ],
   },
   {
     heading: "Company",
     links: [
-      { icon: "📖", label: "About Us", page: "about" },
-      { icon: "💼", label: "Careers", page: "careers" },
-      { icon: "✉️", label: "Contact Us", page: "contact" },
-      { icon: "❓", label: "Help Center / FAQ", page: "faq" },
+      { icon: "", label: "About Us", page: "about" },
+      { icon: "", label: "Careers", page: "careers" },
+      { icon: "", label: "Contact Us", page: "contact" },
+      { icon: "", label: "Help Center / FAQ", page: "faq" },
     ],
   },
   {
     heading: "My Account",
     links: [
-      { icon: "👤", label: "My Profile", page: "profile" },
-      { icon: "❤️", label: "Saved Properties", page: "saved" },
-      { icon: "📋", label: "My Inquiries", page: "inquiries" },
+      { icon: "", label: "My Profile", page: "profile" },
+      { icon: "", label: "Saved Properties", page: "saved" },
+      { icon: "", label: "My Inquiries", page: "inquiries" },
     ],
   },
   {
     heading: "Legal",
     links: [
-      { icon: "🔒", label: "Privacy Policy", page: "privacy-policy" },
-      { icon: "📄", label: "Terms & Conditions", page: "terms-conditions" },
-      { icon: "⚠️", label: "Disclaimer", page: "disclaimer" },
+      { icon: "", label: "Privacy Policy", page: "privacy-policy" },
+      { icon: "", label: "Terms & Conditions", page: "terms-conditions" },
+      { icon: "", label: "Disclaimer", page: "disclaimer" },
     ],
   },
 ];

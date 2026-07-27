@@ -147,44 +147,6 @@ function AppContent() {
         {page === "property-detail" && (
           <PropertyDetail key={navNonce} property={viewingProperty?.property} pool={viewingProperty?.pool} onNavigate={navigate} />
         )}
-
-        {page === "channel-partner" && <ChannelPartner onNavigate={navigate} />}
-
-        {page === "property-management" && <PropertyManagement onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
-
-        {page === "architects-design" && <ArchitectsDesign onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
-
-        {page === "investment-advisory" && <InvestmentAdvisory onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
-
-        {page === "agents" && <PreferredAgents onNavigate={navigate} />}
-
-        {page === "about" && <AboutUs onNavigate={navigate} />}
-
-        {page === "contact" && <ContactUs key={navNonce} onNavigate={navigate} initialSubject={contactSubject} />}
-
-        {page === "careers" && <Careers onNavigate={navigate} />}
-
-        {page === "blog" && <BlogInsights onNavigate={navigate} />}
-
-        {page === "faq" && <Faq onNavigate={navigate} scrollTo={pageAnchor} navKey={navNonce} />}
-
-        {page === "privacy-policy" && <PrivacyPolicy onNavigate={navigate} />}
-
-        {page === "terms-conditions" && <TermsConditions onNavigate={navigate} />}
-
-        {page === "disclaimer" && <Disclaimer onNavigate={navigate} />}
-
-        {page === "sitemap" && <Sitemap onNavigate={navigate} />}
-
-        {page === "post-property" && <PostProperty key={navNonce} onNavigate={navigate} />}
-
-        {page === "my-properties" && <MyProperties key={navNonce} onNavigate={navigate} />}
-
-        {page === "profile" && <ClientProfile onNavigate={navigate} />}
-
-        {page === "saved" && <SavedProperties onNavigate={navigate} />}
-
-        {page === "inquiries" && <MyInquiries onNavigate={navigate} />}
       </main>
 
       {/* ── Footer always visible ── */}

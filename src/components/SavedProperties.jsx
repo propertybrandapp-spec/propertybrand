@@ -70,7 +70,7 @@ export default function SavedProperties({ onNavigate }) {
               color: tab === "properties" ? "#FFFFFF" : "#6B7280",
             }}
           >
-            ❤️ Properties <span className="text-xs opacity-80">({savedPropertyIds.size})</span>
+             Properties <span className="text-xs opacity-80">({savedPropertyIds.size})</span>
           </button>
           <button
             onClick={() => setTab("articles")}
@@ -80,7 +80,7 @@ export default function SavedProperties({ onNavigate }) {
               color: tab === "articles" ? "#FFFFFF" : "#6B7280",
             }}
           >
-            🔖 Articles <span className="text-xs opacity-80">({savedPostIds.size})</span>
+             Articles <span className="text-xs opacity-80">({savedPostIds.size})</span>
           </button>
         </div>
 
@@ -94,7 +94,7 @@ export default function SavedProperties({ onNavigate }) {
         ) : tab === "properties" ? (
           properties.length === 0 ? (
             <EmptyState
-              icon="❤️"
+              icon=""
               title="No saved properties yet"
               subtitle="Tap the heart icon on any listing to save it here."
               ctaLabel="Browse Properties"
@@ -135,7 +135,7 @@ export default function SavedProperties({ onNavigate }) {
         ) : (
           posts.length === 0 ? (
             <EmptyState
-              icon="🔖"
+              icon=""
               title="No saved articles yet"
               subtitle="Tap the bookmark icon on any article to save it here."
               ctaLabel="Browse Articles"

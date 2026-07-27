@@ -485,7 +485,23 @@ export default function Navbar({ onNavigate }) {
 </div>
 
       {/* Secondary Nav */}
-      
+      <nav className="hidden lg:block border-b" style={{ background: "#FFFFFF", borderColor: "#1E88E5" }}>
+        <div className="max-w-7xl mx-auto px-4">
+          <ul className="flex items-center">
+            {NAV_ITEMS.map((item,index) => (
+              <li key={item.label} className="relative" onMouseEnter={() => handleMouseEnter(item.label)} onMouseLeave={handleMouseLeave}>
+                <button className="flex items-center gap-1 px-4 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors border-b-2 -mb-px"
+                  style={{ color: activeDropdown === item.label ? "#1E88E5" : "#6B7280", borderBottomColor: activeDropdown === item.label ? "#1E88E5" : "transparent" }}>
+                  {item.label}
+                  {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded leading-none" style={{ background: "#F59E0B", color: "#FFFFFF" }}>{item.badge}</span>}
+                  <ChevronDown className={activeDropdown === item.label ? "rotate-180" : ""} />
+                </button>
+                <DropdownMenu item={item} isOpen={activeDropdown === item.label} index={index} onNavigate={onNavigate} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
 
       {/* Mobile Menu */}
       <div className={`lg:hidden border-t overflow-hidden transition-all duration-300 ${mobileOpen ? "max-h-[85vh] overflow-y-auto" : "max-h-0"}`}
