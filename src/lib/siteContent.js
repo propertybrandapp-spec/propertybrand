@@ -104,6 +104,55 @@ export async function fetchInvestmentOpportunities() {
   return { data: (data || []).map(normalizeInvestmentOpportunity), error: null };
 }
 
+function normalizeHeroContent(row) {
+  if (!row) return null;
+  return {
+    headlinePrefix: row.headline_prefix,
+    headlineHighlight: row.headline_highlight,
+    headlineSuffix: row.headline_suffix,
+    subtext: row.subtext,
+    searchTabs: Array.isArray(row.search_tabs) ? row.search_tabs : [],
+    quickCtas: Array.isArray(row.quick_ctas) ? row.quick_ctas : [],
+    promoBadge: row.promo_badge,
+    promoImage: row.promo_image,
+    promoEyebrow: row.promo_eyebrow,
+    promoHeading: row.promo_heading,
+    promoCtaLabel: row.promo_cta_label,
+    promoCtaLinkType: row.promo_cta_link_type,
+    promoCtaLinkValue: row.promo_cta_link_value,
+  };
+}
+
+// Singleton — always at most one row. Returns null if the migration hasn't
+// been run yet, so the caller falls back to its own hardcoded defaults
+// (see Hero.jsx), same pattern as fetchSiteSettings() below.
+export async function fetchHeroContent() {
+  const { data, error } = await safeQuery(supabase.from("hero_content").select("*").limit(1));
+  if (error || !data || data.length === 0) return { data: null, error };
+  return { data: normalizeHeroContent(data[0]), error: null };
+}
+
+function normalizeHeroCard(row) {
+  return {
+    id: row.id,
+    image: row.image_url,
+    backgroundColor: row.background_color,
+    title: row.title,
+    subtitle: row.subtitle,
+    cta: row.cta_label,
+    linkType: row.link_type,
+    linkValue: row.link_value,
+  };
+}
+
+export async function fetchHeroCards() {
+  const { data, error } = await safeQuery(
+    supabase.from("hero_cards").select("*").eq("is_active", true).order("display_order", { ascending: true })
+  );
+  if (error) return { data: [], error };
+  return { data: (data || []).map(normalizeHeroCard), error: null };
+}
+
 function normalizeSiteSettings(row) {
   if (!row) return null;
   return {

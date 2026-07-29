@@ -1,78 +1,185 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchHeroContent, fetchHeroCards } from "../lib/siteContent";
+import { fetchListingFieldOptions } from "../lib/listingOptions";
 
-const NAV_LINKS = [
-  { label: "Buy", hasDropdown: true },
-  { label: "Rent", hasDropdown: true },
-  { label: "Sell", hasDropdown: true },
-  { label: "Home Loans", hasDropdown: true },
-  { label: "Home Interiors", hasDropdown: true },
-  { label: "Investment Advisory", hasDropdown: true, badge: "NEW" },
-  { label: "Help", hasDropdown: true },
-];
+// ── Fallback content ──────────────────────────────────────────────────────────
+// Everything below is shown only until an admin sets real values in
+// Admin console → Site Content → "Hero Content" / "Hero Cards" / "Listing
+// Options". The moment a real hero_content row or hero_cards rows exist,
+// they fully replace this — same pattern used by Testimonials, ChannelPartner,
+// PropertyManagement, and InvestmentAdvisory (see src/lib/siteContent.js).
 
-const SEARCH_TABS = ["Buy", "Rent", "New Projects", "Plot", "Commercial", "Post Free Property Ad"];
-
-const PROPERTY_TYPES = [
-  "Flat +1",
-  "Apartment",
-  "Villa",
-  "Plot",
-  "Commercial",
-  "Office Space",
-  "Row House",
-];
-
-const BUDGET_RANGES = [
-  "Under ₹30 Lac",
-  "₹30 - 50 Lac",
-  "₹50 Lac - 1 Cr",
-  "₹1 - 1.5 Cr",
-  "₹1.5 - 2 Cr",
-  "Above ₹2 Cr",
-];
-
-const HERO_CARDS = [
-  {
-    id: 1,
-    count: "12,400+",
-    label: "Verified Properties",
-    image:
-      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop",
-    cta: "Explore",
-  },
-  {
-    id: 2,
-    count: "Featured",
-    label: "Projects",
-    image:
-      "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=300&fit=crop",
-    cta: "Explore",
-  },
-  {
-    id: 3,
-    count: "580+",
-    label: "Budget Homes",
-    image:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
-    cta: "Explore",
-  },
-];
-
-const PROMO_CARD = {
-  headline: "Discover Your Dream Property",
-  subtext: "Get exclusive access to premium listings & investment insights",
-  cta: "Talk to an Expert",
-  badge: "Free Consultation",
+const DEFAULT_HERO_CONTENT = {
+  headlinePrefix: "Start your",
+  headlineHighlight: "#DiscoverInvestGrow",
+  headlineSuffix: "Journey",
+  subtext: "Discover. Invest. Build. Grow. Compare. Discuss. Decide.",
+  searchTabs: ["Buy", "Rent", "New Projects", "Plot", "Commercial", "Post Free Property Ad"],
+  quickCtas: [
+    { label: "Explore Properties", linkType: "page", linkValue: "search" },
+    { label: "Schedule Site Visit", linkType: "page", linkValue: "contact" },
+    { label: "Calculate EMI", linkType: "page", linkValue: "investment-advisory" },
+    { label: "Talk to an Expert", linkType: "page", linkValue: "contact" },
+  ],
+  promoBadge: "Save 40%",
+  promoImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=200&fit=crop",
+  promoEyebrow: "Get Home Interiors from",
+  promoHeading: "Top Architects & Designers",
+  promoCtaLabel: "Check Offers",
+  promoCtaLinkType: "page",
+  promoCtaLinkValue: "architects-design",
 };
 
+const DEMO_HERO_CARDS = [
+  {
+    id: "demo-1",
+    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=260&fit=crop",
+    title: "12,400+",
+    subtitle: "Verified Listings",
+    cta: "Explore",
+    linkType: "page",
+    linkValue: "search",
+  },
+  {
+    id: "demo-2",
+    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=260&fit=crop",
+    title: "Projects",
+    subtitle: "Featured Developers",
+    cta: "Explore",
+    linkType: "page",
+    linkValue: "search",
+  },
+  {
+    id: "demo-3",
+    backgroundColor: "#1E88E5",
+    title: "Discover Your Dream Property",
+    subtitle: "Exclusive access to premium listings & investment insights",
+    cta: "Talk to an Expert",
+    linkType: "page",
+    linkValue: "contact",
+  },
+  {
+    id: "demo-4",
+    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=260&fit=crop",
+    title: "580+",
+    subtitle: "Budget Homes",
+    cta: "Explore",
+    linkType: "page",
+    linkValue: "search",
+  },
+];
+
+// Fallback lists for the two search-bar dropdowns — kept in sync with "Site
+// Content" → Listing Options in the admin console (see the fetch below).
+const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space"];
+const DEFAULT_BUDGET_RANGES = ["Under ₹30 Lac", "₹30 - 50 Lac", "₹50 Lac - 1 Cr", "₹1 - 1.5 Cr", "₹1.5 - 2 Cr", "Above ₹2 Cr"];
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+// Every editable link on the Hero (cards, quick CTAs, promo button) is either
+// an internal page key (handled through the app's onNavigate router) or a
+// plain external URL, chosen in the admin console via a link-type toggle.
+function goTo(onNavigate, linkType, linkValue) {
+  if (!linkValue) return;
+  if (linkType === "url") {
+    window.open(linkValue, "_blank", "noopener,noreferrer");
+  } else {
+    onNavigate && onNavigate(linkValue);
+  }
+}
+
+function HeroCard({ card, onNavigate }) {
+  const handleClick = () => goTo(onNavigate, card.linkType, card.linkValue);
+
+  if (card.backgroundColor) {
+    return (
+      <div
+        onClick={handleClick}
+        className="relative rounded-xl overflow-hidden group cursor-pointer shadow-sm hover:shadow-lg transition flex flex-col justify-between p-4 h-44"
+        style={{ background: card.backgroundColor }}
+      >
+        <div>
+          <p className="text-white font-bold text-base leading-tight mb-1">{card.title}</p>
+          {card.subtitle && <p className="text-white/85 text-xs">{card.subtitle}</p>}
+        </div>
+        {card.cta && (
+          <span
+            className="self-start bg-white text-xs font-bold px-4 py-2 rounded-full group-hover:bg-[#FEF3C7] transition"
+            style={{ color: card.backgroundColor }}
+          >
+            {card.cta}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div onClick={handleClick} className="relative rounded-xl overflow-hidden group cursor-pointer shadow-sm hover:shadow-lg transition">
+      <img
+        src={card.image}
+        alt={card.title || ""}
+        className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <div className="absolute bottom-0 left-0 p-3">
+        {card.title && <p className="text-white text-2xl font-extrabold leading-tight">{card.title}</p>}
+        {card.subtitle && <p className="text-white text-sm font-semibold">{card.subtitle}</p>}
+        {card.cta && (
+          <span className="inline-flex items-center gap-1 text-white text-xs mt-1 hover:underline font-medium">
+            {card.cta}
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Hero({ onNavigate }) {
-  const [activeTab, setActiveTab] = useState("Buy");
+  const [heroContent, setHeroContent] = useState(null); // null = still loading
+  const [heroCards, setHeroCards] = useState(null); // null = still loading
+  const [fieldOptions, setFieldOptions] = useState(null);
+
+  const [activeTab, setActiveTab] = useState(null);
   const [location, setLocation] = useState("");
-  const [propertyType, setPropertyType] = useState("Flat +1");
+  const [propertyType, setPropertyType] = useState(null);
   const [budget, setBudget] = useState("Budget");
   const [showPropertyDropdown, setShowPropertyDropdown] = useState(false);
   const [showBudgetDropdown, setShowBudgetDropdown] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchHeroContent().then(({ data }) => { if (!cancelled) setHeroContent(data || DEFAULT_HERO_CONTENT); });
+    fetchHeroCards().then(({ data }) => { if (!cancelled) setHeroCards(data && data.length > 0 ? data : DEMO_HERO_CARDS); });
+    fetchListingFieldOptions().then(({ data }) => { if (!cancelled) setFieldOptions(data); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const content = heroContent || DEFAULT_HERO_CONTENT;
+  const cards = heroCards || DEMO_HERO_CARDS;
+  const SEARCH_TABS = content.searchTabs?.length ? content.searchTabs : DEFAULT_HERO_CONTENT.searchTabs;
+  const QUICK_CTAS = content.quickCtas?.length ? content.quickCtas : DEFAULT_HERO_CONTENT.quickCtas;
+  const PROPERTY_TYPES = fieldOptions?.propertyTypes?.length ? fieldOptions.propertyTypes : DEFAULT_PROPERTY_TYPES;
+  const BUDGET_RANGES = fieldOptions?.budgetRanges?.length ? fieldOptions.budgetRanges : DEFAULT_BUDGET_RANGES;
+
+  // Derived instead of synced via effect — stays valid even if the admin
+  // changes the underlying lists after the page has already loaded.
+  const currentTab = activeTab && SEARCH_TABS.includes(activeTab) ? activeTab : SEARCH_TABS[0];
+  const currentPropertyType = propertyType && PROPERTY_TYPES.includes(propertyType) ? propertyType : PROPERTY_TYPES[0];
+
+  function handleSearch() {
+    if (currentTab === "Post Free Property Ad") {
+      onNavigate && onNavigate("post-property");
+      return;
+    }
+    onNavigate && onNavigate("search", {
+      transactionType: currentTab === "Rent" ? "Rent" : "Buy",
+      types: currentPropertyType ? [currentPropertyType] : [],
+    });
+  }
 
   return (
     <div className="font-sans bg-[#FFFFFF]">
@@ -84,13 +191,15 @@ export default function Hero({ onNavigate }) {
             <div className="flex-1 min-w-0">
               {/* Headline */}
               <h1 className="text-3xl md:text-4xl font-bold text-[#1F2937] mb-1 leading-tight">
-                Start your{" "}
-                <span className="text-[#1E88E5] font-extrabold">#DiscoverInvestGrow</span>{" "}
-                Journey
+                {content.headlinePrefix}{" "}
+                {content.headlineHighlight && (
+                  <span className="text-[#1E88E5] font-extrabold">{content.headlineHighlight}</span>
+                )}{" "}
+                {content.headlineSuffix}
               </h1>
-              <p className="text-[#6B7280] text-sm mb-6 font-medium tracking-wide">
-                Discover. Invest. Build. Grow. Compare. Discuss. Decide.
-              </p>
+              {content.subtext && (
+                <p className="text-[#6B7280] text-sm mb-6 font-medium tracking-wide">{content.subtext}</p>
+              )}
 
               {/* Search Tabs */}
               <div className="flex flex-wrap gap-0 mb-4 border-b border-[#E2E8F0]">
@@ -99,7 +208,7 @@ export default function Hero({ onNavigate }) {
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px ${
-                      activeTab === tab
+                      currentTab === tab
                         ? "text-[#1E88E5] border-[#1E88E5]"
                         : "text-[#6B7280] border-transparent hover:text-[#1E88E5]"
                     }`}
@@ -137,7 +246,7 @@ export default function Hero({ onNavigate }) {
                     <svg className="w-4 h-4 text-[#1E88E5]" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                     </svg>
-                    {propertyType}
+                    {currentPropertyType}
                     <svg className="w-3.5 h-3.5 text-[#6B7280]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -197,7 +306,10 @@ export default function Hero({ onNavigate }) {
                 </div>
 
                 {/* Search Button */}
-                <button className="flex items-center justify-center gap-2 bg-[#1E88E5] text-white px-6 py-3 text-sm font-bold hover:bg-[#1565C0] transition rounded-b-lg sm:rounded-b-none sm:rounded-r-lg whitespace-nowrap">
+                <button
+                  onClick={handleSearch}
+                  className="flex items-center justify-center gap-2 bg-[#1E88E5] text-white px-6 py-3 text-sm font-bold hover:bg-[#1565C0] transition rounded-b-lg sm:rounded-b-none sm:rounded-r-lg whitespace-nowrap"
+                >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
                   </svg>
@@ -206,131 +318,72 @@ export default function Hero({ onNavigate }) {
               </div>
 
               {/* Quick CTA Strip */}
-              <div className="flex flex-wrap gap-2 mt-4">
-                {["Explore Properties", "Schedule Site Visit", "Calculate EMI", "Talk to an Expert"].map((cta) => (
-                  <button
-                    key={cta}
-                    className="text-xs border border-[#E2E8F0] text-[#6B7280] px-3 py-1.5 rounded-full hover:border-[#1E88E5] hover:text-[#1E88E5] transition font-medium"
-                  >
-                    {cta}
-                  </button>
-                ))}
-              </div>
+              {QUICK_CTAS.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {QUICK_CTAS.map((cta, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goTo(onNavigate, cta.linkType, cta.linkValue)}
+                      className="text-xs border border-[#E2E8F0] text-[#6B7280] px-3 py-1.5 rounded-full hover:border-[#1E88E5] hover:text-[#1E88E5] transition font-medium"
+                    >
+                      {cta.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Sidebar Promo Card */}
-            <div className="w-full lg:w-64 shrink-0">
-              <div className="rounded-xl overflow-hidden border border-[#E2E8F0] shadow-md bg-gradient-to-br from-[#FFFFFF] to-white">
-                <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=200&fit=crop"
-                    alt="Interior design"
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="absolute top-2 left-2 bg-[#F59E0B] text-[#1F2937] text-[11px] font-bold px-2 py-0.5 rounded">
-                    Save 40%
+            {(content.promoImage || content.promoHeading) && (
+              <div className="w-full lg:w-64 shrink-0">
+                <div className="rounded-xl overflow-hidden border border-[#E2E8F0] shadow-md bg-gradient-to-br from-[#FFFFFF] to-white">
+                  <div className="relative">
+                    {content.promoImage && (
+                      <img src={content.promoImage} alt="" className="w-full h-40 object-cover" />
+                    )}
+                    {content.promoBadge && (
+                      <div className="absolute top-2 left-2 bg-[#F59E0B] text-[#1F2937] text-[11px] font-bold px-2 py-0.5 rounded">
+                        {content.promoBadge}
+                      </div>
+                    )}
                   </div>
-                </div>
-                <div className="p-4">
-                  <p className="text-xs text-[#6B7280] font-medium mb-0.5">Get Home Interiors from</p>
-                  <p className="text-sm font-bold text-[#1F2937] mb-3">Top Architects & Designers</p>
-                  <button onClick={() => onNavigate && onNavigate("architects-design")} className="w-full bg-[#1E88E5] text-white text-xs font-bold py-2 rounded hover:bg-[#1565C0] transition">
-                    Check Offers
-                  </button>
-                  <div className="flex justify-center gap-1.5 mt-3">
-                    {[0, 1, 2].map((i) => (
-                      <span key={i} className={`block w-1.5 h-1.5 rounded-full ${i === 1 ? "bg-[#1E88E5]" : "bg-[#E2E8F0]"}`} />
-                    ))}
+                  <div className="p-4">
+                    {content.promoEyebrow && <p className="text-xs text-[#6B7280] font-medium mb-0.5">{content.promoEyebrow}</p>}
+                    {content.promoHeading && <p className="text-sm font-bold text-[#1F2937] mb-3">{content.promoHeading}</p>}
+                    {content.promoCtaLabel && (
+                      <button
+                        onClick={() => goTo(onNavigate, content.promoCtaLinkType, content.promoCtaLinkValue)}
+                        className="w-full bg-[#1E88E5] text-white text-xs font-bold py-2 rounded hover:bg-[#1565C0] transition"
+                      >
+                        {content.promoCtaLabel}
+                      </button>
+                    )}
+                    <div className="flex justify-center gap-1.5 mt-3">
+                      {[0, 1, 2].map((i) => (
+                        <span key={i} className={`block w-1.5 h-1.5 rounded-full ${i === 1 ? "bg-[#1E88E5]" : "bg-[#E2E8F0]"}`} />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* ── Property Cards Grid ── */}
-          <div className="mt-10">
-            <h2 className="text-xl font-bold text-[#1F2937] mb-1">
-              We've got properties for everyone
-            </h2>
-            <div className="w-12 h-0.5 bg-[#1E88E5] mb-5 rounded-full" />
+          {cards.length > 0 && (
+            <div className="mt-10">
+              <h2 className="text-xl font-bold text-[#1F2937] mb-1">
+                We've got properties for everyone
+              </h2>
+              <div className="w-12 h-0.5 bg-[#1E88E5] mb-5 rounded-full" />
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Card 1 – Verified Listings */}
-              <div className="relative rounded-xl overflow-hidden group cursor-pointer shadow-sm hover:shadow-lg transition">
-                <img
-                  src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=260&fit=crop"
-                  alt="Owner Properties"
-                  className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-3">
-                  <p className="text-white text-2xl font-extrabold leading-tight">12,400+</p>
-                  <p className="text-white text-sm font-semibold">Verified Listings</p>
-                  <span className="inline-flex items-center gap-1 text-white text-xs mt-1 hover:underline font-medium">
-                    Explore
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              {/* Card 2 – Featured Projects */}
-              <div className="relative rounded-xl overflow-hidden group cursor-pointer shadow-sm hover:shadow-lg transition">
-                <img
-                  src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=260&fit=crop"
-                  alt="Featured Projects"
-                  className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-3">
-                  <p className="text-white text-2xl font-extrabold leading-tight">Projects</p>
-                  <p className="text-white text-sm font-semibold">Featured Developers</p>
-                  <span className="inline-flex items-center gap-1 text-white text-xs mt-1 hover:underline font-medium">
-                    Explore
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              {/* Card 3 – Promo */}
-              <div className="relative rounded-xl overflow-hidden bg-[#1E88E5] group cursor-pointer shadow-sm hover:shadow-lg transition flex flex-col justify-between p-4 h-44">
-                <div>
-                  <p className="text-white font-bold text-base leading-tight mb-1">
-                    Discover Your<br />Dream Property
-                  </p>
-                  <p className="text-white/85 text-xs">
-                    Exclusive access to premium listings & investment insights
-                  </p>
-                </div>
-                <button className="self-start bg-white text-[#1E88E5] text-xs font-bold px-4 py-2 rounded-full hover:bg-[#FEF3C7] transition">
-                  Talk to an Expert
-                </button>
-              </div>
-
-              {/* Card 4 – Budget Homes */}
-              <div className="relative rounded-xl overflow-hidden group cursor-pointer shadow-sm hover:shadow-lg transition">
-                <img
-                  src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=260&fit=crop"
-                  alt="Budget Homes"
-                  className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-3">
-                  <p className="text-white text-2xl font-extrabold leading-tight">580+</p>
-                  <p className="text-white text-sm font-semibold">Budget Homes</p>
-                  <span className="inline-flex items-center gap-1 text-white text-xs mt-1 hover:underline font-medium">
-                    Explore
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {cards.map((card) => (
+                  <HeroCard key={card.id} card={card} onNavigate={onNavigate} />
+                ))}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </div>

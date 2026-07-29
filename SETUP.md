@@ -39,6 +39,8 @@ Finally, run `supabase/migration_010_listing_options.sql`. This changes how list
 - Adds a Google Maps link and video links to each listing.
 - Seeds a much bigger default set of property types, BHK options, amenities, and tags than the site shipped with originally.
 
+Also run `supabase/migration_011_hero_content.sql` — makes the homepage Hero section (headline, search tabs, quick-action buttons, sidebar promo card, and the property card grid) fully admin-editable from "Site Content" → Hero Content / Hero Cards, and adds Budget Ranges as a fourth admin-editable list alongside property types/BHK/amenities/tags. Seeded with the exact content the Hero already showed, so nothing changes visually until you edit it.
+
 ## Step 2 — Admin console
 
 The admin console is a **separate project/deployment** (not part of this
