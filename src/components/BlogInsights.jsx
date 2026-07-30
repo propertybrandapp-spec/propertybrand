@@ -450,7 +450,7 @@ export default function BlogInsights({ onNavigate }) {
         className="w-full md:w-72 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-[#1F2937] shadow-sm transition-all focus:border-[#1E88E5] focus:outline-none focus:ring-4 focus:ring-sky-100"
       />
 
-      <button className="rounded-xl bg-[#1E88E5] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#990A09] hover:shadow-lg">
+      <button className="rounded-xl bg-[#1E88E5] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#1565C0] hover:shadow-lg">
         Subscribe
       </button>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
+import LocationMap from "./LocationMap";
 
 // Converts a YouTube/Vimeo share link into an embeddable iframe URL. Returns
 // null for anything else (Google Drive links, direct .mp4 links, etc.) so
@@ -13,11 +14,16 @@ function toEmbeddableVideoUrl(url) {
   return null;
 }
 
-// Falls back to a Google Maps search built from the location text if no
-// explicit share link was set on the listing — so there's always a usable
-// "View on Map" link either way.
-function googleMapsUrl(property) {
+// Prefers an explicit share link (e.g. pointing at a specific building
+// entrance/Street View); otherwise builds a directions URL straight from
+// the pinned coordinates; otherwise falls back to a text search on the
+// location string. Always returns *something* usable as long as either a
+// pin or a location string exists.
+function directionsUrl(property) {
   if (property.googleMapsLink) return property.googleMapsLink;
+  if (property.latitude != null && property.longitude != null) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${property.latitude},${property.longitude}`;
+  }
   if (!property.location) return null;
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.location)}`;
 }
@@ -129,10 +135,10 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               <h1 className="text-xl font-extrabold" style={{ color: "#1F2937" }}>{property.title}</h1>
               <div className="flex items-center gap-2 mt-1">
                 <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
-                {googleMapsUrl(property) && (
-                  <a href={googleMapsUrl(property)} target="_blank" rel="noopener noreferrer"
+                {directionsUrl(property) && (
+                  <a href={directionsUrl(property)} target="_blank" rel="noopener noreferrer"
                     className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
-                    View on Map
+                    Get Directions
                   </a>
                 )}
               </div>
@@ -178,6 +184,23 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                       {a}
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Location */}
+            {property.latitude != null && property.longitude != null && (
+              <div className="mb-8">
+                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Location</h2>
+                <LocationMap latitude={property.latitude} longitude={property.longitude} label={property.title} />
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
+                  {directionsUrl(property) && (
+                    <a href={directionsUrl(property)} target="_blank" rel="noopener noreferrer"
+                      className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
+                      Get Directions
+                    </a>
+                  )}
                 </div>
               </div>
             )}
@@ -237,10 +260,10 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
-                  {googleMapsUrl(property) && (
-                    <a href={googleMapsUrl(property)} target="_blank" rel="noopener noreferrer"
+                  {directionsUrl(property) && (
+                    <a href={directionsUrl(property)} target="_blank" rel="noopener noreferrer"
                       className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
-                      View on Map
+                      Get Directions
                     </a>
                   )}
                 </div>

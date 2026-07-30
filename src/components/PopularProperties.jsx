@@ -373,7 +373,7 @@ export default function PopularProperties({ onNavigate }) {
 
     <div className="flex flex-col sm:flex-row gap-3 shrink-0">
       
-      <button className="bg-[#1E88E5] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#990A09] transition-all duration-300 shadow-md hover:shadow-lg">
+      <button className="bg-[#1E88E5] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#1565C0] transition-all duration-300 shadow-md hover:shadow-lg">
         Schedule Site Visit
       </button>
 

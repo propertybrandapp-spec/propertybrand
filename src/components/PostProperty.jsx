@@ -3,6 +3,7 @@ import { useAuth } from "../lib/AuthContext";
 import { createListing } from "../lib/listings";
 import { uploadToR2, validateImageFile } from "../lib/r2Upload";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
+import LocationPicker from "./LocationPicker";
 import AuthModal from "./AuthModal";
 
 // Fallback defaults — used until the dynamic options load (or if the
@@ -25,6 +26,8 @@ const EMPTY_FORM = {
   status: "Ready to Move",
   description: "",
   googleMapsLink: "",
+  latitude: null,
+  longitude: null,
   videoUrls: [],
   images: [],
 };
@@ -258,7 +261,15 @@ export default function PostProperty({ onNavigate }) {
               </div>
             </Field>
 
-            <Field label="Google Maps Location">
+            <Field label="Pin Location on Map" hint="This powers the interactive map buyers/tenants see on your listing.">
+              <LocationPicker
+                latitude={form.latitude}
+                longitude={form.longitude}
+                onChange={({ latitude, longitude }) => setForm((f) => ({ ...f, latitude, longitude }))}
+              />
+            </Field>
+
+            <Field label="Google Maps Link (optional)" hint="Only needed if you want the &quot;Get Directions&quot; button to open a specific saved link instead of the pin above.">
               <TextInput value={form.googleMapsLink} onChange={(e) => set("googleMapsLink", e.target.value)}
                 placeholder="Paste a Google Maps share link (optional)" />
             </Field>

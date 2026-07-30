@@ -220,7 +220,7 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
         {/* Decorative blobs */}
         <div
           className="absolute top-0 right-1/3 w-48 h-48 rounded-full opacity-20 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #f87171 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, #D4AF37 0%, transparent 70%)" }}
         />
         <div
           className="absolute bottom-0 right-1/2 w-36 h-36 rounded-full opacity-15 pointer-events-none"
@@ -234,12 +234,12 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
             {/* Brand */}
             <div>
               <div className="flex items-center gap-0.5 mb-2">
-                <span className="text-[#e8303a] font-bold text-xl tracking-tight leading-none">propertyBrand</span>
-                <span className="font-bold text-xl tracking-tight leading-none text-gray-900">
+                <span className="text-[#1F2937] font-bold text-xl tracking-tight leading-none">property</span>
+                <span className="font-bold text-xl tracking-tight leading-none text-[#1E88E5]">
                   L
                   <span
                     className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full mx-0.5 align-middle"
-                    style={{ background: "#e8303a", marginBottom: "2px" }}
+                    style={{ background: "#0F2D52", marginBottom: "2px" }}
                   >
                     <span className="text-white font-black text-[10px]">O</span>
                   </span>
@@ -258,14 +258,14 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
                 </div>
                 <div className="flex items-center gap-1.5 text-sm text-gray-700">
                   <CheckCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span><span className="font-bold text-[#e8303a]">0%*</span> Processing Fee</span>
+                  <span><span className="font-bold text-[#1E88E5]">0%*</span> Processing Fee</span>
                 </div>
               </div>
             </div>
 
             {/* Bank slider */}
             <div>
-              <p className="text-[10px] font-semibold text-[#e8303a] tracking-widest uppercase mb-3">
+              <p className="text-[10px] font-semibold text-[#1E88E5] tracking-widest uppercase mb-3">
                 Our Banking Partners
               </p>
 
@@ -317,15 +317,15 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
             <div className="flex items-center gap-6 mt-4">
               <button
                 onClick={() => onNavigate && onNavigate("investment-advisory")}
-                className="text-[#e8303a] font-semibold text-sm flex items-center gap-1 hover:underline"
+                className="text-[#1E88E5] font-semibold text-sm flex items-center gap-1 hover:underline"
               >
                 Explore Bank Offers <span aria-hidden>→</span>
               </button>
               <button
                 className="px-6 py-2.5 rounded-full text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 style={{
-                  background: "linear-gradient(135deg, #e8303a, #c0202a)",
-                  boxShadow: "0 4px 14px rgba(232,48,58,0.4)",
+                  background: "linear-gradient(135deg, #0F2D52, #1E88E5)",
+                  boxShadow: "0 4px 14px rgba(30,136,229,0.35)",
                 }}
               >
                 Check Your Eligibility

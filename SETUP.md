@@ -41,6 +41,8 @@ Finally, run `supabase/migration_010_listing_options.sql`. This changes how list
 
 Also run `supabase/migration_011_hero_content.sql` — makes the homepage Hero section (headline, search tabs, quick-action buttons, sidebar promo card, and the property card grid) fully admin-editable from "Site Content" → Hero Content / Hero Cards, and adds Budget Ranges as a fourth admin-editable list alongside property types/BHK/amenities/tags. Seeded with the exact content the Hero already showed, so nothing changes visually until you edit it.
 
+Finally, run `supabase/migration_012_listing_geolocation.sql` — adds `latitude`/`longitude` to listings so a property can have a real pinned location (an actual interactive map, not just an outbound link). Both Post Property and the admin listing form now have a click-to-pin map with address search; the property detail page shows an embedded map wherever a pin has been set. The old `google_maps_link` field is kept as an optional override for the "Get Directions" button.
+
 ## Step 2 — Admin console
 
 The admin console is a **separate project/deployment** (not part of this

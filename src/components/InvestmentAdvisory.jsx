@@ -644,7 +644,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {LOAN_SERVICES.map((s) => (
               <a key={s.label} href={`#${s.label === "Eligibility Check" ? "eligibility-check" : s.label === "Loan Comparison" ? "loan-comparison" : s.label === "Fast Approval" ? "emi-calculator" : "emi-calculator"}`}
-                className="flex items-start gap-3 bg-[#FFFFFF] rounded-xl p-4 hover:bg-[#FEE2E2] hover:border-[#B91C1C] border border-transparent transition cursor-pointer group">
+                className="flex items-start gap-3 bg-[#FFFFFF] rounded-xl p-4 hover:bg-[#EFF6FF] hover:border-[#1E88E5] border border-transparent transition cursor-pointer group">
                 <span className="text-xl shrink-0 mt-0.5">{s.icon}</span>
                 <div>
                   <p className="text-sm font-bold text-[#1F2937] group-hover:text-[#1E88E5] transition">{s.label}</p>
