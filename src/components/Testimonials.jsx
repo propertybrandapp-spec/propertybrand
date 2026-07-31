@@ -132,14 +132,14 @@ const DEMO_TESTIMONIALS = [
 const DEFAULT_CATEGORY_FILTERS = ["All", "Home Buyers", "Investors", "NRIs", "Developers", "Corporate Clients"];
 
 const PARTNER_LOGOS = [
-  { name: "SBI", color: "#1d4ed8", bg: "#eff6ff" },
-  { name: "HDFC", color: "#dc2626", bg: "#fef2f2" },
-  { name: "ICICI", color: "#ea580c", bg: "#fff7ed" },
-  { name: "Axis", color: "#9f1239", bg: "#fff1f2" },
-  { name: "LIC HFL", color: "#15803d", bg: "#f0fdf4" },
-  { name: "RERA", color: "#7c3aed", bg: "#f5f3ff" },
-  { name: "MahaRERA", color: "#0369a1", bg: "#f0f9ff" },
-  { name: "NHB", color: "#b45309", bg: "#fffbeb" },
+  { name: "SBI", image: "/partners/sbi.svg" },
+  { name: "HDFC Bank", image: "/partners/hdfc.svg" },
+  { name: "ICICI Bank", image: "/partners/icici.svg" },
+  { name: "Axis Bank", image: "/banks/axis.webp" },
+  { name: "LIC Housing Finance", image: "/banks/lic.png" },
+  { name: "RERA", image: "/partners/rera.png" },
+  { name: "National Housing Bank", image: "/partners/nhb.webp"},
+  { name: "CREDAI", image: "/partners/credai.png" },
 ];
 
 // ── Animated Counter ──────────────────────────────────────────────────────────
@@ -422,17 +422,16 @@ export default function Testimonials({ onNavigate }) {
           <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
             {PARTNER_LOGOS.map((logo) => (
               <div
-                key={logo.name}
-                className="flex items-center justify-center rounded-xl border border-[#E2E8F0] py-4 px-2 hover:shadow-md transition cursor-pointer"
-                style={{ background: logo.bg }}
-              >
-                <span
-                  className="text-sm font-extrabold tracking-tight"
-                  style={{ color: logo.color }}
-                >
-                  {logo.name}
-                </span>
-              </div>
+  key={logo.name}
+  className="flex items-center justify-center bg-white rounded-xl border border-[#E2E8F0] h-24 p-4 hover:shadow-lg transition-all duration-300"
+>
+  <img
+    src={logo.image}
+    alt={logo.name}
+    className="max-h-12 max-w-full object-contain"
+    loading="lazy"
+  />
+</div>
             ))}
           </div>
         </div>
