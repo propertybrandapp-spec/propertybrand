@@ -136,7 +136,7 @@ const PARTNER_LOGOS = [
   { name: "HDFC Bank", image: "/partners/hdfc.svg" },
   { name: "ICICI Bank", image: "/partners/icici.svg" },
   { name: "Axis Bank", image: "/banks/axis.webp" },
-  { name: "LIC Housing Finance", image: "/banks/lic.png" },
+  { name: "LIC Housing Finance", image: "/banks/lic.svg" },
   { name: "RERA", image: "/partners/rera.png" },
   { name: "National Housing Bank", image: "/partners/nhb.webp"},
   { name: "CREDAI", image: "/partners/credai.png" },
