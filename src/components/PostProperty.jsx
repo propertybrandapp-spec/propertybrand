@@ -5,6 +5,7 @@ import { uploadToR2, validateImageFile } from "../lib/r2Upload";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
 import LocationPicker from "./LocationPicker";
 import AuthModal from "./AuthModal";
+import { Home, CheckCircle2 } from "lucide-react";
 
 // Fallback defaults — used until the dynamic options load (or if the
 // "Site Content" → Listing Options table is still empty). Admins can add
@@ -171,7 +172,9 @@ export default function PostProperty({ onNavigate }) {
   if (!isLoggedIn) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-        <span className="text-4xl mb-4">🏠</span>
+        <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
+          <Home className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+        </span>
         <p className="text-lg font-bold mb-2" style={{ color: "#1F2937" }}>Log in to post your property</p>
         <p className="text-sm mb-5 max-w-sm" style={{ color: "#6B7280" }}>
           Creating a free account lets you manage your listing and track inquiries from interested buyers or tenants.
@@ -188,7 +191,9 @@ export default function PostProperty({ onNavigate }) {
   if (submitted) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-        <span className="text-5xl mb-4">✅</span>
+        <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#F0FDF4" }}>
+          <CheckCircle2 className="w-8 h-8" style={{ color: "#16A34A" }} strokeWidth={2} />
+        </span>
         <p className="text-lg font-bold mb-2" style={{ color: "#1F2937" }}>Property submitted for review!</p>
         <p className="text-sm mb-6 max-w-sm" style={{ color: "#6B7280" }}>
           Our team will verify the details and publish it within 24 hours. You can track its status from your profile.

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { fetchPublicAgents } from "../lib/agents";
+import { Car, Users } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -208,7 +209,7 @@ function SiteVisitBanner() {
           </p>
 
           <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mt-2">
-            <span className="text-lg">🚕</span>
+            <Car className="w-[18px] h-[18px]" style={{ color: "#b45309" }} strokeWidth={2} />
 
             <p className="text-sm text-slate-700">
               Get{" "}
@@ -316,7 +317,9 @@ export default function PreferredAgents({ onNavigate }) {
             </div>
           ) : agents.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 text-center rounded-2xl" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-              <span className="text-4xl mb-3">🧑‍💼</span>
+              <span className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
+                <Users className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+              </span>
               <p className="text-sm font-bold" style={{ color: "#1F2937" }}>No preferred agents yet</p>
               <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Verified partner agents will appear here as they join.</p>
             </div>

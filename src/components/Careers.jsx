@@ -1,14 +1,15 @@
 import { useState } from "react";
+import { DollarSign, TrendingUp, Palmtree, GraduationCap, HeartPulse, PartyPopper } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const PERKS = [
-  { icon: "💰", title: "Competitive Pay", desc: "Industry-leading salaries plus performance bonuses and commission structures." },
-  { icon: "📈", title: "Growth Path", desc: "Clear career progression with mentorship and leadership development programs." },
-  { icon: "🏖️", title: "Work-Life Balance", desc: "Flexible hours, generous leave policy, and hybrid work options for most roles." },
-  { icon: "🎓", title: "Learning Budget", desc: "Annual budget for courses, certifications, and conferences relevant to your role." },
-  { icon: "🏥", title: "Health Coverage", desc: "Comprehensive medical insurance for you and your immediate family." },
-  { icon: "🎉", title: "Team Culture", desc: "Regular team outings, annual retreats, and a genuinely collaborative environment." },
+  { icon: DollarSign, title: "Competitive Pay", desc: "Industry-leading salaries plus performance bonuses and commission structures." },
+  { icon: TrendingUp, title: "Growth Path", desc: "Clear career progression with mentorship and leadership development programs." },
+  { icon: Palmtree, title: "Work-Life Balance", desc: "Flexible hours, generous leave policy, and hybrid work options for most roles." },
+  { icon: GraduationCap, title: "Learning Budget", desc: "Annual budget for courses, certifications, and conferences relevant to your role." },
+  { icon: HeartPulse, title: "Health Coverage", desc: "Comprehensive medical insurance for you and your immediate family." },
+  { icon: PartyPopper, title: "Team Culture", desc: "Regular team outings, annual retreats, and a genuinely collaborative environment." },
 ];
 
 const DEPARTMENTS = ["All Departments", "Sales", "Technology", "Marketing", "Operations", "Customer Success"];
@@ -64,7 +65,9 @@ export default function Careers({ onNavigate }) {
                 className="rounded-2xl p-6 transition-all duration-200 hover:-translate-y-1"
                 style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
               >
-                <span className="text-3xl block mb-3">{p.icon}</span>
+                <span className="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
+                  <p.icon className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                </span>
                 <h3 className="text-base font-bold mb-2" style={{ color: "#1F2937" }}>{p.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "#6B7280" }}>{p.desc}</p>
               </div>

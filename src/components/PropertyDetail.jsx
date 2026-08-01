@@ -250,7 +250,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 <div className="flex items-start justify-between gap-2">
                   <h1 className="text-lg font-extrabold leading-tight" style={{ color: "#1F2937" }}>{property.title}</h1>
                   {property.verified && (
-                    <span className="flex items-center gap-1 text-[10px] font-bold shrink-0" style={{ color: "#4ade80" }}>
+                    <span className="flex items-center gap-1 text-[10px] font-bold shrink-0" style={{ color: "#1E88E5" }}>
                       <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>

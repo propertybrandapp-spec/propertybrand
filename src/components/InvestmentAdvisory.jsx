@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import MagicLoansSection from "./MagicLoansSection";
 import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
 import { fetchInvestmentOpportunities } from "../lib/siteContent";
+import { CheckCircle2, FileText, Scale, Zap, Globe } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -15,10 +16,10 @@ const PARTNER_BANKS = [
 ];
 
 const LOAN_SERVICES = [
-  { icon: "✅", label: "Eligibility Check", desc: "Know your loan amount instantly" },
-  { icon: "📄", label: "Documentation", desc: "We handle all your paperwork" },
-  { icon: "⚖️", label: "Loan Comparison", desc: "Compare 40+ banks & NBFCs" },
-  { icon: "⚡", label: "Fast Approval", desc: "Get approval within 48 hours" },
+  { icon: CheckCircle2, label: "Eligibility Check", desc: "Know your loan amount instantly" },
+  { icon: FileText, label: "Documentation", desc: "We handle all your paperwork" },
+  { icon: Scale, label: "Loan Comparison", desc: "Compare 40+ banks & NBFCs" },
+  { icon: Zap, label: "Fast Approval", desc: "Get approval within 48 hours" },
 ];
 
 // Shown until real opportunities are added in the admin console ("Site Content" → Investment Opportunities)
@@ -645,7 +646,9 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
             {LOAN_SERVICES.map((s) => (
               <a key={s.label} href={`#${s.label === "Eligibility Check" ? "eligibility-check" : s.label === "Loan Comparison" ? "loan-comparison" : s.label === "Fast Approval" ? "emi-calculator" : "emi-calculator"}`}
                 className="flex items-start gap-3 bg-[#FFFFFF] rounded-xl p-4 hover:bg-[#EFF6FF] hover:border-[#1E88E5] border border-transparent transition cursor-pointer group">
-                <span className="text-xl shrink-0 mt-0.5">{s.icon}</span>
+                <span className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#EFF6FF" }}>
+                  <s.icon className="w-[18px] h-[18px]" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                </span>
                 <div>
                   <p className="text-sm font-bold text-[#1F2937] group-hover:text-[#1E88E5] transition">{s.label}</p>
                   <p className="text-[11px] text-slate-500 mt-0.5">{s.desc}</p>
@@ -784,8 +787,8 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
           {/* NRI Investment CTA */}
           <div id="nri-investments" style={{ ...sectionHighlight("nri-investments"), scrollMarginTop: "100px" }} className="bg-gradient-to-r from-[#1F2937] to-[#1a1a2e] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#1E88E5]/20 border border-[#1E88E5]/40 flex items-center justify-center text-2xl shrink-0">
-                🌍
+              <div className="w-12 h-12 rounded-full bg-[#1E88E5]/20 border border-[#1E88E5]/40 flex items-center justify-center shrink-0">
+                <Globe className="w-6 h-6 text-white" strokeWidth={2} />
               </div>
               <div>
                 <p className="text-white font-bold text-base">NRI Investment Services</p>

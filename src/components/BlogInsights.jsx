@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { fetchPublicPosts } from "../lib/blogPosts";
 import { useSavedItems } from "../lib/SavedItemsContext";
+import { Home, Key, TrendingUp, Building2, Sofa, BarChart3, ClipboardList, Landmark, PenLine, Search, DollarSign, Newspaper, Inbox } from "lucide-react";
 
 // ── Static content (categories for the filter UI, market news ticker) ───────
 
 const BLOG_CATEGORIES = [
-  { label: "All", icon: "🏠" },
-  { label: "Buying Guide", icon: "🔑" },
-  { label: "Investment Insights", icon: "📈" },
-  { label: "Project Reviews", icon: "🏢" },
-  { label: "Home & Lifestyle", icon: "🛋️" },
-  { label: "Market Reports", icon: "📊" },
+  { label: "All", icon: Home },
+  { label: "Buying Guide", icon: Key },
+  { label: "Investment Insights", icon: TrendingUp },
+  { label: "Project Reviews", icon: Building2 },
+  { label: "Home & Lifestyle", icon: Sofa },
+  { label: "Market Reports", icon: BarChart3 },
 ];
 
 const NEWS_ITEMS = [
@@ -57,12 +58,12 @@ const NEWS_ITEMS = [
 ];
 
 const QUICK_GUIDES = [
-  { icon: "📋", label: "How to Buy a Property", page: "faq" },
-  { icon: "🏦", label: "Apply for Home Loan", page: "faq" },
-  { icon: "📝", label: "Property Registration Process", page: "faq" },
-  { icon: "🔍", label: "What is RERA?", page: "faq" },
-  { icon: "💰", label: "How to Calculate EMI", page: "faq" },
-  { icon: "🏠", label: "How to Rent a Property", page: "faq" },
+  { icon: ClipboardList, label: "How to Buy a Property", page: "faq" },
+  { icon: Landmark, label: "Apply for Home Loan", page: "faq" },
+  { icon: PenLine, label: "Property Registration Process", page: "faq" },
+  { icon: Search, label: "What is RERA?", page: "faq" },
+  { icon: DollarSign, label: "How to Calculate EMI", page: "faq" },
+  { icon: Home, label: "How to Rent a Property", page: "faq" },
 ];
 
 // ── Blog Card ─────────────────────────────────────────────────────────────────
@@ -347,7 +348,7 @@ export default function BlogInsights({ onNavigate }) {
                   : "bg-[#FFFFFF] text-[#6B7280] border-[#E2E8F0] hover:border-[#1E88E5] hover:text-[#1E88E5]"
               }`}
             >
-              <span>{cat.icon}</span>
+              <cat.icon className="w-3.5 h-3.5" strokeWidth={2.5} />
               {cat.label}
             </button>
           ))}
@@ -361,7 +362,9 @@ export default function BlogInsights({ onNavigate }) {
           </div>
         ) : posts.length === 0 ? (
           <div className="rounded-2xl flex flex-col items-center justify-center py-20 text-center" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-            <span className="text-4xl mb-3">📰</span>
+            <span className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
+              <Newspaper className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+            </span>
             <p className="text-sm font-bold" style={{ color: "#1F2937" }}>No articles published yet</p>
             <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Check back soon for real estate news, guides & market insights.</p>
           </div>
@@ -385,7 +388,7 @@ export default function BlogInsights({ onNavigate }) {
 
             {filtered.length === 0 && (
               <div className="text-center py-16 text-[#6B7280]">
-                <p className="text-4xl mb-3">📭</p>
+                <Inbox className="w-10 h-10 mx-auto mb-3" strokeWidth={1.5} />
                 <p className="text-sm font-medium">No articles in this category yet.</p>
               </div>
             )}
@@ -404,7 +407,9 @@ export default function BlogInsights({ onNavigate }) {
                 onClick={() => onNavigate && onNavigate(g.page)}
                 className="flex items-center gap-3 p-3 rounded-xl border border-[#E2E8F0] hover:border-[#1E88E5] hover:bg-[#EFF6FF] transition group text-left w-full"
               >
-                <span className="text-xl shrink-0">{g.icon}</span>
+                <span className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#EFF6FF" }}>
+                  <g.icon className="w-[18px] h-[18px]" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                </span>
                 <span className="text-sm font-semibold text-[#1F2937] group-hover:text-[#1E88E5] transition leading-snug">
                   {g.label}
                 </span>

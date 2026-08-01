@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../lib/AuthContext";
+import { User, Tag, Heart, ClipboardList } from "lucide-react";
 
 export default function ClientAccountMenu({ onNavigate }) {
   const { profile, session, signOut } = useAuth();
@@ -67,10 +68,10 @@ export default function ClientAccountMenu({ onNavigate }) {
               </div>
             </div>
             {[
-              { label: "My Profile", page: "profile", icon: "👤" },
-              { label: "My Properties", page: "my-properties", icon: "🏷️" },
-              { label: "Saved Properties", page: "saved", icon: "❤️" },
-              { label: "My Inquiries", page: "inquiries", icon: "📋" },
+              { label: "My Profile", page: "profile", icon: User },
+              { label: "My Properties", page: "my-properties", icon: Tag },
+              { label: "Saved Properties", page: "saved", icon: Heart },
+              { label: "My Inquiries", page: "inquiries", icon: ClipboardList },
             ].map((item) => (
               <button
                 key={item.label}
@@ -80,7 +81,7 @@ export default function ClientAccountMenu({ onNavigate }) {
                 onMouseEnter={(e) => e.currentTarget.style.background = "#F1F5F9"}
                 onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
               >
-                <span>{item.icon}</span>
+                <item.icon className="w-4 h-4" style={{ color: "#6B7280" }} strokeWidth={2} />
                 {item.label}
               </button>
             ))}

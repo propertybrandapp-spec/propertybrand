@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../lib/AuthContext";
 import { fetchMyListings, deleteListing } from "../lib/listings";
+import { Tag, Home } from "lucide-react";
 
 const STATUS_STYLES = {
   Live: { bg: "#F0FDF4", color: "#16A34A", note: "Live on the public site." },
@@ -47,7 +48,9 @@ export default function MyProperties({ onNavigate }) {
   if (!isLoggedIn) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-        <span className="text-4xl mb-4">🏷️</span>
+        <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
+          <Tag className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+        </span>
         <p className="text-lg font-bold mb-2" style={{ color: "#1F2937" }}>Log in to see your properties</p>
         <p className="text-sm mb-5" style={{ color: "#6B7280" }}>Track the properties you've posted and their review status.</p>
         <button onClick={() => onNavigate && onNavigate("home")} className="px-6 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
@@ -76,7 +79,9 @@ export default function MyProperties({ onNavigate }) {
           </div>
         ) : listings.length === 0 ? (
           <div className="rounded-2xl flex flex-col items-center justify-center py-20 text-center" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-            <span className="text-5xl mb-4">🏠</span>
+            <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
+              <Home className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+            </span>
             <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>You haven't posted any properties yet</p>
             <p className="text-sm mb-5" style={{ color: "#6B7280" }}>List your property for free — it takes just a couple of minutes.</p>
             <button onClick={() => onNavigate && onNavigate("post-property")} className="px-6 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#1E88E5", color: "#FFFFFF" }}>

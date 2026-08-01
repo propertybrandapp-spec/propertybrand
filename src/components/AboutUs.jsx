@@ -1,3 +1,5 @@
+import { Target, Handshake, Lightbulb, ShieldCheck } from "lucide-react";
+
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const STATS = [
@@ -9,22 +11,22 @@ const STATS = [
 
 const VALUES = [
   {
-    icon: "🎯",
+    icon: Target,
     title: "Transparency First",
     desc: "Every listing is verified, every price is real, and every commitment is documented. No hidden charges, no surprises.",
   },
   {
-    icon: "🤝",
+    icon: Handshake,
     title: "Client-Centric Approach",
     desc: "We don't sell properties — we solve housing and investment problems. Your goals shape every recommendation we make.",
   },
   {
-    icon: "💡",
+    icon: Lightbulb,
     title: "Technology-Driven",
     desc: "AI-powered property discovery, data-backed investment advisory, and digital-first transaction support at every step.",
   },
   {
-    icon: "🛡️",
+    icon: ShieldCheck,
     title: "RERA Compliant",
     desc: "Every project we list and every transaction we facilitate fully complies with RERA regulations across all states we operate in.",
   },
@@ -137,7 +139,9 @@ export default function AboutUs({ onNavigate }) {
                 className="rounded-2xl p-6 transition-all duration-200 hover:-translate-y-1"
                 style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
               >
-                <span className="text-3xl block mb-3">{v.icon}</span>
+                <span className="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
+                  <v.icon className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                </span>
                 <h3 className="text-sm font-bold mb-2" style={{ color: "#1F2937" }}>{v.title}</h3>
                 <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>{v.desc}</p>
               </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../lib/AuthContext";
 import { supabase, safeQuery } from "../lib/supabaseClient";
+import { ClipboardList } from "lucide-react";
 
 const STAGE_STYLES = {
   New: { color: "#1E88E5", bg: "#EFF6FF" },
@@ -72,7 +73,9 @@ export default function MyInquiries({ onNavigate }) {
           </div>
         ) : inquiries.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-            <span className="text-5xl mb-4">📋</span>
+            <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
+              <ClipboardList className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+            </span>
             <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>No inquiries yet</p>
             <p className="text-sm mb-5" style={{ color: "#6B7280" }}>Submit an inquiry from any listing or the contact form to see it here.</p>
             <button

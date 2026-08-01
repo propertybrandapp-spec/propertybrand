@@ -189,7 +189,7 @@ function PropertyCardList({ property, onOpen, onNavigate }) {
             {property.title}
           </h3>
           {property.verified && (
-            <span className="flex items-center gap-1 text-[10px] font-bold shrink-0" style={{ color: "#4ade80" }}>
+            <span className="flex items-center gap-1 text-[10px] font-bold shrink-0" style={{ color: "#1E88E5" }}>
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
@@ -305,7 +305,10 @@ function PropertyCardGrid({ property, onOpen, onNavigate }) {
         </button>
         <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
           style={{ background: "rgba(11,11,11,0.8)", color: "#FFFFFF" }}>
-          📷 {property.imgCount}
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+          </svg>
+          {property.imgCount}
         </div>
       </div>
 
@@ -313,7 +316,7 @@ function PropertyCardGrid({ property, onOpen, onNavigate }) {
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="text-sm font-bold" style={{ color: "#1F2937" }}>{property.title}</h3>
           {property.verified && (
-            <svg className="w-4 h-4 shrink-0 fill-current" viewBox="0 0 20 20" style={{ color: "#4ade80" }}>
+            <svg className="w-4 h-4 shrink-0 fill-current" viewBox="0 0 20 20" style={{ color: "#1E88E5" }}>
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
           )}
@@ -592,14 +595,22 @@ export default function SearchResults({ initialFilters, onNavigate }) {
             ) : loadError ? (
               <div className="rounded-2xl flex flex-col items-center justify-center py-24 text-center"
                 style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-                <span className="text-5xl mb-4">⚠️</span>
+                <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#FEF3C7" }}>
+                  <svg className="w-7 h-7" fill="none" stroke="#F59E0B" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  </svg>
+                </span>
                 <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>Couldn't load properties</p>
                 <p className="text-sm" style={{ color: "#6B7280" }}>{loadError}</p>
               </div>
             ) : ALL_PROPERTIES.length === 0 ? (
               <div className="rounded-2xl flex flex-col items-center justify-center py-24 text-center"
                 style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-                <span className="text-5xl mb-4">🏠</span>
+                <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
+                  <svg className="w-7 h-7" fill="none" stroke="#1E88E5" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  </svg>
+                </span>
                 <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>No properties listed yet</p>
                 <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Be the first — post your property for free.</p>
                 <button onClick={() => onNavigate && onNavigate("post-property")}
@@ -611,7 +622,11 @@ export default function SearchResults({ initialFilters, onNavigate }) {
             ) : sorted.length === 0 ? (
               <div className="rounded-2xl flex flex-col items-center justify-center py-24 text-center"
                 style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-                <span className="text-5xl mb-4">🏚️</span>
+                <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#F1F5F9" }}>
+                  <svg className="w-7 h-7" fill="none" stroke="#6B7280" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                  </svg>
+                </span>
                 <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>No properties found</p>
                 <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Try adjusting your filters</p>
                 <button onClick={resetFilters}

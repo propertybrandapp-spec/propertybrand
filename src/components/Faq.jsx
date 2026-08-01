@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
+import { ClipboardList, Home, Landmark, DollarSign, Search, PenLine } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -8,42 +9,42 @@ const CATEGORIES = ["All", "Buying", "Renting", "Loans & Finance", "Legal & RERA
 const GUIDES = [
   {
     category: "Buying",
-    icon: "📋",
+    icon: ClipboardList,
     slug: "how-to-buy",
     q: "How to Buy a Property",
     a: "Start by finalizing your budget and getting a home loan pre-approval so you know your exact spending power. Shortlist localities and projects, verify RERA registration and title documents, negotiate the price, and pay a token amount to block the unit. Complete due diligence (encumbrance certificate, approved building plan), sign the sale agreement, arrange your loan disbursement, and finally register the sale deed at the sub-registrar's office. Our relationship managers can walk you through every step and coordinate with the seller on your behalf.",
   },
   {
     category: "Renting",
-    icon: "🏠",
+    icon: Home,
     slug: "how-to-rent",
     q: "How to Rent a Property",
     a: "Filter listings by budget, locality, and move-in date, then shortlist 3–4 homes to visit in person. Once you've chosen one, verify the owner's ID and property ownership documents, agree on rent, security deposit, and lock-in period, and get everything in writing. Draft a rental agreement (11-month agreements are common and don't require registration in most states), complete a joint inspection with a fixtures checklist, and hand over the deposit only after signing. We can also connect you with a verified agent to handle paperwork.",
   },
   {
     category: "Loans & Finance",
-    icon: "🏦",
+    icon: Landmark,
     slug: "how-to-apply-loan",
     q: "How to Apply for a Home Loan",
     a: "Check your eligibility using our EMI calculator, which factors in your income, existing obligations, and tenure. Compare interest rates and processing fees across our 40+ partner banks, then submit your application with income proof, KYC documents, bank statements, and the property's title papers. The lender will conduct a technical and legal valuation of the property before sanctioning the loan. Once approved, the loan amount is disbursed directly to the seller or builder as per the agreed payment schedule.",
   },
   {
     category: "Loans & Finance",
-    icon: "💰",
+    icon: DollarSign,
     slug: "how-to-calculate-emi",
     q: "How to Calculate EMI",
     a: "Your Equated Monthly Installment depends on three inputs: loan amount (principal), interest rate, and tenure. The standard formula is EMI = [P × R × (1+R)^N] / [(1+R)^N − 1], where P is principal, R is the monthly interest rate, and N is the number of monthly installments. Longer tenures lower your EMI but increase total interest paid, while a larger down payment reduces both. Use the EMI Calculator on our Investment Advisory page to instantly see your monthly outgo across different loan amounts and tenures.",
   },
   {
     category: "Legal & RERA",
-    icon: "🔍",
+    icon: Search,
     slug: "what-is-rera",
     q: "What is RERA?",
     a: "The Real Estate (Regulation and Development) Act, 2013 (RERA) is a central law that regulates the real estate sector to protect homebuyers and boost transparency. It mandates that developers register projects with the state RERA authority, publish accurate project details and timelines, deposit 70% of buyer funds in an escrow account reserved for construction, and compensate buyers for delayed possession. Always check a project's RERA registration number on the state RERA portal before booking — every project we list is RERA compliant.",
   },
   {
     category: "Legal & RERA",
-    icon: "📝",
+    icon: PenLine,
     slug: "property-registration",
     q: "Property Registration Process",
     a: "Once the sale agreement is finalized, the property must be registered at the local sub-registrar's office to legally transfer ownership. This involves paying stamp duty and registration charges (which vary by state, typically 5–7% of the property value), submitting the sale deed along with identity and property documents, and having both parties (or their representatives) present for biometric verification and signing. The registered sale deed is your legal proof of ownership — our documentation team can prepare and file this on your behalf.",
@@ -129,7 +130,7 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
                 style={{ background: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.background : "#FFFFFF" }}
               >
                 <span className="flex items-center gap-3">
-                  <span className="text-xl shrink-0">{item.icon}</span>
+                  <item.icon className="w-5 h-5 shrink-0" style={{ color: "#1E88E5" }} strokeWidth={2} />
                   <span className="text-sm md:text-base font-bold" style={{ color: "#1F2937" }}>{item.q}</span>
                 </span>
                 <svg

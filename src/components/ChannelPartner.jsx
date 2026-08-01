@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { submitPartnerApplication } from "../lib/agents";
 import { fetchPartnerTiers } from "../lib/siteContent";
+import { Package, BarChart3, Smartphone, GraduationCap, MessageCircle, DollarSign } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -464,15 +465,17 @@ export default function ChannelPartner({ onNavigate }) {
               <p className="text-sm font-bold mb-4" style={{ color: "#1E88E5" }}>What you get from Day 1</p>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { icon: "📦", text: "Inventory Access" },
-                  { icon: "📊", text: "Partner Dashboard" },
-                  { icon: "📱", text: "PB Mobile App" },
-                  { icon: "🎓", text: "Training Resources" },
-                  { icon: "💬", text: "Dedicated RM" },
-                  { icon: "💰", text: "Timely Payouts" },
+                  { icon: Package, text: "Inventory Access" },
+                  { icon: BarChart3, text: "Partner Dashboard" },
+                  { icon: Smartphone, text: "PB Mobile App" },
+                  { icon: GraduationCap, text: "Training Resources" },
+                  { icon: MessageCircle, text: "Dedicated RM" },
+                  { icon: DollarSign, text: "Timely Payouts" },
                 ].map((item) => (
                   <div key={item.text} className="flex items-center gap-2.5">
-                    <span className="text-lg">{item.icon}</span>
+                    <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#FFFFFF" }}>
+                      <item.icon className="w-4 h-4" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                    </span>
                     <span className="text-xs font-medium" style={{ color: "#1F2937" }}>{item.text}</span>
                   </div>
                 ))}

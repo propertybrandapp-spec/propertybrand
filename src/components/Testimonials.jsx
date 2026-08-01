@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { fetchClientReviews } from "../lib/siteContent";
+import { Smile, Home, MapPin, Briefcase } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
 const STATS = [
-  { label: "Happy Clients", value: 15000, suffix: "+", icon: "😊" },
-  { label: "Properties Listed", value: 12400, suffix: "+", icon: "🏠" },
-  { label: "Cities Covered", value: 28, suffix: "+", icon: "📍" },
-  { label: "Expert Advisors", value: 320, suffix: "+", icon: "👨‍💼" },
+  { label: "Happy Clients", value: 15000, suffix: "+", icon: Smile },
+  { label: "Properties Listed", value: 12400, suffix: "+", icon: Home },
+  { label: "Cities Covered", value: 28, suffix: "+", icon: MapPin },
+  { label: "Expert Advisors", value: 320, suffix: "+", icon: Briefcase },
 ];
 
 // Shown until real reviews are added in the admin console ("Site Content" → Client Reviews)
@@ -132,14 +133,14 @@ const DEMO_TESTIMONIALS = [
 const DEFAULT_CATEGORY_FILTERS = ["All", "Home Buyers", "Investors", "NRIs", "Developers", "Corporate Clients"];
 
 const PARTNER_LOGOS = [
-  { name: "SBI", image: "/partners/sbi.svg" },
-  { name: "HDFC Bank", image: "/partners/hdfc.svg" },
-  { name: "ICICI Bank", image: "/partners/icici.svg" },
-  { name: "Axis Bank", image: "/banks/axis.webp" },
-  { name: "LIC Housing Finance", image: "/banks/lic.svg" },
-  { name: "RERA", image: "/partners/rera.png" },
-  { name: "National Housing Bank", image: "/partners/nhb.webp"},
-  { name: "CREDAI", image: "/partners/credai.png" },
+  { name: "SBI", color: "#1d4ed8", bg: "#eff6ff" },
+  { name: "HDFC", color: "#dc2626", bg: "#fef2f2" },
+  { name: "ICICI", color: "#ea580c", bg: "#fff7ed" },
+  { name: "Axis", color: "#9f1239", bg: "#fff1f2" },
+  { name: "LIC HFL", color: "#15803d", bg: "#f0fdf4" },
+  { name: "RERA", color: "#7c3aed", bg: "#f5f3ff" },
+  { name: "MahaRERA", color: "#0369a1", bg: "#f0f9ff" },
+  { name: "NHB", color: "#b45309", bg: "#fffbeb" },
 ];
 
 // ── Animated Counter ──────────────────────────────────────────────────────────
@@ -326,8 +327,10 @@ export default function Testimonials({ onNavigate }) {
           key={stat.label}
           className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
         >
-          <div className="mb-3 text-3xl">
-            {stat.icon}
+          <div className="mb-3 flex justify-center">
+            <span className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "#EFF6FF" }}>
+              <stat.icon className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+            </span>
           </div>
 
           <div className="text-3xl font-extrabold text-[#1E88E5] tracking-tight">
@@ -422,16 +425,17 @@ export default function Testimonials({ onNavigate }) {
           <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
             {PARTNER_LOGOS.map((logo) => (
               <div
-  key={logo.name}
-  className="flex items-center justify-center bg-white rounded-xl border border-[#E2E8F0] h-24 p-4 hover:shadow-lg transition-all duration-300"
->
-  <img
-    src={logo.image}
-    alt={logo.name}
-    className="max-h-12 max-w-full object-contain"
-    loading="lazy"
-  />
-</div>
+                key={logo.name}
+                className="flex items-center justify-center rounded-xl border border-[#E2E8F0] py-4 px-2 hover:shadow-md transition cursor-pointer"
+                style={{ background: logo.bg }}
+              >
+                <span
+                  className="text-sm font-extrabold tracking-tight"
+                  style={{ color: logo.color }}
+                >
+                  {logo.name}
+                </span>
+              </div>
             ))}
           </div>
         </div>

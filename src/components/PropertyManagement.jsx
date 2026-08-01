@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
 import { fetchSubscriptionPlans } from "../lib/siteContent";
+import { Globe, TrendingUp, Briefcase, BarChart3, Camera, Wrench, FileText, CreditCard, Phone } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -137,19 +138,19 @@ const DEMO_PLANS = [
 
 const IDEAL_FOR = [
   {
-    icon: "🌍",
+    icon: Globe,
     title: "NRIs",
     desc: "Living abroad but own property in India? We manage everything so you don't have to worry from thousands of miles away.",
     highlight: "Remote Dashboard Access",
   },
   {
-    icon: "📈",
+    icon: TrendingUp,
     title: "Investors",
     desc: "Own multiple rental properties? Our portfolio management service maximizes your yield with minimal involvement.",
     highlight: "Portfolio Analytics",
   },
   {
-    icon: "💼",
+    icon: Briefcase,
     title: "Busy Professionals",
     desc: "No time to chase tenants or coordinate repairs? Let us handle it all while you focus on your career.",
     highlight: "Zero Hassle Management",
@@ -157,12 +158,12 @@ const IDEAL_FOR = [
 ];
 
 const DASHBOARD_FEATURES = [
-  { icon: "📊", label: "Real-time rent tracking" },
-  { icon: "📸", label: "Inspection photo reports" },
-  { icon: "🔧", label: "Maintenance request log" },
-  { icon: "📄", label: "Document vault" },
-  { icon: "💳", label: "Payment history" },
-  { icon: "📞", label: "RM direct chat" },
+  { icon: BarChart3, label: "Real-time rent tracking" },
+  { icon: Camera, label: "Inspection photo reports" },
+  { icon: Wrench, label: "Maintenance request log" },
+  { icon: FileText, label: "Document vault" },
+  { icon: CreditCard, label: "Payment history" },
+  { icon: Phone, label: "RM direct chat" },
 ];
 
 // ── Plan Card ─────────────────────────────────────────────────────────────────
@@ -302,7 +303,9 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
               style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
               onMouseEnter={e => e.currentTarget.style.borderColor = "#1E88E5"}
               onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}>
-              <span className="text-3xl shrink-0">{item.icon}</span>
+              <span className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#EFF6FF" }}>
+                <item.icon className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+              </span>
               <div>
                 <h3 className="text-sm font-bold mb-1" style={{ color: "#1F2937" }}>{item.title}</h3>
                 <p className="text-xs leading-relaxed mb-2.5" style={{ color: "#6B7280" }}>{item.desc}</p>
@@ -429,7 +432,7 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
               {DASHBOARD_FEATURES.map((f) => (
                 <div key={f.label} className="rounded-xl p-3 text-center"
                   style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-                  <span className="text-xl block mb-1">{f.icon}</span>
+                  <f.icon className="w-5 h-5 mx-auto mb-1" style={{ color: "#1E88E5" }} strokeWidth={2} />
                   <p className="text-[9px] font-medium leading-tight" style={{ color: "#6B7280" }}>{f.label}</p>
                 </div>
               ))}

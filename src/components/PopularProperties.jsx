@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { fetchPublicListings } from "../lib/listings";
+import { Home } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -129,7 +130,7 @@ function PropertyCard({ property, onOpen, onNavigate }) {
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="text-sm font-bold text-[#1F2937] leading-tight">{title}</h3>
           {verified && (
-            <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-[#4ade80] font-bold">
+            <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-[#1E88E5] font-bold">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
@@ -317,7 +318,9 @@ export default function PopularProperties({ onNavigate }) {
           </div>
         ) : ALL_PROPERTIES.length === 0 ? (
           <div className="mb-10 rounded-2xl flex flex-col items-center justify-center py-16 text-center" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-            <span className="text-4xl mb-3">🏠</span>
+            <span className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
+              <Home className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+            </span>
             <p className="text-sm font-bold" style={{ color: "#1F2937" }}>No properties listed yet</p>
             <p className="text-xs mt-1 mb-4" style={{ color: "#6B7280" }}>Be the first to list a property on PropertyBrands.</p>
             <button onClick={() => onNavigate && onNavigate("post-property")} className="text-xs font-bold px-4 py-2 rounded-lg" style={{ background: "#1E88E5", color: "#FFFFFF" }}>

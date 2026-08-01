@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../lib/AuthContext";
 import { uploadToR2, validateImageFile } from "../lib/r2Upload";
+import { Heart, ClipboardList } from "lucide-react";
 
 const CLIENT_TYPES = ["Buyer", "Investor", "NRI", "Agent", "Tenant", "Landlord"];
 
@@ -139,14 +140,14 @@ export default function ClientProfile({ onNavigate }) {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold shrink-0 transition-all"
               style={{ background: "#FFFFFF", color: "#1F2937", border: "1px solid #E2E8F0" }}
             >
-              ❤️ Saved Properties
+              <Heart className="w-4 h-4" style={{ color: "#1E88E5" }} strokeWidth={2} /> Saved Properties
             </button>
             <button
               onClick={() => onNavigate && onNavigate("inquiries")}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold shrink-0 transition-all"
               style={{ background: "#FFFFFF", color: "#1F2937", border: "1px solid #E2E8F0" }}
             >
-              📋 My Inquiries
+              <ClipboardList className="w-4 h-4" style={{ color: "#1E88E5" }} strokeWidth={2} /> My Inquiries
             </button>
           </div>
 
