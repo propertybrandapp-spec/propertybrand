@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { fetchPublicListings } from "../lib/listings";
 import { Home } from "lucide-react";
+import QuickViewModal from "./QuickViewModal";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -26,7 +27,7 @@ function HeartBtn({ property }) {
         e.stopPropagation();
         toggleSaveProperty(property);
       }}
-      className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-[#FFFFFF]/90 backdrop-blur flex items-center justify-center shadow hover:scale-110 transition z-10"
+      className="w-7 h-7 rounded-full bg-[#FFFFFF]/90 backdrop-blur flex items-center justify-center shadow hover:scale-110 transition"
     >
       <svg
         className={`w-3.5 h-3.5 transition-colors ${liked ? "fill-sky-500 text-sky-500" : "fill-none text-[#6B7280]"}`}
@@ -39,6 +40,21 @@ function HeartBtn({ property }) {
           strokeLinejoin="round"
           d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
         />
+      </svg>
+    </button>
+  );
+}
+
+function QuickViewBtn({ property, onQuickView }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); onQuickView && onQuickView(property); }}
+      aria-label="Quick view"
+      className="w-7 h-7 rounded-full bg-[#FFFFFF]/90 backdrop-blur flex items-center justify-center shadow hover:scale-110 transition"
+    >
+      <svg className="w-3.5 h-3.5 text-[#6B7280]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
       </svg>
     </button>
   );
@@ -100,7 +116,7 @@ function ImageCarousel({ images, imgCount, badge, badgeColor }) {
 }
 
 // ── Property Card ─────────────────────────────────────────────────────────────
-function PropertyCard({ property, onOpen, onNavigate }) {
+function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
   const {
     id, images, imgCount, badge, badgeColor,
     title, price, area, location,
@@ -123,7 +139,10 @@ function PropertyCard({ property, onOpen, onNavigate }) {
         badge={badge}
         badgeColor={badgeColor}
       />
-      <HeartBtn property={property} />
+      <div className="absolute top-2.5 right-2.5 z-10 flex flex-col gap-1.5">
+        <QuickViewBtn property={property} onQuickView={onQuickView} />
+        <HeartBtn property={property} />
+      </div>
 
       <div className="p-3.5">
         {/* Title + Price */}
@@ -209,7 +228,7 @@ function SectionHeader({ title, seeAllLabel = "See all Properties", onNavigate }
 }
 
 // ── Scroll Row ────────────────────────────────────────────────────────────────
-function ScrollRow({ properties, onOpen, onNavigate }) {
+function ScrollRow({ properties, onOpen, onQuickView, onNavigate }) {
   const rowRef = useRef(null);
 
   function scroll(dir) {
@@ -236,7 +255,7 @@ function ScrollRow({ properties, onOpen, onNavigate }) {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {properties.map((p) => (
-          <PropertyCard key={p.id} property={p} onOpen={onOpen} onNavigate={onNavigate} />
+          <PropertyCard key={p.id} property={p} onOpen={onOpen} onQuickView={onQuickView} onNavigate={onNavigate} />
         ))}
       </div>
 
@@ -290,6 +309,8 @@ export default function PopularProperties({ onNavigate }) {
     onNavigate && onNavigate("property-detail", { property, pool: ALL_PROPERTIES });
   }
 
+  const [quickViewProperty, setQuickViewProperty] = useState(null);
+
   return (
     <section className="bg-[#FFFFFF] py-10 px-4">
       <div className="max-w-7xl mx-auto">
@@ -333,7 +354,7 @@ export default function PopularProperties({ onNavigate }) {
             {ownerProperties.length > 0 && (
               <div className="mb-10">
                 <SectionHeader title="Popular Owner Properties" onNavigate={onNavigate} />
-                <ScrollRow properties={ownerProperties} onOpen={openProperty} onNavigate={onNavigate} />
+                <ScrollRow properties={ownerProperties} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
               </div>
             )}
 
@@ -341,7 +362,7 @@ export default function PopularProperties({ onNavigate }) {
             {builderProperties.length > 0 && (
               <div className="mb-10">
                 <SectionHeader title="Featured Projects" seeAllLabel="See all Projects" onNavigate={onNavigate} />
-                <ScrollRow properties={builderProperties} onOpen={openProperty} onNavigate={onNavigate} />
+                <ScrollRow properties={builderProperties} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
               </div>
             )}
 
@@ -389,6 +410,14 @@ export default function PopularProperties({ onNavigate }) {
         </div>
 
       </div>
+
+      {quickViewProperty && (
+        <QuickViewModal
+          property={quickViewProperty}
+          onClose={() => setQuickViewProperty(null)}
+          onViewDetails={(p) => { setQuickViewProperty(null); openProperty(p); }}
+        />
+      )}
     </section>
   );
 }

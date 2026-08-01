@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { AuthProvider } from "./lib/AuthContext";
 import { SavedItemsProvider } from "./lib/SavedItemsContext";
+import { CompareProvider } from "./lib/CompareContext";
 import Navbar from "./components/Navbar";
+import CompareBar from "./components/CompareBar";
+import ComparePage from "./components/ComparePage";
 import Hero from "./components/Hero";
 import PopularProperties from "./components/PopularProperties";
 import PreferredAgents from "./components/PreferredAgents";
@@ -32,7 +35,7 @@ import ArchitectsDesign from "./components/ArchitectsDesign";
 // Pages: "home" | "search" | "channel-partner" | "property-management"
 //      | "investment-advisory" | "agents" | "about" | "contact" | "careers"
 //      | "blog" | "faq" | "privacy-policy" | "terms-conditions" | "disclaimer"
-//      | "sitemap" | "profile" | "saved" | "inquiries"
+//      | "sitemap" | "profile" | "saved" | "inquiries" | "compare"
 //
 // The admin console used to render here (page === "admin") but now lives in
 // its own separate project/deployment — see /admin-console (or wherever you
@@ -132,7 +135,12 @@ function AppContent() {
         {page === "saved" && <SavedProperties onNavigate={navigate} />}
 
         {page === "inquiries" && <MyInquiries onNavigate={navigate} />}
+
+        {page === "compare" && <ComparePage onNavigate={navigate} />}
       </main>
+
+      {/* ── Floating compare bar (visible on every page once something's selected) ── */}
+      <CompareBar onNavigate={navigate} />
 
       {/* ── Footer always visible ── */}
       <Footer onNavigate={navigate} />
@@ -144,7 +152,9 @@ export default function App() {
   return (
     <AuthProvider>
       <SavedItemsProvider>
-        <AppContent />
+        <CompareProvider>
+          <AppContent />
+        </CompareProvider>
       </SavedItemsProvider>
     </AuthProvider>
   );

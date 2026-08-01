@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { fetchPublicListings } from "../lib/listings";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
 import { useSavedItems } from "../lib/SavedItemsContext";
+import { useCompare } from "../lib/CompareContext";
+import QuickViewModal from "./QuickViewModal";
 
 // Fallback defaults for the filter sidebar — kept in sync with "Site
 // Content" → Listing Options in the admin console (see the fetch below).
@@ -134,9 +136,12 @@ function Sidebar({
 }
 
 // ── Property Card (List View) ──────────────────────────────────────────────────
-function PropertyCardList({ property, onOpen, onNavigate }) {
+function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
   const { isPropertySaved, toggleSaveProperty } = useSavedItems();
+  const { isComparing, toggleCompare, items, maxCompare } = useCompare();
   const saved = isPropertySaved(property.dbId || property.id);
+  const comparing = isComparing(property.dbId || property.id);
+  const compareFull = items.length >= maxCompare && !comparing;
   const [imgIdx, setImgIdx] = useState(0);
   const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
 
@@ -163,14 +168,35 @@ function PropertyCardList({ property, onOpen, onNavigate }) {
           {property.badge}
         </span>
 
-        {/* Save */}
-        <button onClick={e => { e.stopPropagation(); toggleSaveProperty(property); }}
-          className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110"
-          style={{ background: "rgba(11,11,11,0.8)" }}>
-          <svg className="w-3.5 h-3.5" fill={saved ? "#1E88E5" : "none"} stroke={saved ? "#1E88E5" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </button>
+        {/* Quick actions */}
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5">
+          <button onClick={e => { e.stopPropagation(); onQuickView && onQuickView(property); }}
+            aria-label="Quick view"
+            className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110"
+            style={{ background: "rgba(11,11,11,0.8)" }}>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="#FFFFFF" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+          <button onClick={e => { e.stopPropagation(); toggleSaveProperty(property); }}
+            aria-label="Save"
+            disabled={false}
+            className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110"
+            style={{ background: "rgba(11,11,11,0.8)" }}>
+            <svg className="w-3.5 h-3.5" fill={saved ? "#1E88E5" : "none"} stroke={saved ? "#1E88E5" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+          <button onClick={e => { e.stopPropagation(); toggleCompare(property); }}
+            aria-label="Compare" disabled={compareFull}
+            className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110 disabled:opacity-40"
+            style={{ background: comparing ? "#1E88E5" : "rgba(11,11,11,0.8)" }}>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="#FFFFFF" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+            </svg>
+          </button>
+        </div>
 
         {/* Image count */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
@@ -276,9 +302,12 @@ function PropertyCardList({ property, onOpen, onNavigate }) {
 }
 
 // ── Property Card (Grid View) ──────────────────────────────────────────────────
-function PropertyCardGrid({ property, onOpen, onNavigate }) {
+function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
   const { isPropertySaved, toggleSaveProperty } = useSavedItems();
+  const { isComparing, toggleCompare, items, maxCompare } = useCompare();
   const saved = isPropertySaved(property.dbId || property.id);
+  const comparing = isComparing(property.dbId || property.id);
+  const compareFull = items.length >= maxCompare && !comparing;
   const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
 
   return (
@@ -296,13 +325,33 @@ function PropertyCardGrid({ property, onOpen, onNavigate }) {
           style={{ background: property.badgeColor, color: "#FFFFFF" }}>
           {property.badge}
         </span>
-        <button onClick={e => { e.stopPropagation(); toggleSaveProperty(property); }}
-          className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(11,11,11,0.8)" }}>
-          <svg className="w-3.5 h-3.5" fill={saved ? "#1E88E5" : "none"} stroke={saved ? "#1E88E5" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </button>
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5">
+          <button onClick={e => { e.stopPropagation(); onQuickView && onQuickView(property); }}
+            aria-label="Quick view"
+            className="w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(11,11,11,0.8)" }}>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="#FFFFFF" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+          <button onClick={e => { e.stopPropagation(); toggleSaveProperty(property); }}
+            aria-label="Save"
+            className="w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(11,11,11,0.8)" }}>
+            <svg className="w-3.5 h-3.5" fill={saved ? "#1E88E5" : "none"} stroke={saved ? "#1E88E5" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+          <button onClick={e => { e.stopPropagation(); toggleCompare(property); }}
+            aria-label="Compare" disabled={compareFull}
+            className="w-7 h-7 rounded-full flex items-center justify-center disabled:opacity-40"
+            style={{ background: comparing ? "#1E88E5" : "rgba(11,11,11,0.8)" }}>
+            <svg className="w-3.5 h-3.5" fill="none" stroke="#FFFFFF" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+            </svg>
+          </button>
+        </div>
         <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full"
           style={{ background: "rgba(11,11,11,0.8)", color: "#FFFFFF" }}>
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -364,6 +413,7 @@ function buildFilters(overrides) {
   const transactionType = overrides?.transactionType || "Buy";
   return {
     transactionType,
+    location: overrides?.location || "",
     budget: overrides?.budget || [0, BUDGET_MAX[transactionType]],
     types: overrides?.types || [],
     bhk: overrides?.bhk || [],
@@ -377,6 +427,7 @@ function buildFilters(overrides) {
 
 export default function SearchResults({ initialFilters, onNavigate }) {
   const [viewMode, setViewMode] = useState("list"); // list | grid
+  const resultsRef = useRef(null);
   const [sortBy, setSortBy] = useState("Relevance");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -408,6 +459,8 @@ export default function SearchResults({ initialFilters, onNavigate }) {
     onNavigate && onNavigate("property-detail", { property, pool: ALL_PROPERTIES });
   }
 
+  const [quickViewProperty, setQuickViewProperty] = useState(null);
+
   function resetFilters() {
     setFilters(buildFilters({ transactionType: filters.transactionType }));
   }
@@ -427,6 +480,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
     if (filters.verifiedOnly && !p.verified) return false;
     if (filters.amenities.length && !filters.amenities.some(a => p.amenities.includes(a))) return false;
     if (filters.tags.length && !filters.tags.some(t => p.tags.includes(t))) return false;
+    if (filters.location.trim() && !(p.location || "").toLowerCase().includes(filters.location.trim().toLowerCase())) return false;
     return true;
   });
 
@@ -471,24 +525,20 @@ export default function SearchResults({ initialFilters, onNavigate }) {
             <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1E88E5" }}>
               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
             </svg>
-            <input type="text" defaultValue="Bhubaneswar" className="flex-1 text-sm bg-transparent focus:outline-none"
+            <input type="text" value={filters.location}
+              onChange={e => setFilters(f => ({ ...f, location: e.target.value }))}
+              onKeyDown={e => { if (e.key === "Enter") resultsRef.current?.scrollIntoView({ behavior: "smooth" }); }}
+              className="flex-1 text-sm bg-transparent focus:outline-none"
               style={{ color: "#1F2937" }} placeholder="Location, project, or landmark..." />
+            {filters.location && (
+              <button onClick={() => setFilters(f => ({ ...f, location: "" }))} aria-label="Clear location"
+                className="text-xs font-bold shrink-0" style={{ color: "#6B7280" }}>
+                ×
+              </button>
+            )}
           </div>
-          <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 w-full sm:w-40"
-            style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#1E88E5" }}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <span className="text-sm" style={{ color: "#6B7280" }}>Flat +1</span>
-          </div>
-          <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 w-full sm:w-40"
-            style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#1E88E5" }}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1" />
-            </svg>
-            <span className="text-sm" style={{ color: "#6B7280" }}>Budget</span>
-          </div>
-          <button className="px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all"
+          <button onClick={() => resultsRef.current?.scrollIntoView({ behavior: "smooth" })}
+            className="px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all justify-center"
             style={{ background: "#1E88E5", color: "#FFFFFF" }}
             onMouseEnter={e => e.currentTarget.style.background = "#1565C0"}
             onMouseLeave={e => e.currentTarget.style.background = "#1E88E5"}>
@@ -500,10 +550,11 @@ export default function SearchResults({ initialFilters, onNavigate }) {
         </div>
 
         {/* ── Results Header ── */}
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div ref={resultsRef} className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div>
             <h1 className="text-lg font-bold" style={{ color: "#1F2937" }}>
-              {filters.transactionType === "Rent" ? "Properties for Rent in" : "Properties for Sale in"} <span style={{ color: "#1E88E5" }}>Bhubaneswar</span>
+              {filters.transactionType === "Rent" ? "Properties for Rent" : "Properties for Sale"}
+              {filters.location.trim() && <> in <span style={{ color: "#1E88E5" }}>{filters.location.trim()}</span></>}
             </h1>
             <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
               {sorted.length} properties found
@@ -637,11 +688,11 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               </div>
             ) : viewMode === "list" ? (
               <div className="space-y-4">
-                {sorted.map(p => <PropertyCardList key={p.id} property={p} onOpen={openProperty} onNavigate={onNavigate} />)}
+                {sorted.map(p => <PropertyCardList key={p.id} property={p} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />)}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {sorted.map(p => <PropertyCardGrid key={p.id} property={p} onOpen={openProperty} onNavigate={onNavigate} />)}
+                {sorted.map(p => <PropertyCardGrid key={p.id} property={p} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />)}
               </div>
             )}
 
@@ -700,6 +751,14 @@ export default function SearchResults({ initialFilters, onNavigate }) {
         )}
 
       </div>
+
+      {quickViewProperty && (
+        <QuickViewModal
+          property={quickViewProperty}
+          onClose={() => setQuickViewProperty(null)}
+          onViewDetails={(p) => { setQuickViewProperty(null); openProperty(p); }}
+        />
+      )}
     </div>
   );
 }

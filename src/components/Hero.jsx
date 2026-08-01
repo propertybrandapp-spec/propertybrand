@@ -178,6 +178,7 @@ export default function Hero({ onNavigate }) {
     onNavigate && onNavigate("search", {
       transactionType: currentTab === "Rent" ? "Rent" : "Buy",
       types: currentPropertyType ? [currentPropertyType] : [],
+      location: location.trim() || undefined,
     });
   }
 

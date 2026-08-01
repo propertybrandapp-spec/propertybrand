@@ -28,6 +28,23 @@ function directionsUrl(property) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.location)}`;
 }
 
+// Rough "what would this cost me a month" estimate for Buy listings, shown
+// so price/monthly-cost is understandable within the first screen without
+// forcing a trip to the full EMI Calculator. Assumes an 80% loan (20% down),
+// 8.5% p.a., 20-year tenure — typical defaults, not a quote. priceRaw is in
+// rupees; returns a formatted string like "₹68,432" or null if we don't have
+// a usable price.
+function estimatedMonthlyEmi(property) {
+  if (property.transactionType === "Rent" || !property.priceRaw) return null;
+  const principal = property.priceRaw * 0.8;
+  const monthlyRate = 0.085 / 12;
+  const months = 20 * 12;
+  const factor = Math.pow(1 + monthlyRate, months);
+  const emi = (principal * monthlyRate * factor) / (factor - 1);
+  if (!isFinite(emi) || emi <= 0) return null;
+  return `₹${Math.round(emi).toLocaleString("en-IN")}`;
+}
+
 // ── Mini card used in the "Similar Properties" strip ─────────────────────────
 function SimilarCard({ property, onOpen }) {
   return (
@@ -275,7 +292,19 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               {property.transactionType === "Rent" && (
                 <p className="text-xs mb-4" style={{ color: "#6B7280" }}>+ security deposit &amp; maintenance, as applicable</p>
               )}
-              {property.transactionType !== "Rent" && <div className="mb-4" />}
+              {property.transactionType !== "Rent" && (
+                estimatedMonthlyEmi(property) ? (
+                  <p className="text-xs mb-4" style={{ color: "#6B7280" }}>
+                    Est. EMI <span className="font-bold" style={{ color: "#1F2937" }}>{estimatedMonthlyEmi(property)}/mo</span>
+                    {" "}(80% loan, 8.5% p.a., 20 yrs) ·{" "}
+                    <button onClick={() => onNavigate && onNavigate("investment-advisory", "emi-calculator")} className="font-semibold hover:underline" style={{ color: "#1E88E5" }}>
+                      Calculate exactly
+                    </button>
+                  </p>
+                ) : (
+                  <div className="mb-4" />
+                )
+              )}
 
               <div className="flex flex-col gap-2.5">
                 <button
@@ -293,6 +322,13 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   style={{ background: "#FFFFFF", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
                 >
                   Schedule a Site Visit
+                </button>
+                <button
+                  onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "callback" })}
+                  className="text-xs font-semibold hover:underline text-center"
+                  style={{ color: "#6B7280" }}
+                >
+                  Prefer a callback instead? Request one →
                 </button>
                 <button
                   onClick={() => toggleSaveProperty(property)}

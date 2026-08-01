@@ -89,7 +89,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
   const isRichPayload = initialSubject && typeof initialSubject === "object";
   const subjectValue = isRichPayload ? initialSubject.subject : initialSubject;
   const property = isRichPayload ? initialSubject.property : null;
-  const intent = isRichPayload ? initialSubject.intent : null; // "contact" | "site-visit"
+  const intent = isRichPayload ? initialSubject.intent : null; // "contact" | "site-visit" | "callback"
 
   const [settings, setSettings] = useState(null);
   const [offices, setOffices] = useState(null); // null = loading
@@ -119,6 +119,9 @@ export default function ContactUs({ onNavigate, initialSubject }) {
     if (intent === "site-visit") {
       return `I'd like to schedule a site visit for "${property.title}"${property.location ? ` in ${property.location}` : ""}${specs ? ` (${specs})` : ""}. Please share available slots.`;
     }
+    if (intent === "callback") {
+      return `Could someone call me back about "${property.title}"${property.location ? ` in ${property.location}` : ""}${specs ? ` (${specs})` : ""}? I have a few quick questions.`;
+    }
     return `I'm interested in "${property.title}"${property.location ? ` in ${property.location}` : ""}${specs ? ` (${specs})` : ""} and would like more details.`;
   }
 
@@ -137,7 +140,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
     // interest text and link the lead to it directly (listingId) so it
     // shows up with full specs/photos wherever leads are reviewed.
     const interest = property
-      ? `${intent === "site-visit" ? "Site Visit Request" : SUBJECT_LABELS[form.subject] || "Property Inquiry"} — ${property.title}, ${property.location}, ${property.price}${property.bhkLabel ? `, ${property.bhkLabel}` : ""}${property.area ? `, ${property.area}` : ""} — ${form.message}`
+      ? `${intent === "site-visit" ? "Site Visit Request" : intent === "callback" ? "Callback Request" : SUBJECT_LABELS[form.subject] || "Property Inquiry"} — ${property.title}, ${property.location}, ${property.price}${property.bhkLabel ? `, ${property.bhkLabel}` : ""}${property.area ? `, ${property.area}` : ""} — ${form.message}`
       : `${SUBJECT_LABELS[form.subject] || "General Inquiry"} — ${form.message}`;
 
     const { error } = await submitLead({
@@ -224,7 +227,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                 )}
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#1E88E5" }}>
-                    {intent === "site-visit" ? "Scheduling a visit for" : "Inquiring about"}
+                    {intent === "site-visit" ? "Scheduling a visit for" : intent === "callback" ? "Requesting a callback about" : "Inquiring about"}
                   </p>
                   <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{property.title}</p>
                   <p className="text-xs truncate" style={{ color: "#6B7280" }}>{property.location} · {property.price}</p>
