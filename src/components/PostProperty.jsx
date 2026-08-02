@@ -10,16 +10,23 @@ import { Home, CheckCircle2 } from "lucide-react";
 // Fallback defaults — used until the dynamic options load (or if the
 // "Site Content" → Listing Options table is still empty). Admins can add
 // more of these from the admin console without a code change.
-const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land"];
+const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land", "Office", "Retail", "Industrial", "Co-living", "Student Accommodation"];
 const DEFAULT_BHK_OPTIONS = ["1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK", "5+ BHK"];
 const DEFAULT_AMENITIES = ["Lift", "Parking", "Visitor Parking", "Power Backup", "Security", "24x7 Security", "CCTV", "Intercom", "Swimming Pool", "Gym", "Garden", "Club House", "Multipurpose Hall", "Indoor Games", "Kids Play Area", "Jogging Track", "Amphitheatre", "Yoga / Meditation Area", "Senior Citizen Sitout", "Cafeteria", "WiFi", "Housekeeping", "Fire Safety", "Rain Water Harvesting", "Sewage Treatment Plant", "Solar Water Heating", "EV Charging Point", "Water Softener Plant", "Vaastu Compliant", "Pet Friendly", "Gated Community"];
 const POSSESSION_OPTIONS = ["Ready to Move", "Under Construction"];
+const FACING_OPTIONS = ["North", "South", "East", "West", "North-East", "North-West", "South-East", "South-West"];
+// ── New in Section 2A: Property Identity & Basic Details ──
+const LISTING_TYPE_OPTIONS = ["Sale", "Rent", "Lease", "Resale", "New Launch", "Under Construction"];
+const VASTU_OPTIONS = ["Vastu Compliant", "Not Vastu Compliant", "Not Specified"];
+const FURNISHING_OPTIONS = ["Unfurnished", "Semi-furnished", "Fully furnished"];
+const CONDITION_OPTIONS = ["New", "Renovated", "Well maintained", "Needs renovation"];
 
 const EMPTY_FORM = {
   title: "",
   location: "",
   type: "Apartment",
   transactionType: "Buy",
+  listingType: "Sale",
   priceRaw: "",
   bhk: [],
   amenities: [],
@@ -31,6 +38,28 @@ const EMPTY_FORM = {
   longitude: null,
   videoUrls: [],
   images: [],
+
+  // ── Section 2A: Property Identity & Basic Details ──
+  projectName: "",
+  towerBlock: "",
+  unitNumber: "",
+  unitNumberPublic: true,
+  bathrooms: "",
+  balconies: "",
+  servantRoom: false,
+  builtUpArea: "",
+  superBuiltUpArea: "",
+  carpetArea: "",
+  plotArea: "",
+  floorNumber: "",
+  totalFloors: "",
+  totalUnits: "",
+  facing: "",
+  entranceDirection: "",
+  vastuStatus: "Not Specified",
+  furnishing: "",
+  condition: "",
+  age: "",
 };
 
 const inputStyle = { background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" };
@@ -240,7 +269,7 @@ export default function PostProperty({ onNavigate }) {
             </Field>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <Field label="Listing Type">
+              <Field label="Transaction Type">
                 <Select value={form.transactionType} onChange={(e) => set("transactionType", e.target.value)}>
                   <option value="Buy">For Sale</option>
                   <option value="Rent">For Rent</option>
@@ -283,9 +312,6 @@ export default function PostProperty({ onNavigate }) {
               <Field label={`Price (${form.transactionType === "Rent" ? "₹ / month" : "₹ total"})`} required>
                 <TextInput type="number" min="0" value={form.priceRaw} onChange={(e) => set("priceRaw", e.target.value)} placeholder="e.g. 2400000" required />
               </Field>
-              <Field label="Area (sqft)">
-                <TextInput type="number" min="0" value={form.area} onChange={(e) => set("area", e.target.value)} placeholder="e.g. 1200" />
-              </Field>
             </div>
 
             {form.priceRaw && (
@@ -307,6 +333,110 @@ export default function PostProperty({ onNavigate }) {
                 ))}
               </div>
             </Field>
+          </div>
+
+          <div className="rounded-2xl p-6 space-y-5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+            <div>
+              <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Property Identity &amp; Configuration</h2>
+              <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Project details, room configuration, and area breakdown — helps buyers/tenants find exactly what they need.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Field label="Project Name" hint="Optional">
+                <TextInput value={form.projectName} onChange={(e) => set("projectName", e.target.value)} placeholder="e.g. Skyline Residency" />
+              </Field>
+              <Field label="Tower / Block">
+                <TextInput value={form.towerBlock} onChange={(e) => set("towerBlock", e.target.value)} placeholder="e.g. Tower B" />
+              </Field>
+              <Field label="Unit Number">
+                <TextInput value={form.unitNumber} onChange={(e) => set("unitNumber", e.target.value)} placeholder="e.g. 1204" />
+              </Field>
+            </div>
+
+            <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
+              <input type="checkbox" checked={form.unitNumberPublic} onChange={(e) => set("unitNumberPublic", e.target.checked)} className="w-4 h-4 rounded accent-[#1E88E5]" />
+              Show my unit number on the public listing
+            </label>
+
+            <Field label="Listing Type">
+              <Select value={form.listingType} onChange={(e) => set("listingType", e.target.value)}>
+                {LISTING_TYPE_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+              </Select>
+            </Field>
+
+            <div className="grid grid-cols-3 gap-4">
+              <Field label="Bathrooms">
+                <TextInput type="number" min="0" value={form.bathrooms} onChange={(e) => set("bathrooms", e.target.value)} placeholder="e.g. 2" />
+              </Field>
+              <Field label="Balconies">
+                <TextInput type="number" min="0" value={form.balconies} onChange={(e) => set("balconies", e.target.value)} placeholder="e.g. 1" />
+              </Field>
+              <div className="flex items-end pb-2.5">
+                <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
+                  <input type="checkbox" checked={form.servantRoom} onChange={(e) => set("servantRoom", e.target.checked)} className="w-4 h-4 rounded accent-[#1E88E5]" />
+                  Servant Room
+                </label>
+              </div>
+            </div>
+
+            <Field label="Area Breakdown (sqft)" hint="Fill in whichever apply — e.g. plots typically only need Plot Area.">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <TextInput type="number" min="0" value={form.builtUpArea} onChange={(e) => set("builtUpArea", e.target.value)} placeholder="Built-up" />
+                <TextInput type="number" min="0" value={form.superBuiltUpArea} onChange={(e) => set("superBuiltUpArea", e.target.value)} placeholder="Super Built-up" />
+                <TextInput type="number" min="0" value={form.carpetArea} onChange={(e) => set("carpetArea", e.target.value)} placeholder="Carpet" />
+                <TextInput type="number" min="0" value={form.plotArea} onChange={(e) => set("plotArea", e.target.value)} placeholder="Plot" />
+              </div>
+            </Field>
+
+            <div className="grid grid-cols-3 gap-4">
+              <Field label="Floor Number" hint="0 = ground floor">
+                <TextInput type="number" min="0" value={form.floorNumber} onChange={(e) => set("floorNumber", e.target.value)} placeholder="e.g. 8" />
+              </Field>
+              <Field label="Total Floors">
+                <TextInput type="number" min="0" value={form.totalFloors} onChange={(e) => set("totalFloors", e.target.value)} placeholder="e.g. 12" />
+              </Field>
+              <Field label="Total Units in Project">
+                <TextInput type="number" min="0" value={form.totalUnits} onChange={(e) => set("totalUnits", e.target.value)} placeholder="e.g. 240" />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <Field label="Facing">
+                <Select value={form.facing} onChange={(e) => set("facing", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {FACING_OPTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
+                </Select>
+              </Field>
+              <Field label="Entrance Direction">
+                <Select value={form.entranceDirection} onChange={(e) => set("entranceDirection", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {FACING_OPTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
+                </Select>
+              </Field>
+              <Field label="Vastu Status">
+                <Select value={form.vastuStatus} onChange={(e) => set("vastuStatus", e.target.value)}>
+                  {VASTU_OPTIONS.map((v) => <option key={v} value={v}>{v}</option>)}
+                </Select>
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <Field label="Furnishing">
+                <Select value={form.furnishing} onChange={(e) => set("furnishing", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {FURNISHING_OPTIONS.map((f) => <option key={f} value={f}>{f}</option>)}
+                </Select>
+              </Field>
+              <Field label="Condition">
+                <Select value={form.condition} onChange={(e) => set("condition", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {CONDITION_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+                </Select>
+              </Field>
+              <Field label="Age of Property">
+                <TextInput value={form.age} onChange={(e) => set("age", e.target.value)} placeholder="e.g. 2 years / New" />
+              </Field>
+            </div>
           </div>
 
           <div className="rounded-2xl p-6 space-y-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>

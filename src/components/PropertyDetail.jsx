@@ -180,6 +180,44 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               ))}
             </div>
 
+            {/* Property Details (project identity, configuration, area breakdown) */}
+            {(() => {
+              const unitLine = [property.projectName, property.towerBlock, property.unitNumberPublic ? property.unitNumber : null]
+                .filter(Boolean).join(", ");
+              const rows = [
+                property.listingCode && { label: "Listing ID", value: property.listingCode },
+                unitLine && { label: "Project / Unit", value: unitLine },
+                property.listingType && { label: "Listing Type", value: property.listingType },
+                property.bathrooms != null && { label: "Bathrooms", value: property.bathrooms },
+                property.balconies != null && { label: "Balconies", value: property.balconies },
+                property.servantRoom && { label: "Servant Room", value: "Yes" },
+                property.builtUpArea && { label: "Built-up Area", value: `${property.builtUpArea} sqft` },
+                property.superBuiltUpArea && { label: "Super Built-up Area", value: `${property.superBuiltUpArea} sqft` },
+                property.carpetArea && { label: "Carpet Area", value: `${property.carpetArea} sqft` },
+                property.plotArea && { label: "Plot Area", value: `${property.plotArea} sqft` },
+                property.totalFloors && { label: "Total Floors", value: property.totalFloors },
+                property.totalUnits && { label: "Total Units", value: property.totalUnits },
+                property.entranceDirection && { label: "Entrance Direction", value: property.entranceDirection },
+                property.vastuStatus && property.vastuStatus !== "Not Specified" && { label: "Vastu Status", value: property.vastuStatus },
+                property.furnishing && { label: "Furnishing", value: property.furnishing },
+                property.condition && { label: "Condition", value: property.condition },
+              ].filter(Boolean);
+              if (rows.length === 0) return null;
+              return (
+                <div className="mb-8">
+                  <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Property Details</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {rows.map((r) => (
+                      <div key={r.label} className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>{r.label}</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{r.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Description */}
             <div className="mb-8">
               <h2 className="text-base font-bold mb-2" style={{ color: "#1F2937" }}>About this property</h2>
