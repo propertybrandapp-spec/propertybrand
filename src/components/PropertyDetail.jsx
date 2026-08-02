@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
+import { fetchPriceHistory, fetchComparableListings } from "../lib/listings";
 import LocationMap from "./LocationMap";
 
 // Converts a YouTube/Vimeo share link into an embeddable iframe URL. Returns
@@ -30,19 +31,39 @@ function directionsUrl(property) {
 
 // Rough "what would this cost me a month" estimate for Buy listings, shown
 // so price/monthly-cost is understandable within the first screen without
-// forcing a trip to the full EMI Calculator. Assumes an 80% loan (20% down),
-// 8.5% p.a., 20-year tenure — typical defaults, not a quote. priceRaw is in
-// rupees; returns a formatted string like "₹68,432" or null if we don't have
-// a usable price.
+// forcing a trip to the full EMI Calculator. Uses the listing's own EMI
+// assumptions (Section 2B — set per-listing in the admin form, defaulting to
+// 20% down / 8.5% p.a. / 20-year tenure if the listing predates that field).
+// priceRaw is in rupees; returns a formatted string like "₹68,432" or null if
+// we don't have a usable price.
 function estimatedMonthlyEmi(property) {
   if (property.transactionType === "Rent" || !property.priceRaw) return null;
-  const principal = property.priceRaw * 0.8;
-  const monthlyRate = 0.085 / 12;
-  const months = 20 * 12;
+  const downPct = property.emiDownPaymentPercent ?? 20;
+  const rate = property.emiInterestRate ?? 8.5;
+  const years = property.emiTenureYears ?? 20;
+  const principal = property.priceRaw * (1 - downPct / 100);
+  const monthlyRate = rate / 100 / 12;
+  const months = years * 12;
   const factor = Math.pow(1 + monthlyRate, months);
   const emi = (principal * monthlyRate * factor) / (factor - 1);
   if (!isFinite(emi) || emi <= 0) return null;
   return `₹${Math.round(emi).toLocaleString("en-IN")}`;
+}
+
+// The assumptions behind estimatedMonthlyEmi(), spelled out for transparency
+// (spec asks for the EMI estimate to be shown "with interest-rate and tenure
+// assumptions", not just the number on its own).
+function emiAssumptionsText(property) {
+  const downPct = property.emiDownPaymentPercent ?? 20;
+  const rate = property.emiInterestRate ?? 8.5;
+  const years = property.emiTenureYears ?? 20;
+  return `Assumes ${downPct}% down payment, ${rate}% p.a. interest, ${years}-year tenure.`;
+}
+
+function downPaymentEstimate(property) {
+  if (property.transactionType === "Rent" || !property.priceRaw) return null;
+  const downPct = property.emiDownPaymentPercent ?? 20;
+  return `₹${Math.round(property.priceRaw * (downPct / 100)).toLocaleString("en-IN")}`;
 }
 
 // ── Mini card used in the "Similar Properties" strip ─────────────────────────
@@ -76,6 +97,19 @@ function SimilarCard({ property, onOpen }) {
 export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const { isPropertySaved, toggleSaveProperty } = useSavedItems();
   const [activeImage, setActiveImage] = useState(0);
+  const [priceHistory, setPriceHistory] = useState([]);
+  const [comparable, setComparable] = useState(null);
+
+  // Both hooks below must stay above the `if (!property)` early return —
+  // React requires hooks to run in the same order on every render.
+  useEffect(() => {
+    if (!property) return;
+    let cancelled = false;
+    const listingId = property.dbId || property.id;
+    fetchPriceHistory(listingId).then(({ data }) => { if (!cancelled) setPriceHistory(data || []); });
+    fetchComparableListings(property.location, listingId).then(({ data }) => { if (!cancelled) setComparable(data); });
+    return () => { cancelled = true; };
+  }, [property?.dbId, property?.id, property?.location]);
 
   if (!property) {
     return (
@@ -218,6 +252,122 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               );
             })()}
 
+            {/* Price & Financial Details (Section 2B) */}
+            {(() => {
+              const costRows = [
+                property.costBase && { label: "Base Cost", value: property.costBase },
+                property.costFloorRise && { label: "Floor Rise", value: property.costFloorRise },
+                property.costParking && { label: "Parking", value: property.costParking },
+                property.costClubhouse && { label: "Clubhouse", value: property.costClubhouse },
+                property.costPlc && { label: "PLC", value: property.costPlc },
+                property.costGst && { label: "GST", value: property.costGst },
+                property.costRegistration && { label: "Registration", value: property.costRegistration },
+                property.costMaintenanceDeposit && { label: "Maintenance Deposit", value: property.costMaintenanceDeposit },
+                property.costOther && { label: property.costOtherLabel || "Other Charges", value: property.costOther },
+              ].filter(Boolean);
+
+              const hasLoanInfo = property.approvedBanks?.length > 0 || property.loanEligibilityNotes;
+              const hasInvestmentInfo = property.estimatedMonthlyRent || property.rentalYieldPercent || property.appreciationPotential || property.recommendedHoldingPeriod;
+
+              if (costRows.length === 0 && !hasLoanInfo && !hasInvestmentInfo && !comparable && priceHistory.length <= 1) return null;
+
+              return (
+                <div className="mb-8 space-y-6">
+                  <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Price &amp; Financial Details</h2>
+
+                  {costRows.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Cost Breakup</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {costRows.map((r) => (
+                          <div key={r.label} className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                            <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>{r.label}</p>
+                            <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>₹{r.value.toLocaleString("en-IN")}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {comparable && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Comparable Pricing in {property.location}</p>
+                      <p className="text-sm" style={{ color: "#1F2937" }}>
+                        <span className="font-bold">₹{comparable.min.toLocaleString("en-IN")} – ₹{comparable.max.toLocaleString("en-IN")}</span> per sqft
+                        <span style={{ color: "#6B7280" }}> (avg ₹{comparable.avg.toLocaleString("en-IN")}/sqft, based on {comparable.count} other listing{comparable.count === 1 ? "" : "s"} nearby)</span>
+                      </p>
+                    </div>
+                  )}
+
+                  {hasInvestmentInfo && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Investment Indicators</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {property.estimatedMonthlyRent && (
+                          <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                            <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Est. Monthly Rent</p>
+                            <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>₹{property.estimatedMonthlyRent.toLocaleString("en-IN")}</p>
+                          </div>
+                        )}
+                        {property.rentalYieldPercent != null && (
+                          <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                            <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Rental Yield</p>
+                            <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.rentalYieldPercent}%/yr</p>
+                          </div>
+                        )}
+                        {property.appreciationPotential && (
+                          <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                            <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Appreciation Potential</p>
+                            <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.appreciationPotential}</p>
+                          </div>
+                        )}
+                        {property.recommendedHoldingPeriod && (
+                          <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                            <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Recommended Holding Period</p>
+                            <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.recommendedHoldingPeriod}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {hasLoanInfo && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Loan Eligibility</p>
+                      {property.approvedBanks?.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {property.approvedBanks.map((b) => (
+                            <span key={b} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#F1F5F9", color: "#1F2937" }}>{b}</span>
+                          ))}
+                        </div>
+                      )}
+                      {property.loanEligibilityNotes && (
+                        <p className="text-sm" style={{ color: "#6B7280" }}>{property.loanEligibilityNotes}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {priceHistory.length > 1 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Price History</p>
+                      <div className="space-y-1.5">
+                        {priceHistory.map((h, i) => (
+                          <div key={i} className="flex items-center justify-between text-sm">
+                            <span style={{ color: "#1F2937" }} className="font-semibold">{h.priceLabel}</span>
+                            <span style={{ color: "#6B7280" }}>{new Date(h.changedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <p className="text-[11px]" style={{ color: "#9CA3AF" }}>
+                    Last updated {new Date(property.updatedAt || property.createdAt || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                </div>
+              );
+            })()}
+
             {/* Description */}
             <div className="mb-8">
               <h2 className="text-base font-bold mb-2" style={{ color: "#1F2937" }}>About this property</h2>
@@ -324,21 +474,38 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 </div>
               </div>
 
-              <div className="flex items-baseline gap-2 mb-1">
+              <div className="flex items-baseline gap-2 mb-1 flex-wrap">
                 <span className="text-3xl font-extrabold" style={{ color: "#1E88E5" }}>{property.price}</span>
+                {property.priceNegotiable && (
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "#F0FDF4", color: "#16A34A" }}>Negotiable</span>
+                )}
               </div>
+              {property.pricePerSqft && (
+                <p className="text-xs mb-1" style={{ color: "#6B7280" }}>
+                  ₹{property.pricePerSqft.toLocaleString("en-IN")}/sqft{property.priceType ? ` · ${property.priceType}` : ""}
+                </p>
+              )}
               {property.transactionType === "Rent" && (
-                <p className="text-xs mb-4" style={{ color: "#6B7280" }}>+ security deposit &amp; maintenance, as applicable</p>
+                <p className="text-xs mb-4" style={{ color: "#6B7280" }}>
+                  {property.securityDeposit
+                    ? `+ ₹${property.securityDeposit.toLocaleString("en-IN")} security deposit`
+                    : "+ security deposit"}
+                  {property.maintenanceAmount ? ` & ₹${property.maintenanceAmount.toLocaleString("en-IN")}/${(property.maintenanceFrequency || "month").toLowerCase()} maintenance` : " & maintenance, as applicable"}
+                </p>
               )}
               {property.transactionType !== "Rent" && (
                 estimatedMonthlyEmi(property) ? (
-                  <p className="text-xs mb-4" style={{ color: "#6B7280" }}>
-                    Est. EMI <span className="font-bold" style={{ color: "#1F2937" }}>{estimatedMonthlyEmi(property)}/mo</span>
-                    {" "}(80% loan, 8.5% p.a., 20 yrs) ·{" "}
-                    <button onClick={() => onNavigate && onNavigate("investment-advisory", "emi-calculator")} className="font-semibold hover:underline" style={{ color: "#1E88E5" }}>
-                      Calculate exactly
-                    </button>
-                  </p>
+                  <div className="mb-4">
+                    <p className="text-xs" style={{ color: "#6B7280" }}>
+                      Est. EMI <span className="font-bold" style={{ color: "#1F2937" }}>{estimatedMonthlyEmi(property)}/mo</span>
+                      {downPaymentEstimate(property) && <> · Down payment <span className="font-bold" style={{ color: "#1F2937" }}>{downPaymentEstimate(property)}</span></>}
+                      {" "}·{" "}
+                      <button onClick={() => onNavigate && onNavigate("investment-advisory", "emi-calculator")} className="font-semibold hover:underline" style={{ color: "#1E88E5" }}>
+                        Calculate exactly
+                      </button>
+                    </p>
+                    <p className="text-[11px] mt-0.5" style={{ color: "#9CA3AF" }}>{emiAssumptionsText(property)}</p>
+                  </div>
                 ) : (
                   <div className="mb-4" />
                 )
