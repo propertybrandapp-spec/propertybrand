@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
-import { fetchPriceHistory, fetchComparableListings } from "../lib/listings";
+import { fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS } from "../lib/listings";
 import LocationMap from "./LocationMap";
 
 // Converts a YouTube/Vimeo share link into an embeddable iframe URL. Returns
@@ -16,18 +16,26 @@ function toEmbeddableVideoUrl(url) {
 }
 
 // Prefers an explicit share link (e.g. pointing at a specific building
-// entrance/Street View); otherwise builds a directions URL straight from
-// the pinned coordinates; otherwise falls back to a text search on the
-// location string. Always returns *something* usable as long as either a
-// pin or a location string exists.
-function directionsUrl(property) {
+// entrance/Street View) — travel mode can't be applied on top of a saved
+// link, so mode is ignored in that case; otherwise builds a directions URL
+// straight from the pinned coordinates; otherwise falls back to a text
+// search on the location string. Always returns *something* usable as long
+// as either a pin or a location string exists.
+function directionsUrl(property, mode = "driving") {
   if (property.googleMapsLink) return property.googleMapsLink;
   if (property.latitude != null && property.longitude != null) {
-    return `https://www.google.com/maps/dir/?api=1&destination=${property.latitude},${property.longitude}`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${property.latitude},${property.longitude}&travelmode=${mode}`;
   }
   if (!property.location) return null;
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.location)}`;
 }
+
+const ROUTE_MODES = [
+  { mode: "driving", label: "Drive" },
+  { mode: "walking", label: "Walk" },
+  { mode: "transit", label: "Transit" },
+  { mode: "bicycling", label: "Bike" },
+];
 
 // Rough "what would this cost me a month" estimate for Buy listings, shown
 // so price/monthly-cost is understandable within the first screen without
@@ -99,6 +107,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const [activeImage, setActiveImage] = useState(0);
   const [priceHistory, setPriceHistory] = useState([]);
   const [comparable, setComparable] = useState(null);
+  const [activeLandmarkLayer, setActiveLandmarkLayer] = useState(null); // null = show all layers
 
   // Both hooks below must stay above the `if (!property)` early return —
   // React requires hooks to run in the same order on every render.
@@ -186,7 +195,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               <h1 className="text-xl font-extrabold" style={{ color: "#1F2937" }}>{property.title}</h1>
               <div className="flex items-center gap-2 mt-1">
                 <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
-                {directionsUrl(property) && (
+                {directionsUrl(property) && property.addressVisibility !== "Locality Only" && (
                   <a href={directionsUrl(property)} target="_blank" rel="noopener noreferrer"
                     className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
                     Get Directions
@@ -394,19 +403,107 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
             )}
 
             {/* Location */}
-            {property.latitude != null && property.longitude != null && (
+            {(property.latitude != null || property.locality || property.city) && (
               <div className="mb-8">
-                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Location</h2>
-                <LocationMap latitude={property.latitude} longitude={property.longitude} label={property.title} />
-                <div className="flex items-center gap-2 mt-2">
-                  <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
-                  {directionsUrl(property) && (
-                    <a href={directionsUrl(property)} target="_blank" rel="noopener noreferrer"
-                      className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
-                      Get Directions
-                    </a>
-                  )}
+                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Location &amp; Connectivity</h2>
+
+                {property.addressVisibility === "Locality Only" ? (
+                  <div className="rounded-xl p-4 mb-3" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                    <p className="text-sm font-semibold" style={{ color: "#1F2937" }}>
+                      {[property.locality, property.city].filter(Boolean).join(", ") || property.location}
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Exact address is shared once you get in touch.</p>
+                  </div>
+                ) : (
+                  <LocationMap
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    label={property.title}
+                    addressVisibility={property.addressVisibility}
+                    listingId={property.dbId || property.id}
+                  />
+                )}
+
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                  <p className="text-sm" style={{ color: "#6B7280" }}>
+                    {[property.landmark && `Near ${property.landmark}`, property.locality, property.city, property.pincode].filter(Boolean).join(" · ") || property.location}
+                  </p>
                 </div>
+
+                {directionsUrl(property) && property.addressVisibility !== "Locality Only" && (
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    {ROUTE_MODES.map((r) => (
+                      <a key={r.mode} href={directionsUrl(property, r.mode)} target="_blank" rel="noopener noreferrer"
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-80" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                        {r.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                {(property.roadWidth || property.approachRoadDetails || property.publicTransportNotes || property.neighbourhoodProfile) && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+                    {property.roadWidth && (
+                      <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Road Width</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.roadWidth}</p>
+                      </div>
+                    )}
+                    {property.neighbourhoodProfile && (
+                      <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Neighbourhood</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.neighbourhoodProfile}</p>
+                      </div>
+                    )}
+                    {property.approachRoadDetails && (
+                      <div className="rounded-xl p-3.5 col-span-2" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Approach Road</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.approachRoadDetails}</p>
+                      </div>
+                    )}
+                    {property.publicTransportNotes && (
+                      <div className="rounded-xl p-3.5 col-span-2 sm:col-span-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Public Transport</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.publicTransportNotes}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {property.nearbyLandmarks?.length > 0 && (
+                  <div className="mt-5">
+                    <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>What's Nearby</p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <button onClick={() => setActiveLandmarkLayer(null)}
+                        className="text-xs font-bold px-3 py-1.5 rounded-full"
+                        style={activeLandmarkLayer === null ? { background: "#1E88E5", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
+                        All
+                      </button>
+                      {LANDMARK_LAYERS.filter((layer) => property.nearbyLandmarks.some((l) => LANDMARK_LAYER_GROUPS[l.category] === layer)).map((layer) => (
+                        <button key={layer} onClick={() => setActiveLandmarkLayer(layer)}
+                          className="text-xs font-bold px-3 py-1.5 rounded-full"
+                          style={activeLandmarkLayer === layer ? { background: "#1E88E5", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
+                          {layer}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {property.nearbyLandmarks
+                        .filter((l) => activeLandmarkLayer === null || LANDMARK_LAYER_GROUPS[l.category] === activeLandmarkLayer)
+                        .map((l, i) => (
+                          <div key={i} className="flex items-center justify-between text-sm rounded-lg px-3.5 py-2.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                            <div>
+                              <span className="font-semibold" style={{ color: "#1F2937" }}>{l.name || l.category}</span>
+                              <span className="text-xs ml-1.5" style={{ color: "#6B7280" }}>({l.category})</span>
+                            </div>
+                            <span className="text-xs shrink-0 ml-2" style={{ color: "#6B7280" }}>
+                              {[l.distance, l.travelTime].filter(Boolean).join(" · ")}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -465,7 +562,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
-                  {directionsUrl(property) && (
+                  {directionsUrl(property) && property.addressVisibility !== "Locality Only" && (
                     <a href={directionsUrl(property)} target="_blank" rel="noopener noreferrer"
                       className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
                       Get Directions
