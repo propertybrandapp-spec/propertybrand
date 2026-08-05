@@ -29,6 +29,9 @@ const BANK_PRESETS = ["SBI", "HDFC", "ICICI", "Axis Bank", "Bank of Baroda", "Pu
 // ── New in Section 2C: Location & Connectivity ──
 const ADDRESS_VISIBILITY_OPTIONS = ["Exact Address", "Approximate Location", "Locality Only"];
 const NEIGHBOURHOOD_PROFILE_OPTIONS = ["Residential", "Commercial", "Mixed-Use", "Emerging Growth Corridor"];
+// ── New in Section 2E: Legal & Verification Information ──
+const RERA_STATUS_OPTIONS = ["Registered", "Not Applicable", "Pending Verification"];
+const OWNERSHIP_TYPE_OPTIONS = ["Freehold", "Leasehold", "Cooperative", "Society", "Authority Lease", "Other"];
 
 const EMPTY_FORM = {
   title: "",
@@ -50,6 +53,11 @@ const EMPTY_FORM = {
 
   // ── Section 2A: Property Identity & Basic Details ──
   projectName: "",
+  developerName: "",
+  // ── Section 2E: Legal & Verification (self-declared subset only — see
+  // migration_017 comment for why the rest stays admin-only) ──
+  ownershipType: "",
+  reraStatus: "Pending Verification",
   towerBlock: "",
   unitNumber: "",
   unitNumberPublic: true,
@@ -468,10 +476,15 @@ export default function PostProperty({ onNavigate }) {
               <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Project details, room configuration, and area breakdown — helps buyers/tenants find exactly what they need.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Project Name" hint="Optional">
                 <TextInput value={form.projectName} onChange={(e) => set("projectName", e.target.value)} placeholder="e.g. Skyline Residency" />
               </Field>
+              <Field label="Developer / Builder Name" hint="Optional">
+                <TextInput value={form.developerName} onChange={(e) => set("developerName", e.target.value)} placeholder="e.g. Skyline Builders" />
+              </Field>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Tower / Block">
                 <TextInput value={form.towerBlock} onChange={(e) => set("towerBlock", e.target.value)} placeholder="e.g. Tower B" />
               </Field>
@@ -479,6 +492,23 @@ export default function PostProperty({ onNavigate }) {
                 <TextInput value={form.unitNumber} onChange={(e) => set("unitNumber", e.target.value)} placeholder="e.g. 1204" />
               </Field>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Ownership Type" hint="Optional">
+                <Select value={form.ownershipType} onChange={(e) => set("ownershipType", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {OWNERSHIP_TYPE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                </Select>
+              </Field>
+              <Field label="RERA Status">
+                <Select value={form.reraStatus} onChange={(e) => set("reraStatus", e.target.value)}>
+                  {RERA_STATUS_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                </Select>
+              </Field>
+            </div>
+            <p className="text-xs" style={{ color: "#6B7280" }}>
+              Other legal details (title status, certificates, verification) are confirmed by our team after review.
+            </p>
 
             <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
               <input type="checkbox" checked={form.unitNumberPublic} onChange={(e) => set("unitNumberPublic", e.target.checked)} className="w-4 h-4 rounded accent-[#1E88E5]" />

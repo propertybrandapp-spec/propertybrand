@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS } from "../lib/listings";
+import { fetchSiteSettings } from "../lib/siteContent";
 import LocationMap from "./LocationMap";
 
 // Converts a YouTube/Vimeo share link into an embeddable iframe URL. Returns
@@ -108,9 +109,14 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const [priceHistory, setPriceHistory] = useState([]);
   const [comparable, setComparable] = useState(null);
   const [activeLandmarkLayer, setActiveLandmarkLayer] = useState(null); // null = show all layers
+  const [legalDisclaimer, setLegalDisclaimer] = useState("");
 
   // Both hooks below must stay above the `if (!property)` early return —
   // React requires hooks to run in the same order on every render.
+  useEffect(() => {
+    fetchSiteSettings().then(({ data }) => { if (data?.legalDisclaimer) setLegalDisclaimer(data.legalDisclaimer); });
+  }, []);
+
   useEffect(() => {
     if (!property) return;
     let cancelled = false;
@@ -373,6 +379,254 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   <p className="text-[11px]" style={{ color: "#9CA3AF" }}>
                     Last updated {new Date(property.updatedAt || property.createdAt || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                   </p>
+                </div>
+              );
+            })()}
+
+            {/* Project & Developer Information (Section 2D) */}
+            {(property.developer || property.developerName || property.project) && (
+              <div className="mb-8 space-y-6">
+                <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Project &amp; Developer</h2>
+
+                {(property.developer || property.developerName) && (
+                  <div className="rounded-xl p-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-bold" style={{ color: "#1F2937" }}>
+                        {property.developer?.name || property.developerName}
+                      </p>
+                      {property.developer?.verified && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>✓ Verified Developer</span>
+                      )}
+                    </div>
+                    {property.developer && (property.developer.experienceYears || property.developer.completedProjectsCount || property.developer.currentProjectsCount) && (
+                      <p className="text-xs mt-1.5" style={{ color: "#6B7280" }}>
+                        {[
+                          property.developer.experienceYears && `${property.developer.experienceYears} years' experience`,
+                          property.developer.completedProjectsCount && `${property.developer.completedProjectsCount} completed projects`,
+                          property.developer.currentProjectsCount && `${property.developer.currentProjectsCount} ongoing`,
+                        ].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
+                    {property.developer?.description && (
+                      <p className="text-xs mt-1.5" style={{ color: "#6B7280" }}>{property.developer.description}</p>
+                    )}
+                  </div>
+                )}
+
+                {property.project && (
+                  <>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {property.project.landAreaAcres && (
+                        <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Land Area</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.landAreaAcres} acres</p>
+                        </div>
+                      )}
+                      {property.project.totalTowers && (
+                        <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Towers</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.totalTowers}</p>
+                        </div>
+                      )}
+                      {property.project.totalFloors && (
+                        <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Floors</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.totalFloors}</p>
+                        </div>
+                      )}
+                      {property.project.totalUnits && (
+                        <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Total Units</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.totalUnits}</p>
+                        </div>
+                      )}
+                      {property.project.unitsPerAcre && (
+                        <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Density</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.unitsPerAcre} units/acre</p>
+                        </div>
+                      )}
+                      {property.project.homesPerFloor && (
+                        <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Homes / Floor</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.homesPerFloor}</p>
+                        </div>
+                      )}
+                      {property.project.openSpacePercent && (
+                        <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Open / Green Space</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.openSpacePercent}%</p>
+                        </div>
+                      )}
+                      {property.project.expectedPossessionDate && (
+                        <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Expected Possession</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>
+                            {new Date(property.project.expectedPossessionDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {(property.project.constructionStage || property.project.handoverTimeline) && (
+                      <div className="rounded-xl p-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        {property.project.constructionStage && (
+                          <p className="text-sm font-bold" style={{ color: "#1F2937" }}>
+                            {property.project.constructionStage}
+                            {property.project.constructionStageVerifiedAt && (
+                              <span className="text-xs font-normal ml-1.5" style={{ color: "#6B7280" }}>
+                                · verified {new Date(property.project.constructionStageVerifiedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                              </span>
+                            )}
+                          </p>
+                        )}
+                        {property.project.handoverTimeline && (
+                          <p className="text-xs mt-1" style={{ color: "#6B7280" }}>{property.project.handoverTimeline}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {property.project.reraNumber && (
+                      <div className="rounded-xl p-4" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
+                        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: "#16A34A" }}>RERA Registered</p>
+                        <p className="text-sm font-bold mt-1" style={{ color: "#1F2937" }}>
+                          {property.project.reraNumber}{property.project.reraState ? ` · ${property.project.reraState}` : ""}
+                        </p>
+                        {property.project.reraProjectName && (
+                          <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>Registered as: {property.project.reraProjectName}</p>
+                        )}
+                        {property.project.reraVerificationLink && (
+                          <a href={property.project.reraVerificationLink} target="_blank" rel="noopener noreferrer"
+                            className="text-xs font-semibold hover:underline inline-block mt-1.5" style={{ color: "#16A34A" }}>
+                            Verify on state RERA portal →
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    {property.project.approvals?.length > 0 && (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Approvals</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {property.project.approvals.map((a, i) => (
+                            <div key={i} className="flex items-center justify-between text-sm rounded-lg px-3.5 py-2.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                              <span className="font-semibold" style={{ color: "#1F2937" }}>{a.name}</span>
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ml-2"
+                                style={a.status === "Approved" ? { background: "#F0FDF4", color: "#16A34A" } : { background: "#FFFBEB", color: "#B45309" }}>
+                                {a.status}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {property.project.documents?.length > 0 && (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Documents</p>
+                        <div className="flex flex-wrap gap-2">
+                          {property.project.documents.filter((d) => d.url).map((d, i) => (
+                            <a key={i} href={d.url} target="_blank" rel="noopener noreferrer"
+                              className="text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-80" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                              {d.label || d.type} ↓
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {(property.project.structureType || property.project.constructionQuality || property.project.keyMaterials) && (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Construction Quality</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+                          {property.project.structureType && (
+                            <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                              <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Structure Type</p>
+                              <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.structureType}</p>
+                            </div>
+                          )}
+                          {property.project.constructionQuality && (
+                            <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                              <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Quality</p>
+                              <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.project.constructionQuality}</p>
+                            </div>
+                          )}
+                        </div>
+                        {property.project.keyMaterials && (
+                          <p className="text-sm" style={{ color: "#6B7280" }}>{property.project.keyMaterials}</p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Legal & Verification Information (Section 2E) */}
+            {(() => {
+              const rows = [
+                property.reraStatus && { label: "RERA Status", value: property.reraStatus },
+                property.ownershipType && { label: "Ownership Type", value: property.ownershipType },
+                property.titleStatus && { label: "Title Status", value: property.titleStatus },
+                property.encumbranceStatus && { label: "Encumbrance", value: property.encumbranceStatus },
+                property.occupancyCertificateStatus && { label: "Occupancy Certificate", value: property.occupancyCertificateStatus },
+                property.completionCertificateStatus && { label: "Completion Certificate", value: property.completionCertificateStatus },
+                property.possessionCertificateStatus && { label: "Possession Certificate", value: property.possessionCertificateStatus },
+                property.buildingPlanStatus && { label: "Building Plan", value: property.buildingPlanStatus },
+                property.propertyTaxStatus && { label: "Property Tax", value: property.propertyTaxStatus },
+                property.utilityConnectionStatus && { label: "Utility Connections", value: property.utilityConnectionStatus },
+              ].filter(Boolean);
+
+              if (rows.length === 0 && !property.posterVerified && !legalDisclaimer) return null;
+
+              // Good/warning/neutral color coding for the more common statuses.
+              const POSITIVE = new Set(["Registered", "Clear Title", "Verified", "No Encumbrance", "Available", "Approved", "Paid Up to Date", "Connected"]);
+              const WARNING = new Set(["Disputed", "Under Litigation", "Not Verified", "Not Available", "Dues Pending", "Not Connected"]);
+
+              return (
+                <div className="mb-8 space-y-4">
+                  <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Legal &amp; Verification</h2>
+
+                  {property.posterVerified && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                        ✓ Verified {property.postedBy || "Owner"}
+                      </span>
+                      {(property.verificationDate || property.verificationSource) && (
+                        <span className="text-xs" style={{ color: "#6B7280" }}>
+                          {[
+                            property.verificationDate && new Date(property.verificationDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+                            property.verificationSource,
+                          ].filter(Boolean).join(" · ")}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {rows.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {rows.map((r) => (
+                        <div key={r.label} className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>{r.label}</p>
+                          <p className="text-sm font-bold mt-0.5" style={POSITIVE.has(r.value) ? { color: "#16A34A" } : WARNING.has(r.value) ? { color: "#B45309" } : { color: "#1F2937" }}>
+                            {r.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {(property.encumbranceNotes || property.utilityConnectionNotes) && (
+                    <p className="text-xs" style={{ color: "#6B7280" }}>
+                      {[property.encumbranceNotes, property.utilityConnectionNotes].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
+
+                  {legalDisclaimer && (
+                    <div className="rounded-xl p-4" style={{ background: "#FFFBEB", border: "1px solid #FDE68A" }}>
+                      <p className="text-xs leading-relaxed" style={{ color: "#92400E" }}>{legalDisclaimer}</p>
+                    </div>
+                  )}
                 </div>
               );
             })()}

@@ -66,7 +66,7 @@ async function handleDelete(request, env) {
 
   // Convert each public URL back into its R2 object key, and only allow
   // deleting inside the folders this Worker is allowed to write to
-  const ALLOWED_FOLDERS = ["listings", "blog", "avatars", "agents"];
+  const ALLOWED_FOLDERS = ["listings", "blog", "avatars", "agents", "documents"];
   const prefix = `${env.R2_PUBLIC_BASE_URL}/`;
   const safeKeys = urls
     .filter((u) => typeof u === "string" && u.startsWith(prefix))
@@ -97,15 +97,19 @@ async function handlePresign(request, env) {
   }
 
   // Restrict which folders are writable — prevents path traversal / abuse
-  const ALLOWED_FOLDERS = ["listings", "blog", "avatars", "agents"];
+  const ALLOWED_FOLDERS = ["listings", "blog", "avatars", "agents", "documents"];
   if (!ALLOWED_FOLDERS.includes(folder)) {
     return json({ error: `folder must be one of: ${ALLOWED_FOLDERS.join(", ")}` }, 400, request, env);
   }
 
-  // Restrict file types to images only
-  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+  // Images everywhere, plus PDFs — but only inside "documents" (project
+  // brochures / floor plans / master plans / spec sheets). Keeps listing
+  // photos, avatars, etc. image-only while allowing real PDF uploads for
+  // project documents.
+  const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+  const ALLOWED_TYPES = folder === "documents" ? [...ALLOWED_IMAGE_TYPES, "application/pdf"] : ALLOWED_IMAGE_TYPES;
   if (!ALLOWED_TYPES.includes(fileType)) {
-    return json({ error: "Only image uploads are allowed" }, 400, request, env);
+    return json({ error: folder === "documents" ? "Only image or PDF uploads are allowed" : "Only image uploads are allowed" }, 400, request, env);
   }
 
   const safeFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");

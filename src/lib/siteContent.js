@@ -166,6 +166,7 @@ function normalizeSiteSettings(row) {
     instagram: row.instagram_url,
     linkedin: row.linkedin_url,
     youtube: row.youtube_url,
+    legalDisclaimer: row.legal_disclaimer || "",
   };
 }
 
