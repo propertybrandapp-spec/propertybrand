@@ -32,6 +32,19 @@ const NEIGHBOURHOOD_PROFILE_OPTIONS = ["Residential", "Commercial", "Mixed-Use",
 // ── New in Section 2E: Legal & Verification Information ──
 const RERA_STATUS_OPTIONS = ["Registered", "Not Applicable", "Pending Verification"];
 const OWNERSHIP_TYPE_OPTIONS = ["Freehold", "Leasehold", "Cooperative", "Society", "Authority Lease", "Other"];
+// ── New in Section 2F: Amenities & Lifestyle ──
+const UNIT_FEATURES_OPTIONS = ["Modular Kitchen", "False Ceiling", "Wooden Flooring", "Vitrified Tile Flooring", "Walk-in Closet", "Study Room", "Private Balcony", "Premium Bath Fittings", "Piped Gas Connection", "In-unit Video Door Phone", "Air Conditioning", "Wardrobes", "Home Automation", "Private Terrace/Garden"];
+const PARKING_TYPE_OPTIONS = ["Open", "Covered", "Basement", "Multi-level Mechanical", "Stilt", "None"];
+const EV_CHARGING_OPTIONS = ["Available", "Not Available", "Planned"];
+const POWER_BACKUP_OPTIONS = ["None", "Common Areas Only", "Partial Apartment Backup", "Full Apartment Backup"];
+const SECURITY_FEATURES_OPTIONS = ["Security Guards", "CCTV Surveillance", "Access Control", "Video Door Phone"];
+const WATER_SOURCE_OPTIONS = ["Municipal Supply", "Borewell", "Both", "Tanker Supply", "Not Specified"];
+const WATER_SEWAGE_FEATURES_OPTIONS = ["Water Treatment Plant", "Sewage Treatment Plant (STP)", "Rainwater Harvesting"];
+const INTERNET_READINESS_OPTIONS = ["Fibre Ready", "Broadband Ready", "Not Ready", "Not Specified"];
+const MOBILE_NETWORK_QUALITY_OPTIONS = ["Excellent", "Good", "Average", "Poor", "Not Specified"];
+const PET_POLICY_OPTIONS = ["Pets Allowed", "Not Allowed", "Restrictions Apply", "Not Specified"];
+const SENIOR_CITIZEN_FEATURES_OPTIONS = ["Ramps", "Lifts", "Handrails", "Common Seating Areas", "Emergency Support/Alert System"];
+const ACCESSIBILITY_FEATURES_OPTIONS = ["Wheelchair Ramps", "Wide Doorways", "Accessible Restrooms", "Braille Signage", "Accessible Parking", "Elevator Access", "Tactile Flooring"];
 
 const EMPTY_FORM = {
   title: "",
@@ -119,6 +132,22 @@ const EMPTY_FORM = {
   approachRoadDetails: "",
   publicTransportNotes: "",
   neighbourhoodProfile: "",
+
+  // ── Section 2F: Amenities & Lifestyle ──
+  unitFeatures: [],
+  parkingType: "",
+  parkingSlots: "",
+  evChargingStatus: "",
+  powerBackupType: "",
+  securityFeatures: [],
+  waterSource: "",
+  waterSewageFeatures: [],
+  internetReadiness: "",
+  mobileNetworkQuality: "",
+  petPolicy: "",
+  petPolicyNotes: "",
+  seniorCitizenFeatures: [],
+  accessibilityFeatures: [],
 };
 
 const inputStyle = { background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" };
@@ -465,6 +494,116 @@ export default function PostProperty({ onNavigate }) {
               <div className="flex flex-wrap gap-2">
                 {AMENITIES.map((a) => (
                   <Chip key={a} label={a} active={form.amenities.includes(a)} onClick={() => toggleInArray("amenities", a)} />
+                ))}
+              </div>
+            </Field>
+          </div>
+
+          <div className="rounded-2xl p-6 space-y-6" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+            <div>
+              <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Amenities &amp; Lifestyle</h2>
+              <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Unit-level features, parking, security, utilities, and accessibility.</p>
+            </div>
+
+            <Field label="Unit-Level Features" hint="Specific to this unit — separate from the shared amenities above.">
+              <div className="flex flex-wrap gap-2">
+                {UNIT_FEATURES_OPTIONS.map((u) => (
+                  <Chip key={u} label={u} active={form.unitFeatures.includes(u)} onClick={() => toggleInArray("unitFeatures", u)} />
+                ))}
+              </div>
+            </Field>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Field label="Parking Type">
+                <Select value={form.parkingType} onChange={(e) => set("parkingType", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {PARKING_TYPE_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
+                </Select>
+              </Field>
+              <Field label="Parking Slots">
+                <TextInput type="number" min="0" value={form.parkingSlots} onChange={(e) => set("parkingSlots", e.target.value)} placeholder="e.g. 2" />
+              </Field>
+              <Field label="EV Charging">
+                <Select value={form.evChargingStatus} onChange={(e) => set("evChargingStatus", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {EV_CHARGING_OPTIONS.map((e_) => <option key={e_} value={e_}>{e_}</option>)}
+                </Select>
+              </Field>
+            </div>
+
+            <Field label="Power Backup">
+              <Select value={form.powerBackupType} onChange={(e) => set("powerBackupType", e.target.value)}>
+                <option value="">— N/A —</option>
+                {POWER_BACKUP_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
+              </Select>
+            </Field>
+
+            <Field label="Security Features">
+              <div className="flex flex-wrap gap-2">
+                {SECURITY_FEATURES_OPTIONS.map((s) => (
+                  <Chip key={s} label={s} active={form.securityFeatures.includes(s)} onClick={() => toggleInArray("securityFeatures", s)} />
+                ))}
+              </div>
+            </Field>
+
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: "#6B7280" }}>Water &amp; Sewage</h3>
+              <Field label="Water Source">
+                <Select value={form.waterSource} onChange={(e) => set("waterSource", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {WATER_SOURCE_OPTIONS.map((w) => <option key={w} value={w}>{w}</option>)}
+                </Select>
+              </Field>
+              <div className="mt-3">
+                <Field label="Water & Sewage Features">
+                  <div className="flex flex-wrap gap-2">
+                    {WATER_SEWAGE_FEATURES_OPTIONS.map((w) => (
+                      <Chip key={w} label={w} active={form.waterSewageFeatures.includes(w)} onClick={() => toggleInArray("waterSewageFeatures", w)} />
+                    ))}
+                  </div>
+                </Field>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Internet / Fibre Readiness">
+                <Select value={form.internetReadiness} onChange={(e) => set("internetReadiness", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {INTERNET_READINESS_OPTIONS.map((i) => <option key={i} value={i}>{i}</option>)}
+                </Select>
+              </Field>
+              <Field label="Mobile Network Quality">
+                <Select value={form.mobileNetworkQuality} onChange={(e) => set("mobileNetworkQuality", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {MOBILE_NETWORK_QUALITY_OPTIONS.map((m) => <option key={m} value={m}>{m}</option>)}
+                </Select>
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Pet Policy">
+                <Select value={form.petPolicy} onChange={(e) => set("petPolicy", e.target.value)}>
+                  <option value="">— N/A —</option>
+                  {PET_POLICY_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
+                </Select>
+              </Field>
+              <Field label="Pet Policy Notes">
+                <TextInput value={form.petPolicyNotes} onChange={(e) => set("petPolicyNotes", e.target.value)} placeholder="e.g. Small breeds only" />
+              </Field>
+            </div>
+
+            <Field label="Senior-Citizen-Friendly Features">
+              <div className="flex flex-wrap gap-2">
+                {SENIOR_CITIZEN_FEATURES_OPTIONS.map((s) => (
+                  <Chip key={s} label={s} active={form.seniorCitizenFeatures.includes(s)} onClick={() => toggleInArray("seniorCitizenFeatures", s)} />
+                ))}
+              </div>
+            </Field>
+
+            <Field label="Accessibility Features">
+              <div className="flex flex-wrap gap-2">
+                {ACCESSIBILITY_FEATURES_OPTIONS.map((a) => (
+                  <Chip key={a} label={a} active={form.accessibilityFeatures.includes(a)} onClick={() => toggleInArray("accessibilityFeatures", a)} />
                 ))}
               </div>
             </Field>

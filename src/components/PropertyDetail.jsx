@@ -640,21 +640,89 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
             </div>
 
             {/* Amenities */}
-            {property.amenities?.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Amenities</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {property.amenities.map((a) => (
-                    <div key={a} className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ background: "#EFF6FF", color: "#1F2937" }}>
-                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="#1E88E5" strokeWidth={2.5} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      {a}
+            {property.amenities?.length > 0 && (() => {
+              const detailsByName = Object.fromEntries((property.amenityDetails || []).map((d) => [d.name, d]));
+              return (
+                <div className="mb-8">
+                  <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Amenities</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    {property.amenities.map((a) => {
+                      const d = detailsByName[a];
+                      return (
+                        <div key={a} className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ background: "#EFF6FF", color: "#1F2937" }}>
+                          <svg className="w-4 h-4 shrink-0" fill="none" stroke="#1E88E5" strokeWidth={2.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>
+                            {a}
+                            {d && (d.status || d.condition) && (
+                              <span className="block text-[10px] font-normal" style={{ color: "#6B7280" }}>
+                                {[d.status, d.condition].filter(Boolean).join(" · ")}
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Amenities & Lifestyle detail (Section 2F) */}
+            {(() => {
+              const facts = [
+                property.parkingType && { label: "Parking", value: `${property.parkingType}${property.parkingSlots ? ` · ${property.parkingSlots} slot${property.parkingSlots === 1 ? "" : "s"}` : ""}` },
+                property.evChargingStatus && { label: "EV Charging", value: property.evChargingStatus },
+                property.powerBackupType && { label: "Power Backup", value: property.powerBackupType },
+                property.waterSource && { label: "Water Source", value: property.waterSource },
+                property.internetReadiness && { label: "Internet", value: property.internetReadiness },
+                property.mobileNetworkQuality && { label: "Mobile Network", value: property.mobileNetworkQuality },
+                property.petPolicy && { label: "Pet Policy", value: property.petPolicy },
+              ].filter(Boolean);
+
+              const checklistGroups = [
+                { title: "Unit-Level Features", items: property.unitFeatures },
+                { title: "Security", items: property.securityFeatures },
+                { title: "Water & Sewage", items: property.waterSewageFeatures },
+                { title: "Senior-Citizen-Friendly", items: property.seniorCitizenFeatures },
+                { title: "Accessibility", items: property.accessibilityFeatures },
+              ].filter((g) => g.items?.length > 0);
+
+              if (facts.length === 0 && checklistGroups.length === 0) return null;
+
+              return (
+                <div className="mb-8 space-y-5">
+                  <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Lifestyle &amp; Convenience</h2>
+
+                  {facts.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {facts.map((f) => (
+                        <div key={f.label} className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>{f.label}</p>
+                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{f.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {property.petPolicyNotes && (
+                    <p className="text-xs" style={{ color: "#6B7280" }}>{property.petPolicyNotes}</p>
+                  )}
+
+                  {checklistGroups.map((g) => (
+                    <div key={g.title}>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>{g.title}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {g.items.map((item) => (
+                          <span key={item} className="text-xs font-semibold px-3 py-1.5 rounded-full" style={{ background: "#F1F5F9", color: "#1F2937" }}>{item}</span>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Location */}
             {(property.latitude != null || property.locality || property.city) && (
