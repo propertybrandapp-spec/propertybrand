@@ -42,7 +42,7 @@ const TIMELINE = [
 ];
 
 const LEADERSHIP = [
-  { name: "Arjun Verma", role: "Founder & CEO", avatar: "AV", bg: "linear-gradient(135deg, #1E88E5, #0F2D52)" },
+  { name: "Arjun Verma", role: "Founder & CEO", avatar: "AV", bg: "linear-gradient(135deg, #1565C0, #0F2D52)" },
   { name: "Meera Kapoor", role: "Chief Operating Officer", avatar: "MK", bg: "linear-gradient(135deg, #F59E0B, #b85f00)" },
   { name: "Rohan Bose", role: "Head of Investment Advisory", avatar: "RB", bg: "linear-gradient(135deg, #16A34A, #0f7a32)" },
   { name: "Ananya Iyer", role: "Head of Technology", avatar: "AI", bg: "linear-gradient(135deg, #a78bfa, #7c5cd6)" },
@@ -58,7 +58,7 @@ export default function AboutUs({ onNavigate }) {
         <div className="max-w-4xl mx-auto text-center">
           <span
             className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-            style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
+            style={{ background: "#FFFFFF", color: "#1565C0", border: "1px solid #1565C0" }}
           >
             About PropertyBrands
           </span>
@@ -77,7 +77,7 @@ export default function AboutUs({ onNavigate }) {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 rounded-2xl p-6 lg:p-8" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", boxShadow: "0 20px 40px rgba(31,41,55,0.08)" }}>
             {STATS.map((s) => (
               <div key={s.label} className="text-center">
-                <p className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1E88E5" }}>{s.value}</p>
+                <p className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1565C0" }}>{s.value}</p>
                 <p className="text-sm mt-1" style={{ color: "#6B7280" }}>{s.label}</p>
               </div>
             ))}
@@ -100,16 +100,16 @@ export default function AboutUs({ onNavigate }) {
               <button
                 onClick={() => onNavigate && onNavigate("home")}
                 className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#1E88E5", color: "#FFFFFF" }}
-                onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
-                onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
+                style={{ background: "#1565C0", color: "#FFFFFF" }}
+                onMouseEnter={(e) => e.currentTarget.style.background = "#0D47A1"}
+                onMouseLeave={(e) => e.currentTarget.style.background = "#1565C0"}
               >
                 Explore Properties
               </button>
               <button
                 onClick={() => onNavigate && onNavigate("contact")}
                 className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#FFFFFF", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
+                style={{ background: "#FFFFFF", color: "#1565C0", border: "1.5px solid #1565C0" }}
               >
                 Talk to Us
               </button>
@@ -130,7 +130,7 @@ export default function AboutUs({ onNavigate }) {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>What Drives Us</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1565C0" }} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {VALUES.map((v) => (
@@ -140,7 +140,7 @@ export default function AboutUs({ onNavigate }) {
                 style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
               >
                 <span className="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
-                  <v.icon className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                  <v.icon className="w-6 h-6" style={{ color: "#1565C0" }} strokeWidth={2} />
                 </span>
                 <h3 className="text-sm font-bold mb-2" style={{ color: "#1F2937" }}>{v.title}</h3>
                 <p className="text-xs leading-relaxed" style={{ color: "#6B7280" }}>{v.desc}</p>
@@ -155,7 +155,7 @@ export default function AboutUs({ onNavigate }) {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>Our Journey</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1565C0" }} />
           </div>
           <div className="space-y-0">
             {TIMELINE.map((item, i) => (
@@ -163,14 +163,14 @@ export default function AboutUs({ onNavigate }) {
                 <div className="flex flex-col items-center shrink-0">
                   <div
                     className="w-3 h-3 rounded-full shrink-0"
-                    style={{ background: i === TIMELINE.length - 1 ? "#1E88E5" : "#1E88E5" }}
+                    style={{ background: i === TIMELINE.length - 1 ? "#1565C0" : "#1565C0" }}
                   />
                   {i < TIMELINE.length - 1 && (
                     <div className="w-px flex-1" style={{ background: "#E2E8F0", minHeight: "40px" }} />
                   )}
                 </div>
                 <div className="pb-8">
-                  <span className="text-sm font-extrabold" style={{ color: "#1E88E5" }}>{item.year}</span>
+                  <span className="text-sm font-extrabold" style={{ color: "#1565C0" }}>{item.year}</span>
                   <h3 className="text-base font-bold mt-1" style={{ color: "#1F2937" }}>{item.title}</h3>
                   <p className="text-sm mt-1" style={{ color: "#6B7280" }}>{item.desc}</p>
                 </div>
@@ -185,7 +185,7 @@ export default function AboutUs({ onNavigate }) {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>Leadership Team</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1565C0" }} />
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {LEADERSHIP.map((p) => (
@@ -208,7 +208,7 @@ export default function AboutUs({ onNavigate }) {
       <section className="px-4 py-14">
         <div
           className="max-w-5xl mx-auto rounded-3xl p-10 lg:p-14 text-center"
-          style={{ background: "linear-gradient(135deg, #1E88E5 0%, #1565C0 100%)" }}
+          style={{ background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)" }}
         >
           <h2 className="text-2xl lg:text-3xl font-extrabold text-white mb-3">Ready to Get Started?</h2>
           <p className="text-sm lg:text-base text-white/85 mb-7 max-w-lg mx-auto">
@@ -218,7 +218,7 @@ export default function AboutUs({ onNavigate }) {
             <button
               onClick={() => onNavigate && onNavigate("home")}
               className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-              style={{ background: "#FFFFFF", color: "#1E88E5" }}
+              style={{ background: "#FFFFFF", color: "#1565C0" }}
             >
               Explore Properties
             </button>

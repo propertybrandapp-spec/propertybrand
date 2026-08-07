@@ -42,7 +42,7 @@ export default function CompareBar({ onNavigate }) {
           onClick={() => onNavigate && onNavigate("compare")}
           disabled={items.length < 2}
           className="text-sm font-bold px-4 py-2 rounded-xl shrink-0 disabled:opacity-50"
-          style={{ background: "#1E88E5", color: "#FFFFFF" }}
+          style={{ background: "#1565C0", color: "#FFFFFF" }}
         >
           Compare {items.length >= 2 ? `(${items.length})` : ""}
         </button>

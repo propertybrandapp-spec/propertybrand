@@ -167,7 +167,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
       <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
+          style={{ background: "#FFFFFF", color: "#1565C0", border: "1px solid #1565C0" }}
         >
           Get in Touch
         </span>
@@ -188,7 +188,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
             >
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                style={{ background: "#EFF6FF", color: "#1E88E5" }}
+                style={{ background: "#EFF6FF", color: "#1565C0" }}
               >
                 {item.icon}
               </div>
@@ -221,12 +221,12 @@ export default function ContactUs({ onNavigate, initialSubject }) {
             <p className="text-sm mb-6" style={{ color: "#6B7280" }}>Fill out the form and we'll get back to you shortly.</p>
 
             {property && !submitted && (
-              <div className="flex items-center gap-3 mb-6 p-3 rounded-xl" style={{ background: "#EFF6FF", border: "1px solid #1E88E5" }}>
+              <div className="flex items-center gap-3 mb-6 p-3 rounded-xl" style={{ background: "#EFF6FF", border: "1px solid #1565C0" }}>
                 {property.images?.[0] && (
                   <img src={property.images[0]} alt={property.title} className="w-14 h-14 rounded-lg object-cover shrink-0" />
                 )}
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#1E88E5" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#1565C0" }}>
                     {intent === "site-visit" ? "Scheduling a visit for" : intent === "callback" ? "Requesting a callback about" : "Inquiring about"}
                   </p>
                   <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{property.title}</p>
@@ -244,7 +244,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                 </div>
                 <p className="font-bold text-lg" style={{ color: "#1F2937" }}>Message Sent!</p>
                 <p className="text-sm mt-1" style={{ color: "#6B7280" }}>We'll respond within 24 hours.</p>
-                <button onClick={() => setSubmitted(false)} className="mt-5 text-xs font-semibold underline" style={{ color: "#1E88E5" }}>
+                <button onClick={() => setSubmitted(false)} className="mt-5 text-xs font-semibold underline" style={{ color: "#1565C0" }}>
                   Send another message
                 </button>
               </div>
@@ -256,7 +256,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
                     style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-                    onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                    onFocus={(e) => e.target.style.borderColor = "#1565C0"}
                     onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                   />
                   <input
@@ -264,7 +264,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
                     style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-                    onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                    onFocus={(e) => e.target.style.borderColor = "#1565C0"}
                     onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                   />
                 </div>
@@ -273,7 +273,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
                   style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-                  onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                  onFocus={(e) => e.target.style.borderColor = "#1565C0"}
                   onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
                 <select
@@ -295,19 +295,19 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition resize-none"
                   style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-                  onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                  onFocus={(e) => e.target.style.borderColor = "#1565C0"}
                   onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
                 {error && (
-                  <p className="text-xs font-semibold" style={{ color: "#1E88E5" }}>{error}</p>
+                  <p className="text-xs font-semibold" style={{ color: "#1565C0" }}>{error}</p>
                 )}
                 <button
                   onClick={handleSubmit}
                   disabled={submitting}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-60"
-                  style={{ background: "#1E88E5", color: "#FFFFFF" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
+                  style={{ background: "#1565C0", color: "#FFFFFF" }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = "#0D47A1"}
+                  onMouseLeave={(e) => e.currentTarget.style.background = "#1565C0"}
                 >
                   {submitting ? "Sending..." : "Send Message"}
                 </button>
@@ -328,7 +328,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
               <div key={office.id || office.city} className="rounded-2xl p-5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-bold" style={{ color: "#1F2937" }}>{office.city} Office</p>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1565C0" }}>
                     Open
                   </span>
                 </div>
@@ -350,7 +350,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-extrabold" style={{ color: "#1F2937" }}>Frequently Asked Questions</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1565C0" }} />
           </div>
           <div className="space-y-3">
             {FAQ.map((item, i) => (
@@ -363,7 +363,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   <span className="text-sm font-semibold" style={{ color: "#1F2937" }}>{item.q}</span>
                   <svg
                     className="w-4 h-4 shrink-0 transition-transform"
-                    style={{ color: "#1E88E5", transform: openFaq === i ? "rotate(180deg)" : "rotate(0deg)" }}
+                    style={{ color: "#1565C0", transform: openFaq === i ? "rotate(180deg)" : "rotate(0deg)" }}
                     fill="currentColor" viewBox="0 0 20 20"
                   >
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />

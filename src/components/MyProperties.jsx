@@ -49,11 +49,11 @@ export default function MyProperties({ onNavigate }) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
         <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
-          <Tag className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+          <Tag className="w-7 h-7" style={{ color: "#1565C0" }} strokeWidth={2} />
         </span>
         <p className="text-lg font-bold mb-2" style={{ color: "#1F2937" }}>Log in to see your properties</p>
         <p className="text-sm mb-5" style={{ color: "#6B7280" }}>Track the properties you've posted and their review status.</p>
-        <button onClick={() => onNavigate && onNavigate("home")} className="px-6 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+        <button onClick={() => onNavigate && onNavigate("home")} className="px-6 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#1565C0", color: "#FFFFFF" }}>
           Return Home
         </button>
       </div>
@@ -66,9 +66,9 @@ export default function MyProperties({ onNavigate }) {
         <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
           <div>
             <h1 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>My Properties</h1>
-            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1565C0" }} />
           </div>
-          <button onClick={() => onNavigate && onNavigate("post-property")} className="px-5 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+          <button onClick={() => onNavigate && onNavigate("post-property")} className="px-5 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#1565C0", color: "#FFFFFF" }}>
             + Post a Property
           </button>
         </div>
@@ -80,11 +80,11 @@ export default function MyProperties({ onNavigate }) {
         ) : listings.length === 0 ? (
           <div className="rounded-2xl flex flex-col items-center justify-center py-20 text-center" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
             <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
-              <Home className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+              <Home className="w-7 h-7" style={{ color: "#1565C0" }} strokeWidth={2} />
             </span>
             <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>You haven't posted any properties yet</p>
             <p className="text-sm mb-5" style={{ color: "#6B7280" }}>List your property for free — it takes just a couple of minutes.</p>
-            <button onClick={() => onNavigate && onNavigate("post-property")} className="px-6 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+            <button onClick={() => onNavigate && onNavigate("post-property")} className="px-6 py-2.5 rounded-xl text-sm font-bold" style={{ background: "#1565C0", color: "#FFFFFF" }}>
               Post a Property
             </button>
           </div>
@@ -105,19 +105,19 @@ export default function MyProperties({ onNavigate }) {
                       <StatusBadge status={listing.moderationStatus} />
                     </div>
                     <p className="text-xs mb-1 truncate" style={{ color: "#6B7280" }}>{listing.location}</p>
-                    <p className="text-base font-extrabold mb-2" style={{ color: "#1E88E5" }}>{listing.price}</p>
+                    <p className="text-base font-extrabold mb-2" style={{ color: "#1565C0" }}>{listing.price}</p>
                     <p className="text-xs mb-3" style={{ color: "#6B7280" }}>{statusInfo.note}</p>
 
                     <div className="flex gap-2">
                       {listing.moderationStatus === "Live" && (
-                        <button onClick={() => openProperty(listing)} className="flex-1 py-2 rounded-lg text-xs font-bold" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                        <button onClick={() => openProperty(listing)} className="flex-1 py-2 rounded-lg text-xs font-bold" style={{ background: "#EFF6FF", color: "#1565C0" }}>
                           View Listing
                         </button>
                       )}
                       {listing.moderationStatus === "Pending" && (
                         confirmWithdrawId === listing.id ? (
                           <div className="flex gap-2 flex-1">
-                            <button onClick={() => handleWithdraw(listing)} className="flex-1 py-2 rounded-lg text-xs font-bold" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+                            <button onClick={() => handleWithdraw(listing)} className="flex-1 py-2 rounded-lg text-xs font-bold" style={{ background: "#1565C0", color: "#FFFFFF" }}>
                               Confirm
                             </button>
                             <button onClick={() => setConfirmWithdrawId(null)} className="flex-1 py-2 rounded-lg text-xs font-bold" style={{ background: "#F1F5F9", color: "#6B7280" }}>

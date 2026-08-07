@@ -18,7 +18,7 @@ const NEWS_ITEMS = [
   {
     id: 1,
     tag: "Policy",
-    tagColor: "bg-blue-100 text-[#1E88E5]",
+    tagColor: "bg-blue-100 text-[#1565C0]",
     headline: "Govt extends PMAY subsidy for affordable housing till March 2026",
     time: "2 hours ago",
     source: "Economic Times",
@@ -89,7 +89,7 @@ function BlogCard({ post }) {
           className="absolute top-3 right-3 w-7 h-7 rounded-full bg-[#FFFFFF]/90 flex items-center justify-center hover:scale-110 transition"
         >
           <svg
-            className={`w-3.5 h-3.5 ${bookmarked ? "fill-[#1E88E5] text-[#1E88E5]" : "fill-none text-[#6B7280]"}`}
+            className={`w-3.5 h-3.5 ${bookmarked ? "fill-[#1565C0] text-[#1565C0]" : "fill-none text-[#6B7280]"}`}
             stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -99,7 +99,7 @@ function BlogCard({ post }) {
 
       {/* Body */}
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="text-sm font-bold text-[#1F2937] leading-snug mb-2 group-hover:text-[#1E88E5] transition-colors line-clamp-2">
+        <h3 className="text-sm font-bold text-[#1F2937] leading-snug mb-2 group-hover:text-[#1565C0] transition-colors line-clamp-2">
           {post.title}
         </h3>
         <p className="text-xs text-[#6B7280] leading-relaxed mb-3 line-clamp-2 flex-1">
@@ -118,7 +118,7 @@ function BlogCard({ post }) {
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t border-[#E2E8F0]">
           <div className="flex items-center gap-1.5">
-            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#1E88E5] to-[#1E88E5] flex items-center justify-center text-white text-[8px] font-bold">
+            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#1565C0] to-[#1565C0] flex items-center justify-center text-white text-[8px] font-bold">
               {post.author.charAt(0)}
             </div>
             <span className="text-[10px] text-[#6B7280] font-medium">{post.author}</span>
@@ -182,7 +182,7 @@ function FeaturedArticle({ article }) {
         </div>
 
         {/* Title */}
-        <h2 className="text-white text-xl font-extrabold leading-snug mb-2 line-clamp-2 transition-colors duration-300 group-hover:text-[#1E88E5]">
+        <h2 className="text-white text-xl font-extrabold leading-snug mb-2 line-clamp-2 transition-colors duration-300 group-hover:text-[#1565C0]">
           {article.title}
         </h2>
 
@@ -196,7 +196,7 @@ function FeaturedArticle({ article }) {
           
           {/* Author */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1E88E5] to-[#F59E0B] flex items-center justify-center text-white text-[10px] font-bold shadow-md">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1565C0] to-[#F59E0B] flex items-center justify-center text-white text-[10px] font-bold shadow-md">
               {article.author.charAt(0)}
             </div>
 
@@ -212,7 +212,7 @@ function FeaturedArticle({ article }) {
           </div>
 
           {/* CTA */}
-          <button className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:border-[#1E88E5] hover:bg-[#1E88E5]">
+          <button className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:border-[#1565C0] hover:bg-[#1565C0]">
             Read Full Article
 
             <svg
@@ -243,10 +243,10 @@ function NewsFeed({ onNavigate }) {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-[#1E88E5] rounded-full animate-pulse" />
+          <span className="w-2 h-2 bg-[#1565C0] rounded-full animate-pulse" />
           <h3 className="text-sm font-bold text-[#1F2937]">Live Market News</h3>
         </div>
-        <button onClick={() => onNavigate && onNavigate("blog")} className="text-xs font-semibold text-[#1E88E5] hover:underline">View all</button>
+        <button onClick={() => onNavigate && onNavigate("blog")} className="text-xs font-semibold text-[#1565C0] hover:underline">View all</button>
       </div>
 
       {/* News items */}
@@ -258,7 +258,7 @@ function NewsFeed({ onNavigate }) {
                 {item.tag}
               </span>
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-[#1F2937] leading-snug group-hover:text-[#1E88E5] transition line-clamp-2">
+                <p className="text-xs font-semibold text-[#1F2937] leading-snug group-hover:text-[#1565C0] transition line-clamp-2">
                   {item.headline}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
@@ -279,9 +279,9 @@ function NewsFeed({ onNavigate }) {
           <input
             type="email"
             placeholder="your@email.com"
-            className="flex-1 text-xs border border-[#E2E8F0] rounded-lg px-3 py-2 focus:outline-none focus:border-[#1E88E5] bg-[#FFFFFF]"
+            className="flex-1 text-xs border border-[#E2E8F0] rounded-lg px-3 py-2 focus:outline-none focus:border-[#1565C0] bg-[#FFFFFF]"
           />
-          <button className="bg-[#1E88E5] text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-[#1565C0] transition shrink-0">
+          <button className="bg-[#1565C0] text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-[#0D47A1] transition shrink-0">
             Subscribe
           </button>
         </div>
@@ -323,12 +323,12 @@ export default function BlogInsights({ onNavigate }) {
             <h2 className="text-xl font-bold text-[#1F2937]">
               Latest Insights & Trends
             </h2>
-            <div className="w-10 h-0.5 bg-[#1E88E5] rounded-full mt-1" />
+            <div className="w-10 h-0.5 bg-[#1565C0] rounded-full mt-1" />
             <p className="text-[#6B7280] text-sm mt-1">
               Stay updated with real estate news, guides & market intelligence
             </p>
           </div>
-          <button onClick={() => onNavigate && onNavigate("blog")} className="flex items-center gap-1 text-sm font-semibold text-[#1E88E5] hover:underline">
+          <button onClick={() => onNavigate && onNavigate("blog")} className="flex items-center gap-1 text-sm font-semibold text-[#1565C0] hover:underline">
             View all articles
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -344,8 +344,8 @@ export default function BlogInsights({ onNavigate }) {
               onClick={() => setActiveCategory(cat.label)}
               className={`shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                 activeCategory === cat.label
-                  ? "bg-[#1E88E5] text-white border-[#1E88E5] shadow-sm"
-                  : "bg-[#FFFFFF] text-[#6B7280] border-[#E2E8F0] hover:border-[#1E88E5] hover:text-[#1E88E5]"
+                  ? "bg-[#1565C0] text-white border-[#1565C0] shadow-sm"
+                  : "bg-[#FFFFFF] text-[#6B7280] border-[#E2E8F0] hover:border-[#1565C0] hover:text-[#1565C0]"
               }`}
             >
               <cat.icon className="w-3.5 h-3.5" strokeWidth={2.5} />
@@ -363,7 +363,7 @@ export default function BlogInsights({ onNavigate }) {
         ) : posts.length === 0 ? (
           <div className="rounded-2xl flex flex-col items-center justify-center py-20 text-center" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
             <span className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
-              <Newspaper className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+              <Newspaper className="w-7 h-7" style={{ color: "#1565C0" }} strokeWidth={2} />
             </span>
             <p className="text-sm font-bold" style={{ color: "#1F2937" }}>No articles published yet</p>
             <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Check back soon for real estate news, guides & market insights.</p>
@@ -405,15 +405,15 @@ export default function BlogInsights({ onNavigate }) {
               <button
                 key={g.label}
                 onClick={() => onNavigate && onNavigate(g.page)}
-                className="flex items-center gap-3 p-3 rounded-xl border border-[#E2E8F0] hover:border-[#1E88E5] hover:bg-[#EFF6FF] transition group text-left w-full"
+                className="flex items-center gap-3 p-3 rounded-xl border border-[#E2E8F0] hover:border-[#1565C0] hover:bg-[#EFF6FF] transition group text-left w-full"
               >
                 <span className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#EFF6FF" }}>
-                  <g.icon className="w-[18px] h-[18px]" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                  <g.icon className="w-[18px] h-[18px]" style={{ color: "#1565C0" }} strokeWidth={2} />
                 </span>
-                <span className="text-sm font-semibold text-[#1F2937] group-hover:text-[#1E88E5] transition leading-snug">
+                <span className="text-sm font-semibold text-[#1F2937] group-hover:text-[#1565C0] transition leading-snug">
                   {g.label}
                 </span>
-                <svg className="w-4 h-4 text-[#6B7280] group-hover:text-[#1E88E5] ml-auto shrink-0 transition" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[#6B7280] group-hover:text-[#1565C0] ml-auto shrink-0 transition" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -422,7 +422,7 @@ export default function BlogInsights({ onNavigate }) {
         </div>
 
         {/* ── Newsletter CTA ── */}
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(30,136,229,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] p-8 shadow-lg">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(21,101,192,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] p-8 shadow-lg">
 
   {/* Decorative Glow */}
   <div className="absolute -top-16 -right-16 w-48 h-48 bg-sky-100 rounded-full blur-3xl opacity-40 pointer-events-none" />
@@ -431,7 +431,7 @@ export default function BlogInsights({ onNavigate }) {
     
     {/* Content */}
     <div className="max-w-xl">
-      <span className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest">
+      <span className="text-[#1565C0] text-xs font-bold uppercase tracking-widest">
         Newsletter
       </span>
 
@@ -452,10 +452,10 @@ export default function BlogInsights({ onNavigate }) {
       <input
         type="email"
         placeholder="Enter your email"
-        className="w-full md:w-72 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-[#1F2937] shadow-sm transition-all focus:border-[#1E88E5] focus:outline-none focus:ring-4 focus:ring-sky-100"
+        className="w-full md:w-72 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-[#1F2937] shadow-sm transition-all focus:border-[#1565C0] focus:outline-none focus:ring-4 focus:ring-sky-100"
       />
 
-      <button className="rounded-xl bg-[#1E88E5] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#1565C0] hover:shadow-lg">
+      <button className="rounded-xl bg-[#1565C0] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#0D47A1] hover:shadow-lg">
         Subscribe
       </button>
 

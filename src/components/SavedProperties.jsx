@@ -38,7 +38,7 @@ export default function SavedProperties({ onNavigate }) {
         <button
           onClick={() => onNavigate && onNavigate("home")}
           className="px-6 py-2.5 rounded-xl text-sm font-bold"
-          style={{ background: "#1E88E5", color: "#FFFFFF" }}
+          style={{ background: "#1565C0", color: "#FFFFFF" }}
         >
           Return Home
         </button>
@@ -57,7 +57,7 @@ export default function SavedProperties({ onNavigate }) {
       <div className="max-w-5xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>Saved Items</h1>
-          <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
+          <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1565C0" }} />
         </div>
 
         {/* ── Tabs ── */}
@@ -66,7 +66,7 @@ export default function SavedProperties({ onNavigate }) {
             onClick={() => setTab("properties")}
             className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all"
             style={{
-              background: tab === "properties" ? "#1E88E5" : "#F1F5F9",
+              background: tab === "properties" ? "#1565C0" : "#F1F5F9",
               color: tab === "properties" ? "#FFFFFF" : "#6B7280",
             }}
           >
@@ -76,7 +76,7 @@ export default function SavedProperties({ onNavigate }) {
             onClick={() => setTab("articles")}
             className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all"
             style={{
-              background: tab === "articles" ? "#1E88E5" : "#F1F5F9",
+              background: tab === "articles" ? "#1565C0" : "#F1F5F9",
               color: tab === "articles" ? "#FFFFFF" : "#6B7280",
             }}
           >
@@ -109,12 +109,12 @@ export default function SavedProperties({ onNavigate }) {
                   <div className="p-4">
                     <p className="text-sm font-bold mb-1 truncate" style={{ color: "#1F2937" }}>{property.title}</p>
                     <p className="text-xs mb-2 truncate" style={{ color: "#6B7280" }}>{property.location}</p>
-                    <p className="text-base font-extrabold mb-3" style={{ color: "#1E88E5" }}>{property.price}</p>
+                    <p className="text-base font-extrabold mb-3" style={{ color: "#1565C0" }}>{property.price}</p>
                     <div className="flex gap-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); openProperty(property); }}
                         className="flex-1 py-2 rounded-lg text-xs font-bold"
-                        style={{ background: "#EFF6FF", color: "#1E88E5" }}
+                        style={{ background: "#EFF6FF", color: "#1565C0" }}
                       >
                         View Details
                       </button>
@@ -153,7 +153,7 @@ export default function SavedProperties({ onNavigate }) {
                       <button
                         onClick={() => onNavigate && onNavigate("blog")}
                         className="flex-1 py-2 rounded-lg text-xs font-bold"
-                        style={{ background: "#EFF6FF", color: "#1E88E5" }}
+                        style={{ background: "#EFF6FF", color: "#1565C0" }}
                       >
                         Read Article
                       </button>
@@ -185,7 +185,7 @@ function EmptyState({ icon, title, subtitle, ctaLabel, onCta }) {
       <button
         onClick={onCta}
         className="px-6 py-2.5 rounded-xl text-sm font-bold"
-        style={{ background: "#1E88E5", color: "#FFFFFF" }}
+        style={{ background: "#1565C0", color: "#FFFFFF" }}
       >
         {ctaLabel}
       </button>

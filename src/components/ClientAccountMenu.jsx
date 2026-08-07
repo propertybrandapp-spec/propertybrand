@@ -30,7 +30,7 @@ export default function ClientAccountMenu({ onNavigate }) {
         ) : (
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-            style={{ background: "#1E88E5", color: "#FFFFFF" }}
+            style={{ background: "#1565C0", color: "#FFFFFF" }}
           >
             {initials}
           </div>
@@ -58,7 +58,7 @@ export default function ClientAccountMenu({ onNavigate }) {
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt={displayName} className="w-10 h-10 rounded-full object-cover shrink-0" />
               ) : (
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "#1565C0", color: "#FFFFFF" }}>
                   {initials}
                 </div>
               )}

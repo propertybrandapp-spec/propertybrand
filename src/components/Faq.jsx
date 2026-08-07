@@ -78,7 +78,7 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
       <section className="px-4 py-16 lg:py-20 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
+          style={{ background: "#FFFFFF", color: "#1565C0", border: "1px solid #1565C0" }}
         >
           Help Center
         </span>
@@ -99,9 +99,9 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
               onClick={() => { setActiveCategory(cat); setOpenSlug(null); }}
               className="px-4 py-1.5 rounded-full text-sm font-semibold border transition-all"
               style={{
-                background: activeCategory === cat ? "#1E88E5" : "#FFFFFF",
+                background: activeCategory === cat ? "#1565C0" : "#FFFFFF",
                 color: activeCategory === cat ? "#FFFFFF" : "#6B7280",
-                borderColor: activeCategory === cat ? "#1E88E5" : "#E2E8F0",
+                borderColor: activeCategory === cat ? "#1565C0" : "#E2E8F0",
               }}
             >
               {cat}
@@ -130,12 +130,12 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
                 style={{ background: isHighlighted ? ANCHOR_HIGHLIGHT_STYLE.background : "#FFFFFF" }}
               >
                 <span className="flex items-center gap-3">
-                  <item.icon className="w-5 h-5 shrink-0" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                  <item.icon className="w-5 h-5 shrink-0" style={{ color: "#1565C0" }} strokeWidth={2} />
                   <span className="text-sm md:text-base font-bold" style={{ color: "#1F2937" }}>{item.q}</span>
                 </span>
                 <svg
                   className="w-4 h-4 shrink-0 transition-transform"
-                  style={{ color: "#1E88E5", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                  style={{ color: "#1565C0", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
                   fill="currentColor" viewBox="0 0 20 20"
                 >
                   <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -165,9 +165,9 @@ export default function Faq({ onNavigate, scrollTo, navKey }) {
           <button
             onClick={() => onNavigate && onNavigate("contact")}
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#1E88E5", color: "#FFFFFF" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
+            style={{ background: "#1565C0", color: "#FFFFFF" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#0D47A1"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#1565C0"}
           >
             Talk to Our Team
           </button>

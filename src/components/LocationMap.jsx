@@ -51,11 +51,11 @@ export default function LocationMap({ latitude, longitude, label, className = ""
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {isApproximate ? (
-          <Circle center={position} radius={350} pathOptions={{ color: "#1E88E5", fillColor: "#1E88E5", fillOpacity: 0.15 }}>
+          <Circle center={position} radius={350} pathOptions={{ color: "#1565C0", fillColor: "#1565C0", fillOpacity: 0.15 }}>
             <Popup>Approximate area — exact address shared after inquiry</Popup>
           </Circle>
         ) : (
-          <Marker position={position} icon={pinIcon("#1E88E5")}>
+          <Marker position={position} icon={pinIcon("#1565C0")}>
             {label && <Popup>{label}</Popup>}
           </Marker>
         )}

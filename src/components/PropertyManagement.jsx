@@ -15,7 +15,7 @@ const SERVICES = [
     title: "Tenant Management",
     desc: "End-to-end tenant sourcing, background verification, agreement drafting, and move-in coordination.",
     tag: "Most Requested",
-    tagColor: "#1E88E5",
+    tagColor: "#1565C0",
   },
   {
     icon: (
@@ -60,7 +60,7 @@ const SERVICES = [
     title: "Legal & Documentation",
     desc: "Lease agreement drafting, renewal management, NOC handling, and legal dispute resolution support.",
     tag: "RERA Compliant",
-    tagColor: "#1E88E5",
+    tagColor: "#1565C0",
   },
   {
     icon: (
@@ -101,8 +101,8 @@ const DEMO_PLANS = [
     price: "₹5,499",
     period: "/month",
     idealFor: "NRIs & busy professionals",
-    color: "#1E88E5",
-    borderColor: "#1E88E5",
+    color: "#1565C0",
+    borderColor: "#1565C0",
     features: [
       { text: "Tenant Sourcing", included: true },
       { text: "Rent Collection", included: true },
@@ -179,7 +179,7 @@ function PlanCard({ plan }) {
     >
       {plan.popular && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[11px] font-bold px-4 py-1 rounded-full whitespace-nowrap"
-          style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+          style={{ background: "#1565C0", color: "#FFFFFF" }}>
           Most Popular
         </div>
       )}
@@ -218,12 +218,12 @@ function PlanCard({ plan }) {
       <button
         className="w-full py-2.5 rounded-xl text-sm font-bold transition-all"
         style={{
-          background: plan.popular ? "#1E88E5" : "transparent",
+          background: plan.popular ? "#1565C0" : "transparent",
           color: plan.popular ? "#FFFFFF" : plan.color,
           border: plan.popular ? "none" : `1.5px solid ${plan.color}`,
         }}
-        onMouseEnter={e => { e.currentTarget.style.background = "#1E88E5"; e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.border = "none"; }}
-        onMouseLeave={e => { e.currentTarget.style.background = plan.popular ? "#1E88E5" : "transparent"; e.currentTarget.style.color = plan.popular ? "#FFFFFF" : plan.color; e.currentTarget.style.border = plan.popular ? "none" : `1.5px solid ${plan.color}`; }}
+        onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.border = "none"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = plan.popular ? "#1565C0" : "transparent"; e.currentTarget.style.color = plan.popular ? "#FFFFFF" : plan.color; e.currentTarget.style.border = plan.popular ? "none" : `1.5px solid ${plan.color}`; }}
       >
         Get Started
       </button>
@@ -267,29 +267,29 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
         {/* ── Section Header ── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: "#1E88E5" }}>
+            <span className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: "#1565C0" }}>
               Property Management
             </span>
             <h2 className="text-3xl font-extrabold leading-tight" style={{ color: "#1F2937" }}>
               Complete Property<br />
-              <span style={{ color: "#1E88E5" }}>Care Solutions</span>
+              <span style={{ color: "#1565C0" }}>Care Solutions</span>
             </h2>
-            <div className="w-10 h-0.5 rounded-full mt-3" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-3" style={{ background: "#1565C0" }} />
             <p className="text-sm mt-3 max-w-lg" style={{ color: "#6B7280" }}>
               Own property, not problems. Our end-to-end management service takes care of everything — from tenant sourcing to resale — so you can earn passively without the stress.
             </p>
           </div>
           <div className="flex gap-3 shrink-0">
             <button className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
-              style={{ background: "#1E88E5", color: "#FFFFFF" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#1565C0"}
-              onMouseLeave={e => e.currentTarget.style.background = "#1E88E5"}>
+              style={{ background: "#1565C0", color: "#FFFFFF" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
+              onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
               Enquire Now
             </button>
             <button className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
-              style={{ background: "transparent", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#1E88E5"; e.currentTarget.style.color = "#FFFFFF"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1E88E5"; }}>
+              style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
               View Plans
             </button>
           </div>
@@ -301,10 +301,10 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
             <div key={item.title}
               className="rounded-2xl p-6 flex gap-5 items-start transition-all duration-200"
               style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "#1E88E5"}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "#1565C0"}
               onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}>
               <span className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#EFF6FF" }}>
-                <item.icon className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                <item.icon className="w-6 h-6" style={{ color: "#1565C0" }} strokeWidth={2} />
               </span>
               <div>
                 <h3 className="text-sm font-bold mb-1" style={{ color: "#1F2937" }}>{item.title}</h3>
@@ -323,7 +323,7 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
           <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <div>
               <h2 className="text-xl font-bold" style={{ color: "#1F2937" }}>What We Handle</h2>
-              <div className="w-10 h-0.5 rounded-full mt-1.5" style={{ background: "#1E88E5" }} />
+              <div className="w-10 h-0.5 rounded-full mt-1.5" style={{ background: "#1565C0" }} />
             </div>
             {/* Filter tabs */}
             <div className="flex gap-2 flex-wrap">
@@ -331,9 +331,9 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
                 <button key={tab} onClick={() => setActiveTab(tab)}
                   className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
-                    background: activeTab === tab ? "#1E88E5" : "transparent",
+                    background: activeTab === tab ? "#1565C0" : "transparent",
                     color: activeTab === tab ? "#FFFFFF" : "#6B7280",
-                    border: `1px solid ${activeTab === tab ? "#1E88E5" : "#E2E8F0"}`,
+                    border: `1px solid ${activeTab === tab ? "#1565C0" : "#E2E8F0"}`,
                   }}>
                   {tab}
                 </button>
@@ -356,11 +356,11 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
                   transition: ANCHOR_HIGHLIGHT_STYLE.transition,
                   scrollMarginTop: "100px",
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = "#1E88E5"}
+                onMouseEnter={e => e.currentTarget.style.borderColor = "#1565C0"}
                 onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                    style={{ background: "#EFF6FF", color: "#1565C0" }}>
                     {service.icon}
                   </div>
                   <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
@@ -377,7 +377,7 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
         </div>
 
         {/* ── Owner Dashboard Preview ── */}
-        <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid #1E88E5" }}>
+        <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid #1565C0" }}>
           <div className="px-6 py-4 flex items-center justify-between"
             style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E8F0" }}>
             <div>
@@ -385,7 +385,7 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
               <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>Track everything from one place — web & mobile</p>
             </div>
             <span className="text-[10px] font-bold px-3 py-1 rounded-full"
-              style={{ background: "#1E88E518", color: "#1E88E5", border: "1px solid #1E88E540" }}>
+              style={{ background: "#1565C018", color: "#1565C0", border: "1px solid #1565C040" }}>
               Live Demo Available
             </span>
           </div>
@@ -395,7 +395,7 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {[
                 { label: "Monthly Rent", value: "₹28,500", sub: "Received on time", color: "#4ade80" },
-                { label: "Properties", value: "3", sub: "Under management", color: "#1E88E5" },
+                { label: "Properties", value: "3", sub: "Under management", color: "#1565C0" },
                 { label: "Active Tenants", value: "3", sub: "All verified", color: "#F59E0B" },
                 { label: "Open Requests", value: "1", sub: "In progress", color: "#a78bfa" },
               ].map((stat) => (
@@ -414,7 +414,7 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
               <div className="space-y-3">
                 {[
                   { dot: "#4ade80", text: "Rent received — Flat 2B, Patia", time: "2 hours ago" },
-                  { dot: "#1E88E5", text: "Inspection report uploaded — Villa, Nayapalli", time: "Yesterday" },
+                  { dot: "#1565C0", text: "Inspection report uploaded — Villa, Nayapalli", time: "Yesterday" },
                   { dot: "#F59E0B", text: "Maintenance request raised — Plumbing, Flat 1A", time: "2 days ago" },
                   { dot: "#a78bfa", text: "Lease renewed — Tenant: Ramesh Kumar", time: "3 days ago" },
                 ].map((item, i) => (
@@ -432,7 +432,7 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
               {DASHBOARD_FEATURES.map((f) => (
                 <div key={f.label} className="rounded-xl p-3 text-center"
                   style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-                  <f.icon className="w-5 h-5 mx-auto mb-1" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                  <f.icon className="w-5 h-5 mx-auto mb-1" style={{ color: "#1565C0" }} strokeWidth={2} />
                   <p className="text-[9px] font-medium leading-tight" style={{ color: "#6B7280" }}>{f.label}</p>
                 </div>
               ))}
@@ -444,7 +444,7 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
         <div>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold" style={{ color: "#1F2937" }}>Simple, Transparent Pricing</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1565C0" }} />
             <p className="text-sm mt-2" style={{ color: "#6B7280" }}>No hidden charges. Cancel anytime.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -452,16 +452,16 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
           </div>
           <p className="text-center text-xs mt-5" style={{ color: "#6B7280" }}>
             All plans include GST. Custom pricing available for{" "}
-            <span style={{ color: "#1E88E5" }}>5+ properties</span>.{" "}
+            <span style={{ color: "#1565C0" }}>5+ properties</span>.{" "}
             <button onClick={() => onNavigate && onNavigate("contact")} className="hover:underline" style={{ color: "#F59E0B" }}>Contact us</button> for bulk rates.
           </p>
         </div>
 
         {/* ── Bottom CTA ── */}
         <div className="relative rounded-3xl overflow-hidden px-8 py-12 text-center"
-          style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 50%, #FFFFFF 100%)", border: "1px solid #1E88E540" }}>
+          style={{ background: "linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 50%, #FFFFFF 100%)", border: "1px solid #1565C040" }}>
           <div className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse at 50% 100%, #1E88E515 0%, transparent 70%)" }} />
+            style={{ background: "radial-gradient(ellipse at 50% 100%, #1565C015 0%, transparent 70%)" }} />
           <div className="relative z-10">
             <h3 className="text-2xl font-extrabold mb-3" style={{ color: "#1F2937" }}>
               Ready to Stress-Free Property Ownership?
@@ -471,15 +471,15 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#1E88E5", color: "#FFFFFF" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#1565C0"}
-                onMouseLeave={e => e.currentTarget.style.background = "#1E88E5"}>
+                style={{ background: "#1565C0", color: "#FFFFFF" }}
+                onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
+                onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
                 Book Free Consultation
               </button>
               <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "transparent", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
-                onMouseEnter={e => { e.currentTarget.style.background = "#1E88E5"; e.currentTarget.style.color = "#FFFFFF"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1E88E5"; }}>
+                style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
                 View All Plans
               </button>
             </div>

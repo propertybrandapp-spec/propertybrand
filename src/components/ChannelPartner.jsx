@@ -82,8 +82,8 @@ const DEMO_TIERS = [
   },
   {
     name: "Silver",
-    color: "#1E88E5",
-    borderColor: "#1E88E5",
+    color: "#1565C0",
+    borderColor: "#1565C0",
     deals: "6–15 deals/yr",
     commission: "2%",
     perks: ["Priority Lead Sharing", "Co-branded Campaigns", "Monthly Workshops", "Dedicated RM", "PB Preferred Badge"],
@@ -130,7 +130,7 @@ function TierCard({ tier }) {
       {tier.popular && (
         <div
           className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[11px] font-bold px-4 py-1 rounded-full"
-          style={{ background: "#1E88E5", color: "#FFFFFF" }}
+          style={{ background: "#1565C0", color: "#FFFFFF" }}
         >
           Most Popular
         </div>
@@ -167,12 +167,12 @@ function TierCard({ tier }) {
       <button
         className="w-full py-2.5 rounded-xl text-sm font-bold transition-all"
         style={{
-          background: tier.popular ? "#1E88E5" : "transparent",
+          background: tier.popular ? "#1565C0" : "transparent",
           color: tier.popular ? "#FFFFFF" : tier.color,
           border: tier.popular ? "none" : `1.5px solid ${tier.color}`,
         }}
-        onMouseEnter={e => { e.currentTarget.style.background = "#1E88E5"; e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.border = "none"; }}
-        onMouseLeave={e => { e.currentTarget.style.background = tier.popular ? "#1E88E5" : "transparent"; e.currentTarget.style.color = tier.popular ? "#FFFFFF" : tier.color; e.currentTarget.style.border = tier.popular ? "none" : `1.5px solid ${tier.color}`; }}
+        onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; e.currentTarget.style.border = "none"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = tier.popular ? "#1565C0" : "transparent"; e.currentTarget.style.color = tier.popular ? "#FFFFFF" : tier.color; e.currentTarget.style.border = tier.popular ? "none" : `1.5px solid ${tier.color}`; }}
       >
         {tier.cta}
       </button>
@@ -211,13 +211,13 @@ function PartnerForm({ onNavigate }) {
     return (
       <div className="flex flex-col items-center justify-center py-14 text-center">
         <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" style={{ color: "#1E88E5" }}>
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" style={{ color: "#1565C0" }}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
         <p className="font-bold text-lg mb-1" style={{ color: "#1F2937" }}>Application Submitted!</p>
         <p className="text-sm" style={{ color: "#6B7280" }}>Our partner team will contact you within 24 hours.</p>
-        <button onClick={() => setSubmitted(false)} className="mt-5 text-xs underline" style={{ color: "#1E88E5" }}>Submit another</button>
+        <button onClick={() => setSubmitted(false)} className="mt-5 text-xs underline" style={{ color: "#1565C0" }}>Submit another</button>
       </div>
     );
   }
@@ -233,7 +233,7 @@ function PartnerForm({ onNavigate }) {
             value={form[f.key]} onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
             className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
             style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-            onFocus={e => e.target.style.borderColor = "#1E88E5"}
+            onFocus={e => e.target.style.borderColor = "#1565C0"}
             onBlur={e => e.target.style.borderColor = "#E2E8F0"}
           />
         ))}
@@ -242,7 +242,7 @@ function PartnerForm({ onNavigate }) {
         value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
         className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
         style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-        onFocus={e => e.target.style.borderColor = "#1E88E5"}
+        onFocus={e => e.target.style.borderColor = "#1565C0"}
         onBlur={e => e.target.style.borderColor = "#E2E8F0"}
       />
       <div className="grid grid-cols-2 gap-3">
@@ -267,23 +267,23 @@ function PartnerForm({ onNavigate }) {
         value={form.rera} onChange={(e) => setForm({ ...form, rera: e.target.value })}
         className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
         style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-        onFocus={e => e.target.style.borderColor = "#1E88E5"}
+        onFocus={e => e.target.style.borderColor = "#1565C0"}
         onBlur={e => e.target.style.borderColor = "#E2E8F0"}
       />
       {error && (
-        <p className="text-xs font-semibold text-center" style={{ color: "#1E88E5" }}>{error}</p>
+        <p className="text-xs font-semibold text-center" style={{ color: "#1565C0" }}>{error}</p>
       )}
       <button onClick={handleSubmit} disabled={submitting}
         className="w-full py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-60"
-        style={{ background: "#1E88E5", color: "#FFFFFF" }}
-        onMouseEnter={e => e.currentTarget.style.background = "#1565C0"}
-        onMouseLeave={e => e.currentTarget.style.background = "#1E88E5"}
+        style={{ background: "#1565C0", color: "#FFFFFF" }}
+        onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
+        onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}
       >
         {submitting ? "Submitting..." : "Submit Partner Application"}
       </button>
       <p className="text-center text-xs" style={{ color: "#6B7280" }}>
         By submitting you agree to our{" "}
-        <button onClick={() => onNavigate && onNavigate("terms-conditions")} style={{ color: "#1E88E5" }} className="hover:underline">Partner Terms & Conditions</button>
+        <button onClick={() => onNavigate && onNavigate("terms-conditions")} style={{ color: "#1565C0" }} className="hover:underline">Partner Terms & Conditions</button>
       </p>
     </div>
   );
@@ -309,17 +309,17 @@ export default function ChannelPartner({ onNavigate }) {
 
         {/* ── Hero Banner ── */}
         <div className="relative rounded-3xl overflow-hidden px-8 py-14 text-center"
-          style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 50%, #EFF6FF 100%)", border: "1px solid #1E88E5" }}>
+          style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 50%, #EFF6FF 100%)", border: "1px solid #1565C0" }}>
           {/* Glow */}
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 0%, #1E88E522 0%, transparent 70%)" }} />
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 0%, #1565C022 0%, transparent 70%)" }} />
           <div className="relative z-10">
             <span className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4"
-              style={{ background: "#1E88E518", color: "#1E88E5", border: "1px solid #1E88E540" }}>
+              style={{ background: "#1565C018", color: "#1565C0", border: "1px solid #1565C040" }}>
               Partner Program
             </span>
             <h2 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight" style={{ color: "#1F2937" }}>
               Join the{" "}
-              <span style={{ color: "#1E88E5" }}>PropertyBrands</span>{" "}
+              <span style={{ color: "#1565C0" }}>PropertyBrands</span>{" "}
               Partner Network
             </h2>
             <p className="text-base max-w-2xl mx-auto mb-8" style={{ color: "#6B7280" }}>
@@ -331,7 +331,7 @@ export default function ChannelPartner({ onNavigate }) {
               {STATS.map((s) => (
                 <div key={s.label} className="rounded-xl px-4 py-4"
                   style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-                  <p className="text-2xl font-extrabold" style={{ color: "#1E88E5" }}>{s.value}</p>
+                  <p className="text-2xl font-extrabold" style={{ color: "#1565C0" }}>{s.value}</p>
                   <p className="text-xs mt-0.5 font-medium" style={{ color: "#6B7280" }}>{s.label}</p>
                 </div>
               ))}
@@ -339,15 +339,15 @@ export default function ChannelPartner({ onNavigate }) {
 
             <div className="flex flex-wrap justify-center gap-3">
               <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#1E88E5", color: "#FFFFFF" }}
-                onMouseEnter={e => e.currentTarget.style.background = "#1565C0"}
-                onMouseLeave={e => e.currentTarget.style.background = "#1E88E5"}>
+                style={{ background: "#1565C0", color: "#FFFFFF" }}
+                onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
+                onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
                 Become a Partner
               </button>
               <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "transparent", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
-                onMouseEnter={e => { e.currentTarget.style.background = "#1E88E5"; e.currentTarget.style.color = "#FFFFFF"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1E88E5"; }}>
+                style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
                 Learn More
               </button>
             </div>
@@ -358,7 +358,7 @@ export default function ChannelPartner({ onNavigate }) {
         <div>
           <div className="mb-8">
             <h2 className="text-2xl font-bold" style={{ color: "#1F2937" }}>Why Partner With Us?</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1565C0" }} />
             <p className="text-sm mt-2" style={{ color: "#6B7280" }}>Everything you need to grow your real estate business</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -366,10 +366,10 @@ export default function ChannelPartner({ onNavigate }) {
               <div key={b.title}
                 className="rounded-2xl p-6 group cursor-pointer transition-all duration-200 hover:-translate-y-0.5"
                 style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = "#1E88E5"}
+                onMouseEnter={e => e.currentTarget.style.borderColor = "#1565C0"}
                 onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors"
-                  style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                  style={{ background: "#EFF6FF", color: "#1565C0" }}>
                   {b.icon}
                 </div>
                 <h3 className="text-sm font-bold mb-1.5" style={{ color: "#1F2937" }}>{b.title}</h3>
@@ -387,7 +387,7 @@ export default function ChannelPartner({ onNavigate }) {
         <div>
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-bold" style={{ color: "#1F2937" }}>Partner Tiers</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1565C0" }} />
             <p className="text-sm mt-2" style={{ color: "#6B7280" }}>Progress through tiers as you close more deals</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -399,13 +399,13 @@ export default function ChannelPartner({ onNavigate }) {
         <div className="rounded-2xl p-8" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
           <div className="mb-8">
             <h2 className="text-xl font-bold" style={{ color: "#1F2937" }}>How to Get Started</h2>
-            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
+            <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1565C0" }} />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {STEPS.map((step, i) => (
               <div key={step.num} className="flex flex-col">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl font-black" style={{ color: "#1E88E5" }}>{step.num}</span>
+                  <span className="text-2xl font-black" style={{ color: "#1565C0" }}>{step.num}</span>
                   {i < STEPS.length - 1 && (
                     <div className="flex-1 h-px hidden lg:block" style={{ background: "#E2E8F0" }} />
                   )}
@@ -420,8 +420,8 @@ export default function ChannelPartner({ onNavigate }) {
         {/* ── Registration Form + CTA ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left – form */}
-          <div className="rounded-2xl p-8" style={{ background: "#FFFFFF", border: "1px solid #1E88E5" }}>
-            <span className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: "#1E88E5" }}>
+          <div className="rounded-2xl p-8" style={{ background: "#FFFFFF", border: "1px solid #1565C0" }}>
+            <span className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: "#1565C0" }}>
               Join Now
             </span>
             <h3 className="text-xl font-bold mb-1" style={{ color: "#1F2937" }}>Partner Registration</h3>
@@ -435,7 +435,7 @@ export default function ChannelPartner({ onNavigate }) {
           <div className="flex flex-col gap-5">
             {/* Quote */}
             <div className="rounded-2xl p-6 flex-1" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-              <svg className="w-8 h-8 mb-3" fill="currentColor" viewBox="0 0 32 32" style={{ color: "#1E88E520" }}>
+              <svg className="w-8 h-8 mb-3" fill="currentColor" viewBox="0 0 32 32" style={{ color: "#1565C020" }}>
                 <path d="M10 8C6.686 8 4 10.686 4 14v10h10V14H7.8C7.8 11.9 9.5 10.2 11.6 10.2L10 8zm14 0c-3.314 0-6 2.686-6 6v10h10V14h-6.2c0-2.1 1.7-3.8 3.8-3.8L24 8z" />
               </svg>
               <p className="text-sm leading-relaxed mb-5" style={{ color: "#1F2937" }}>
@@ -443,7 +443,7 @@ export default function ChannelPartner({ onNavigate }) {
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
-                  style={{ background: "linear-gradient(135deg, #1E88E5, #0F2D52)", color: "#FFFFFF" }}>
+                  style={{ background: "linear-gradient(135deg, #1565C0, #0F2D52)", color: "#FFFFFF" }}>
                   RK
                 </div>
                 <div>
@@ -461,8 +461,8 @@ export default function ChannelPartner({ onNavigate }) {
             </div>
 
             {/* Quick perks */}
-            <div className="rounded-2xl p-6" style={{ background: "linear-gradient(135deg, #EFF6FF, #FFFFFF)", border: "1px solid #1E88E540" }}>
-              <p className="text-sm font-bold mb-4" style={{ color: "#1E88E5" }}>What you get from Day 1</p>
+            <div className="rounded-2xl p-6" style={{ background: "linear-gradient(135deg, #EFF6FF, #FFFFFF)", border: "1px solid #1565C040" }}>
+              <p className="text-sm font-bold mb-4" style={{ color: "#1565C0" }}>What you get from Day 1</p>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Package, text: "Inventory Access" },
@@ -474,7 +474,7 @@ export default function ChannelPartner({ onNavigate }) {
                 ].map((item) => (
                   <div key={item.text} className="flex items-center gap-2.5">
                     <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#FFFFFF" }}>
-                      <item.icon className="w-4 h-4" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                      <item.icon className="w-4 h-4" style={{ color: "#1565C0" }} strokeWidth={2} />
                     </span>
                     <span className="text-xs font-medium" style={{ color: "#1F2937" }}>{item.text}</span>
                   </div>

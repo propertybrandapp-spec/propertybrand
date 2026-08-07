@@ -39,7 +39,7 @@ export default function ComparePage({ onNavigate }) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-24 text-center">
         <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto" style={{ background: "#EFF6FF" }}>
-          <svg className="w-7 h-7" fill="none" stroke="#1E88E5" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-7 h-7" fill="none" stroke="#1565C0" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
           </svg>
         </span>
@@ -47,7 +47,7 @@ export default function ComparePage({ onNavigate }) {
         <p className="text-sm mb-6" style={{ color: "#6B7280" }}>
           Browse properties and tap "Compare" on any two or more listings — they'll show up here side by side.
         </p>
-        <button onClick={() => onNavigate && onNavigate("search")} className="text-sm font-bold px-5 py-2.5 rounded-xl" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+        <button onClick={() => onNavigate && onNavigate("search")} className="text-sm font-bold px-5 py-2.5 rounded-xl" style={{ background: "#1565C0", color: "#FFFFFF" }}>
           Browse Properties
         </button>
       </div>
@@ -88,14 +88,14 @@ export default function ComparePage({ onNavigate }) {
                   <button
                     onClick={() => onNavigate && onNavigate("property-detail", { property: p, pool: items })}
                     className="w-full text-xs font-bold py-2 rounded-lg mb-1.5"
-                    style={{ background: "#1E88E5", color: "#FFFFFF" }}
+                    style={{ background: "#1565C0", color: "#FFFFFF" }}
                   >
                     View Details
                   </button>
                   <button
                     onClick={() => toggleSaveProperty(p)}
                     className="w-full text-xs font-bold py-2 rounded-lg"
-                    style={{ background: "#FFFFFF", color: isPropertySaved(p.dbId || p.id) ? "#1E88E5" : "#6B7280", border: "1px solid #E2E8F0" }}
+                    style={{ background: "#FFFFFF", color: isPropertySaved(p.dbId || p.id) ? "#1565C0" : "#6B7280", border: "1px solid #E2E8F0" }}
                   >
                     {isPropertySaved(p.dbId || p.id) ? "Saved ♥" : "Save"}
                   </button>

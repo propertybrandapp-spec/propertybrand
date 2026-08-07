@@ -41,7 +41,7 @@ const DEMO_INVESTMENT_CORRIDORS = [
     city: "Bhubaneswar",
     area: "Patia",
     tag: "Rental Hotspot",
-    tagColor: "bg-blue-100 text-[#1E88E5]",
+    tagColor: "bg-blue-100 text-[#1565C0]",
     appreciation: "+12%",
     rentalYield: "5.8%",
     priceRange: "₹30 – 60 Lac",
@@ -83,7 +83,7 @@ const INVESTMENT_TOOLS = [
     ),
     label: "EMI Calculator",
     desc: "Plan your monthly payments",
-    color: "text-[#1E88E5] bg-[#EFF6FF]",
+    color: "text-[#1565C0] bg-[#EFF6FF]",
   },
   {
     icon: (
@@ -144,11 +144,11 @@ function EMICalculator({ onCheckEligibility }) {
   return (
 <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">      
     {/* Header */}
-<div className="bg-[radial-gradient(circle_at_top_right,_rgba(30,136,229,0.12),_transparent_35%),linear-gradient(to_right,#ffffff,#f8fafc)] border-b border-slate-200 px-6 py-6">
+<div className="bg-[radial-gradient(circle_at_top_right,_rgba(21,101,192,0.12),_transparent_35%),linear-gradient(to_right,#ffffff,#f8fafc)] border-b border-slate-200 px-6 py-6">
   <div className="flex items-center gap-3 mb-2">
     <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center">
       <svg
-        className="w-5 h-5 text-[#1E88E5]"
+        className="w-5 h-5 text-[#1565C0]"
         fill="none"
         stroke="currentColor"
         strokeWidth={2}
@@ -181,13 +181,13 @@ function EMICalculator({ onCheckEligibility }) {
           <div>
             <div className="flex justify-between mb-1.5">
               <label className="text-xs font-semibold text-slate-500">Loan Amount</label>
-              <span className="text-xs font-bold text-[#1E88E5]">{fmt(loanAmount)}</span>
+              <span className="text-xs font-bold text-[#1565C0]">{fmt(loanAmount)}</span>
             </div>
             <input
               type="range" min={500000} max={50000000} step={100000}
               value={loanAmount}
               onChange={(e) => setLoanAmount(Number(e.target.value))}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1E88E5] bg-gray-200"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1565C0] bg-gray-200"
             />
             <div className="flex justify-between mt-0.5 text-[10px] text-slate-500">
               <span>₹5 Lac</span><span>₹5 Cr</span>
@@ -198,13 +198,13 @@ function EMICalculator({ onCheckEligibility }) {
           <div>
             <div className="flex justify-between mb-1.5">
               <label className="text-xs font-semibold text-slate-500">Interest Rate (p.a.)</label>
-              <span className="text-xs font-bold text-[#1E88E5]">{interestRate}%</span>
+              <span className="text-xs font-bold text-[#1565C0]">{interestRate}%</span>
             </div>
             <input
               type="range" min={6} max={16} step={0.1}
               value={interestRate}
               onChange={(e) => setInterestRate(Number(e.target.value))}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1E88E5] bg-gray-200"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1565C0] bg-gray-200"
             />
             <div className="flex justify-between mt-0.5 text-[10px] text-slate-500">
               <span>6%</span><span>16%</span>
@@ -215,13 +215,13 @@ function EMICalculator({ onCheckEligibility }) {
           <div>
             <div className="flex justify-between mb-1.5">
               <label className="text-xs font-semibold text-slate-500">Loan Tenure</label>
-              <span className="text-xs font-bold text-[#1E88E5]">{tenure} Years</span>
+              <span className="text-xs font-bold text-[#1565C0]">{tenure} Years</span>
             </div>
             <input
               type="range" min={1} max={30} step={1}
               value={tenure}
               onChange={(e) => setTenure(Number(e.target.value))}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1E88E5] bg-gray-200"
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1565C0] bg-gray-200"
             />
             <div className="flex justify-between mt-0.5 text-[10px] text-slate-500">
               <span>1 Yr</span><span>30 Yrs</span>
@@ -241,7 +241,7 @@ function EMICalculator({ onCheckEligibility }) {
                 <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f3f4f6" strokeWidth="3.5" />
                 <circle
                   cx="18" cy="18" r="15.9" fill="none"
-                  stroke="#1E88E5" strokeWidth="3.5"
+                  stroke="#1565C0" strokeWidth="3.5"
                   strokeDasharray={`${interestPct} ${principalPct}`}
                   strokeLinecap="round"
                 />
@@ -266,7 +266,7 @@ function EMICalculator({ onCheckEligibility }) {
                 <span className="text-slate-500">Principal</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#1E88E5] inline-block" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1565C0] inline-block" />
                 <span className="text-slate-500">Interest</span>
               </div>
             </div>
@@ -281,14 +281,14 @@ function EMICalculator({ onCheckEligibility }) {
             ].map((row) => (
               <div key={row.label} className="flex items-center justify-between py-2 border-b border-[#E2E8F0] last:border-0">
                 <span className="text-xs text-slate-500">{row.label}</span>
-                <span className={`text-sm ${row.bold ? "font-extrabold text-[#1E88E5]" : "font-semibold text-[#1F2937]"}`}>
+                <span className={`text-sm ${row.bold ? "font-extrabold text-[#1565C0]" : "font-semibold text-[#1F2937]"}`}>
                   {row.value}
                 </span>
               </div>
             ))}
           </div>
 
-          <button onClick={onCheckEligibility} className="w-full bg-[#1E88E5] text-white text-sm font-bold py-2.5 rounded-lg hover:bg-[#1565C0] transition">
+          <button onClick={onCheckEligibility} className="w-full bg-[#1565C0] text-white text-sm font-bold py-2.5 rounded-lg hover:bg-[#0D47A1] transition">
             Check Loan Eligibility
           </button>
         </div>
@@ -340,10 +340,10 @@ function EligibilityCalculator() {
 
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
-      <div className="bg-[radial-gradient(circle_at_top_right,_rgba(30,136,229,0.12),_transparent_35%),linear-gradient(to_right,#ffffff,#f8fafc)] border-b border-slate-200 px-6 py-6">
+      <div className="bg-[radial-gradient(circle_at_top_right,_rgba(21,101,192,0.12),_transparent_35%),linear-gradient(to_right,#ffffff,#f8fafc)] border-b border-slate-200 px-6 py-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#1E88E5]/20 flex items-center justify-center">
-            <svg className="w-5 h-5 text-[#1E88E5]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] border border-[#1565C0]/20 flex items-center justify-center">
+            <svg className="w-5 h-5 text-[#1565C0]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
@@ -359,33 +359,33 @@ function EligibilityCalculator() {
           <div>
             <div className="flex justify-between mb-1.5">
               <label className="text-xs font-semibold text-slate-500">Monthly Income</label>
-              <span className="text-xs font-bold text-[#1E88E5]">{fmt(income)}</span>
+              <span className="text-xs font-bold text-[#1565C0]">{fmt(income)}</span>
             </div>
             <input type="range" min={20000} max={1000000} step={5000} value={income}
               onChange={(e) => setIncome(Number(e.target.value))}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1E88E5] bg-gray-200" />
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1565C0] bg-gray-200" />
             <div className="flex justify-between mt-0.5 text-[10px] text-slate-500"><span>₹20K</span><span>₹10L</span></div>
           </div>
 
           <div>
             <div className="flex justify-between mb-1.5">
               <label className="text-xs font-semibold text-slate-500">Existing Monthly EMIs</label>
-              <span className="text-xs font-bold text-[#1E88E5]">{fmt(existingEmi)}</span>
+              <span className="text-xs font-bold text-[#1565C0]">{fmt(existingEmi)}</span>
             </div>
             <input type="range" min={0} max={200000} step={1000} value={existingEmi}
               onChange={(e) => setExistingEmi(Number(e.target.value))}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1E88E5] bg-gray-200" />
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1565C0] bg-gray-200" />
             <div className="flex justify-between mt-0.5 text-[10px] text-slate-500"><span>₹0</span><span>₹2L</span></div>
           </div>
 
           <div>
             <div className="flex justify-between mb-1.5">
               <label className="text-xs font-semibold text-slate-500">Desired Tenure</label>
-              <span className="text-xs font-bold text-[#1E88E5]">{tenure} Years</span>
+              <span className="text-xs font-bold text-[#1565C0]">{tenure} Years</span>
             </div>
             <input type="range" min={1} max={30} step={1} value={tenure}
               onChange={(e) => setTenure(Number(e.target.value))}
-              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1E88E5] bg-gray-200" />
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#1565C0] bg-gray-200" />
             <div className="flex justify-between mt-0.5 text-[10px] text-slate-500"><span>1 Yr</span><span>30 Yrs</span></div>
           </div>
         </div>
@@ -393,7 +393,7 @@ function EligibilityCalculator() {
         <div className="flex flex-col justify-center gap-4">
           <div className="rounded-2xl p-6 text-center" style={{ background: "#EFF6FF" }}>
             <p className="text-xs font-semibold" style={{ color: "#6B7280" }}>You're likely eligible for up to</p>
-            <p className="text-3xl font-extrabold mt-1" style={{ color: "#1E88E5" }}>{fmt(eligibleLoan)}</p>
+            <p className="text-3xl font-extrabold mt-1" style={{ color: "#1565C0" }}>{fmt(eligibleLoan)}</p>
             <p className="text-xs mt-1" style={{ color: "#6B7280" }}>at ~{rate}% p.a. over {tenure} years</p>
           </div>
           <p className="text-[11px] leading-relaxed" style={{ color: "#6B7280" }}>
@@ -588,7 +588,7 @@ function CorridorCard({ corridor }) {
           <p className="text-[10px] text-slate-500 leading-tight">Appreciation</p>
         </div>
         <div className="text-center border-x border-[#E2E8F0]">
-          <p className="text-sm font-extrabold text-[#1E88E5]">{corridor.rentalYield}</p>
+          <p className="text-sm font-extrabold text-[#1565C0]">{corridor.rentalYield}</p>
           <p className="text-[10px] text-slate-500 leading-tight">Rental Yield</p>
         </div>
         <div className="text-center">
@@ -633,11 +633,11 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-2xl font-extrabold text-[#1F2937] tracking-tight">
-                  property<span className="text-[#1E88E5]">Loans</span>
+                  property<span className="text-[#1565C0]">Loans</span>
                 </span>
               </div>
               <p className="text-slate-500 text-sm">Compare Home Loan Offers from 40+ Banks</p>
-              <div className="w-10 h-0.5 bg-[#1E88E5] rounded-full mt-2" />
+              <div className="w-10 h-0.5 bg-[#1565C0] rounded-full mt-2" />
             </div>
           </div>
 
@@ -645,12 +645,12 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {LOAN_SERVICES.map((s) => (
               <a key={s.label} href={`#${s.label === "Eligibility Check" ? "eligibility-check" : s.label === "Loan Comparison" ? "loan-comparison" : s.label === "Fast Approval" ? "emi-calculator" : "emi-calculator"}`}
-                className="flex items-start gap-3 bg-[#FFFFFF] rounded-xl p-4 hover:bg-[#EFF6FF] hover:border-[#1E88E5] border border-transparent transition cursor-pointer group">
+                className="flex items-start gap-3 bg-[#FFFFFF] rounded-xl p-4 hover:bg-[#EFF6FF] hover:border-[#1565C0] border border-transparent transition cursor-pointer group">
                 <span className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "#EFF6FF" }}>
-                  <s.icon className="w-[18px] h-[18px]" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                  <s.icon className="w-[18px] h-[18px]" style={{ color: "#1565C0" }} strokeWidth={2} />
                 </span>
                 <div>
-                  <p className="text-sm font-bold text-[#1F2937] group-hover:text-[#1E88E5] transition">{s.label}</p>
+                  <p className="text-sm font-bold text-[#1F2937] group-hover:text-[#1565C0] transition">{s.label}</p>
                   <p className="text-[11px] text-slate-500 mt-0.5">{s.desc}</p>
                 </div>
               </a>
@@ -678,7 +678,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
           <div className="flex items-center justify-between mb-2">
             <div>
               <h2 className="text-xl font-bold text-[#1F2937]">Smart Real Estate Investment</h2>
-              <div className="w-10 h-0.5 bg-[#1E88E5] rounded-full mt-1" />
+              <div className="w-10 h-0.5 bg-[#1565C0] rounded-full mt-1" />
             </div>
           </div>
           <p className="text-slate-500 text-sm mb-5">Our experts help investors identify high-growth opportunities</p>
@@ -689,7 +689,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
               <a
                 key={tool.label}
                 href={`#${tool.label === "EMI Calculator" ? "emi-calculator" : tool.label === "ROI Calculator" ? "roi-calculator" : tool.label === "Rental Yield" ? "rental-yield-calculator" : "high-growth-corridors"}`}
-                className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] p-4 hover:border-[#1E88E5] hover:shadow-md transition group text-left"
+                className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] p-4 hover:border-[#1565C0] hover:shadow-md transition group text-left"
               >
                 <div className={`${tool.color} p-2 rounded-lg shrink-0 group-hover:scale-110 transition-transform`}>
                   {tool.icon}
@@ -735,7 +735,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
                     <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{c.area}</p>
                     <p className="text-xs" style={{ color: "#6B7280" }}>{c.priceRange}</p>
                   </div>
-                  <span className="text-base font-extrabold shrink-0" style={{ color: "#1E88E5" }}>{c.rentalYield}</span>
+                  <span className="text-base font-extrabold shrink-0" style={{ color: "#1565C0" }}>{c.rentalYield}</span>
                 </div>
               ))}
             </div>
@@ -772,10 +772,10 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
                   <div className="p-4">
                     <p className="text-sm font-bold" style={{ color: "#1F2937" }}>{home.name}</p>
                     <p className="text-xs mb-2" style={{ color: "#6B7280" }}>{home.area}</p>
-                    <p className="text-base font-extrabold mb-3" style={{ color: "#1E88E5" }}>{home.price}</p>
+                    <p className="text-base font-extrabold mb-3" style={{ color: "#1565C0" }}>{home.price}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {home.features.map((f) => (
-                        <span key={f} className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>{f}</span>
+                        <span key={f} className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "#EFF6FF", color: "#1565C0" }}>{f}</span>
                       ))}
                     </div>
                   </div>
@@ -787,7 +787,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
           {/* NRI Investment CTA */}
           <div id="nri-investments" style={{ ...sectionHighlight("nri-investments"), scrollMarginTop: "100px" }} className="bg-gradient-to-r from-[#1F2937] to-[#1a1a2e] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#1E88E5]/20 border border-[#1E88E5]/40 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-full bg-[#1565C0]/20 border border-[#1565C0]/40 flex items-center justify-center shrink-0">
                 <Globe className="w-6 h-6 text-white" strokeWidth={2} />
               </div>
               <div>
@@ -798,7 +798,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
               </div>
             </div>
             <div className="flex gap-3 shrink-0">
-              <button onClick={() => onNavigate && onNavigate("contact", "invest")} className="bg-[#1E88E5] text-white text-sm font-bold px-5 py-2.5 rounded-lg hover:bg-[#1565C0] transition">
+              <button onClick={() => onNavigate && onNavigate("contact", "invest")} className="bg-[#1565C0] text-white text-sm font-bold px-5 py-2.5 rounded-lg hover:bg-[#0D47A1] transition">
                 NRI Advisory
               </button>
               <button onClick={() => onNavigate && onNavigate("contact", "invest")} className="bg-white/10 text-white text-sm font-bold px-5 py-2.5 rounded-lg border border-white/20 hover:bg-white/20 transition">

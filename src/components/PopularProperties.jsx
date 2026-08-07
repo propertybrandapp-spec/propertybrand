@@ -130,7 +130,7 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
       className="relative bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64"
     >
       {featured && (
-        <div className="absolute -top-px left-0 right-0 h-0.5 bg-gradient-to-r from-yellow-400 via-[#1E88E5] to-yellow-400 rounded-t-xl z-10" />
+        <div className="absolute -top-px left-0 right-0 h-0.5 bg-gradient-to-r from-yellow-400 via-[#1565C0] to-yellow-400 rounded-t-xl z-10" />
       )}
 
       <ImageCarousel
@@ -149,7 +149,7 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="text-sm font-bold text-[#1F2937] leading-tight">{title}</h3>
           {verified && (
-            <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-[#1E88E5] font-bold">
+            <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-[#1565C0] font-bold">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
@@ -167,7 +167,7 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
 
         {/* Location */}
         <div className="flex items-start gap-1 mb-2.5">
-          <svg className="w-3 h-3 text-[#1E88E5] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-3 h-3 text-[#1565C0] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
           <span className="text-[11px] text-[#6B7280] leading-tight">{location}</span>
@@ -181,7 +181,7 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
             </span>
           ))}
           {amenities.length > 3 && (
-            <span className="text-[10px] text-[#1E88E5] font-semibold px-1">
+            <span className="text-[10px] text-[#1565C0] font-semibold px-1">
               +{amenities.length - 3} more
             </span>
           )}
@@ -196,7 +196,7 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: property.transactionType === "Rent" ? "rent" : "buy", property, intent: "contact" }); }}
-            className="flex items-center gap-1 text-[11px] font-bold text-[#1E88E5] hover:underline"
+            className="flex items-center gap-1 text-[11px] font-bold text-[#1565C0] hover:underline"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V5z" />
@@ -215,9 +215,9 @@ function SectionHeader({ title, seeAllLabel = "See all Properties", onNavigate }
     <div className="flex items-center justify-between mb-4">
       <div>
         <h2 className="text-xl font-bold text-[#1F2937]">{title}</h2>
-        <div className="w-10 h-0.5 bg-[#1E88E5] rounded-full mt-1" />
+        <div className="w-10 h-0.5 bg-[#1565C0] rounded-full mt-1" />
       </div>
-      <button onClick={() => onNavigate && onNavigate("search")} className="flex items-center gap-1 text-sm font-semibold text-[#1E88E5] hover:underline">
+      <button onClick={() => onNavigate && onNavigate("search")} className="flex items-center gap-1 text-sm font-semibold text-[#1565C0] hover:underline">
         {seeAllLabel}
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -241,7 +241,7 @@ function ScrollRow({ properties, onOpen, onQuickView, onNavigate }) {
       {/* Left arrow */}
       <button
         onClick={() => scroll(-1)}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E88E5] hover:border-[#1E88E5] opacity-0 group-hover/row:opacity-100 transition"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-lg flex items-center justify-center text-[#6B7280] hover:text-[#1565C0] hover:border-[#1565C0] opacity-0 group-hover/row:opacity-100 transition"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -251,7 +251,7 @@ function ScrollRow({ properties, onOpen, onQuickView, onNavigate }) {
       {/* Scrollable list */}
       <div
         ref={rowRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth pb-2 scrollbar-hide"
+        className="flex items-start gap-4 overflow-x-auto scroll-smooth pb-2 scrollbar-hide"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {properties.map((p) => (
@@ -262,7 +262,7 @@ function ScrollRow({ properties, onOpen, onQuickView, onNavigate }) {
       {/* Right arrow */}
       <button
         onClick={() => scroll(1)}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E88E5] hover:border-[#1E88E5] opacity-0 group-hover/row:opacity-100 transition"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-lg flex items-center justify-center text-[#6B7280] hover:text-[#1565C0] hover:border-[#1565C0] opacity-0 group-hover/row:opacity-100 transition"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -324,8 +324,8 @@ export default function PopularProperties({ onNavigate }) {
               onClick={() => setActiveFilter(tab)}
               className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                 activeFilter === tab
-                  ? "bg-[#1E88E5] text-white border-[#1E88E5] shadow"
-                  : "bg-[#FFFFFF] text-[#6B7280] border-[#E2E8F0] hover:border-[#1E88E5] hover:text-[#1E88E5]"
+                  ? "bg-[#1565C0] text-white border-[#1565C0] shadow"
+                  : "bg-[#FFFFFF] text-[#6B7280] border-[#E2E8F0] hover:border-[#1565C0] hover:text-[#1565C0]"
               }`}
             >
               {tab}
@@ -340,11 +340,11 @@ export default function PopularProperties({ onNavigate }) {
         ) : ALL_PROPERTIES.length === 0 ? (
           <div className="mb-10 rounded-2xl flex flex-col items-center justify-center py-16 text-center" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
             <span className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
-              <Home className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+              <Home className="w-6 h-6" style={{ color: "#1565C0" }} strokeWidth={2} />
             </span>
             <p className="text-sm font-bold" style={{ color: "#1F2937" }}>No properties listed yet</p>
             <p className="text-xs mt-1 mb-4" style={{ color: "#6B7280" }}>Be the first to list a property on PropertyBrands.</p>
-            <button onClick={() => onNavigate && onNavigate("post-property")} className="text-xs font-bold px-4 py-2 rounded-lg" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+            <button onClick={() => onNavigate && onNavigate("post-property")} className="text-xs font-bold px-4 py-2 rounded-lg" style={{ background: "#1565C0", color: "#FFFFFF" }}>
               Post a Property
             </button>
           </div>
@@ -382,7 +382,7 @@ export default function PopularProperties({ onNavigate }) {
         )}
 
         {/* ── Bottom CTA Banner ── */}
-        <div className="rounded-3xl bg-[radial-gradient(circle_at_top_right,_rgba(30,136,229,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] border border-slate-200 shadow-lg p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="rounded-3xl bg-[radial-gradient(circle_at_top_right,_rgba(21,101,192,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] border border-slate-200 shadow-lg p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
 
     <div>
       <p className="text-[#1F2937] font-bold text-2xl leading-tight">
@@ -397,11 +397,11 @@ export default function PopularProperties({ onNavigate }) {
 
     <div className="flex flex-col sm:flex-row gap-3 shrink-0">
       
-      <button className="bg-[#1E88E5] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#1565C0] transition-all duration-300 shadow-md hover:shadow-lg">
+      <button className="bg-[#1565C0] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#0D47A1] transition-all duration-300 shadow-md hover:shadow-lg">
         Schedule Site Visit
       </button>
 
-      <button className="bg-white border border-slate-300 text-[#1F2937] text-sm font-semibold px-6 py-3 rounded-xl hover:border-[#1E88E5] hover:text-[#1E88E5] transition-all duration-300">
+      <button className="bg-white border border-slate-300 text-[#1F2937] text-sm font-semibold px-6 py-3 rounded-xl hover:border-[#1565C0] hover:text-[#1565C0] transition-all duration-300">
         Talk to Expert
       </button>
 

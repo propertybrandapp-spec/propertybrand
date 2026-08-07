@@ -4,7 +4,7 @@ import { supabase, safeQuery } from "../lib/supabaseClient";
 import { ClipboardList } from "lucide-react";
 
 const STAGE_STYLES = {
-  New: { color: "#1E88E5", bg: "#EFF6FF" },
+  New: { color: "#1565C0", bg: "#EFF6FF" },
   Contacted: { color: "#F59E0B", bg: "#FEF3C7" },
   "Site Visit": { color: "#a78bfa", bg: "#F0EAFB" },
   Negotiation: { color: "#F59E0B", bg: "#FEF3C7" },
@@ -46,7 +46,7 @@ export default function MyInquiries({ onNavigate }) {
         <button
           onClick={() => onNavigate && onNavigate("home")}
           className="px-6 py-2.5 rounded-xl text-sm font-bold"
-          style={{ background: "#1E88E5", color: "#FFFFFF" }}
+          style={{ background: "#1565C0", color: "#FFFFFF" }}
         >
           Return Home
         </button>
@@ -59,7 +59,7 @@ export default function MyInquiries({ onNavigate }) {
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl lg:text-3xl font-extrabold" style={{ color: "#1F2937" }}>My Inquiries</h1>
-          <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1E88E5" }} />
+          <div className="w-10 h-0.5 rounded-full mt-2" style={{ background: "#1565C0" }} />
           <p className="text-sm mt-3" style={{ color: "#6B7280" }}>
             {loading ? "Loading..." : `${inquiries.length} inquir${inquiries.length === 1 ? "y" : "ies"} submitted`}
           </p>
@@ -74,14 +74,14 @@ export default function MyInquiries({ onNavigate }) {
         ) : inquiries.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
             <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
-              <ClipboardList className="w-7 h-7" style={{ color: "#1E88E5" }} strokeWidth={2} />
+              <ClipboardList className="w-7 h-7" style={{ color: "#1565C0" }} strokeWidth={2} />
             </span>
             <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>No inquiries yet</p>
             <p className="text-sm mb-5" style={{ color: "#6B7280" }}>Submit an inquiry from any listing or the contact form to see it here.</p>
             <button
               onClick={() => onNavigate && onNavigate("contact")}
               className="px-6 py-2.5 rounded-xl text-sm font-bold"
-              style={{ background: "#1E88E5", color: "#FFFFFF" }}
+              style={{ background: "#1565C0", color: "#FFFFFF" }}
             >
               Contact Us
             </button>

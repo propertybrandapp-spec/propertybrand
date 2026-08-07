@@ -40,7 +40,7 @@ export function useScrollToAnchor(anchor, deps = []) {
 // Shared highlight style — a soft blue ring + tint that fades in/out, applied
 // to whichever element's id matches the current highlight target.
 export const ANCHOR_HIGHLIGHT_STYLE = {
-  boxShadow: "0 0 0 3px #1E88E5",
+  boxShadow: "0 0 0 3px #1565C0",
   background: "#EFF6FF",
   transition: "box-shadow 0.3s ease, background 0.3s ease",
 };

@@ -217,7 +217,7 @@ function QuickInquiry() {
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full bg-[#FFFFFF] text-[#1E88E5] font-bold py-2.5 rounded-lg hover:bg-[#F1F5F9] transition text-sm shadow disabled:opacity-60"
+        className="w-full bg-[#FFFFFF] text-[#1565C0] font-bold py-2.5 rounded-lg hover:bg-[#F1F5F9] transition text-sm shadow disabled:opacity-60"
       >
         {submitting ? "Sending..." : "Send Inquiry"}
       </button>
@@ -255,13 +255,13 @@ export default function Footer({ onNavigate }) {
   return (
     <footer>
       {/* ── Get in Touch Band ── */}
-      <div className="bg-[radial-gradient(circle_at_top_right,_rgba(30,136,229,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] px-4 py-16">
+      <div className="bg-[radial-gradient(circle_at_top_right,_rgba(21,101,192,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] px-4 py-16">
         <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
       
       {/* Left – Contact Info */}
         <div>
-          <span className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest mb-2 block">
+          <span className="text-[#1565C0] text-xs font-bold uppercase tracking-widest mb-2 block">
           Get in Touch
           </span>
 
@@ -325,12 +325,12 @@ export default function Footer({ onNavigate }) {
             },
           ].map((item) => (
             <div key={item.label} className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#1E88E5] shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#1565C0] shrink-0">
                 {item.icon}
               </div>
 
               <div>
-                <p className="text-[#1E88E5] text-[11px] font-bold uppercase tracking-wider">
+                <p className="text-[#1565C0] text-[11px] font-bold uppercase tracking-wider">
                   {item.label}
                 </p>
 
@@ -339,7 +339,7 @@ export default function Footer({ onNavigate }) {
                     href={item.href}
                     target={item.href.startsWith("http") ? "_blank" : undefined}
                     rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    className="text-[#1F2937] text-sm font-medium mt-1 block hover:text-[#1E88E5] hover:underline"
+                    className="text-[#1F2937] text-sm font-medium mt-1 block hover:text-[#1565C0] hover:underline"
                   >
                     {item.value}
                   </a>
@@ -356,7 +356,7 @@ export default function Footer({ onNavigate }) {
         {/* Social Icons — only shown once real URLs are set in the admin console */}
         {activeSocials.length > 0 && (
           <div className="mt-8">
-            <p className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest mb-3">
+            <p className="text-[#1565C0] text-xs font-bold uppercase tracking-widest mb-3">
               Follow Us
             </p>
 
@@ -368,7 +368,7 @@ export default function Footer({ onNavigate }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.name}
-                  className="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-[#1E88E5] text-slate-600 transition-all duration-300 flex items-center justify-center"
+                  className="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-[#1565C0] text-slate-600 transition-all duration-300 flex items-center justify-center"
                 >
                   {s.icon}
                 </a>
@@ -380,7 +380,7 @@ export default function Footer({ onNavigate }) {
 
       {/* Right – Inquiry Form */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8">
-        <p className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest mb-2">
+        <p className="text-[#1565C0] text-xs font-bold uppercase tracking-widest mb-2">
           Quick Inquiry
         </p>
 
@@ -446,7 +446,7 @@ export default function Footer({ onNavigate }) {
       <button
         key={item.label}
         onClick={() => onNavigate?.(item.page)}
-        className="block text-sm text-slate-600 hover:text-[#1E88E5]"
+        className="block text-sm text-slate-600 hover:text-[#1565C0]"
       >
         {item.label}
       </button>
@@ -468,7 +468,7 @@ export default function Footer({ onNavigate }) {
       <button
         key={item.label}
         onClick={() => onNavigate?.(item.page)}
-        className="block text-sm text-slate-600 hover:text-[#1E88E5]"
+        className="block text-sm text-slate-600 hover:text-[#1565C0]"
       >
         {item.label}
       </button>
@@ -490,7 +490,7 @@ export default function Footer({ onNavigate }) {
       <button
         key={item.label}
         onClick={() => onNavigate?.(item.page)}
-        className="block text-sm text-slate-600 hover:text-[#1E88E5]"
+        className="block text-sm text-slate-600 hover:text-[#1565C0]"
       >
         {item.label}
       </button>
@@ -523,7 +523,7 @@ export default function Footer({ onNavigate }) {
               <span key={l.label} className="flex items-center gap-1">
                 <button
                   onClick={() => onNavigate && onNavigate(l.page)}
-                  className="text-slate-600 text-xs hover:text-[#1E88E5] transition"
+                  className="text-slate-600 text-xs hover:text-[#1565C0] transition"
                 >
                   {l.label}
                 </button>
@@ -549,7 +549,7 @@ export default function Footer({ onNavigate }) {
               <span key={l.label} className="flex items-center gap-4">
                 <button
                   onClick={() => onNavigate && onNavigate(l.page)}
-                  className="text-slate-600 text-xs font-medium hover:text-[#1E88E5] hover:translate-x-0.5 transition-all duration-300 inline-flex items-center"
+                  className="text-slate-600 text-xs font-medium hover:text-[#1565C0] hover:translate-x-0.5 transition-all duration-300 inline-flex items-center"
                 >
                   {l.label}
                 </button>

@@ -69,7 +69,7 @@ export default function ClientProfile({ onNavigate }) {
         <button
           onClick={() => onNavigate && onNavigate("home")}
           className="px-6 py-2.5 rounded-xl text-sm font-bold"
-          style={{ background: "#1E88E5", color: "#FFFFFF" }}
+          style={{ background: "#1565C0", color: "#FFFFFF" }}
         >
           Return Home
         </button>
@@ -88,7 +88,7 @@ export default function ClientProfile({ onNavigate }) {
               onClick={() => fileInputRef.current?.click()}
               disabled={avatarUploading}
               className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold overflow-hidden transition-opacity"
-              style={{ background: "#1E88E5", color: "#FFFFFF", opacity: avatarUploading ? 0.6 : 1 }}
+              style={{ background: "#1565C0", color: "#FFFFFF", opacity: avatarUploading ? 0.6 : 1 }}
             >
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
@@ -107,7 +107,7 @@ export default function ClientProfile({ onNavigate }) {
             <button
               onClick={() => fileInputRef.current?.click()}
               className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center"
-              style={{ background: "#1E88E5", border: "2px solid #FFFFFF" }}
+              style={{ background: "#1565C0", border: "2px solid #FFFFFF" }}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="#FFFFFF" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -123,7 +123,7 @@ export default function ClientProfile({ onNavigate }) {
             />
           </div>
           {avatarError && (
-            <p className="text-xs mb-2" style={{ color: "#1E88E5" }}>{avatarError}</p>
+            <p className="text-xs mb-2" style={{ color: "#1565C0" }}>{avatarError}</p>
           )}
           <h1 className="text-2xl font-extrabold" style={{ color: "#1F2937" }}>{form.full_name || "Welcome"}</h1>
           <p className="text-sm mt-1" style={{ color: "#6B7280" }}>{session.user.email}</p>
@@ -140,14 +140,14 @@ export default function ClientProfile({ onNavigate }) {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold shrink-0 transition-all"
               style={{ background: "#FFFFFF", color: "#1F2937", border: "1px solid #E2E8F0" }}
             >
-              <Heart className="w-4 h-4" style={{ color: "#1E88E5" }} strokeWidth={2} /> Saved Properties
+              <Heart className="w-4 h-4" style={{ color: "#1565C0" }} strokeWidth={2} /> Saved Properties
             </button>
             <button
               onClick={() => onNavigate && onNavigate("inquiries")}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold shrink-0 transition-all"
               style={{ background: "#FFFFFF", color: "#1F2937", border: "1px solid #E2E8F0" }}
             >
-              <ClipboardList className="w-4 h-4" style={{ color: "#1E88E5" }} strokeWidth={2} /> My Inquiries
+              <ClipboardList className="w-4 h-4" style={{ color: "#1565C0" }} strokeWidth={2} /> My Inquiries
             </button>
           </div>
 
@@ -165,7 +165,7 @@ export default function ClientProfile({ onNavigate }) {
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
                   style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-                  onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                  onFocus={(e) => e.target.style.borderColor = "#1565C0"}
                   onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
               </div>
@@ -178,7 +178,7 @@ export default function ClientProfile({ onNavigate }) {
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
                   style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-                  onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                  onFocus={(e) => e.target.style.borderColor = "#1565C0"}
                   onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
               </div>
@@ -192,7 +192,7 @@ export default function ClientProfile({ onNavigate }) {
                   placeholder="e.g. Bhubaneswar"
                   className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
                   style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
-                  onFocus={(e) => e.target.style.borderColor = "#1E88E5"}
+                  onFocus={(e) => e.target.style.borderColor = "#1565C0"}
                   onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
               </div>
@@ -206,9 +206,9 @@ export default function ClientProfile({ onNavigate }) {
                       onClick={() => setForm({ ...form, client_type: type })}
                       className="px-3.5 py-1.5 rounded-full text-sm font-semibold transition-all"
                       style={{
-                        background: form.client_type === type ? "#1E88E5" : "#F8FAFC",
+                        background: form.client_type === type ? "#1565C0" : "#F8FAFC",
                         color: form.client_type === type ? "#FFFFFF" : "#6B7280",
-                        border: `1px solid ${form.client_type === type ? "#1E88E5" : "#E2E8F0"}`,
+                        border: `1px solid ${form.client_type === type ? "#1565C0" : "#E2E8F0"}`,
                       }}
                     >
                       {type}
@@ -227,7 +227,7 @@ export default function ClientProfile({ onNavigate }) {
                 onClick={handleSave}
                 disabled={saving}
                 className="w-full py-3 rounded-xl text-sm font-bold transition-all"
-                style={{ background: "#1E88E5", color: "#FFFFFF", opacity: saving ? 0.7 : 1 }}
+                style={{ background: "#1565C0", color: "#FFFFFF", opacity: saving ? 0.7 : 1 }}
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>
@@ -239,7 +239,7 @@ export default function ClientProfile({ onNavigate }) {
             <button
               onClick={async () => { await signOut(); onNavigate && onNavigate("home"); }}
               className="text-sm font-semibold"
-              style={{ color: "#1E88E5" }}
+              style={{ color: "#1565C0" }}
             >
               Log out of your account
             </button>

@@ -68,9 +68,9 @@ export default function Disclaimer({ onNavigate }) {
           <button
             onClick={() => onNavigate && onNavigate("contact")}
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#1E88E5", color: "#FFFFFF" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
+            style={{ background: "#1565C0", color: "#FFFFFF" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#0D47A1"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#1565C0"}
           >
             Contact Us
           </button>

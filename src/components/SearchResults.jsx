@@ -26,8 +26,8 @@ function CheckBox({ label, checked, onChange }) {
         onClick={onChange}
         className="w-4 h-4 rounded flex items-center justify-center shrink-0 transition-all"
         style={{
-          background: checked ? "#1E88E5" : "transparent",
-          border: `1.5px solid ${checked ? "#1E88E5" : "#E2E8F0"}`,
+          background: checked ? "#1565C0" : "transparent",
+          border: `1.5px solid ${checked ? "#1565C0" : "#E2E8F0"}`,
         }}
       >
         {checked && (
@@ -51,14 +51,14 @@ function PriceRange({ min, max, value, onChange, mode = "Buy" }) {
   return (
     <div>
       <div className="flex justify-between mb-2">
-        <span className="text-xs" style={{ color: "#6B7280" }}>Min: <span style={{ color: "#1E88E5" }}>{format(value[0])}</span></span>
-        <span className="text-xs" style={{ color: "#6B7280" }}>Max: <span style={{ color: "#1E88E5" }}>{format(value[1])}</span></span>
+        <span className="text-xs" style={{ color: "#6B7280" }}>Min: <span style={{ color: "#1565C0" }}>{format(value[0])}</span></span>
+        <span className="text-xs" style={{ color: "#6B7280" }}>Max: <span style={{ color: "#1565C0" }}>{format(value[1])}</span></span>
       </div>
       <input type="range" min={min} max={max} step={step}
         value={value[1]}
         onChange={e => onChange([value[0], Number(e.target.value)])}
         className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-        style={{ accentColor: "#1E88E5", background: "#E2E8F0" }}
+        style={{ accentColor: "#1565C0", background: "#E2E8F0" }}
       />
     </div>
   );
@@ -96,7 +96,7 @@ function Sidebar({
         {/* Header */}
         <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #E2E8F0" }}>
           <h3 className="text-sm font-bold" style={{ color: "#1F2937" }}>Filters</h3>
-          <button onClick={onReset} className="text-xs font-semibold transition-colors hover:underline" style={{ color: "#1E88E5" }}>
+          <button onClick={onReset} className="text-xs font-semibold transition-colors hover:underline" style={{ color: "#1565C0" }}>
             Reset All
           </button>
         </div>
@@ -149,12 +149,12 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
     <div className="rounded-2xl overflow-hidden flex flex-col sm:flex-row transition-all duration-200 group cursor-pointer"
       style={{
         background: "#FFFFFF",
-        border: property.featured ? "1.5px solid #1E88E540" : "1px solid #E2E8F0",
-        boxShadow: property.featured ? "0 0 24px #1E88E510" : "none",
+        border: property.featured ? "1.5px solid #1565C040" : "1px solid #E2E8F0",
+        boxShadow: property.featured ? "0 0 24px #1565C010" : "none",
       }}
       onClick={() => onOpen && onOpen(property)}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "#1E88E5"}
-      onMouseLeave={e => e.currentTarget.style.borderColor = property.featured ? "#1E88E540" : "#E2E8F0"}
+      onMouseEnter={e => e.currentTarget.style.borderColor = "#1565C0"}
+      onMouseLeave={e => e.currentTarget.style.borderColor = property.featured ? "#1565C040" : "#E2E8F0"}
     >
       {/* Image */}
       <div className="relative sm:w-64 h-52 sm:h-auto shrink-0 overflow-hidden">
@@ -184,14 +184,14 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
             disabled={false}
             className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110"
             style={{ background: "rgba(11,11,11,0.8)" }}>
-            <svg className="w-3.5 h-3.5" fill={saved ? "#1E88E5" : "none"} stroke={saved ? "#1E88E5" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill={saved ? "#1565C0" : "none"} stroke={saved ? "#1565C0" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </button>
           <button onClick={e => { e.stopPropagation(); toggleCompare(property); }}
             aria-label="Compare" disabled={compareFull}
             className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110 disabled:opacity-40"
-            style={{ background: comparing ? "#1E88E5" : "rgba(11,11,11,0.8)" }}>
+            style={{ background: comparing ? "#1565C0" : "rgba(11,11,11,0.8)" }}>
             <svg className="w-3.5 h-3.5" fill="none" stroke="#FFFFFF" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
             </svg>
@@ -215,7 +215,7 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
             {property.title}
           </h3>
           {property.verified && (
-            <span className="flex items-center gap-1 text-[10px] font-bold shrink-0" style={{ color: "#1E88E5" }}>
+            <span className="flex items-center gap-1 text-[10px] font-bold shrink-0" style={{ color: "#1565C0" }}>
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
@@ -226,14 +226,14 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
 
         {/* Price + Area */}
         <div className="flex items-baseline gap-3 mb-2">
-          <span className="text-xl font-extrabold" style={{ color: "#1E88E5" }}>{property.price}</span>
+          <span className="text-xl font-extrabold" style={{ color: "#1565C0" }}>{property.price}</span>
           <span className="text-xs" style={{ color: "#6B7280" }}>|</span>
           <span className="text-sm font-medium" style={{ color: "#6B7280" }}>{property.area}</span>
         </div>
 
         {/* Location */}
         <div className="flex items-center gap-1.5 mb-3">
-          <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1E88E5" }}>
+          <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1565C0" }}>
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
           <span className="text-xs" style={{ color: "#6B7280" }}>{property.location}</span>
@@ -243,9 +243,9 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
         <div className="flex flex-wrap gap-2 mb-3">
           {[
             { label: property.status },
-            { label: `Floor: ${property.floor}` },
-            { label: `Facing: ${property.facing}` },
-            { label: property.age !== "—" ? `Age: ${property.age}` : null },
+            { label: property.floor ? `Floor: ${property.floor}` : null },
+            { label: property.facing ? `Facing: ${property.facing}` : null },
+            { label: property.age && property.age !== "—" ? `Age: ${property.age}` : null },
           ].filter(x => x.label).map(chip => (
             <span key={chip.label} className="text-[10px] font-medium px-2.5 py-1 rounded-full"
               style={{ background: "#FFFFFF", color: "#6B7280", border: "1px solid #E2E8F0" }}>
@@ -258,7 +258,7 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
         <div className="flex flex-wrap gap-1.5 mb-4">
           {property.amenities.slice(0, 4).map(a => (
             <span key={a} className="text-[10px] px-2 py-0.5 rounded"
-              style={{ background: "#EFF6FF", color: "#1E88E5", border: "1px solid #1E88E520" }}>
+              style={{ background: "#EFF6FF", color: "#1565C0", border: "1px solid #1565C020" }}>
               {a}
             </span>
           ))}
@@ -279,9 +279,9 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
           <div className="flex gap-2">
             <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "contact" }); }}
               className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
-              style={{ background: "transparent", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#1E88E5"; e.currentTarget.style.color = "#FFFFFF"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1E88E5"; }}>
+              style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V5z" />
               </svg>
@@ -289,9 +289,9 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
             </button>
             <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "site-visit" }); }}
               className="text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all"
-              style={{ background: "#1E88E5", color: "#FFFFFF" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#1565C0"}
-              onMouseLeave={e => e.currentTarget.style.background = "#1E88E5"}>
+              style={{ background: "#1565C0", color: "#FFFFFF" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
+              onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
               Site Visit
             </button>
           </div>
@@ -314,7 +314,7 @@ function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
     <div className="rounded-2xl overflow-hidden flex flex-col transition-all duration-200 group cursor-pointer"
       style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
       onClick={() => onOpen && onOpen(property)}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "#1E88E5"}
+      onMouseEnter={e => e.currentTarget.style.borderColor = "#1565C0"}
       onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}>
 
       <div className="relative h-44 overflow-hidden">
@@ -339,14 +339,14 @@ function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
             aria-label="Save"
             className="w-7 h-7 rounded-full flex items-center justify-center"
             style={{ background: "rgba(11,11,11,0.8)" }}>
-            <svg className="w-3.5 h-3.5" fill={saved ? "#1E88E5" : "none"} stroke={saved ? "#1E88E5" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill={saved ? "#1565C0" : "none"} stroke={saved ? "#1565C0" : "#FFFFFF"} strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </button>
           <button onClick={e => { e.stopPropagation(); toggleCompare(property); }}
             aria-label="Compare" disabled={compareFull}
             className="w-7 h-7 rounded-full flex items-center justify-center disabled:opacity-40"
-            style={{ background: comparing ? "#1E88E5" : "rgba(11,11,11,0.8)" }}>
+            style={{ background: comparing ? "#1565C0" : "rgba(11,11,11,0.8)" }}>
             <svg className="w-3.5 h-3.5" fill="none" stroke="#FFFFFF" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
             </svg>
@@ -365,17 +365,17 @@ function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="text-sm font-bold" style={{ color: "#1F2937" }}>{property.title}</h3>
           {property.verified && (
-            <svg className="w-4 h-4 shrink-0 fill-current" viewBox="0 0 20 20" style={{ color: "#1E88E5" }}>
+            <svg className="w-4 h-4 shrink-0 fill-current" viewBox="0 0 20 20" style={{ color: "#1565C0" }}>
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
           )}
         </div>
         <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-base font-extrabold" style={{ color: "#1E88E5" }}>{property.price}</span>
+          <span className="text-base font-extrabold" style={{ color: "#1565C0" }}>{property.price}</span>
           <span className="text-xs" style={{ color: "#6B7280" }}>| {property.area}</span>
         </div>
         <div className="flex items-center gap-1.5 mb-3">
-          <svg className="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1E88E5" }}>
+          <svg className="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1565C0" }}>
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
           <span className="text-[11px]" style={{ color: "#6B7280" }}>{property.location}</span>
@@ -383,7 +383,7 @@ function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
         <div className="flex flex-wrap gap-1 mb-3">
           {property.amenities.slice(0, 3).map(a => (
             <span key={a} className="text-[9px] px-1.5 py-0.5 rounded"
-              style={{ background: "#EFF6FF", color: "#1E88E5", border: "1px solid #1E88E520" }}>{a}</span>
+              style={{ background: "#EFF6FF", color: "#1565C0", border: "1px solid #1565C020" }}>{a}</span>
           ))}
           {property.amenities.length > 3 && (
             <span className="text-[9px] font-semibold" style={{ color: "#F59E0B" }}>+{property.amenities.length - 3}</span>
@@ -396,9 +396,9 @@ function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
           </span>
           <button onClick={e => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "contact" }); }}
             className="text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
-            style={{ background: "#1E88E5", color: "#FFFFFF" }}
-            onMouseEnter={e => e.currentTarget.style.background = "#1565C0"}
-            onMouseLeave={e => e.currentTarget.style.background = "#1E88E5"}>
+            style={{ background: "#1565C0", color: "#FFFFFF" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
+            onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
             Contact
           </button>
         </div>
@@ -508,7 +508,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               onClick={() => setTransactionType(tt)}
               className="px-6 py-2 rounded-lg text-sm font-bold transition-all"
               style={{
-                background: filters.transactionType === tt ? "#1E88E5" : "transparent",
+                background: filters.transactionType === tt ? "#1565C0" : "transparent",
                 color: filters.transactionType === tt ? "#FFFFFF" : "#6B7280",
               }}
             >
@@ -522,7 +522,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
           style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
           <div className="flex items-center gap-2 flex-1 rounded-xl px-4 py-2.5"
             style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-            <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1E88E5" }}>
+            <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1565C0" }}>
               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
             </svg>
             <input type="text" value={filters.location}
@@ -539,9 +539,9 @@ export default function SearchResults({ initialFilters, onNavigate }) {
           </div>
           <button onClick={() => resultsRef.current?.scrollIntoView({ behavior: "smooth" })}
             className="px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all justify-center"
-            style={{ background: "#1E88E5", color: "#FFFFFF" }}
-            onMouseEnter={e => e.currentTarget.style.background = "#1565C0"}
-            onMouseLeave={e => e.currentTarget.style.background = "#1E88E5"}>
+            style={{ background: "#1565C0", color: "#FFFFFF" }}
+            onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
+            onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
             </svg>
@@ -554,7 +554,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
           <div>
             <h1 className="text-lg font-bold" style={{ color: "#1F2937" }}>
               {filters.transactionType === "Rent" ? "Properties for Rent" : "Properties for Sale"}
-              {filters.location.trim() && <> in <span style={{ color: "#1E88E5" }}>{filters.location.trim()}</span></>}
+              {filters.location.trim() && <> in <span style={{ color: "#1565C0" }}>{filters.location.trim()}</span></>}
             </h1>
             <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
               {sorted.length} properties found
@@ -567,7 +567,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
             <button onClick={() => setShowMobileFilters(true)}
               className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
               style={{ background: "#FFFFFF", color: "#1F2937", border: "1px solid #E2E8F0" }}>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#1E88E5" }}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#1565C0" }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
               </svg>
               Filters {activeFilterCount > 0 && <span className="font-bold" style={{ color: "#F59E0B" }}>({activeFilterCount})</span>}
@@ -578,7 +578,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               <button onClick={() => setShowSortDropdown(!showSortDropdown)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
                 style={{ background: "#FFFFFF", color: "#1F2937", border: "1px solid #E2E8F0" }}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#1E88E5" }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#1565C0" }}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18M6 12h12M9 17h6" />
                 </svg>
                 {sortBy}
@@ -588,11 +588,11 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               </button>
               {showSortDropdown && (
                 <div className="absolute right-0 top-full mt-1 w-52 rounded-xl z-30 py-1 overflow-hidden shadow-2xl"
-                  style={{ background: "#FFFFFF", border: "1px solid #1E88E5" }}>
+                  style={{ background: "#FFFFFF", border: "1px solid #1565C0" }}>
                   {SORT_OPTIONS.map(opt => (
                     <button key={opt} onClick={() => { setSortBy(opt); setShowSortDropdown(false); }}
                       className="block w-full text-left px-4 py-2.5 text-sm transition-colors"
-                      style={{ color: sortBy === opt ? "#1E88E5" : "#6B7280", background: sortBy === opt ? "#EFF6FF" : "transparent" }}>
+                      style={{ color: sortBy === opt ? "#1565C0" : "#6B7280", background: sortBy === opt ? "#EFF6FF" : "transparent" }}>
                       {opt}
                     </button>
                   ))}
@@ -605,7 +605,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               {["list", "grid"].map(mode => (
                 <button key={mode} onClick={() => setViewMode(mode)}
                   className="w-9 h-9 flex items-center justify-center transition-all"
-                  style={{ background: viewMode === mode ? "#1E88E5" : "#FFFFFF" }}>
+                  style={{ background: viewMode === mode ? "#1565C0" : "#FFFFFF" }}>
                   {mode === "list" ? (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
                       style={{ color: viewMode === "list" ? "#FFFFFF" : "#6B7280" }}>
@@ -658,7 +658,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               <div className="rounded-2xl flex flex-col items-center justify-center py-24 text-center"
                 style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
                 <span className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
-                  <svg className="w-7 h-7" fill="none" stroke="#1E88E5" strokeWidth={2} viewBox="0 0 24 24">
+                  <svg className="w-7 h-7" fill="none" stroke="#1565C0" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                   </svg>
                 </span>
@@ -666,7 +666,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
                 <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Be the first — post your property for free.</p>
                 <button onClick={() => onNavigate && onNavigate("post-property")}
                   className="px-5 py-2.5 rounded-xl text-sm font-bold"
-                  style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+                  style={{ background: "#1565C0", color: "#FFFFFF" }}>
                   Post a Property
                 </button>
               </div>
@@ -682,7 +682,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
                 <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Try adjusting your filters</p>
                 <button onClick={resetFilters}
                   className="px-5 py-2.5 rounded-xl text-sm font-bold"
-                  style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+                  style={{ background: "#1565C0", color: "#FFFFFF" }}>
                   Reset Filters
                 </button>
               </div>
@@ -700,9 +700,9 @@ export default function SearchResults({ initialFilters, onNavigate }) {
             {sorted.length > 0 && (
               <div className="mt-8 flex justify-center">
                 <button className="px-8 py-3 rounded-xl text-sm font-bold transition-all"
-                  style={{ background: "transparent", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#1E88E5"; e.currentTarget.style.color = "#FFFFFF"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1E88E5"; }}>
+                  style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
                   Load More Properties
                 </button>
               </div>
@@ -715,12 +715,12 @@ export default function SearchResults({ initialFilters, onNavigate }) {
           <div className="fixed inset-0 z-50 lg:hidden">
             <div className="absolute inset-0 bg-black/70" onClick={() => setShowMobileFilters(false)} />
             <div className="absolute right-0 top-0 bottom-0 w-80 overflow-y-auto"
-              style={{ background: "#FFFFFF", borderLeft: "1px solid #1E88E5" }}>
+              style={{ background: "#FFFFFF", borderLeft: "1px solid #1565C0" }}>
               <div className="px-5 py-4 flex items-center justify-between sticky top-0"
                 style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E8F0" }}>
                 <h3 className="text-sm font-bold" style={{ color: "#1F2937" }}>Filters</h3>
                 <div className="flex items-center gap-3">
-                  <button onClick={resetFilters} className="text-xs font-semibold" style={{ color: "#1E88E5" }}>Reset</button>
+                  <button onClick={resetFilters} className="text-xs font-semibold" style={{ color: "#1565C0" }}>Reset</button>
                   <button onClick={() => setShowMobileFilters(false)}>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" style={{ color: "#6B7280" }}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -742,7 +742,7 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               <div className="sticky bottom-0 px-5 py-4" style={{ background: "#FFFFFF", borderTop: "1px solid #E2E8F0" }}>
                 <button onClick={() => setShowMobileFilters(false)}
                   className="w-full py-3 rounded-xl text-sm font-bold"
-                  style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+                  style={{ background: "#1565C0", color: "#FFFFFF" }}>
                   Show {sorted.length} Results
                 </button>
               </div>

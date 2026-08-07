@@ -33,7 +33,7 @@ const DEMO_TESTIMONIALS = [
     role: "NRI Investor",
     location: "Dubai → Bhubaneswar",
     avatar: "NS",
-    avatarBg: "from-[#1E88E5] to-[#1565C0]",
+    avatarBg: "from-[#1565C0] to-[#0D47A1]",
     rating: 5,
     category: "NRIs",
     text: "As an NRI, I was skeptical about investing in Indian real estate remotely. PropertyBrands' NRI desk handled everything — property visits, legal checks, loan paperwork, and registration — while I stayed in Dubai. The transparency and communication were exceptional.",
@@ -206,13 +206,13 @@ function TestimonialCard({ t, featured = false }) {
     <div
       className={`bg-[#FFFFFF] rounded-2xl border transition-shadow duration-200 flex flex-col h-full ${
         featured
-          ? "border-[#1E88E5]/30 shadow-lg ring-1 ring-[#1E88E5]/10"
+          ? "border-[#1565C0]/30 shadow-lg ring-1 ring-[#1565C0]/10"
           : "border-[#E2E8F0] hover:shadow-lg hover:border-[#E2E8F0]"
       }`}
     >
       {/* Quote mark */}
       <div className="px-5 pt-5 pb-0">
-        <svg className="w-8 h-8 text-[#1E88E5]/20 fill-current mb-2" viewBox="0 0 32 32">
+        <svg className="w-8 h-8 text-[#1565C0]/20 fill-current mb-2" viewBox="0 0 32 32">
           <path d="M10 8C6.686 8 4 10.686 4 14v10h10V14H7.8C7.8 11.9 9.5 10.2 11.6 10.2L10 8zm14 0c-3.314 0-6 2.686-6 6v10h10V14h-6.2c0-2.1 1.7-3.8 3.8-3.8L24 8z" />
         </svg>
         <p className={`text-sm text-[#6B7280] leading-relaxed ${featured ? "text-[#1F2937]" : ""}`}>
@@ -223,7 +223,7 @@ function TestimonialCard({ t, featured = false }) {
       {/* Property tag */}
       <div className="px-5 pt-3">
         <span className="inline-flex items-center gap-1 text-[10px] bg-[#F1F5F9] text-[#6B7280] px-2.5 py-1 rounded-full font-medium">
-          <svg className="w-3 h-3 text-[#1E88E5]" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-3 h-3 text-[#1565C0]" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
           {t.property}
@@ -298,7 +298,7 @@ export default function Testimonials({ onNavigate }) {
       <div className="max-w-7xl mx-auto space-y-12">
 
         {/* ── Stats Counter ── */}
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(30,136,229,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] p-8 md:p-10 shadow-lg">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(21,101,192,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] p-8 md:p-10 shadow-lg">
 
   {/* Decorative Glow */}
   <div className="absolute -top-20 -right-20 w-64 h-64 bg-sky-100 rounded-full blur-3xl opacity-30 pointer-events-none" />
@@ -307,7 +307,7 @@ export default function Testimonials({ onNavigate }) {
     
     {/* Heading */}
     <div className="text-center mb-10">
-      <span className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest">
+      <span className="text-[#1565C0] text-xs font-bold uppercase tracking-widest">
         Our Impact
       </span>
 
@@ -329,11 +329,11 @@ export default function Testimonials({ onNavigate }) {
         >
           <div className="mb-3 flex justify-center">
             <span className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "#EFF6FF" }}>
-              <stat.icon className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+              <stat.icon className="w-6 h-6" style={{ color: "#1565C0" }} strokeWidth={2} />
             </span>
           </div>
 
-          <div className="text-3xl font-extrabold text-[#1E88E5] tracking-tight">
+          <div className="text-3xl font-extrabold text-[#1565C0] tracking-tight">
             <AnimatedCounter
               target={stat.value}
               suffix={stat.suffix}
@@ -356,7 +356,7 @@ export default function Testimonials({ onNavigate }) {
           <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
             <div>
               <h2 className="text-xl font-bold text-[#1F2937]">What Our Clients Say</h2>
-              <div className="w-10 h-0.5 bg-[#1E88E5] rounded-full mt-1" />
+              <div className="w-10 h-0.5 bg-[#1565C0] rounded-full mt-1" />
               <p className="text-[#6B7280] text-sm mt-1">Real stories from real people</p>
             </div>
             <div className="flex items-center gap-1.5 bg-[#F1F5F9] border border-[#E2E8F0] px-3 py-1.5 rounded-full shrink-0">
@@ -376,8 +376,8 @@ export default function Testimonials({ onNavigate }) {
                 onClick={() => setActiveFilter(f)}
                 className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
                   activeFilter === f
-                    ? "bg-[#1E88E5] text-white border-[#1E88E5] shadow-sm"
-                    : "bg-[#FFFFFF] text-[#6B7280] border-[#E2E8F0] hover:border-[#1E88E5] hover:text-[#1E88E5]"
+                    ? "bg-[#1565C0] text-white border-[#1565C0] shadow-sm"
+                    : "bg-[#FFFFFF] text-[#6B7280] border-[#E2E8F0] hover:border-[#1565C0] hover:text-[#1565C0]"
                 }`}
               >
                 {f}
@@ -397,7 +397,7 @@ export default function Testimonials({ onNavigate }) {
                     onClick={() => setCurrent(i)}
                     className={`rounded-full transition-all ${
                       i === current
-                        ? "w-6 h-2 bg-[#1E88E5]"
+                        ? "w-6 h-2 bg-[#1565C0]"
                         : "w-2 h-2 bg-gray-300 hover:bg-gray-400"
                     }`}
                   />
@@ -445,10 +445,10 @@ export default function Testimonials({ onNavigate }) {
             Join thousands of happy clients who found their dream property with us
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => onNavigate && onNavigate("search")} className="bg-[#1E88E5] text-white font-bold px-6 py-3 rounded-lg hover:bg-[#1565C0] transition shadow-sm">
+            <button onClick={() => onNavigate && onNavigate("search")} className="bg-[#1565C0] text-white font-bold px-6 py-3 rounded-lg hover:bg-[#0D47A1] transition shadow-sm">
               Explore Properties
             </button>
-            <button onClick={() => onNavigate && onNavigate("contact")} className="bg-[#FFFFFF] text-[#1E88E5] font-bold px-6 py-3 rounded-lg border-2 border-[#1E88E5] hover:bg-[#EFF6FF] transition">
+            <button onClick={() => onNavigate && onNavigate("contact")} className="bg-[#FFFFFF] text-[#1565C0] font-bold px-6 py-3 rounded-lg border-2 border-[#1565C0] hover:bg-[#EFF6FF] transition">
               Talk to an Expert
             </button>
           </div>

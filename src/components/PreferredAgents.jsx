@@ -23,7 +23,7 @@ const NEW_PROJECT_FEATURES = [
     ),
     label: "All Reports from RERA",
     bg: "bg-[#FEE2E2]",
-    iconColor: "text-[#1E88E5]",
+    iconColor: "text-[#1565C0]",
   },
   {
     icon: (
@@ -78,8 +78,8 @@ function AgentCard({ agent }) {
     <div className="flex-shrink-0 w-64 bg-[#FFFFFF] border border-[#E2E8F0] rounded-xl p-4 hover:shadow-xl transition-shadow duration-200 cursor-pointer group">
       {/* Badge */}
       <div className="flex items-center justify-between mb-3">
-        <span className="flex items-center gap-1 text-[10px] font-bold text-[#1E88E5] bg-[#EFF6FF] px-2 py-0.5 rounded-full border border-[#1E88E5]/30">
-          <svg className="w-3 h-3 fill-[#1E88E5]" viewBox="0 0 20 20">
+        <span className="flex items-center gap-1 text-[10px] font-bold text-[#1565C0] bg-[#EFF6FF] px-2 py-0.5 rounded-full border border-[#1565C0]/30">
+          <svg className="w-3 h-3 fill-[#1565C0]" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
           {agent.tier} Partner
@@ -128,7 +128,7 @@ function AgentCard({ agent }) {
         className={`w-full py-2 rounded-lg text-sm font-bold transition-all ${
           contacted
             ? "bg-[#F0FDF4] text-[#4ade80] border border-[#1a3a1a]"
-            : "bg-[#1E88E5] text-white hover:bg-[#1565C0]"
+            : "bg-[#1565C0] text-white hover:bg-[#0D47A1]"
         }`}
       >
         {contacted ? "✓ Request Sent" : "Contact Agent"}
@@ -143,11 +143,11 @@ function NewProjectsSection() {
     <div className="bg-[#FFFFFF] rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
       {/* Header */}
       <div className="text-center pt-8 pb-6 px-6 border-b border-[#E2E8F0]">
-        <span className="inline-block bg-[#1E88E5] text-white text-[10px] font-bold px-3 py-1 rounded-full mb-3 tracking-widest uppercase">
+        <span className="inline-block bg-[#1565C0] text-white text-[10px] font-bold px-3 py-1 rounded-full mb-3 tracking-widest uppercase">
           New Launch
         </span>
         <h2 className="text-2xl font-extrabold text-[#1F2937] tracking-tight">
-          property<span className="text-[#1E88E5]">Homes</span>
+          property<span className="text-[#1565C0]">Homes</span>
         </h2>
         <p className="text-[#6B7280] text-sm mt-1 font-medium">
           Encyclopedia For All New Projects
@@ -173,7 +173,7 @@ function NewProjectsSection() {
 
       {/* CTA */}
       <div className="flex justify-center py-6 border-t border-[#E2E8F0]">
-        <button className="bg-[#1E88E5] text-white text-sm font-bold px-8 py-3 rounded-lg hover:bg-[#1565C0] transition shadow-sm">
+        <button className="bg-[#1565C0] text-white text-sm font-bold px-8 py-3 rounded-lg hover:bg-[#0D47A1] transition shadow-sm">
           View All New Projects
         </button>
       </div>
@@ -184,7 +184,7 @@ function NewProjectsSection() {
 // ── Site Visit Banner ─────────────────────────────────────────────────────────
 function SiteVisitBanner() {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(30,136,229,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] shadow-lg p-6 md:p-8">
+    <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(21,101,192,0.08),_transparent_35%),linear-gradient(to_bottom_right,#ffffff,#f8fafc)] shadow-lg p-6 md:p-8">
       
       {/* Decorative Glow */}
       <div className="absolute -top-20 -right-20 w-64 h-64 bg-sky-100 rounded-full blur-3xl opacity-30 pointer-events-none" />
@@ -193,7 +193,7 @@ function SiteVisitBanner() {
         
         {/* Left */}
         <div className="flex-1 max-w-md">
-          <p className="text-[#1E88E5] text-xs font-bold uppercase tracking-widest mb-2">
+          <p className="text-[#1565C0] text-xs font-bold uppercase tracking-widest mb-2">
             Plan hassle-free
           </p>
 
@@ -203,7 +203,7 @@ function SiteVisitBanner() {
 
           <p className="text-slate-600 text-sm mb-2">
             with{" "}
-            <span className="text-[#1E88E5] font-bold">
+            <span className="text-[#1565C0] font-bold">
               PropertyDiary
             </span>
           </p>
@@ -229,7 +229,7 @@ function SiteVisitBanner() {
               className="flex items-start gap-3 flex-1"
             >
               <div className="w-8 h-8 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
-                <span className="text-[#1E88E5] text-xs font-extrabold">
+                <span className="text-[#1565C0] text-xs font-extrabold">
                   {step.num}
                 </span>
               </div>
@@ -264,7 +264,7 @@ function SiteVisitBanner() {
         </div>
 
         {/* CTA */}
-        <button className="bg-[#1E88E5] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#1565C0] transition-all duration-300 shadow-md hover:shadow-lg shrink-0">
+        <button className="bg-[#1565C0] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#0D47A1] transition-all duration-300 shadow-md hover:shadow-lg shrink-0">
           Find out how
         </button>
 
@@ -301,9 +301,9 @@ export default function PreferredAgents({ onNavigate }) {
           <div className="flex items-center justify-between mb-5">
             <div>
               <h2 className="text-xl font-bold text-[#1F2937]">PB Preferred Agents</h2>
-              <div className="w-10 h-0.5 bg-[#1E88E5] rounded-full mt-1" />
+              <div className="w-10 h-0.5 bg-[#1565C0] rounded-full mt-1" />
             </div>
-            <button onClick={() => onNavigate && onNavigate("agents")} className="flex items-center gap-1 text-sm font-semibold text-[#1E88E5] hover:underline">
+            <button onClick={() => onNavigate && onNavigate("agents")} className="flex items-center gap-1 text-sm font-semibold text-[#1565C0] hover:underline">
               See all
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -318,7 +318,7 @@ export default function PreferredAgents({ onNavigate }) {
           ) : agents.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 text-center rounded-2xl" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
               <span className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ background: "#EFF6FF" }}>
-                <Users className="w-6 h-6" style={{ color: "#1E88E5" }} strokeWidth={2} />
+                <Users className="w-6 h-6" style={{ color: "#1565C0" }} strokeWidth={2} />
               </span>
               <p className="text-sm font-bold" style={{ color: "#1F2937" }}>No preferred agents yet</p>
               <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Verified partner agents will appear here as they join.</p>
@@ -328,7 +328,7 @@ export default function PreferredAgents({ onNavigate }) {
             <div className="relative group/agents">
               <button
                 onClick={() => scroll(-1)}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E88E5] hover:border-[#1E88E5] opacity-0 group-hover/agents:opacity-100 transition"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-lg flex items-center justify-center text-[#6B7280] hover:text-[#1565C0] hover:border-[#1565C0] opacity-0 group-hover/agents:opacity-100 transition"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -337,7 +337,7 @@ export default function PreferredAgents({ onNavigate }) {
 
               <div
                 ref={rowRef}
-                className="flex gap-4 overflow-x-auto scroll-smooth pb-2"
+                className="flex items-start gap-4 overflow-x-auto scroll-smooth pb-2"
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
               >
                 {agents.map((agent) => (
@@ -347,7 +347,7 @@ export default function PreferredAgents({ onNavigate }) {
 
               <button
                 onClick={() => scroll(1)}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E88E5] hover:border-[#1E88E5] opacity-0 group-hover/agents:opacity-100 transition"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-9 h-9 rounded-full bg-[#FFFFFF] border border-[#E2E8F0] shadow-lg flex items-center justify-center text-[#6B7280] hover:text-[#1565C0] hover:border-[#1565C0] opacity-0 group-hover/agents:opacity-100 transition"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

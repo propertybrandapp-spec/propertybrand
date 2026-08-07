@@ -251,18 +251,18 @@ function DropdownMenu({ item, isOpen, onNavigate, index }) {
       : "justify-start pl-8"
   }`}
 >
-        <div className="w-3 h-3 rotate-45 -mb-1.5 z-10 relative border-l border-t" style={{ background: "#FFFFFF", borderColor: "#1E88E5" }} />
+        <div className="w-3 h-3 rotate-45 -mb-1.5 z-10 relative border-l border-t" style={{ background: "#FFFFFF", borderColor: "#1565C0" }} />
       </div>
-      <div className="rounded-xl shadow-2xl overflow-hidden border" style={{ background: "#FFFFFF", borderColor: "#1E88E5" }}>
-        <div className="flex gap-0 divide-x" style={{ borderColor: "#1E88E5" }}>
+      <div className="rounded-xl shadow-2xl overflow-hidden border" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
+        <div className="flex gap-0 divide-x" style={{ borderColor: "#1565C0" }}>
           {item.columns.map((col) => (
-            <div key={col.heading} className="px-5 pb-5 pt-7 min-w-[180px]" style={{ borderColor: "#1E88E5" }}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#1E88E5" }}>{col.heading}</p>
+            <div key={col.heading} className="px-5 pb-5 pt-7 min-w-[180px]" style={{ borderColor: "#1565C0" }}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#1565C0" }}>{col.heading}</p>
               <ul className="space-y-1.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
                     <button onClick={() => onNavigate && onNavigate(link.page, link.filters || link.anchor)} className="text-sm block py-0.5 transition-colors text-left w-full" style={{ color: "#6B7280" }}
-                      onMouseEnter={e => e.target.style.color = "#1E88E5"}
+                      onMouseEnter={e => e.target.style.color = "#1565C0"}
                       onMouseLeave={e => e.target.style.color = "#6B7280"}>
                       {link.label}
                     </button>
@@ -288,14 +288,14 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
         <ChevronDown className={isOpen ? "rotate-180" : ""} />
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-44 rounded-xl shadow-2xl z-50 py-2 overflow-hidden border" style={{ background: "#FFFFFF", borderColor: "#1E88E5" }}>
-          <p className="text-[10px] font-bold uppercase tracking-widest px-3 pb-1" style={{ color: "#1E88E5" }}>Select City</p>
+        <div className="absolute top-full left-0 mt-2 w-44 rounded-xl shadow-2xl z-50 py-2 overflow-hidden border" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
+          <p className="text-[10px] font-bold uppercase tracking-widest px-3 pb-1" style={{ color: "#1565C0" }}>Select City</p>
           {CITIES.map((city) => (
             <button key={city} onClick={() => onSelect(city)}
               className="block w-full text-left px-3 py-2 text-sm transition"
-              style={{ color: city === selectedCity ? "#1E88E5" : "#6B7280" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#1E88E5"}
-              onMouseLeave={e => e.currentTarget.style.color = city === selectedCity ? "#1E88E5" : "#6B7280"}>
+              style={{ color: city === selectedCity ? "#1565C0" : "#6B7280" }}
+              onMouseEnter={e => e.currentTarget.style.color = "#1565C0"}
+              onMouseLeave={e => e.currentTarget.style.color = city === selectedCity ? "#1565C0" : "#6B7280"}>
               {city}
             </button>
           ))}
@@ -308,19 +308,19 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
 function MobileNavItem({ item, onNavigate, onLinkClick }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-b last:border-0" style={{ borderColor: "#1E88E5" }}>
+    <div className="border-b last:border-0" style={{ borderColor: "#1565C0" }}>
       <button onClick={() => setOpen(!open)} className="flex items-center justify-between w-full px-5 py-3.5 text-sm font-semibold" style={{ color: "#1F2937" }}>
         <span className="flex items-center gap-2">
           {item.label}
           {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: "#F59E0B", color: "#FFFFFF" }}>{item.badge}</span>}
         </span>
-        <ChevronDown className={open ? "rotate-180" : ""} style={{ color: open ? "#1E88E5" : "#6B7280" }} />
+        <ChevronDown className={open ? "rotate-180" : ""} style={{ color: open ? "#1565C0" : "#6B7280" }} />
       </button>
       {open && item.columns && (
         <div className="px-5 pb-4" style={{ background: "#FFFFFF" }}>
           {item.columns.map((col) => (
             <div key={col.heading} className="mt-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: "#1E88E5" }}>{col.heading}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: "#1565C0" }}>{col.heading}</p>
               <ul className="space-y-1">
                 {col.links.map((link) => (
                   <li key={link.label}>
@@ -375,7 +375,7 @@ export default function Navbar({ onNavigate }) {
       {/* Top Bar */}
       <div
   className="bg-white border-b shadow-sm"
-  style={{ borderBottomColor: "#1E88E5" }}
+  style={{ borderBottomColor: "#1565C0" }}
 >
   <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
 
@@ -412,7 +412,7 @@ export default function Navbar({ onNavigate }) {
         className="px-3 py-1 rounded-full text-sm font-semibold transition"
         style={{
           background: "#E3F2FD",
-          color: "#1E88E5",
+          color: "#1565C0",
         }}
       >
         PB Prime
@@ -438,7 +438,7 @@ export default function Navbar({ onNavigate }) {
         onClick={() => onNavigate && onNavigate("post-property")}
         className="flex items-center gap-2 rounded-lg px-5 py-2 font-semibold shadow-sm transition hover:shadow-md"
         style={{
-          background: "#1E88E5",
+          background: "#1565C0",
           color: "#FFFFFF",
         }}
       >
@@ -485,13 +485,13 @@ export default function Navbar({ onNavigate }) {
 </div>
 
       {/* Secondary Nav */}
-      <nav className="hidden lg:block border-b" style={{ background: "#FFFFFF", borderColor: "#1E88E5" }}>
+      <nav className="hidden lg:block border-b" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
         <div className="max-w-7xl mx-auto px-4">
           <ul className="flex items-center">
             {NAV_ITEMS.map((item,index) => (
               <li key={item.label} className="relative" onMouseEnter={() => handleMouseEnter(item.label)} onMouseLeave={handleMouseLeave}>
                 <button className="flex items-center gap-1 px-4 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors border-b-2 -mb-px"
-                  style={{ color: activeDropdown === item.label ? "#1E88E5" : "#6B7280", borderBottomColor: activeDropdown === item.label ? "#1E88E5" : "transparent" }}>
+                  style={{ color: activeDropdown === item.label ? "#1565C0" : "#6B7280", borderBottomColor: activeDropdown === item.label ? "#1565C0" : "transparent" }}>
                   {item.label}
                   {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded leading-none" style={{ background: "#F59E0B", color: "#FFFFFF" }}>{item.badge}</span>}
                   <ChevronDown className={activeDropdown === item.label ? "rotate-180" : ""} />
@@ -505,9 +505,9 @@ export default function Navbar({ onNavigate }) {
 
       {/* Mobile Menu */}
       <div className={`lg:hidden border-t overflow-hidden transition-all duration-300 ${mobileOpen ? "max-h-[85vh] overflow-y-auto" : "max-h-0"}`}
-        style={{ background: "#FFFFFF", borderColor: "#1E88E5" }}>
-        <div className="flex items-center justify-between px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#1E88E5" }}>
-          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("contact", "prime"); }} className="text-sm font-semibold" style={{ color: "#1E88E5" }}>PB Prime</button>
+        style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
+        <div className="flex items-center justify-between px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
+          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("contact", "prime"); }} className="text-sm font-semibold" style={{ color: "#1565C0" }}>PB Prime</button>
           {isLoggedIn ? (
             <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("profile"); }} className="flex items-center gap-2 text-sm font-semibold" style={{ color: "#1F2937" }}>
               {profile?.avatar_url && (
@@ -518,23 +518,23 @@ export default function Navbar({ onNavigate }) {
           ) : (
             <button onClick={() => { setMobileOpen(false); setAuthModalOpen(true); }} className="text-sm font-semibold" style={{ color: "#1F2937" }}>Login</button>
           )}
-          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("post-property"); }} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#1E88E5", color: "#FFFFFF" }}>
+          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("post-property"); }} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#1565C0", color: "#FFFFFF" }}>
             Post Property <span className="text-[9px] font-extrabold px-1 py-0.5 rounded" style={{ background: "#F59E0B", color: "#FFFFFF" }}>FREE</span>
           </button>
         </div>
-        <div className="px-5 py-3 border-b flex items-center gap-2" style={{ borderColor: "#1E88E5" }}>
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1E88E5" }}>
+        <div className="px-5 py-3 border-b flex items-center gap-2" style={{ borderColor: "#1565C0" }}>
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1565C0" }}>
             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
           </svg>
           <span className="text-sm font-medium" style={{ color: "#1F2937" }}>{selectedCity}</span>
-          <button className="ml-auto text-xs font-semibold" style={{ color: "#1E88E5" }} onClick={() => setCityOpen(!cityOpen)}>Change City</button>
+          <button className="ml-auto text-xs font-semibold" style={{ color: "#1565C0" }} onClick={() => setCityOpen(!cityOpen)}>Change City</button>
         </div>
         {cityOpen && (
-          <div className="grid grid-cols-3 gap-2 px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#1E88E5" }}>
+          <div className="grid grid-cols-3 gap-2 px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
             {CITIES.map((city) => (
               <button key={city} onClick={() => { handleCitySelect(city); setMobileOpen(false); }}
                 className="text-sm py-1.5 px-2 rounded-md text-center transition"
-                style={{ background: city === selectedCity ? "#1E88E5" : "transparent", color: city === selectedCity ? "#FFFFFF" : "#6B7280" }}>
+                style={{ background: city === selectedCity ? "#1565C0" : "transparent", color: city === selectedCity ? "#FFFFFF" : "#6B7280" }}>
                 {city}
               </button>
             ))}

@@ -235,7 +235,7 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
             <div>
               <div className="flex items-center gap-0.5 mb-2">
                 <span className="text-[#1F2937] font-bold text-xl tracking-tight leading-none">property</span>
-                <span className="font-bold text-xl tracking-tight leading-none text-[#1E88E5]">
+                <span className="font-bold text-xl tracking-tight leading-none text-[#1565C0]">
                   L
                   <span
                     className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full mx-0.5 align-middle"
@@ -258,14 +258,14 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
                 </div>
                 <div className="flex items-center gap-1.5 text-sm text-gray-700">
                   <CheckCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                  <span><span className="font-bold text-[#1E88E5]">0%*</span> Processing Fee</span>
+                  <span><span className="font-bold text-[#1565C0]">0%*</span> Processing Fee</span>
                 </div>
               </div>
             </div>
 
             {/* Bank slider */}
             <div>
-              <p className="text-[10px] font-semibold text-[#1E88E5] tracking-widest uppercase mb-3">
+              <p className="text-[10px] font-semibold text-[#1565C0] tracking-widest uppercase mb-3">
                 Our Banking Partners
               </p>
 
@@ -317,15 +317,15 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
             <div className="flex items-center gap-6 mt-4">
               <button
                 onClick={() => onNavigate && onNavigate("investment-advisory")}
-                className="text-[#1E88E5] font-semibold text-sm flex items-center gap-1 hover:underline"
+                className="text-[#1565C0] font-semibold text-sm flex items-center gap-1 hover:underline"
               >
                 Explore Bank Offers <span aria-hidden>→</span>
               </button>
               <button
                 className="px-6 py-2.5 rounded-full text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 style={{
-                  background: "linear-gradient(135deg, #0F2D52, #1E88E5)",
-                  boxShadow: "0 4px 14px rgba(30,136,229,0.35)",
+                  background: "linear-gradient(135deg, #0F2D52, #1565C0)",
+                  boxShadow: "0 4px 14px rgba(21,101,192,0.35)",
                 }}
               >
                 Check Your Eligibility

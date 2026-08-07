@@ -82,20 +82,20 @@ function SimilarCard({ property, onOpen }) {
       onClick={() => onOpen(property)}
       className="text-left rounded-2xl overflow-hidden shrink-0 w-64 transition-all duration-200 group"
       style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
-      onMouseEnter={(e) => e.currentTarget.style.borderColor = "#1E88E5"}
+      onMouseEnter={(e) => e.currentTarget.style.borderColor = "#1565C0"}
       onMouseLeave={(e) => e.currentTarget.style.borderColor = "#E2E8F0"}
     >
       <div className="relative h-36 overflow-hidden">
         <img src={property.images?.[0]} alt={property.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         {property.badge && (
-          <span className="absolute top-2.5 left-2.5 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: property.badgeColor || "#1E88E5", color: "#FFFFFF" }}>
+          <span className="absolute top-2.5 left-2.5 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: property.badgeColor || "#1565C0", color: "#FFFFFF" }}>
             {property.badge}
           </span>
         )}
       </div>
       <div className="p-3.5">
         <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{property.title}</p>
-        <p className="text-base font-extrabold mt-0.5" style={{ color: "#1E88E5" }}>{property.price}</p>
+        <p className="text-base font-extrabold mt-0.5" style={{ color: "#1565C0" }}>{property.price}</p>
         <p className="text-xs truncate mt-1" style={{ color: "#6B7280" }}>{property.location}</p>
       </div>
     </button>
@@ -130,7 +130,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
         <p className="text-lg font-bold" style={{ color: "#1F2937" }}>Property not found</p>
-        <button onClick={() => onNavigate && onNavigate("search")} className="mt-4 text-sm font-bold" style={{ color: "#1E88E5" }}>
+        <button onClick={() => onNavigate && onNavigate("search")} className="mt-4 text-sm font-bold" style={{ color: "#1565C0" }}>
           ← Back to Search
         </button>
       </div>
@@ -156,9 +156,9 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
 
         {/* ── Breadcrumb ── */}
         <div className="flex items-center gap-1.5 text-xs mb-5 flex-wrap" style={{ color: "#6B7280" }}>
-          <button onClick={() => onNavigate && onNavigate("home")} className="hover:underline" style={{ color: "#1E88E5" }}>Home</button>
+          <button onClick={() => onNavigate && onNavigate("home")} className="hover:underline" style={{ color: "#1565C0" }}>Home</button>
           <span>/</span>
-          <button onClick={() => onNavigate && onNavigate("search")} className="hover:underline" style={{ color: "#1E88E5" }}>
+          <button onClick={() => onNavigate && onNavigate("search")} className="hover:underline" style={{ color: "#1565C0" }}>
             {property.transactionType === "Rent" ? "Rent" : "Buy"}
           </button>
           {property.type && (<><span>/</span><span>{property.type}</span></>)}
@@ -172,7 +172,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
           <div className="lg:col-span-2">
 
             {/* Gallery */}
-            <div className="rounded-2xl overflow-hidden mb-3" style={{ border: "1px solid #E2E8F0", background: "#F1F5F9" }}>
+            <div className="rounded-2xl overflow-hidden mb-2" style={{ border: "1px solid #E2E8F0", background: "#F1F5F9" }}>
               {images.length > 0 ? (
                 <img src={images[activeImage]} alt={property.title} className="w-full h-[320px] sm:h-[440px] object-cover" />
               ) : (
@@ -181,6 +181,17 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 </div>
               )}
             </div>
+            {(() => {
+              const detail = (property.imageDetails || []).find((d) => d.url === images[activeImage]);
+              if (!detail || (!detail.caption && !detail.roomLabel)) return null;
+              return (
+                <p className="text-xs mb-3" style={{ color: "#6B7280" }}>
+                  {detail.roomLabel && <span className="font-semibold" style={{ color: "#1F2937" }}>{detail.roomLabel}</span>}
+                  {detail.roomLabel && detail.caption && " · "}
+                  {detail.caption}
+                </p>
+              );
+            })()}
             {images.length > 1 && (
               <div className="flex gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
                 {images.map((img, i) => (
@@ -188,7 +199,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                     key={i}
                     onClick={() => setActiveImage(i)}
                     className="shrink-0 w-20 h-16 rounded-lg overflow-hidden transition-all"
-                    style={{ border: activeImage === i ? "2px solid #1E88E5" : "2px solid transparent", opacity: activeImage === i ? 1 : 0.7 }}
+                    style={{ border: activeImage === i ? "2px solid #1565C0" : "2px solid transparent", opacity: activeImage === i ? 1 : 0.7 }}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
@@ -203,7 +214,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
                 {directionsUrl(property) && property.addressVisibility !== "Locality Only" && (
                   <a href={directionsUrl(property)} target="_blank" rel="noopener noreferrer"
-                    className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
+                    className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1565C0" }}>
                     Get Directions
                   </a>
                 )}
@@ -395,7 +406,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                         {property.developer?.name || property.developerName}
                       </p>
                       {property.developer?.verified && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>✓ Verified Developer</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1565C0" }}>✓ Verified Developer</span>
                       )}
                     </div>
                     {property.developer && (property.developer.experienceYears || property.developer.completedProjectsCount || property.developer.currentProjectsCount) && (
@@ -527,7 +538,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                         <div className="flex flex-wrap gap-2">
                           {property.project.documents.filter((d) => d.url).map((d, i) => (
                             <a key={i} href={d.url} target="_blank" rel="noopener noreferrer"
-                              className="text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-80" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                              className="text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-80" style={{ background: "#EFF6FF", color: "#1565C0" }}>
                               {d.label || d.type} ↓
                             </a>
                           ))}
@@ -589,7 +600,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
 
                   {property.posterVerified && (
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                      <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "#EFF6FF", color: "#1565C0" }}>
                         ✓ Verified {property.postedBy || "Owner"}
                       </span>
                       {(property.verificationDate || property.verificationSource) && (
@@ -650,7 +661,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                       const d = detailsByName[a];
                       return (
                         <div key={a} className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ background: "#EFF6FF", color: "#1F2937" }}>
-                          <svg className="w-4 h-4 shrink-0" fill="none" stroke="#1E88E5" strokeWidth={2.5} viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 shrink-0" fill="none" stroke="#1565C0" strokeWidth={2.5} viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                           </svg>
                           <span>
@@ -756,7 +767,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
                     {ROUTE_MODES.map((r) => (
                       <a key={r.mode} href={directionsUrl(property, r.mode)} target="_blank" rel="noopener noreferrer"
-                        className="text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-80" style={{ background: "#EFF6FF", color: "#1E88E5" }}>
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-80" style={{ background: "#EFF6FF", color: "#1565C0" }}>
                         {r.label}
                       </a>
                     ))}
@@ -798,13 +809,13 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                     <div className="flex flex-wrap gap-2 mb-3">
                       <button onClick={() => setActiveLandmarkLayer(null)}
                         className="text-xs font-bold px-3 py-1.5 rounded-full"
-                        style={activeLandmarkLayer === null ? { background: "#1E88E5", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
+                        style={activeLandmarkLayer === null ? { background: "#1565C0", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
                         All
                       </button>
                       {LANDMARK_LAYERS.filter((layer) => property.nearbyLandmarks.some((l) => LANDMARK_LAYER_GROUPS[l.category] === layer)).map((layer) => (
                         <button key={layer} onClick={() => setActiveLandmarkLayer(layer)}
                           className="text-xs font-bold px-3 py-1.5 rounded-full"
-                          style={activeLandmarkLayer === layer ? { background: "#1E88E5", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
+                          style={activeLandmarkLayer === layer ? { background: "#1565C0", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
                           {layer}
                         </button>
                       ))}
@@ -843,7 +854,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                     ) : (
                       <a key={url} href={url} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline"
-                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1E88E5" }}>
+                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
                         <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -855,6 +866,83 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 </div>
               </div>
             )}
+
+            {/* Virtual Experience, Floor Plan & Construction Progress (Section 2G) */}
+            {(() => {
+              const hasVirtual = property.virtualTourUrl || property.droneViewUrl;
+              const hasFloorPlan = property.floorPlanUrl;
+              const progressPhotos = property.project?.constructionProgressPhotos || [];
+              if (!hasVirtual && !hasFloorPlan && progressPhotos.length === 0) return null;
+
+              // Matterport/Kuula-style links are directly iframe-embeddable;
+              // anything else just gets a plain "open" link instead.
+              const tourEmbeddable = property.virtualTourUrl && /matterport|kuula|cloudpano/.test(property.virtualTourUrl);
+              const droneEmbedUrl = property.droneViewUrl ? toEmbeddableVideoUrl(property.droneViewUrl) : null;
+
+              return (
+                <div className="mb-8 space-y-5">
+                  <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Virtual Experience</h2>
+
+                  {property.virtualTourUrl && (
+                    tourEmbeddable ? (
+                      <div className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                        <iframe src={property.virtualTourUrl} title="360° virtual tour" className="w-full h-full" allowFullScreen />
+                      </div>
+                    ) : (
+                      <a href={property.virtualTourUrl} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline w-fit"
+                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
+                        Open 360° Virtual Tour →
+                      </a>
+                    )
+                  )}
+
+                  {property.droneViewUrl && (
+                    droneEmbedUrl ? (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Drone View</p>
+                        <div className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                          <iframe src={droneEmbedUrl} title="Drone view" className="w-full h-full" allowFullScreen />
+                        </div>
+                      </div>
+                    ) : (
+                      <a href={property.droneViewUrl} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline w-fit"
+                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
+                        Watch Drone View →
+                      </a>
+                    )
+                  )}
+
+                  {property.floorPlanUrl && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Floor Plan</p>
+                      <a href={property.floorPlanUrl} target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden max-w-md" style={{ border: "1px solid #E2E8F0" }}>
+                        <img src={property.floorPlanUrl} alt="Floor plan" className="w-full h-auto" onError={(e) => { e.target.style.display = "none"; }} />
+                      </a>
+                      {property.floorPlanCaption && <p className="text-xs mt-1.5" style={{ color: "#6B7280" }}>{property.floorPlanCaption}</p>}
+                    </div>
+                  )}
+
+                  {progressPhotos.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Construction Progress</p>
+                      <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                        {[...progressPhotos].sort((a, b) => new Date(a.date) - new Date(b.date)).map((p, i) => (
+                          <div key={i} className="shrink-0 w-40 rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                            <img src={p.url} alt={p.caption || "Construction progress"} className="w-full h-28 object-cover" />
+                            <div className="p-2">
+                              {p.date && <p className="text-[10px] font-bold" style={{ color: "#1565C0" }}>{new Date(p.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>}
+                              {p.caption && <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{p.caption}</p>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Tags */}
             {property.tags?.length > 0 && (
@@ -874,7 +962,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 <div className="flex items-start justify-between gap-2">
                   <h1 className="text-lg font-extrabold leading-tight" style={{ color: "#1F2937" }}>{property.title}</h1>
                   {property.verified && (
-                    <span className="flex items-center gap-1 text-[10px] font-bold shrink-0" style={{ color: "#1E88E5" }}>
+                    <span className="flex items-center gap-1 text-[10px] font-bold shrink-0" style={{ color: "#1565C0" }}>
                       <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
@@ -886,7 +974,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   <p className="text-sm" style={{ color: "#6B7280" }}>{property.location}</p>
                   {directionsUrl(property) && property.addressVisibility !== "Locality Only" && (
                     <a href={directionsUrl(property)} target="_blank" rel="noopener noreferrer"
-                      className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1E88E5" }}>
+                      className="text-xs font-semibold shrink-0 hover:underline" style={{ color: "#1565C0" }}>
                       Get Directions
                     </a>
                   )}
@@ -894,7 +982,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               </div>
 
               <div className="flex items-baseline gap-2 mb-1 flex-wrap">
-                <span className="text-3xl font-extrabold" style={{ color: "#1E88E5" }}>{property.price}</span>
+                <span className="text-3xl font-extrabold" style={{ color: "#1565C0" }}>{property.price}</span>
                 {property.priceNegotiable && (
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "#F0FDF4", color: "#16A34A" }}>Negotiable</span>
                 )}
@@ -919,7 +1007,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                       Est. EMI <span className="font-bold" style={{ color: "#1F2937" }}>{estimatedMonthlyEmi(property)}/mo</span>
                       {downPaymentEstimate(property) && <> · Down payment <span className="font-bold" style={{ color: "#1F2937" }}>{downPaymentEstimate(property)}</span></>}
                       {" "}·{" "}
-                      <button onClick={() => onNavigate && onNavigate("investment-advisory", "emi-calculator")} className="font-semibold hover:underline" style={{ color: "#1E88E5" }}>
+                      <button onClick={() => onNavigate && onNavigate("investment-advisory", "emi-calculator")} className="font-semibold hover:underline" style={{ color: "#1565C0" }}>
                         Calculate exactly
                       </button>
                     </p>
@@ -934,16 +1022,16 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 <button
                   onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "contact" })}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all"
-                  style={{ background: "#1E88E5", color: "#FFFFFF" }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
+                  style={{ background: "#1565C0", color: "#FFFFFF" }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = "#0D47A1"}
+                  onMouseLeave={(e) => e.currentTarget.style.background = "#1565C0"}
                 >
                   Contact {property.postedBy || "Owner"}
                 </button>
                 <button
                   onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "site-visit" })}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all"
-                  style={{ background: "#FFFFFF", color: "#1E88E5", border: "1.5px solid #1E88E5" }}
+                  style={{ background: "#FFFFFF", color: "#1565C0", border: "1.5px solid #1565C0" }}
                 >
                   Schedule a Site Visit
                 </button>
@@ -957,9 +1045,9 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 <button
                   onClick={() => toggleSaveProperty(property)}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
-                  style={{ background: "#F8FAFC", color: saved ? "#1E88E5" : "#1F2937", border: "1px solid #E2E8F0" }}
+                  style={{ background: "#F8FAFC", color: saved ? "#1565C0" : "#1F2937", border: "1px solid #E2E8F0" }}
                 >
-                  <svg className="w-4 h-4" fill={saved ? "#1E88E5" : "none"} stroke={saved ? "#1E88E5" : "#1F2937"} strokeWidth={2} viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill={saved ? "#1565C0" : "none"} stroke={saved ? "#1565C0" : "#1F2937"} strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                   {saved ? "Saved" : "Save Property"}

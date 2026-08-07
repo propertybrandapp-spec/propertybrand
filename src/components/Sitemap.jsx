@@ -54,7 +54,7 @@ export default function Sitemap({ onNavigate }) {
       <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
+          style={{ background: "#FFFFFF", color: "#1565C0", border: "1px solid #1565C0" }}
         >
           Sitemap
         </span>
@@ -69,7 +69,7 @@ export default function Sitemap({ onNavigate }) {
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {SITEMAP.map((group) => (
             <div key={group.heading} className="rounded-2xl p-6" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-              <h2 className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "#1E88E5" }}>
+              <h2 className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "#1565C0" }}>
                 {group.heading}
               </h2>
               <div className="space-y-1">

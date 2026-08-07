@@ -70,7 +70,7 @@ export default function PrivacyPolicy({ onNavigate }) {
       <section className="px-4 py-14 lg:py-16 text-center" style={{ background: "linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%)" }}>
         <span
           className="inline-block text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5"
-          style={{ background: "#FFFFFF", color: "#1E88E5", border: "1px solid #1E88E5" }}
+          style={{ background: "#FFFFFF", color: "#1565C0", border: "1px solid #1565C0" }}
         >
           Legal
         </span>
@@ -116,9 +116,9 @@ export default function PrivacyPolicy({ onNavigate }) {
           <button
             onClick={() => onNavigate && onNavigate("contact")}
             className="px-6 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: "#1E88E5", color: "#FFFFFF" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#1565C0"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#1E88E5"}
+            style={{ background: "#1565C0", color: "#FFFFFF" }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#0D47A1"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#1565C0"}
           >
             Contact Us
           </button>
