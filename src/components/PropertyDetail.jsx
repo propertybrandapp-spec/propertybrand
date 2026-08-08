@@ -75,6 +75,46 @@ function downPaymentEstimate(property) {
   return `₹${Math.round(property.priceRaw * (downPct / 100)).toLocaleString("en-IN")}`;
 }
 
+// ── Section 2H: Seller / Agent Information ──
+// Unifies the two possible sources of contact info into one shape: a linked
+// agents-directory profile (richer — rating, RERA, areas served...), or the
+// plain poster_* fallback fields (mainly private Owners). Returns null if
+// the listing predates this feature and has neither.
+const CONTACT_METHOD_ORDER = ["Call", "WhatsApp", "Chat", "Email"];
+function resolvePoster(property) {
+  if (property.agent) {
+    const a = property.agent;
+    return {
+      name: a.name, company: a.agency, photoUrl: a.photoUrl, phone: a.phone, email: a.email,
+      verified: a.status === "Verified", rating: a.rating, experience: a.experience, reraNumber: a.reraNumber,
+      areasServed: a.areasServed, responseTime: a.responseTime,
+      preferredContactMethods: a.preferredContactMethods?.length ? a.preferredContactMethods : CONTACT_METHOD_ORDER,
+      availabilityNotes: a.availabilityNotes, phoneMaskingEnabled: a.phoneMaskingEnabled, isProfile: true,
+    };
+  }
+  if (property.posterName || property.posterPhone) {
+    return {
+      name: property.posterName || property.postedBy || "Owner", company: null, photoUrl: property.posterPhotoUrl,
+      phone: property.posterPhone, email: property.posterEmail, verified: false, rating: null, experience: null, reraNumber: null,
+      areasServed: [], responseTime: null,
+      preferredContactMethods: property.posterPreferredContactMethods?.length ? property.posterPreferredContactMethods : CONTACT_METHOD_ORDER,
+      availabilityNotes: property.posterAvailabilityNotes, phoneMaskingEnabled: property.posterPhoneMaskingEnabled, isProfile: false,
+    };
+  }
+  return null;
+}
+
+// Keeps roughly the first half of the digits visible, masks the rest —
+// display-level privacy, not real telephony call-masking (see
+// migration_021 for why: no telephony API is configured in this project).
+function maskPhone(phone) {
+  if (!phone) return "";
+  const digitCount = (phone.match(/\d/g) || []).length;
+  const visibleCount = Math.max(2, Math.ceil(digitCount / 2));
+  let seen = 0;
+  return phone.replace(/\d/g, (d) => (seen++ < visibleCount ? d : "•"));
+}
+
 // ── Mini card used in the "Similar Properties" strip ─────────────────────────
 function SimilarCard({ property, onOpen }) {
   return (
@@ -110,6 +150,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const [comparable, setComparable] = useState(null);
   const [activeLandmarkLayer, setActiveLandmarkLayer] = useState(null); // null = show all layers
   const [legalDisclaimer, setLegalDisclaimer] = useState("");
+  const [phoneRevealed, setPhoneRevealed] = useState(false);
 
   // Both hooks below must stay above the `if (!property)` early return —
   // React requires hooks to run in the same order on every render.
@@ -1052,6 +1093,84 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   </svg>
                   {saved ? "Saved" : "Save Property"}
                 </button>
+
+                {(() => {
+                  const poster = resolvePoster(property);
+                  if (!poster) return null;
+                  const showMethod = (m) => poster.preferredContactMethods.includes(m);
+                  const waMessage = encodeURIComponent(`Hi, I'm interested in ${property.title} (${property.location}, ${property.price}). Is it still available?`);
+                  const waDigits = (poster.phone || "").replace(/\D/g, "");
+
+                  return (
+                    <div className="pt-4 mt-1" style={{ borderTop: "1px solid #E2E8F0" }}>
+                      <div className="flex items-center gap-3 mb-3">
+                        {poster.photoUrl ? (
+                          <img src={poster.photoUrl} alt="" className="w-11 h-11 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "#EFF6FF", color: "#1565C0" }}>
+                            {poster.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{poster.name}</p>
+                            {poster.verified && (
+                              <svg className="w-3.5 h-3.5 fill-current shrink-0" style={{ color: "#1565C0" }} viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
+                          <p className="text-xs truncate" style={{ color: "#6B7280" }}>{poster.company || property.postedBy || "Owner"}</p>
+                        </div>
+                      </div>
+
+                      {(poster.rating > 0 || poster.experience || poster.responseTime) && (
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs mb-2" style={{ color: "#6B7280" }}>
+                          {poster.rating > 0 && <span>★ {poster.rating.toFixed(1)}</span>}
+                          {poster.experience && <span>{poster.experience} experience</span>}
+                          {poster.responseTime && <span>Responds {poster.responseTime}</span>}
+                        </div>
+                      )}
+                      {poster.reraNumber && <p className="text-xs mb-1" style={{ color: "#6B7280" }}>RERA: {poster.reraNumber}</p>}
+                      {poster.areasServed?.length > 0 && (
+                        <p className="text-xs mb-1" style={{ color: "#6B7280" }}>Serves {poster.areasServed.slice(0, 3).join(", ")}{poster.areasServed.length > 3 ? " +more" : ""}</p>
+                      )}
+                      {poster.availabilityNotes && <p className="text-xs mb-3" style={{ color: "#6B7280" }}>🕐 {poster.availabilityNotes}</p>}
+
+                      <div className="flex flex-wrap gap-2">
+                        {poster.phone && showMethod("Call") && (
+                          phoneRevealed || !poster.phoneMaskingEnabled ? (
+                            <a href={`tel:${poster.phone}`} className="text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#EFF6FF", color: "#1565C0" }}>
+                              📞 {poster.phone}
+                            </a>
+                          ) : (
+                            <button onClick={() => setPhoneRevealed(true)} className="text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#EFF6FF", color: "#1565C0" }}>
+                              📞 {maskPhone(poster.phone)} · Reveal
+                            </button>
+                          )
+                        )}
+                        {poster.phone && showMethod("WhatsApp") && (
+                          <a href={`https://wa.me/${waDigits}?text=${waMessage}`} target="_blank" rel="noopener noreferrer"
+                            className="text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#F0FDF4", color: "#16A34A" }}>
+                            WhatsApp
+                          </a>
+                        )}
+                        {poster.email && showMethod("Email") && (
+                          <a href={`mailto:${poster.email}?subject=${encodeURIComponent(`Enquiry: ${property.title}`)}`}
+                            className="text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#F8FAFC", color: "#1F2937", border: "1px solid #E2E8F0" }}>
+                            Email
+                          </a>
+                        )}
+                        {showMethod("Chat") && (
+                          <button onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "contact" })}
+                            className="text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#F8FAFC", color: "#1F2937", border: "1px solid #E2E8F0" }}>
+                            Chat / Send Message
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="mt-5 pt-5 flex items-center justify-between text-xs" style={{ borderTop: "1px solid #E2E8F0", color: "#6B7280" }}>

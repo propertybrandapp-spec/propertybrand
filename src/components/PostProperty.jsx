@@ -50,6 +50,9 @@ const ROOM_LABEL_OPTIONS = ["Exterior", "Living Room", "Kitchen", "Bedroom", "Ba
 const MANDATORY_ROOM_CATEGORIES = ["Exterior", "Living Room", "Kitchen", "Bedroom", "Bathroom", "Balcony"];
 const MIN_PHOTOS = 8;
 const MAX_RECOMMENDED_PHOTOS = 15;
+// ── New in Section 2H: Seller / Agent Information ──
+const POSTED_BY_OPTIONS = ["Owner", "Builder", "Channel Partner", "Agent", "Property Manager"];
+const CONTACT_METHOD_OPTIONS = ["Call", "WhatsApp", "Chat", "Email"];
 
 const EMPTY_FORM = {
   title: "",
@@ -160,6 +163,16 @@ const EMPTY_FORM = {
   droneViewUrl: "",
   floorPlanUrl: "",
   floorPlanCaption: "",
+
+  // ── Section 2H: Seller / Agent Information ──
+  postedBy: "Owner",
+  posterName: "",
+  posterPhone: "",
+  posterEmail: "",
+  posterPhotoUrl: "",
+  posterPreferredContactMethods: [],
+  posterAvailabilityNotes: "",
+  posterPhoneMaskingEnabled: true,
 };
 
 const inputStyle = { background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" };
@@ -282,6 +295,23 @@ export default function PostProperty({ onNavigate }) {
   }
 
   const imageHashesRef = useRef(new Map()); // url -> perceptual hash, this session only — not persisted
+
+  // ── Section 2H: poster photo upload ──
+  const [posterPhotoUploading, setPosterPhotoUploading] = useState(false);
+  const [posterPhotoError, setPosterPhotoError] = useState("");
+  async function handlePosterPhotoSelected(e) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const validationError = validateImageFile(file);
+    if (validationError) { setPosterPhotoError(validationError); return; }
+    setPosterPhotoError("");
+    setPosterPhotoUploading(true);
+    const { url, error } = await uploadToR2(file, "avatars");
+    setPosterPhotoUploading(false);
+    if (error) { setPosterPhotoError(error); return; }
+    set("posterPhotoUrl", url);
+  }
 
   async function handleFilesSelected(e) {
     const files = Array.from(e.target.files || []);
@@ -424,7 +454,6 @@ export default function PostProperty({ onNavigate }) {
     const { error } = await createListing({
       ...form,
       price: priceLabelFromRaw(form.priceRaw),
-      postedBy: "Owner",
       // moderationStatus intentionally omitted — createListing/denormalizeListing
       // defaults it to "Pending", and RLS only allows inserting as Pending anyway.
     });
@@ -1137,6 +1166,61 @@ export default function PostProperty({ onNavigate }) {
             <Field label="Floor Plan Caption">
               <TextInput value={form.floorPlanCaption} onChange={(e) => set("floorPlanCaption", e.target.value)} placeholder="e.g. 3BHK · 1450 sqft, with dimensions" />
             </Field>
+          </div>
+
+          <div className="rounded-2xl p-6 space-y-5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+            <div>
+              <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Your Contact Information</h2>
+              <p className="text-xs mt-1" style={{ color: "#6B7280" }}>How buyers/tenants can reach you about this listing.</p>
+            </div>
+
+            <Field label="I am posting as a...">
+              <Select value={form.postedBy} onChange={(e) => set("postedBy", e.target.value)}>
+                {POSTED_BY_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
+              </Select>
+            </Field>
+
+            <div className="flex items-center gap-3">
+              {form.posterPhotoUrl ? (
+                <img src={form.posterPhotoUrl} alt="" className="w-12 h-12 rounded-full object-cover shrink-0" />
+              ) : (
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "#F1F5F9", color: "#6B7280" }}>?</div>
+              )}
+              <label className="text-xs font-bold px-3 py-2 rounded-lg cursor-pointer" style={{ background: "#F1F5F9", color: "#1F2937" }}>
+                {posterPhotoUploading ? "Uploading…" : "Upload Photo"}
+                <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="hidden" onChange={handlePosterPhotoSelected} disabled={posterPhotoUploading} />
+              </label>
+              {posterPhotoError && <span className="text-xs font-semibold" style={{ color: "#DC2626" }}>{posterPhotoError}</span>}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Field label="Your Name">
+                <TextInput value={form.posterName} onChange={(e) => set("posterName", e.target.value)} placeholder="e.g. Rajesh Kumar" />
+              </Field>
+              <Field label="Phone">
+                <TextInput value={form.posterPhone} onChange={(e) => set("posterPhone", e.target.value)} placeholder="e.g. 98765 43210" />
+              </Field>
+              <Field label="Email">
+                <TextInput value={form.posterEmail} onChange={(e) => set("posterEmail", e.target.value)} placeholder="e.g. rajesh@example.com" />
+              </Field>
+            </div>
+
+            <Field label="Preferred Contact Methods">
+              <div className="flex flex-wrap gap-2">
+                {CONTACT_METHOD_OPTIONS.map((m) => (
+                  <Chip key={m} label={m} active={form.posterPreferredContactMethods.includes(m)} onClick={() => toggleInArray("posterPreferredContactMethods", m)} />
+                ))}
+              </div>
+            </Field>
+
+            <Field label="Availability for Site Visits">
+              <TextInput value={form.posterAvailabilityNotes} onChange={(e) => set("posterAvailabilityNotes", e.target.value)} placeholder="e.g. Weekends only, 10am–6pm" />
+            </Field>
+
+            <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
+              <input type="checkbox" checked={form.posterPhoneMaskingEnabled} onChange={(e) => set("posterPhoneMaskingEnabled", e.target.checked)} className="w-4 h-4 rounded accent-[#1565C0]" />
+              Mask my phone number until a visitor taps "Reveal"
+            </label>
           </div>
 
           <button type="submit" disabled={saving || uploading}
