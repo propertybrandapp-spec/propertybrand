@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { submitLead } from "../lib/leads";
+import { useAuth } from "../lib/AuthContext";
 import { fetchSiteSettings, fetchOfficeLocations } from "../lib/siteContent";
 
 // ── Contact Info ──────────────────────────────────────────────────────────────
@@ -68,6 +69,18 @@ const FAQ = [
   { q: "Can NRIs invest through PropertyBrands?", a: "Yes — we have a dedicated NRI desk that handles property visits, legal checks, loan paperwork, and registration remotely." },
 ];
 
+// ── Section 3A: Quick Questions for Buyers (optional "Tell us more" step) ──
+const PURPOSE_OPTIONS = ["Self-Use", "Investment", "Rental Income", "Second Home", "Retirement"];
+const TIMELINE_OPTIONS = ["Immediately", "1-3 Months", "3-6 Months", "6-12 Months", "Just Exploring"];
+const PRIORITY_OPTIONS = ["Price", "Location", "Size", "Amenities", "Connectivity", "Possession Timeline", "Investment Return"];
+const LOAN_ASSISTANCE_OPTIONS = ["Need a Home Loan", "Need Eligibility Help", "Self-Funded / No Loan Needed", "Not Sure Yet"];
+const UNDER_CONSTRUCTION_OPTIONS = ["Yes", "No", "Maybe"];
+const MUST_HAVE_OPTIONS = ["Parking", "Lift", "Power Backup", "Pet-Friendly", "Senior-Friendly Design"];
+const EMPTY_BUYER_PREFS = {
+  purpose: "", budgetMax: "", comfortableEmi: "", preferredLocations: [], acceptableLocations: [], excludedLocations: [],
+  purchaseTimeline: "", priorityFactors: [], loanAssistance: "", openToUnderConstruction: "", mustHaveFeatures: [], wantsComparison: false,
+};
+
 const SUBJECT_LABELS = {
   buy: "Buying a Property",
   rent: "Renting a Property",
@@ -125,11 +138,42 @@ export default function ContactUs({ onNavigate, initialSubject }) {
     return `I'm interested in "${property.title}"${property.location ? ` in ${property.location}` : ""}${specs ? ` (${specs})` : ""} and would like more details.`;
   }
 
+  const { profile, isLoggedIn } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: subjectValue || "", message: defaultMessage() });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
+  const [showBuyerQuestions, setShowBuyerQuestions] = useState(false);
+  const [buyerPrefs, setBuyerPrefs] = useState(EMPTY_BUYER_PREFS);
+
+  // Pre-fill from the buyer's saved preferences if they're logged in and
+  // already answered these once — they can still tweak them per-inquiry.
+  useEffect(() => {
+    if (!isLoggedIn || !profile) return;
+    setBuyerPrefs({
+      purpose: profile.buyer_purpose || "",
+      budgetMax: profile.buyer_budget_max ?? "",
+      comfortableEmi: profile.buyer_comfortable_emi ?? "",
+      preferredLocations: profile.buyer_preferred_locations || [],
+      acceptableLocations: profile.buyer_acceptable_locations || [],
+      excludedLocations: profile.buyer_excluded_locations || [],
+      purchaseTimeline: profile.buyer_purchase_timeline || "",
+      priorityFactors: profile.buyer_priority_factors || [],
+      loanAssistance: profile.buyer_loan_assistance || "",
+      openToUnderConstruction: profile.buyer_open_to_under_construction || "",
+      mustHaveFeatures: profile.buyer_must_have_features || [],
+      wantsComparison: !!profile.buyer_wants_comparison,
+    });
+  }, [isLoggedIn, profile]);
+
+  function toggleBuyerArray(key, value) {
+    setBuyerPrefs((p) => ({ ...p, [key]: p[key].includes(value) ? p[key].filter((v) => v !== value) : [...p[key], value] }));
+  }
+
+  function locationsFromInput(value) {
+    return value.split(",").map((s) => s.trim()).filter(Boolean);
+  }
 
   async function handleSubmit() {
     if (!(form.name && form.phone && form.message)) return;
@@ -151,6 +195,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
       budget: property?.price,
       listingId: property?.dbId,
       stage: intent === "site-visit" ? "Site Visit" : undefined,
+      buyerPreferences: buyerPrefs,
     });
     setSubmitting(false);
     if (error) {
@@ -298,6 +343,124 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   onFocus={(e) => e.target.style.borderColor = "#1565C0"}
                   onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
+
+                {/* ── Optional buyer questions (Section 3A) ── */}
+                <button type="button" onClick={() => setShowBuyerQuestions((v) => !v)}
+                  className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "#1565C0" }}>
+                  {showBuyerQuestions ? "Hide" : "Tell us more about what you're looking for"} (optional)
+                  <svg className={`w-4 h-4 transition-transform ${showBuyerQuestions ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {showBuyerQuestions && (
+                  <div className="space-y-4 rounded-xl p-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Purpose</label>
+                      <div className="flex flex-wrap gap-2">
+                        {PURPOSE_OPTIONS.map((p) => (
+                          <button key={p} type="button" onClick={() => setBuyerPrefs({ ...buyerPrefs, purpose: p })}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: buyerPrefs.purpose === p ? "#1565C0" : "#FFFFFF", color: buyerPrefs.purpose === p ? "#FFFFFF" : "#6B7280", border: `1px solid ${buyerPrefs.purpose === p ? "#1565C0" : "#E2E8F0"}` }}>
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <input type="number" min="0" placeholder="Total budget (₹, incl. charges)" value={buyerPrefs.budgetMax}
+                        onChange={(e) => setBuyerPrefs({ ...buyerPrefs, budgetMax: e.target.value })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                      <input type="number" min="0" placeholder="Comfortable EMI (₹/mo)" value={buyerPrefs.comfortableEmi}
+                        onChange={(e) => setBuyerPrefs({ ...buyerPrefs, comfortableEmi: e.target.value })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <input placeholder="Preferred locations" value={buyerPrefs.preferredLocations.join(", ")}
+                        onChange={(e) => setBuyerPrefs({ ...buyerPrefs, preferredLocations: locationsFromInput(e.target.value) })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                      <input placeholder="Acceptable locations" value={buyerPrefs.acceptableLocations.join(", ")}
+                        onChange={(e) => setBuyerPrefs({ ...buyerPrefs, acceptableLocations: locationsFromInput(e.target.value) })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                      <input placeholder="Excluded locations" value={buyerPrefs.excludedLocations.join(", ")}
+                        onChange={(e) => setBuyerPrefs({ ...buyerPrefs, excludedLocations: locationsFromInput(e.target.value) })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>How soon do you plan to buy?</label>
+                      <div className="flex flex-wrap gap-2">
+                        {TIMELINE_OPTIONS.map((t) => (
+                          <button key={t} type="button" onClick={() => setBuyerPrefs({ ...buyerPrefs, purchaseTimeline: t })}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: buyerPrefs.purchaseTimeline === t ? "#1565C0" : "#FFFFFF", color: buyerPrefs.purchaseTimeline === t ? "#FFFFFF" : "#6B7280", border: `1px solid ${buyerPrefs.purchaseTimeline === t ? "#1565C0" : "#E2E8F0"}` }}>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>What matters most?</label>
+                      <div className="flex flex-wrap gap-2">
+                        {PRIORITY_OPTIONS.map((p) => (
+                          <button key={p} type="button" onClick={() => toggleBuyerArray("priorityFactors", p)}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: buyerPrefs.priorityFactors.includes(p) ? "#1565C0" : "#FFFFFF", color: buyerPrefs.priorityFactors.includes(p) ? "#FFFFFF" : "#6B7280", border: `1px solid ${buyerPrefs.priorityFactors.includes(p) ? "#1565C0" : "#E2E8F0"}` }}>
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Home loan or eligibility help?</label>
+                      <div className="flex flex-wrap gap-2">
+                        {LOAN_ASSISTANCE_OPTIONS.map((l) => (
+                          <button key={l} type="button" onClick={() => setBuyerPrefs({ ...buyerPrefs, loanAssistance: l })}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: buyerPrefs.loanAssistance === l ? "#1565C0" : "#FFFFFF", color: buyerPrefs.loanAssistance === l ? "#FFFFFF" : "#6B7280", border: `1px solid ${buyerPrefs.loanAssistance === l ? "#1565C0" : "#E2E8F0"}` }}>
+                            {l}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Open to under-construction?</label>
+                      <div className="flex flex-wrap gap-2">
+                        {UNDER_CONSTRUCTION_OPTIONS.map((u) => (
+                          <button key={u} type="button" onClick={() => setBuyerPrefs({ ...buyerPrefs, openToUnderConstruction: u })}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: buyerPrefs.openToUnderConstruction === u ? "#1565C0" : "#FFFFFF", color: buyerPrefs.openToUnderConstruction === u ? "#FFFFFF" : "#6B7280", border: `1px solid ${buyerPrefs.openToUnderConstruction === u ? "#1565C0" : "#E2E8F0"}` }}>
+                            {u}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Must-haves</label>
+                      <div className="flex flex-wrap gap-2">
+                        {MUST_HAVE_OPTIONS.map((m) => (
+                          <button key={m} type="button" onClick={() => toggleBuyerArray("mustHaveFeatures", m)}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: buyerPrefs.mustHaveFeatures.includes(m) ? "#1565C0" : "#FFFFFF", color: buyerPrefs.mustHaveFeatures.includes(m) ? "#FFFFFF" : "#6B7280", border: `1px solid ${buyerPrefs.mustHaveFeatures.includes(m) ? "#1565C0" : "#E2E8F0"}` }}>
+                            {m}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
+                      <input type="checkbox" checked={buyerPrefs.wantsComparison} onChange={(e) => setBuyerPrefs({ ...buyerPrefs, wantsComparison: e.target.checked })} className="w-4 h-4 rounded accent-[#1565C0]" />
+                      I'd like to compare this with similar options
+                    </label>
+                  </div>
+                )}
+
                 {error && (
                   <p className="text-xs font-semibold" style={{ color: "#1565C0" }}>{error}</p>
                 )}
