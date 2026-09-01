@@ -44,6 +44,20 @@ export function normalizeLead(row, adminsById) {
     buyerOpenToUnderConstruction: row.buyer_open_to_under_construction || null,
     buyerMustHaveFeatures: row.buyer_must_have_features || [],
     buyerWantsComparison: !!row.buyer_wants_comparison,
+
+    // ── Section 3B: Questions for Renters ──
+    renterMoveInDate: row.renter_move_in_date || null,
+    renterMonthlyRentBudget: row.renter_monthly_rent_budget != null ? Number(row.renter_monthly_rent_budget) : null,
+    renterUpfrontBudget: row.renter_upfront_budget != null ? Number(row.renter_upfront_budget) : null,
+    renterProfileType: row.renter_profile_type || null,
+    renterFurnishingRequirement: row.renter_furnishing_requirement || null,
+    renterLeaseDuration: row.renter_lease_duration || null,
+    renterPetRequirement: row.renter_pet_requirement || null,
+    renterParkingRequirement: row.renter_parking_requirement || null,
+    renterPreferredLocalities: row.renter_preferred_localities || [],
+    renterCommuteDestination: row.renter_commute_destination || null,
+    renterWantsBrokerageFree: !!row.renter_wants_brokerage_free,
+    renterWantsManagedRental: !!row.renter_wants_managed_rental,
   };
 }
 
@@ -97,9 +111,18 @@ export async function deleteLead(id) {
 // openToUnderConstruction, mustHaveFeatures, wantsComparison }. Any field
 // left out just stays at its DB default — none of this is required to
 // submit a lead.
-export async function submitLead({ name, phone, email, interest, budget, source = "Website", listingId, stage, buyerPreferences = {} }) {
+//
+// renterPreferences (Section 3B) is the equivalent for Rent inquiries:
+// { moveInDate, monthlyRentBudget, upfrontBudget, profileType,
+// furnishingRequirement, leaseDuration, petRequirement, parkingRequirement,
+// preferredLocalities, commuteDestination, wantsBrokerageFree,
+// wantsManagedRental }. A lead only ever fills in one or the other in
+// practice (ContactUs.jsx picks based on the property's transaction type),
+// but both are accepted independently here.
+export async function submitLead({ name, phone, email, interest, budget, source = "Website", listingId, stage, buyerPreferences = {}, renterPreferences = {} }) {
   const { data: sessionData } = await safeQuery(supabase.auth.getSession());
   const b = buyerPreferences;
+  const r = renterPreferences;
   const { error } = await safeQuery(
     supabase.from("leads").insert({
       name,
@@ -123,6 +146,18 @@ export async function submitLead({ name, phone, email, interest, budget, source 
       buyer_open_to_under_construction: b.openToUnderConstruction || null,
       buyer_must_have_features: b.mustHaveFeatures || [],
       buyer_wants_comparison: !!b.wantsComparison,
+      renter_move_in_date: r.moveInDate || null,
+      renter_monthly_rent_budget: r.monthlyRentBudget || null,
+      renter_upfront_budget: r.upfrontBudget || null,
+      renter_profile_type: r.profileType || null,
+      renter_furnishing_requirement: r.furnishingRequirement || null,
+      renter_lease_duration: r.leaseDuration || null,
+      renter_pet_requirement: r.petRequirement || null,
+      renter_parking_requirement: r.parkingRequirement || null,
+      renter_preferred_localities: r.preferredLocalities || [],
+      renter_commute_destination: r.commuteDestination || null,
+      renter_wants_brokerage_free: !!r.wantsBrokerageFree,
+      renter_wants_managed_rental: !!r.wantsManagedRental,
     })
   );
   return { error };

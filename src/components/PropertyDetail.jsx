@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
-import { fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS } from "../lib/listings";
+import { fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS, AMENITY_CATEGORIES, groupedAmenities } from "../lib/listings";
 import { fetchSiteSettings } from "../lib/siteContent";
+import { useCompare } from "../lib/CompareContext";
 import LocationMap from "./LocationMap";
 
 // Converts a YouTube/Vimeo share link into an embeddable iframe URL. Returns
@@ -75,6 +76,12 @@ function downPaymentEstimate(property) {
   return `₹${Math.round(property.priceRaw * (downPct / 100)).toLocaleString("en-IN")}`;
 }
 
+// Used by the hero gallery's Video/360°/Floor Plan quick shortcuts (Section 4)
+// to jump straight to that content further down the page.
+function scrollToSection(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 // ── Section 2H: Seller / Agent Information ──
 // Unifies the two possible sources of contact info into one shape: a linked
 // agents-directory profile (richer — rating, RERA, areas served...), or the
@@ -117,40 +124,56 @@ function maskPhone(phone) {
 
 // ── Mini card used in the "Similar Properties" strip ─────────────────────────
 function SimilarCard({ property, onOpen }) {
+  const { isComparing, toggleCompare } = useCompare();
+  const comparing = isComparing(property.dbId || property.id);
   return (
-    <button
-      onClick={() => onOpen(property)}
-      className="text-left rounded-2xl overflow-hidden shrink-0 w-64 transition-all duration-200 group"
+    <div
+      className="text-left rounded-2xl overflow-hidden shrink-0 w-64 transition-all duration-200 group relative"
       style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}
       onMouseEnter={(e) => e.currentTarget.style.borderColor = "#1565C0"}
       onMouseLeave={(e) => e.currentTarget.style.borderColor = "#E2E8F0"}
     >
-      <div className="relative h-36 overflow-hidden">
-        <img src={property.images?.[0]} alt={property.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-        {property.badge && (
-          <span className="absolute top-2.5 left-2.5 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: property.badgeColor || "#1565C0", color: "#FFFFFF" }}>
-            {property.badge}
-          </span>
-        )}
-      </div>
-      <div className="p-3.5">
-        <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{property.title}</p>
-        <p className="text-base font-extrabold mt-0.5" style={{ color: "#1565C0" }}>{property.price}</p>
-        <p className="text-xs truncate mt-1" style={{ color: "#6B7280" }}>{property.location}</p>
-      </div>
-    </button>
+      <button onClick={(e) => { e.stopPropagation(); toggleCompare(property); }}
+        className="absolute top-2.5 right-2.5 z-10 text-[9px] font-bold px-2 py-1 rounded-full"
+        style={comparing ? { background: "#1565C0", color: "#FFFFFF" } : { background: "rgba(255,255,255,0.9)", color: "#1F2937" }}>
+        {comparing ? "✓ Comparing" : "+ Compare"}
+      </button>
+      <button onClick={() => onOpen(property)} className="text-left w-full">
+        <div className="relative h-36 overflow-hidden">
+          <img src={property.images?.[0]} alt={property.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          {property.badge && (
+            <span className="absolute top-2.5 left-2.5 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: property.badgeColor || "#1565C0", color: "#FFFFFF" }}>
+              {property.badge}
+            </span>
+          )}
+        </div>
+        <div className="p-3.5">
+          <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{property.title}</p>
+          <p className="text-base font-extrabold mt-0.5" style={{ color: "#1565C0" }}>{property.price}</p>
+          <p className="text-xs truncate mt-1" style={{ color: "#6B7280" }}>{property.location}</p>
+        </div>
+      </button>
+    </div>
   );
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const { isPropertySaved, toggleSaveProperty } = useSavedItems();
+  const { items: compareItems, isComparing, toggleCompare, maxCompare } = useCompare();
   const [activeImage, setActiveImage] = useState(0);
   const [priceHistory, setPriceHistory] = useState([]);
   const [comparable, setComparable] = useState(null);
   const [activeLandmarkLayer, setActiveLandmarkLayer] = useState(null); // null = show all layers
   const [legalDisclaimer, setLegalDisclaimer] = useState("");
   const [phoneRevealed, setPhoneRevealed] = useState(false);
+  // Section 4: sticky top bar shows once you've scrolled past the hero.
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowStickyBar(window.scrollY > 480);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Both hooks below must stay above the `if (!property)` early return —
   // React requires hooks to run in the same order on every render.
@@ -181,6 +204,8 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const images = property.images?.length ? property.images : [];
   const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
   const saved = isPropertySaved(property.dbId || property.id);
+  const poster = resolvePoster(property); // used by both new sticky bars below
+  const comparingThis = isComparing(property.dbId || property.id);
 
   const similar = pool
     .filter((p) => p.id !== property.id && p.type === property.type)
@@ -192,7 +217,32 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   }
 
   return (
-    <div style={{ background: "#FFFFFF" }} className="pb-16">
+    <div style={{ background: "#FFFFFF" }} className="pb-20 lg:pb-16">
+      {/* ── Sticky top bar (Section 4) — condensed title/verified/location/
+          price/key specs/primary CTA, shown once scrolled past the hero.
+          Desktop only; mobile gets its own bottom action bar instead. ── */}
+      {showStickyBar && (
+        <div className="fixed top-0 left-0 right-0 z-40 hidden lg:block" style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E8F0", boxShadow: "0 2px 10px rgba(31,41,55,0.06)" }}>
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-6">
+            <div className="min-w-0 flex items-center gap-2">
+              <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{property.title}</p>
+              {property.posterVerified && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: "#EFF6FF", color: "#1565C0" }}>✓ Verified</span>
+              )}
+              <span className="text-xs truncate shrink-0" style={{ color: "#6B7280" }}>· {property.location}</span>
+            </div>
+            <div className="flex items-center gap-5 shrink-0">
+              {property.bhkLabel && <span className="text-xs font-semibold hidden xl:block" style={{ color: "#6B7280" }}>{property.bhkLabel}</span>}
+              <span className="text-base font-extrabold" style={{ color: "#1565C0" }}>{property.price}</span>
+              <button onClick={() => onNavigate && onNavigate("contact", { property, intent: "contact" })}
+                className="text-xs font-bold px-4 py-2 rounded-lg" style={{ background: "#1565C0", color: "#FFFFFF" }}>
+                Contact {property.postedBy || "Owner"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 pt-6">
 
         {/* ── Breadcrumb ── */}
@@ -212,14 +262,21 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
           {/* ══════════ LEFT: Gallery + Details ══════════ */}
           <div className="lg:col-span-2">
 
-            {/* Gallery */}
-            <div className="rounded-2xl overflow-hidden mb-2" style={{ border: "1px solid #E2E8F0", background: "#F1F5F9" }}>
+            {/* Hero gallery — Section 4: photo count badge + quick shortcuts to
+                video, 360° tour, and floor plan (all still live in their own
+                fuller sections further down; these just jump there). */}
+            <div className="relative rounded-2xl overflow-hidden mb-2" style={{ border: "1px solid #E2E8F0", background: "#F1F5F9" }}>
               {images.length > 0 ? (
                 <img src={images[activeImage]} alt={property.title} className="w-full h-[320px] sm:h-[440px] object-cover" />
               ) : (
                 <div className="w-full h-[320px] sm:h-[440px] flex items-center justify-center text-sm" style={{ color: "#6B7280" }}>
                   No photos available yet
                 </div>
+              )}
+              {images.length > 0 && (
+                <span className="absolute bottom-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(31,41,55,0.75)", color: "#FFFFFF" }}>
+                  {activeImage + 1} / {images.length} photos
+                </span>
               )}
             </div>
             {(() => {
@@ -234,7 +291,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               );
             })()}
             {images.length > 1 && (
-              <div className="flex gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
                 {images.map((img, i) => (
                   <button
                     key={i}
@@ -245,6 +302,28 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
+              </div>
+            )}
+            {(property.videoUrls?.length > 0 || property.virtualTourUrl || property.floorPlanUrl) && (
+              <div className="flex flex-wrap gap-2 mb-8">
+                {property.videoUrls?.length > 0 && (
+                  <button onClick={() => scrollToSection("videos-section")}
+                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1F2937" }}>
+                    ▶ Video
+                  </button>
+                )}
+                {property.virtualTourUrl && (
+                  <button onClick={() => scrollToSection("virtual-experience-section")}
+                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1F2937" }}>
+                    360° Tour
+                  </button>
+                )}
+                {property.floorPlanUrl && (
+                  <button onClick={() => scrollToSection("virtual-experience-section")}
+                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1F2937" }}>
+                    Floor Plan
+                  </button>
+                )}
               </div>
             )}
 
@@ -261,18 +340,123 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 )}
               </div>
             </div>
+            {/* Videos */}
+            {property.videoUrls?.length > 0 && (
+              <div id="videos-section" className="mb-8">
+                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Videos</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {property.videoUrls.map((url) => {
+                    const embedUrl = toEmbeddableVideoUrl(url);
+                    return embedUrl ? (
+                      <div key={url} className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                        <iframe src={embedUrl} title="Property video" className="w-full h-full" allowFullScreen />
+                      </div>
+                    ) : (
+                      <a key={url} href={url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline"
+                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
+                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Watch Video
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
-            {/* Quick facts */}
+            {/* Virtual Experience, Floor Plan & Construction Progress (Section 2G) */}
+            {(() => {
+              const hasVirtual = property.virtualTourUrl || property.droneViewUrl;
+              const hasFloorPlan = property.floorPlanUrl;
+              const progressPhotos = property.project?.constructionProgressPhotos || [];
+              if (!hasVirtual && !hasFloorPlan && progressPhotos.length === 0) return null;
+
+              // Matterport/Kuula-style links are directly iframe-embeddable;
+              // anything else just gets a plain "open" link instead.
+              const tourEmbeddable = property.virtualTourUrl && /matterport|kuula|cloudpano/.test(property.virtualTourUrl);
+              const droneEmbedUrl = property.droneViewUrl ? toEmbeddableVideoUrl(property.droneViewUrl) : null;
+
+              return (
+                <div id="virtual-experience-section" className="mb-8 space-y-5">
+                  <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Virtual Experience</h2>
+
+                  {property.virtualTourUrl && (
+                    tourEmbeddable ? (
+                      <div className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                        <iframe src={property.virtualTourUrl} title="360° virtual tour" className="w-full h-full" allowFullScreen />
+                      </div>
+                    ) : (
+                      <a href={property.virtualTourUrl} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline w-fit"
+                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
+                        Open 360° Virtual Tour →
+                      </a>
+                    )
+                  )}
+
+                  {property.droneViewUrl && (
+                    droneEmbedUrl ? (
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Drone View</p>
+                        <div className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                          <iframe src={droneEmbedUrl} title="Drone view" className="w-full h-full" allowFullScreen />
+                        </div>
+                      </div>
+                    ) : (
+                      <a href={property.droneViewUrl} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline w-fit"
+                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
+                        Watch Drone View →
+                      </a>
+                    )
+                  )}
+
+                  {property.floorPlanUrl && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Floor Plan</p>
+                      <a href={property.floorPlanUrl} target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden max-w-md" style={{ border: "1px solid #E2E8F0" }}>
+                        <img src={property.floorPlanUrl} alt="Floor plan" className="w-full h-auto" onError={(e) => { e.target.style.display = "none"; }} />
+                      </a>
+                      {property.floorPlanCaption && <p className="text-xs mt-1.5" style={{ color: "#6B7280" }}>{property.floorPlanCaption}</p>}
+                    </div>
+                  )}
+
+                  {progressPhotos.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Construction Progress</p>
+                      <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                        {[...progressPhotos].sort((a, b) => new Date(a.date) - new Date(b.date)).map((p, i) => (
+                          <div key={i} className="shrink-0 w-40 rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                            <img src={p.url} alt={p.caption || "Construction progress"} className="w-full h-28 object-cover" />
+                            <div className="p-2">
+                              {p.date && <p className="text-[10px] font-bold" style={{ color: "#1565C0" }}>{new Date(p.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>}
+                              {p.caption && <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{p.caption}</p>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Quick facts — Section 4's spec'd set: BHK, carpet area, floor,
+                possession, furnishing, facing, parking, age. (Posted By /
+                Listed-days-ago moved to the byline under the title instead.) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
                 property.bhkLabel && { label: "Configuration", value: property.bhkLabel },
-                property.area && { label: "Area", value: property.area },
+                (property.carpetArea || property.area) && { label: "Carpet Area", value: property.carpetArea ? `${property.carpetArea} sqft` : property.area },
                 property.floor && { label: "Floor", value: property.floor },
-                property.facing && { label: "Facing", value: property.facing },
-                property.age && { label: "Age", value: property.age },
                 property.status && { label: "Possession", value: property.status },
-                property.postedBy && { label: "Posted By", value: property.postedBy },
-                { label: "Listed", value: property.postedDays === 0 ? "Today" : `${property.postedDays}d ago` },
+                property.furnishing && { label: "Furnishing", value: property.furnishing },
+                property.facing && { label: "Facing", value: property.facing },
+                property.parkingType && { label: "Parking", value: `${property.parkingType}${property.parkingSlots ? ` (${property.parkingSlots})` : ""}` },
+                property.age && { label: "Age", value: property.age },
               ].filter(Boolean).map((f) => (
                 <div key={f.label} className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
                   <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>{f.label}</p>
@@ -280,44 +464,6 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 </div>
               ))}
             </div>
-
-            {/* Property Details (project identity, configuration, area breakdown) */}
-            {(() => {
-              const unitLine = [property.projectName, property.towerBlock, property.unitNumberPublic ? property.unitNumber : null]
-                .filter(Boolean).join(", ");
-              const rows = [
-                property.listingCode && { label: "Listing ID", value: property.listingCode },
-                unitLine && { label: "Project / Unit", value: unitLine },
-                property.listingType && { label: "Listing Type", value: property.listingType },
-                property.bathrooms != null && { label: "Bathrooms", value: property.bathrooms },
-                property.balconies != null && { label: "Balconies", value: property.balconies },
-                property.servantRoom && { label: "Servant Room", value: "Yes" },
-                property.builtUpArea && { label: "Built-up Area", value: `${property.builtUpArea} sqft` },
-                property.superBuiltUpArea && { label: "Super Built-up Area", value: `${property.superBuiltUpArea} sqft` },
-                property.carpetArea && { label: "Carpet Area", value: `${property.carpetArea} sqft` },
-                property.plotArea && { label: "Plot Area", value: `${property.plotArea} sqft` },
-                property.totalFloors && { label: "Total Floors", value: property.totalFloors },
-                property.totalUnits && { label: "Total Units", value: property.totalUnits },
-                property.entranceDirection && { label: "Entrance Direction", value: property.entranceDirection },
-                property.vastuStatus && property.vastuStatus !== "Not Specified" && { label: "Vastu Status", value: property.vastuStatus },
-                property.furnishing && { label: "Furnishing", value: property.furnishing },
-                property.condition && { label: "Condition", value: property.condition },
-              ].filter(Boolean);
-              if (rows.length === 0) return null;
-              return (
-                <div className="mb-8">
-                  <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Property Details</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {rows.map((r) => (
-                      <div key={r.label} className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>{r.label}</p>
-                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{r.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
 
             {/* Price & Financial Details (Section 2B) */}
             {(() => {
@@ -434,6 +580,128 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 </div>
               );
             })()}
+
+            {/* Why This Property? (Section 4 — new) */}
+            {property.keyHighlights?.length > 0 && (
+              <div className="mb-8 rounded-2xl p-5" style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
+                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Why This Property?</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
+                  {property.keyHighlights.map((h, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="#1565C0" strokeWidth={2.5} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <p className="text-sm font-medium" style={{ color: "#1F2937" }}>{h}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Location */}
+            {(property.latitude != null || property.locality || property.city) && (
+              <div className="mb-8">
+                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Location &amp; Connectivity</h2>
+
+                {property.addressVisibility === "Locality Only" ? (
+                  <div className="rounded-xl p-4 mb-3" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                    <p className="text-sm font-semibold" style={{ color: "#1F2937" }}>
+                      {[property.locality, property.city].filter(Boolean).join(", ") || property.location}
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Exact address is shared once you get in touch.</p>
+                  </div>
+                ) : (
+                  <LocationMap
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    label={property.title}
+                    addressVisibility={property.addressVisibility}
+                    listingId={property.dbId || property.id}
+                  />
+                )}
+
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                  <p className="text-sm" style={{ color: "#6B7280" }}>
+                    {[property.landmark && `Near ${property.landmark}`, property.locality, property.city, property.pincode].filter(Boolean).join(" · ") || property.location}
+                  </p>
+                </div>
+
+                {directionsUrl(property) && property.addressVisibility !== "Locality Only" && (
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    {ROUTE_MODES.map((r) => (
+                      <a key={r.mode} href={directionsUrl(property, r.mode)} target="_blank" rel="noopener noreferrer"
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-80" style={{ background: "#EFF6FF", color: "#1565C0" }}>
+                        {r.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                {(property.roadWidth || property.approachRoadDetails || property.publicTransportNotes || property.neighbourhoodProfile) && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+                    {property.roadWidth && (
+                      <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Road Width</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.roadWidth}</p>
+                      </div>
+                    )}
+                    {property.neighbourhoodProfile && (
+                      <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Neighbourhood</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.neighbourhoodProfile}</p>
+                      </div>
+                    )}
+                    {property.approachRoadDetails && (
+                      <div className="rounded-xl p-3.5 col-span-2" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Approach Road</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.approachRoadDetails}</p>
+                      </div>
+                    )}
+                    {property.publicTransportNotes && (
+                      <div className="rounded-xl p-3.5 col-span-2 sm:col-span-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Public Transport</p>
+                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.publicTransportNotes}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {property.nearbyLandmarks?.length > 0 && (
+                  <div className="mt-5">
+                    <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>What's Nearby</p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <button onClick={() => setActiveLandmarkLayer(null)}
+                        className="text-xs font-bold px-3 py-1.5 rounded-full"
+                        style={activeLandmarkLayer === null ? { background: "#1565C0", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
+                        All
+                      </button>
+                      {LANDMARK_LAYERS.filter((layer) => property.nearbyLandmarks.some((l) => LANDMARK_LAYER_GROUPS[l.category] === layer)).map((layer) => (
+                        <button key={layer} onClick={() => setActiveLandmarkLayer(layer)}
+                          className="text-xs font-bold px-3 py-1.5 rounded-full"
+                          style={activeLandmarkLayer === layer ? { background: "#1565C0", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
+                          {layer}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {property.nearbyLandmarks
+                        .filter((l) => activeLandmarkLayer === null || LANDMARK_LAYER_GROUPS[l.category] === activeLandmarkLayer)
+                        .map((l, i) => (
+                          <div key={i} className="flex items-center justify-between text-sm rounded-lg px-3.5 py-2.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                            <div>
+                              <span className="font-semibold" style={{ color: "#1F2937" }}>{l.name || l.category}</span>
+                              <span className="text-xs ml-1.5" style={{ color: "#6B7280" }}>({l.category})</span>
+                            </div>
+                            <span className="text-xs shrink-0 ml-2" style={{ color: "#6B7280" }}>
+                              {[l.distance, l.travelTime].filter(Boolean).join(" · ")}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Project & Developer Information (Section 2D) */}
             {(property.developer || property.developerName || property.project) && (
@@ -614,6 +882,113 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               </div>
             )}
 
+            {/* Specifications — Section 4: merges the old "Property Details"
+                facts (Section 2A) with the single-value facts that used to
+                sit in "Lifestyle & Convenience" (Section 2F) — parking, EV
+                charging, power backup, water source, internet, mobile
+                network, pet policy. Checklist-style features from that same
+                section (unit features, security, etc.) moved to the
+                Amenities section below instead, where they're grouped by
+                category alongside everything else. */}
+            {(() => {
+              const unitLine = [property.projectName, property.towerBlock, property.unitNumberPublic ? property.unitNumber : null]
+                .filter(Boolean).join(", ");
+              const rows = [
+                property.listingCode && { label: "Listing ID", value: property.listingCode },
+                unitLine && { label: "Project / Unit", value: unitLine },
+                property.listingType && { label: "Listing Type", value: property.listingType },
+                property.bathrooms != null && { label: "Bathrooms", value: property.bathrooms },
+                property.balconies != null && { label: "Balconies", value: property.balconies },
+                property.servantRoom && { label: "Servant Room", value: "Yes" },
+                property.builtUpArea && { label: "Built-up Area", value: `${property.builtUpArea} sqft` },
+                property.superBuiltUpArea && { label: "Super Built-up Area", value: `${property.superBuiltUpArea} sqft` },
+                property.carpetArea && { label: "Carpet Area", value: `${property.carpetArea} sqft` },
+                property.plotArea && { label: "Plot Area", value: `${property.plotArea} sqft` },
+                property.totalFloors && { label: "Total Floors", value: property.totalFloors },
+                property.totalUnits && { label: "Total Units", value: property.totalUnits },
+                property.entranceDirection && { label: "Entrance Direction", value: property.entranceDirection },
+                property.vastuStatus && property.vastuStatus !== "Not Specified" && { label: "Vastu Status", value: property.vastuStatus },
+                property.furnishing && { label: "Furnishing", value: property.furnishing },
+                property.condition && { label: "Condition", value: property.condition },
+                property.parkingType && { label: "Parking", value: `${property.parkingType}${property.parkingSlots ? ` · ${property.parkingSlots} slot${property.parkingSlots === 1 ? "" : "s"}` : ""}` },
+                property.evChargingStatus && { label: "EV Charging", value: property.evChargingStatus },
+                property.powerBackupType && { label: "Power Backup", value: property.powerBackupType },
+                property.waterSource && { label: "Water Source", value: property.waterSource },
+                property.internetReadiness && { label: "Internet", value: property.internetReadiness },
+                property.mobileNetworkQuality && { label: "Mobile Network", value: property.mobileNetworkQuality },
+                property.petPolicy && { label: "Pet Policy", value: property.petPolicy },
+              ].filter(Boolean);
+              return (
+                <div className="mb-8">
+                  <h2 className="text-base font-bold mb-2" style={{ color: "#1F2937" }}>About this property</h2>
+                  <p className="text-sm leading-relaxed mb-4" style={{ color: "#6B7280" }}>
+                    {property.description || `This ${property.bhkLabel ? property.bhkLabel + " " : ""}${property.type?.toLowerCase() || "property"} in ${property.location} is listed ${property.transactionType === "Rent" ? "for rent" : "for sale"} by a ${property.postedBy?.toLowerCase() || "verified"} on PropertyBrands${property.area ? `, spanning ${property.area}` : ""}. Reach out below to schedule a visit or speak with our team for more details.`}
+                  </p>
+                  {property.petPolicyNotes && (
+                    <p className="text-xs mb-4" style={{ color: "#6B7280" }}>{property.petPolicyNotes}</p>
+                  )}
+                  {rows.length > 0 && (
+                    <>
+                      <h3 className="text-sm font-bold mb-3" style={{ color: "#1F2937" }}>Specifications</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {rows.map((r) => (
+                          <div key={r.label} className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                            <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>{r.label}</p>
+                            <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{r.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Amenities — Section 4: grouped into Security, Convenience,
+                Wellness, Recreation, Sustainability, Accessibility. Pulls
+                from the base amenities checklist plus every Section 2F
+                feature array via groupedAmenities() (see listings.js), so
+                nothing that used to show in the old flat list or the old
+                "Lifestyle & Convenience" checklists is lost — just regrouped. */}
+            {(() => {
+              const groups = groupedAmenities(property);
+              const detailsByName = Object.fromEntries((property.amenityDetails || []).map((d) => [d.name, d]));
+              const nonEmpty = AMENITY_CATEGORIES.filter((c) => groups[c].length > 0);
+              if (nonEmpty.length === 0) return null;
+              return (
+                <div className="mb-8">
+                  <h2 className="text-base font-bold mb-4" style={{ color: "#1F2937" }}>Amenities</h2>
+                  <div className="space-y-5">
+                    {nonEmpty.map((category) => (
+                      <div key={category}>
+                        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>{category}</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                          {groups[category].map((a) => {
+                            const d = detailsByName[a];
+                            return (
+                              <div key={a} className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ background: "#EFF6FF", color: "#1F2937" }}>
+                                <svg className="w-4 h-4 shrink-0" fill="none" stroke="#1565C0" strokeWidth={2.5} viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>
+                                  {a}
+                                  {d && (d.status || d.condition) && (
+                                    <span className="block text-[10px] font-normal" style={{ color: "#6B7280" }}>
+                                      {[d.status, d.condition].filter(Boolean).join(" · ")}
+                                    </span>
+                                  )}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Legal & Verification Information (Section 2E) */}
             {(() => {
               const rows = [
@@ -677,308 +1052,6 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   {legalDisclaimer && (
                     <div className="rounded-xl p-4" style={{ background: "#FFFBEB", border: "1px solid #FDE68A" }}>
                       <p className="text-xs leading-relaxed" style={{ color: "#92400E" }}>{legalDisclaimer}</p>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-
-            {/* Description */}
-            <div className="mb-8">
-              <h2 className="text-base font-bold mb-2" style={{ color: "#1F2937" }}>About this property</h2>
-              <p className="text-sm leading-relaxed" style={{ color: "#6B7280" }}>
-                {property.description || `This ${property.bhkLabel ? property.bhkLabel + " " : ""}${property.type?.toLowerCase() || "property"} in ${property.location} is listed ${property.transactionType === "Rent" ? "for rent" : "for sale"} by a ${property.postedBy?.toLowerCase() || "verified"} on PropertyBrands${property.area ? `, spanning ${property.area}` : ""}. Reach out below to schedule a visit or speak with our team for more details.`}
-              </p>
-            </div>
-
-            {/* Amenities */}
-            {property.amenities?.length > 0 && (() => {
-              const detailsByName = Object.fromEntries((property.amenityDetails || []).map((d) => [d.name, d]));
-              return (
-                <div className="mb-8">
-                  <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Amenities</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                    {property.amenities.map((a) => {
-                      const d = detailsByName[a];
-                      return (
-                        <div key={a} className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg" style={{ background: "#EFF6FF", color: "#1F2937" }}>
-                          <svg className="w-4 h-4 shrink-0" fill="none" stroke="#1565C0" strokeWidth={2.5} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span>
-                            {a}
-                            {d && (d.status || d.condition) && (
-                              <span className="block text-[10px] font-normal" style={{ color: "#6B7280" }}>
-                                {[d.status, d.condition].filter(Boolean).join(" · ")}
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Amenities & Lifestyle detail (Section 2F) */}
-            {(() => {
-              const facts = [
-                property.parkingType && { label: "Parking", value: `${property.parkingType}${property.parkingSlots ? ` · ${property.parkingSlots} slot${property.parkingSlots === 1 ? "" : "s"}` : ""}` },
-                property.evChargingStatus && { label: "EV Charging", value: property.evChargingStatus },
-                property.powerBackupType && { label: "Power Backup", value: property.powerBackupType },
-                property.waterSource && { label: "Water Source", value: property.waterSource },
-                property.internetReadiness && { label: "Internet", value: property.internetReadiness },
-                property.mobileNetworkQuality && { label: "Mobile Network", value: property.mobileNetworkQuality },
-                property.petPolicy && { label: "Pet Policy", value: property.petPolicy },
-              ].filter(Boolean);
-
-              const checklistGroups = [
-                { title: "Unit-Level Features", items: property.unitFeatures },
-                { title: "Security", items: property.securityFeatures },
-                { title: "Water & Sewage", items: property.waterSewageFeatures },
-                { title: "Senior-Citizen-Friendly", items: property.seniorCitizenFeatures },
-                { title: "Accessibility", items: property.accessibilityFeatures },
-              ].filter((g) => g.items?.length > 0);
-
-              if (facts.length === 0 && checklistGroups.length === 0) return null;
-
-              return (
-                <div className="mb-8 space-y-5">
-                  <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Lifestyle &amp; Convenience</h2>
-
-                  {facts.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {facts.map((f) => (
-                        <div key={f.label} className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                          <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>{f.label}</p>
-                          <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{f.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {property.petPolicyNotes && (
-                    <p className="text-xs" style={{ color: "#6B7280" }}>{property.petPolicyNotes}</p>
-                  )}
-
-                  {checklistGroups.map((g) => (
-                    <div key={g.title}>
-                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>{g.title}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {g.items.map((item) => (
-                          <span key={item} className="text-xs font-semibold px-3 py-1.5 rounded-full" style={{ background: "#F1F5F9", color: "#1F2937" }}>{item}</span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-
-            {/* Location */}
-            {(property.latitude != null || property.locality || property.city) && (
-              <div className="mb-8">
-                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Location &amp; Connectivity</h2>
-
-                {property.addressVisibility === "Locality Only" ? (
-                  <div className="rounded-xl p-4 mb-3" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                    <p className="text-sm font-semibold" style={{ color: "#1F2937" }}>
-                      {[property.locality, property.city].filter(Boolean).join(", ") || property.location}
-                    </p>
-                    <p className="text-xs mt-1" style={{ color: "#6B7280" }}>Exact address is shared once you get in touch.</p>
-                  </div>
-                ) : (
-                  <LocationMap
-                    latitude={property.latitude}
-                    longitude={property.longitude}
-                    label={property.title}
-                    addressVisibility={property.addressVisibility}
-                    listingId={property.dbId || property.id}
-                  />
-                )}
-
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  <p className="text-sm" style={{ color: "#6B7280" }}>
-                    {[property.landmark && `Near ${property.landmark}`, property.locality, property.city, property.pincode].filter(Boolean).join(" · ") || property.location}
-                  </p>
-                </div>
-
-                {directionsUrl(property) && property.addressVisibility !== "Locality Only" && (
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    {ROUTE_MODES.map((r) => (
-                      <a key={r.mode} href={directionsUrl(property, r.mode)} target="_blank" rel="noopener noreferrer"
-                        className="text-xs font-semibold px-3 py-1.5 rounded-full hover:opacity-80" style={{ background: "#EFF6FF", color: "#1565C0" }}>
-                        {r.label}
-                      </a>
-                    ))}
-                  </div>
-                )}
-
-                {(property.roadWidth || property.approachRoadDetails || property.publicTransportNotes || property.neighbourhoodProfile) && (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                    {property.roadWidth && (
-                      <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Road Width</p>
-                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.roadWidth}</p>
-                      </div>
-                    )}
-                    {property.neighbourhoodProfile && (
-                      <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Neighbourhood</p>
-                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.neighbourhoodProfile}</p>
-                      </div>
-                    )}
-                    {property.approachRoadDetails && (
-                      <div className="rounded-xl p-3.5 col-span-2" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Approach Road</p>
-                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.approachRoadDetails}</p>
-                      </div>
-                    )}
-                    {property.publicTransportNotes && (
-                      <div className="rounded-xl p-3.5 col-span-2 sm:col-span-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Public Transport</p>
-                        <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>{property.publicTransportNotes}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {property.nearbyLandmarks?.length > 0 && (
-                  <div className="mt-5">
-                    <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>What's Nearby</p>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <button onClick={() => setActiveLandmarkLayer(null)}
-                        className="text-xs font-bold px-3 py-1.5 rounded-full"
-                        style={activeLandmarkLayer === null ? { background: "#1565C0", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
-                        All
-                      </button>
-                      {LANDMARK_LAYERS.filter((layer) => property.nearbyLandmarks.some((l) => LANDMARK_LAYER_GROUPS[l.category] === layer)).map((layer) => (
-                        <button key={layer} onClick={() => setActiveLandmarkLayer(layer)}
-                          className="text-xs font-bold px-3 py-1.5 rounded-full"
-                          style={activeLandmarkLayer === layer ? { background: "#1565C0", color: "#FFFFFF" } : { background: "#F1F5F9", color: "#1F2937" }}>
-                          {layer}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {property.nearbyLandmarks
-                        .filter((l) => activeLandmarkLayer === null || LANDMARK_LAYER_GROUPS[l.category] === activeLandmarkLayer)
-                        .map((l, i) => (
-                          <div key={i} className="flex items-center justify-between text-sm rounded-lg px-3.5 py-2.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                            <div>
-                              <span className="font-semibold" style={{ color: "#1F2937" }}>{l.name || l.category}</span>
-                              <span className="text-xs ml-1.5" style={{ color: "#6B7280" }}>({l.category})</span>
-                            </div>
-                            <span className="text-xs shrink-0 ml-2" style={{ color: "#6B7280" }}>
-                              {[l.distance, l.travelTime].filter(Boolean).join(" · ")}
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Videos */}
-            {property.videoUrls?.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Videos</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {property.videoUrls.map((url) => {
-                    const embedUrl = toEmbeddableVideoUrl(url);
-                    return embedUrl ? (
-                      <div key={url} className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
-                        <iframe src={embedUrl} title="Property video" className="w-full h-full" allowFullScreen />
-                      </div>
-                    ) : (
-                      <a key={url} href={url} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline"
-                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
-                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Watch Video
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Virtual Experience, Floor Plan & Construction Progress (Section 2G) */}
-            {(() => {
-              const hasVirtual = property.virtualTourUrl || property.droneViewUrl;
-              const hasFloorPlan = property.floorPlanUrl;
-              const progressPhotos = property.project?.constructionProgressPhotos || [];
-              if (!hasVirtual && !hasFloorPlan && progressPhotos.length === 0) return null;
-
-              // Matterport/Kuula-style links are directly iframe-embeddable;
-              // anything else just gets a plain "open" link instead.
-              const tourEmbeddable = property.virtualTourUrl && /matterport|kuula|cloudpano/.test(property.virtualTourUrl);
-              const droneEmbedUrl = property.droneViewUrl ? toEmbeddableVideoUrl(property.droneViewUrl) : null;
-
-              return (
-                <div className="mb-8 space-y-5">
-                  <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Virtual Experience</h2>
-
-                  {property.virtualTourUrl && (
-                    tourEmbeddable ? (
-                      <div className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
-                        <iframe src={property.virtualTourUrl} title="360° virtual tour" className="w-full h-full" allowFullScreen />
-                      </div>
-                    ) : (
-                      <a href={property.virtualTourUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline w-fit"
-                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
-                        Open 360° Virtual Tour →
-                      </a>
-                    )
-                  )}
-
-                  {property.droneViewUrl && (
-                    droneEmbedUrl ? (
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Drone View</p>
-                        <div className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
-                          <iframe src={droneEmbedUrl} title="Drone view" className="w-full h-full" allowFullScreen />
-                        </div>
-                      </div>
-                    ) : (
-                      <a href={property.droneViewUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline w-fit"
-                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
-                        Watch Drone View →
-                      </a>
-                    )
-                  )}
-
-                  {property.floorPlanUrl && (
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Floor Plan</p>
-                      <a href={property.floorPlanUrl} target="_blank" rel="noopener noreferrer" className="block rounded-xl overflow-hidden max-w-md" style={{ border: "1px solid #E2E8F0" }}>
-                        <img src={property.floorPlanUrl} alt="Floor plan" className="w-full h-auto" onError={(e) => { e.target.style.display = "none"; }} />
-                      </a>
-                      {property.floorPlanCaption && <p className="text-xs mt-1.5" style={{ color: "#6B7280" }}>{property.floorPlanCaption}</p>}
-                    </div>
-                  )}
-
-                  {progressPhotos.length > 0 && (
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Construction Progress</p>
-                      <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-                        {[...progressPhotos].sort((a, b) => new Date(a.date) - new Date(b.date)).map((p, i) => (
-                          <div key={i} className="shrink-0 w-40 rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
-                            <img src={p.url} alt={p.caption || "Construction progress"} className="w-full h-28 object-cover" />
-                            <div className="p-2">
-                              {p.date && <p className="text-[10px] font-bold" style={{ color: "#1565C0" }}>{new Date(p.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>}
-                              {p.caption && <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>{p.caption}</p>}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
                     </div>
                   )}
                 </div>
@@ -1093,6 +1166,14 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   </svg>
                   {saved ? "Saved" : "Save Property"}
                 </button>
+                <button
+                  onClick={() => toggleCompare(property)}
+                  disabled={!comparingThis && compareItems.length >= maxCompare}
+                  className="w-full py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                  style={{ background: "#F8FAFC", color: comparingThis ? "#1565C0" : "#1F2937", border: "1px solid #E2E8F0" }}
+                >
+                  {comparingThis ? "✓ Added to Compare" : "Add to Compare"}
+                </button>
 
                 {(() => {
                   const poster = resolvePoster(property);
@@ -1184,7 +1265,14 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
         {/* ── Similar Properties ── */}
         {similar.length > 0 && (
           <div className="mt-14">
-            <h2 className="text-lg font-bold mb-4" style={{ color: "#1F2937" }}>Similar Properties</h2>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <h2 className="text-lg font-bold" style={{ color: "#1F2937" }}>Similar Properties</h2>
+              <p className="text-xs" style={{ color: "#6B7280" }}>
+                Tap "+ Compare" on up to {maxCompare} properties{compareItems.length > 0 && (
+                  <> — <button onClick={() => onNavigate && onNavigate("compare")} className="font-bold hover:underline" style={{ color: "#1565C0" }}>view comparison ({compareItems.length}) →</button></>
+                )}
+              </p>
+            </div>
             <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
               {similar.map((p) => <SimilarCard key={p.id} property={p} onOpen={openSimilar} />)}
             </div>
@@ -1195,6 +1283,50 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
         <div className="mt-10 text-center">
           <button onClick={() => onNavigate && onNavigate("contact", "other")} className="text-xs hover:underline" style={{ color: "#6B7280" }}>
             Something wrong with this listing? Report it
+          </button>
+        </div>
+      </div>
+
+      {/* ── Sticky mobile CTA bar (Section 4): Call, WhatsApp, Schedule
+          Visit, Save — always reachable without hunting through the page. ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden" style={{ background: "#FFFFFF", borderTop: "1px solid #E2E8F0", boxShadow: "0 -2px 10px rgba(31,41,55,0.08)" }}>
+        <div className="grid grid-cols-4 gap-1 px-2 py-2">
+          {poster?.phone ? (
+            (phoneRevealed || !poster.phoneMaskingEnabled) ? (
+              <a href={`tel:${poster.phone}`} className="flex flex-col items-center gap-0.5 py-1.5 rounded-lg">
+                <span className="text-base leading-none">📞</span>
+                <span className="text-[10px] font-bold" style={{ color: "#1565C0" }}>Call</span>
+              </a>
+            ) : (
+              <button onClick={() => setPhoneRevealed(true)} className="flex flex-col items-center gap-0.5 py-1.5 rounded-lg">
+                <span className="text-base leading-none">📞</span>
+                <span className="text-[10px] font-bold" style={{ color: "#1565C0" }}>Call</span>
+              </button>
+            )
+          ) : (
+            <button onClick={() => onNavigate && onNavigate("contact", { property, intent: "contact" })} className="flex flex-col items-center gap-0.5 py-1.5 rounded-lg">
+              <span className="text-base leading-none">📞</span>
+              <span className="text-[10px] font-bold" style={{ color: "#1565C0" }}>Call</span>
+            </button>
+          )}
+          {poster?.phone ? (
+            <a href={`https://wa.me/${poster.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hi, I'm interested in ${property.title} (${property.location}, ${property.price}). Is it still available?`)}`}
+              target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-0.5 py-1.5 rounded-lg">
+              <span className="text-base leading-none">💬</span>
+              <span className="text-[10px] font-bold" style={{ color: "#16A34A" }}>WhatsApp</span>
+            </a>
+          ) : (
+            <div />
+          )}
+          <button onClick={() => onNavigate && onNavigate("contact", { property, intent: "site-visit" })} className="flex flex-col items-center gap-0.5 py-1.5 rounded-lg">
+            <span className="text-base leading-none">📅</span>
+            <span className="text-[10px] font-bold" style={{ color: "#1F2937" }}>Visit</span>
+          </button>
+          <button onClick={() => toggleSaveProperty(property)} className="flex flex-col items-center gap-0.5 py-1.5 rounded-lg">
+            <svg className="w-[18px] h-[18px]" fill={saved ? "#1565C0" : "none"} stroke={saved ? "#1565C0" : "#1F2937"} strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span className="text-[10px] font-bold" style={{ color: saved ? "#1565C0" : "#1F2937" }}>{saved ? "Saved" : "Save"}</span>
           </button>
         </div>
       </div>

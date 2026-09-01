@@ -80,6 +80,18 @@ const EMPTY_BUYER_PREFS = {
   purpose: "", budgetMax: "", comfortableEmi: "", preferredLocations: [], acceptableLocations: [], excludedLocations: [],
   purchaseTimeline: "", priorityFactors: [], loanAssistance: "", openToUnderConstruction: "", mustHaveFeatures: [], wantsComparison: false,
 };
+// ── Section 3B: Questions for Renters (shown instead of buyer questions when
+// the property being asked about is for Rent) ──
+const PROFILE_TYPE_OPTIONS = ["Family", "Bachelor", "Student", "Corporate"];
+const FURNISHING_REQ_OPTIONS = ["Unfurnished", "Semi-furnished", "Fully furnished", "No Preference"];
+const LEASE_DURATION_OPTIONS = ["11 Months", "1 Year", "2 Years", "3+ Years", "Flexible"];
+const PET_REQ_OPTIONS = ["Have Pets - Need Pet-Friendly", "No Pets", "Planning to Get a Pet"];
+const PARKING_REQ_OPTIONS = ["Not Needed", "1 Two-Wheeler", "1 Car", "Multiple Vehicles", "EV Charging Needed"];
+const EMPTY_RENTER_PREFS = {
+  moveInDate: "", monthlyRentBudget: "", upfrontBudget: "", profileType: "", furnishingRequirement: "",
+  leaseDuration: "", petRequirement: "", parkingRequirement: "", preferredLocalities: [], commuteDestination: "",
+  wantsBrokerageFree: false, wantsManagedRental: false,
+};
 
 const SUBJECT_LABELS = {
   buy: "Buying a Property",
@@ -146,6 +158,11 @@ export default function ContactUs({ onNavigate, initialSubject }) {
   const [openFaq, setOpenFaq] = useState(null);
   const [showBuyerQuestions, setShowBuyerQuestions] = useState(false);
   const [buyerPrefs, setBuyerPrefs] = useState(EMPTY_BUYER_PREFS);
+  const [renterPrefs, setRenterPrefs] = useState(EMPTY_RENTER_PREFS);
+  // The property being asked about tells us which question set is relevant —
+  // Rent listings get the renter questions, everything else (Buy, or a
+  // general inquiry with no property context) gets the buyer questions.
+  const isRentInquiry = property?.transactionType === "Rent";
 
   // Pre-fill from the buyer's saved preferences if they're logged in and
   // already answered these once — they can still tweak them per-inquiry.
@@ -164,6 +181,20 @@ export default function ContactUs({ onNavigate, initialSubject }) {
       openToUnderConstruction: profile.buyer_open_to_under_construction || "",
       mustHaveFeatures: profile.buyer_must_have_features || [],
       wantsComparison: !!profile.buyer_wants_comparison,
+    });
+    setRenterPrefs({
+      moveInDate: profile.renter_move_in_date || "",
+      monthlyRentBudget: profile.renter_monthly_rent_budget ?? "",
+      upfrontBudget: profile.renter_upfront_budget ?? "",
+      profileType: profile.renter_profile_type || "",
+      furnishingRequirement: profile.renter_furnishing_requirement || "",
+      leaseDuration: profile.renter_lease_duration || "",
+      petRequirement: profile.renter_pet_requirement || "",
+      parkingRequirement: profile.renter_parking_requirement || "",
+      preferredLocalities: profile.renter_preferred_localities || [],
+      commuteDestination: profile.renter_commute_destination || "",
+      wantsBrokerageFree: !!profile.renter_wants_brokerage_free,
+      wantsManagedRental: !!profile.renter_wants_managed_rental,
     });
   }, [isLoggedIn, profile]);
 
@@ -195,7 +226,8 @@ export default function ContactUs({ onNavigate, initialSubject }) {
       budget: property?.price,
       listingId: property?.dbId,
       stage: intent === "site-visit" ? "Site Visit" : undefined,
-      buyerPreferences: buyerPrefs,
+      buyerPreferences: isRentInquiry ? undefined : buyerPrefs,
+      renterPreferences: isRentInquiry ? renterPrefs : undefined,
     });
     setSubmitting(false);
     if (error) {
@@ -344,7 +376,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
                 />
 
-                {/* ── Optional buyer questions (Section 3A) ── */}
+                {/* ── Optional buyer/renter questions (Section 3A/3B) ── */}
                 <button type="button" onClick={() => setShowBuyerQuestions((v) => !v)}
                   className="flex items-center gap-1.5 text-sm font-bold" style={{ color: "#1565C0" }}>
                   {showBuyerQuestions ? "Hide" : "Tell us more about what you're looking for"} (optional)
@@ -353,7 +385,7 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                   </svg>
                 </button>
 
-                {showBuyerQuestions && (
+                {showBuyerQuestions && !isRentInquiry && (
                   <div className="space-y-4 rounded-xl p-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
                     <div>
                       <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Purpose</label>
@@ -457,6 +489,109 @@ export default function ContactUs({ onNavigate, initialSubject }) {
                     <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
                       <input type="checkbox" checked={buyerPrefs.wantsComparison} onChange={(e) => setBuyerPrefs({ ...buyerPrefs, wantsComparison: e.target.checked })} className="w-4 h-4 rounded accent-[#1565C0]" />
                       I'd like to compare this with similar options
+                    </label>
+                  </div>
+                )}
+
+                {showBuyerQuestions && isRentInquiry && (
+                  <div className="space-y-4 rounded-xl p-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Move-in Date</label>
+                        <input type="date" value={renterPrefs.moveInDate} onChange={(e) => setRenterPrefs({ ...renterPrefs, moveInDate: e.target.value })}
+                          className="w-full text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Profile</label>
+                        <div className="flex flex-wrap gap-2">
+                          {PROFILE_TYPE_OPTIONS.map((p) => (
+                            <button key={p} type="button" onClick={() => setRenterPrefs({ ...renterPrefs, profileType: p })}
+                              className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                              style={{ background: renterPrefs.profileType === p ? "#1565C0" : "#FFFFFF", color: renterPrefs.profileType === p ? "#FFFFFF" : "#6B7280", border: `1px solid ${renterPrefs.profileType === p ? "#1565C0" : "#E2E8F0"}` }}>
+                              {p}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <input type="number" min="0" placeholder="Expected monthly rent (₹)" value={renterPrefs.monthlyRentBudget}
+                        onChange={(e) => setRenterPrefs({ ...renterPrefs, monthlyRentBudget: e.target.value })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                      <input type="number" min="0" placeholder="Total upfront budget (₹)" value={renterPrefs.upfrontBudget}
+                        onChange={(e) => setRenterPrefs({ ...renterPrefs, upfrontBudget: e.target.value })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Furnishing Requirement</label>
+                      <div className="flex flex-wrap gap-2">
+                        {FURNISHING_REQ_OPTIONS.map((f) => (
+                          <button key={f} type="button" onClick={() => setRenterPrefs({ ...renterPrefs, furnishingRequirement: f })}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: renterPrefs.furnishingRequirement === f ? "#1565C0" : "#FFFFFF", color: renterPrefs.furnishingRequirement === f ? "#FFFFFF" : "#6B7280", border: `1px solid ${renterPrefs.furnishingRequirement === f ? "#1565C0" : "#E2E8F0"}` }}>
+                            {f}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Lease Duration</label>
+                      <div className="flex flex-wrap gap-2">
+                        {LEASE_DURATION_OPTIONS.map((l) => (
+                          <button key={l} type="button" onClick={() => setRenterPrefs({ ...renterPrefs, leaseDuration: l })}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: renterPrefs.leaseDuration === l ? "#1565C0" : "#FFFFFF", color: renterPrefs.leaseDuration === l ? "#FFFFFF" : "#6B7280", border: `1px solid ${renterPrefs.leaseDuration === l ? "#1565C0" : "#E2E8F0"}` }}>
+                            {l}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Pet Requirement</label>
+                      <div className="flex flex-wrap gap-2">
+                        {PET_REQ_OPTIONS.map((p) => (
+                          <button key={p} type="button" onClick={() => setRenterPrefs({ ...renterPrefs, petRequirement: p })}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: renterPrefs.petRequirement === p ? "#1565C0" : "#FFFFFF", color: renterPrefs.petRequirement === p ? "#FFFFFF" : "#6B7280", border: `1px solid ${renterPrefs.petRequirement === p ? "#1565C0" : "#E2E8F0"}` }}>
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold block mb-1.5" style={{ color: "#1F2937" }}>Parking Requirement</label>
+                      <div className="flex flex-wrap gap-2">
+                        {PARKING_REQ_OPTIONS.map((p) => (
+                          <button key={p} type="button" onClick={() => setRenterPrefs({ ...renterPrefs, parkingRequirement: p })}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                            style={{ background: renterPrefs.parkingRequirement === p ? "#1565C0" : "#FFFFFF", color: renterPrefs.parkingRequirement === p ? "#FFFFFF" : "#6B7280", border: `1px solid ${renterPrefs.parkingRequirement === p ? "#1565C0" : "#E2E8F0"}` }}>
+                            {p}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input placeholder="Preferred localities" value={renterPrefs.preferredLocalities.join(", ")}
+                        onChange={(e) => setRenterPrefs({ ...renterPrefs, preferredLocalities: locationsFromInput(e.target.value) })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                      <input placeholder="Commute destination" value={renterPrefs.commuteDestination}
+                        onChange={(e) => setRenterPrefs({ ...renterPrefs, commuteDestination: e.target.value })}
+                        className="text-sm rounded-lg px-3 py-2.5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" }} />
+                    </div>
+
+                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
+                      <input type="checkbox" checked={renterPrefs.wantsBrokerageFree} onChange={(e) => setRenterPrefs({ ...renterPrefs, wantsBrokerageFree: e.target.checked })} className="w-4 h-4 rounded accent-[#1565C0]" />
+                      Looking for brokerage-free options
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
+                      <input type="checkbox" checked={renterPrefs.wantsManagedRental} onChange={(e) => setRenterPrefs({ ...renterPrefs, wantsManagedRental: e.target.checked })} className="w-4 h-4 rounded accent-[#1565C0]" />
+                      Interested in managed rental options
                     </label>
                   </div>
                 )}
