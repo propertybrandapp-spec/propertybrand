@@ -41,7 +41,9 @@ Finally, run `supabase/migration_010_listing_options.sql`. This changes how list
 
 Also run `supabase/migration_011_hero_content.sql` — makes the homepage Hero section (headline, search tabs, quick-action buttons, sidebar promo card, and the property card grid) fully admin-editable from "Site Content" → Hero Content / Hero Cards, and adds Budget Ranges as a fourth admin-editable list alongside property types/BHK/amenities/tags. Seeded with the exact content the Hero already showed, so nothing changes visually until you edit it.
 
-Finally, run `supabase/migration_012_listing_geolocation.sql` — adds `latitude`/`longitude` to listings so a property can have a real pinned location (an actual interactive map, not just an outbound link). Both Post Property and the admin listing form now have a click-to-pin map with address search; the property detail page shows an embedded map wherever a pin has been set. The old `google_maps_link` field is kept as an optional override for the "Get Directions" button.
+Run `supabase/migration_012_listing_geolocation.sql` — adds `latitude`/`longitude` to listings so a property can have a real pinned location (an actual interactive map, not just an outbound link). Both Post Property and the admin listing form now have a click-to-pin map with address search; the property detail page shows an embedded map wherever a pin has been set. The old `google_maps_link` field is kept as an optional override for the "Get Directions" button.
+
+Finally, run `supabase/migration_026_price_on_request.sql` — adds a `price_on_request` flag to listings. Both Post Property and the admin listing form show a "Call for Details" checkbox next to the Price field; checking it skips the numeric price entirely (no more required-field error) and shows "Call for Details" everywhere the price would normally appear — search results, property detail, saved properties, compare, and the admin listings table.
 
 ## Step 2 — Admin console
 

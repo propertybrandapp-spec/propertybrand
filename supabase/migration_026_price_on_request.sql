@@ -1,0 +1,31 @@
+-- ════════════════════════════════════════════════════════════════════════════
+-- PropertyBrands — Migration 026: Price On Request ("Call for Details")
+-- Run this in: Supabase Dashboard → SQL Editor → New Query → Run
+--
+-- Lets a listing skip a numeric price entirely and show "Call for Details"
+-- instead — for posters/admins who'd rather negotiate over a call than post
+-- a number. Both the public Post Property form and the Admin listing form
+-- now have a "Call for Details" checkbox next to the Price field.
+--
+-- Checking it:
+--   • keeps price_value NULL (not 0) — so budget filters/sorts on the public
+--     site correctly treat it as "no numeric price" rather than "free", and
+--     the price_per_sqft / rental_yield_percent generated columns (see
+--     migration_014) stay NULL too, same as they already do for any listing
+--     missing a price today.
+--   • sets price_label to the fixed string "Call for Details" (price_label
+--     was already `not null`, so this is just a normal value for it — no
+--     column change needed there).
+--
+-- Safe to re-run — idempotent (IF NOT EXISTS).
+-- ════════════════════════════════════════════════════════════════════════════
+
+alter table public.listings add column if not exists price_on_request boolean not null default false;
+
+-- ════════════════════════════════════════════════════════════════════════════
+-- After running this file, both listing forms let you mark a listing's price
+-- as "Call for Details" instead of entering a number, and every place price
+-- shows on the public site (search results, property detail, saved
+-- properties, compare, the admin listings table) automatically displays
+-- "Call for Details" in its place.
+-- ════════════════════════════════════════════════════════════════════════════

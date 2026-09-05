@@ -486,8 +486,15 @@ export default function SearchResults({ initialFilters, onNavigate }) {
 
   // Sort
   const sorted = [...filtered].sort((a, b) => {
-    if (sortBy === "Price: Low to High") return a.priceRaw - b.priceRaw;
-    if (sortBy === "Price: High to Low") return b.priceRaw - a.priceRaw;
+    if (sortBy === "Price: Low to High" || sortBy === "Price: High to Low") {
+      // "Call for Details" listings have no priceRaw to compare — always
+      // push them to the end rather than letting them read as the cheapest
+      // option just because priceRaw defaults to 0.
+      if (!a.priceRaw && !b.priceRaw) return 0;
+      if (!a.priceRaw) return 1;
+      if (!b.priceRaw) return -1;
+      return sortBy === "Price: Low to High" ? a.priceRaw - b.priceRaw : b.priceRaw - a.priceRaw;
+    }
     if (sortBy === "Newest First") return a.postedDays - b.postedDays;
     if (sortBy === "Area: Large to Small") return parseInt(b.area) - parseInt(a.area);
     return b.featured - a.featured;
