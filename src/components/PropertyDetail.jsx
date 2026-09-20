@@ -1149,6 +1149,20 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 >
                   Schedule a Site Visit
                 </button>
+                {property.brochureUrl && (
+                  <a
+                    href={property.brochureUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
+                    style={{ background: "#FFFFFF", color: "#1565C0", border: "1.5px solid #1565C0" }}
+                  >
+                    <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+                    </svg>
+                    Download Brochure
+                  </a>
+                )}
                 <button
                   onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "callback" })}
                   className="text-xs font-semibold hover:underline text-center"

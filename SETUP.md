@@ -45,6 +45,8 @@ Run `supabase/migration_012_listing_geolocation.sql` — adds `latitude`/`longit
 
 Finally, run `supabase/migration_026_price_on_request.sql` — adds a `price_on_request` flag to listings. Both Post Property and the admin listing form show a "Call for Details" checkbox next to the Price field; checking it skips the numeric price entirely (no more required-field error) and shows "Call for Details" everywhere the price would normally appear — search results, property detail, saved properties, compare, and the admin listings table.
 
+And run `supabase/migration_027_listing_brochure.sql` — adds a `brochure_url` field to listings, alongside the existing floor plan field. Post Property gets a Brochure link field; the admin listing form gets the same field plus an upload button (PDF straight to R2); the property detail page shows a "Download Brochure" button in the contact sidebar whenever one is set.
+
 ## Step 2 — Admin console
 
 The admin console is a **separate project/deployment** (not part of this

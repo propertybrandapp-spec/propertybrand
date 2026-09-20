@@ -169,6 +169,7 @@ const EMPTY_FORM = {
   droneViewUrl: "",
   floorPlanUrl: "",
   floorPlanCaption: "",
+  brochureUrl: "",
 
   // ── Section 2H: Seller / Agent Information ──
   postedBy: "Owner",
@@ -1217,7 +1218,7 @@ export default function PostProperty({ onNavigate }) {
 
           <div className="rounded-2xl p-6 space-y-5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
             <div>
-              <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Virtual Experience &amp; Floor Plan</h2>
+              <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Virtual Experience, Floor Plan &amp; Brochure</h2>
               <p className="text-xs mt-1" style={{ color: "#6B7280" }}>All optional.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1233,6 +1234,9 @@ export default function PostProperty({ onNavigate }) {
             </Field>
             <Field label="Floor Plan Caption">
               <TextInput value={form.floorPlanCaption} onChange={(e) => set("floorPlanCaption", e.target.value)} placeholder="e.g. 3BHK · 1450 sqft, with dimensions" />
+            </Field>
+            <Field label="Brochure Link" hint="A link to a PDF brochure or spec sheet for this property. Shows as a Download Brochure button on the listing.">
+              <TextInput value={form.brochureUrl} onChange={(e) => set("brochureUrl", e.target.value)} placeholder="https://..." />
             </Field>
           </div>
 

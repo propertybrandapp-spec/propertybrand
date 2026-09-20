@@ -13,7 +13,7 @@ const DEFAULT_HERO_CONTENT = {
   headlinePrefix: "Start your",
   headlineHighlight: "#DiscoverInvestGrow",
   headlineSuffix: "Journey",
-  subtext: "Discover. Invest. Build. Grow. Compare. Discuss. Decide.",
+  subtext: "Find the Right Property. Make the Right Decision.",
   searchTabs: ["Buy", "Rent", "New Projects", "Plot", "Commercial", "Post Free Property Ad"],
   quickCtas: [
     { label: "Explore Properties", linkType: "page", linkValue: "search" },
