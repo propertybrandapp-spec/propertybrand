@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../lib/AuthContext";
 import { createListing, LANDMARK_CATEGORIES } from "../lib/listings";
-import { uploadToR2, validateImageFile, computeImageHash, hammingDistance, looksLikeScreenshot, getImageDimensions } from "../lib/r2Upload";
+import { uploadToR2, validateImageFile, validateDocumentFile, computeImageHash, hammingDistance, looksLikeScreenshot, getImageDimensions } from "../lib/r2Upload";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
 import LocationPicker, { reverseGeocode } from "./LocationPicker";
 import AuthModal from "./AuthModal";
@@ -343,6 +343,23 @@ export default function PostProperty({ onNavigate }) {
     setPosterPhotoUploading(false);
     if (error) { setPosterPhotoError(error); return; }
     set("posterPhotoUrl", url);
+  }
+
+  // ── Section 2G: brochure upload (PDF or image, straight to R2) ──
+  const [brochureUploading, setBrochureUploading] = useState(false);
+  const [brochureUploadError, setBrochureUploadError] = useState("");
+  async function handleBrochureFileSelected(e) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const validationError = validateDocumentFile(file);
+    if (validationError) { setBrochureUploadError(validationError); return; }
+    setBrochureUploadError("");
+    setBrochureUploading(true);
+    const { url, error } = await uploadToR2(file, "documents");
+    setBrochureUploading(false);
+    if (error) { setBrochureUploadError(error); return; }
+    set("brochureUrl", url);
   }
 
   async function handleFilesSelected(e) {
@@ -1235,8 +1252,15 @@ export default function PostProperty({ onNavigate }) {
             <Field label="Floor Plan Caption">
               <TextInput value={form.floorPlanCaption} onChange={(e) => set("floorPlanCaption", e.target.value)} placeholder="e.g. 3BHK · 1450 sqft, with dimensions" />
             </Field>
-            <Field label="Brochure Link" hint="A link to a PDF brochure or spec sheet for this property. Shows as a Download Brochure button on the listing.">
-              <TextInput value={form.brochureUrl} onChange={(e) => set("brochureUrl", e.target.value)} placeholder="https://..." />
+            <Field label="Brochure" hint="Upload a PDF, or paste a link to one. Shows as a Download Brochure button on the listing.">
+              <div className="flex items-center gap-3 flex-wrap">
+                <TextInput value={form.brochureUrl} onChange={(e) => set("brochureUrl", e.target.value)} placeholder="https://... (or upload →)" />
+                <label className="text-xs font-bold px-3 py-2.5 rounded-lg cursor-pointer shrink-0" style={{ background: "#F1F5F9", color: "#1F2937" }}>
+                  {brochureUploading ? "Uploading…" : "Upload PDF"}
+                  <input type="file" accept="application/pdf,image/*" className="hidden" onChange={handleBrochureFileSelected} disabled={brochureUploading} />
+                </label>
+              </div>
+              {brochureUploadError && <p className="text-xs font-semibold mt-1.5" style={{ color: "#DC2626" }}>{brochureUploadError}</p>}
             </Field>
           </div>
 
