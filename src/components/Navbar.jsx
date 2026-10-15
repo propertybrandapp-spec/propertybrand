@@ -368,7 +368,11 @@ export default function Navbar({ onNavigate }) {
 
   function handleMouseEnter(label) { clearTimeout(timeoutRef.current); setActiveDropdown(label); setCityOpen(false); }
   function handleMouseLeave() { timeoutRef.current = setTimeout(() => setActiveDropdown(null), 120); }
-  function handleCitySelect(city) { setSelectedCity(city); setCityOpen(false); }
+  function handleCitySelect(city) {
+    setSelectedCity(city);
+    setCityOpen(false);
+    onNavigate && onNavigate("search", { location: city });
+  }
 
   return (
     <header ref={navRef} className="sticky top-0 z-50">

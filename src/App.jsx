@@ -30,6 +30,7 @@ import Sitemap from "./components/Sitemap";
 import PostProperty from "./components/PostProperty";
 import MyProperties from "./components/MyProperties";
 import ArchitectsDesign from "./components/ArchitectsDesign";
+import AdvertisementBanner from "./components/AdvertisementBanner";
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"
@@ -83,6 +84,7 @@ function AppContent() {
           <>
             <Hero onNavigate={navigate} />
             <PopularProperties onNavigate={navigate} />
+            <AdvertisementBanner onNavigate={navigate} />
             <PreferredAgents onNavigate={navigate} />
             <InvestmentAdvisory onNavigate={navigate} />
             <PropertyManagement onNavigate={navigate} />

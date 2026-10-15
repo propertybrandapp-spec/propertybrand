@@ -1139,8 +1139,8 @@ export default function PostProperty({ onNavigate }) {
           </div>
 
           <div className="rounded-2xl p-6 space-y-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-            <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Videos</h2>
-            <p className="text-xs" style={{ color: "#6B7280" }}>Paste a link to a walkthrough video (YouTube, Vimeo, etc.) — optional.</p>
+            <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Videos (Location Video &amp; Walkthrough)</h2>
+            <p className="text-xs" style={{ color: "#6B7280" }}>Paste links to location/neighborhood video tours or walkthrough videos (YouTube, Vimeo) — optional.</p>
             <div className="flex flex-wrap gap-2">
               {form.videoUrls.map((url) => (
                 <span key={url} className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ background: "#F1F5F9", color: "#1F2937" }}>

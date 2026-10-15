@@ -397,11 +397,17 @@ export default function PopularProperties({ onNavigate }) {
 
     <div className="flex flex-col sm:flex-row gap-3 shrink-0">
       
-      <button className="bg-[#1565C0] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#0D47A1] transition-all duration-300 shadow-md hover:shadow-lg">
+      <button
+        onClick={() => onNavigate && onNavigate("contact", "visit")}
+        className="bg-[#1565C0] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#0D47A1] transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer"
+      >
         Schedule Site Visit
       </button>
 
-      <button className="bg-white border border-slate-300 text-[#1F2937] text-sm font-semibold px-6 py-3 rounded-xl hover:border-[#1565C0] hover:text-[#1565C0] transition-all duration-300">
+      <button
+        onClick={() => onNavigate && onNavigate("contact", "expert")}
+        className="bg-white border border-slate-300 text-[#1F2937] text-sm font-semibold px-6 py-3 rounded-xl hover:border-[#1565C0] hover:text-[#1565C0] transition-all duration-300 cursor-pointer"
+      >
         Talk to Expert
       </button>
 

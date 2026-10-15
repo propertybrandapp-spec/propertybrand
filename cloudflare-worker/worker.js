@@ -166,7 +166,8 @@ function corsHeaders(request, env) {
   const allowList = configured.split(",").map((o) => o.trim()).filter(Boolean);
   const requestOrigin = request.headers.get("Origin") || "";
 
-  const allowOrigin = allowList.includes(requestOrigin)
+  const isLocal = requestOrigin.startsWith("http://localhost:") || requestOrigin.startsWith("http://127.0.0.1:");
+  const allowOrigin = (isLocal || allowList.includes(requestOrigin))
     ? requestOrigin
     : (allowList[0] || "*");
 

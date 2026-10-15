@@ -190,3 +190,69 @@ export async function fetchOfficeLocations() {
   if (error) return { data: [], error };
   return { data: (data || []).map(normalizeOfficeLocation), error: null };
 }
+
+// ── Advertisement Banners ──────────────────────────────────────────────────
+const LOCAL_BANNERS_KEY = "propertybrands_ad_banners";
+
+export const DEFAULT_AD_BANNERS = [
+  {
+    id: "banner-1",
+    title: "Exclusive Launch: Luxury Golf Penthouses & Apartments",
+    subtitle: "Direct booking discounts up to ₹5,00,000 + 0% processing fee on partner bank loans.",
+    badge: "Featured Developer",
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&auto=format&fit=crop&q=80",
+    cta: "Explore Featured Deals",
+    linkType: "page",
+    linkValue: "search",
+    placement: "home",
+    active: true,
+    order: 1,
+  },
+  {
+    id: "banner-2",
+    title: "Advertise Your Real Estate Project on PropertyBrands",
+    subtitle: "Get featured in front of 50,000+ verified home buyers and serious investors every month.",
+    badge: "Partner Spotlight",
+    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&auto=format&fit=crop&q=80",
+    cta: "Partner with Us",
+    linkType: "page",
+    linkValue: "channel-partner",
+    placement: "search",
+    active: true,
+    order: 2,
+  },
+];
+
+function normalizeBanner(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    subtitle: row.subtitle || "",
+    badge: row.badge || "Sponsored",
+    image: row.image_url || "",
+    cta: row.cta_label || "Explore Now",
+    linkType: row.link_type || "page",
+    linkValue: row.link_value || "search",
+    placement: row.placement || "home",
+    active: row.is_active !== false,
+    order: row.display_order || 0,
+  };
+}
+
+export async function fetchBanners(placement = "home") {
+  const { data, error } = await safeQuery(
+    supabase.from("advertisement_banners").select("*").eq("is_active", true).order("display_order", { ascending: true })
+  );
+  if (!error && data && data.length > 0) {
+    const list = data.map(normalizeBanner).filter((b) => b.placement === placement || b.placement === "all");
+    if (list.length > 0) return { data: list, error: null };
+  }
+  const local = typeof window !== "undefined" ? localStorage.getItem(LOCAL_BANNERS_KEY) : null;
+  if (local) {
+    try {
+      const parsed = JSON.parse(local).filter((b) => (b.placement === placement || b.placement === "all") && b.active);
+      if (parsed.length > 0) return { data: parsed, error: null };
+    } catch {}
+  }
+  return { data: DEFAULT_AD_BANNERS.filter((b) => b.placement === placement || b.placement === "all"), error: null };
+}

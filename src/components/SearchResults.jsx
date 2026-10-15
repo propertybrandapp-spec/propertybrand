@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { fetchPublicListings } from "../lib/listings";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { useCompare } from "../lib/CompareContext";
 import QuickViewModal from "./QuickViewModal";
+import AdvertisementBanner from "./AdvertisementBanner";
 
 // Fallback defaults for the filter sidebar — kept in sync with "Site
 // Content" → Listing Options in the admin console (see the fetch below).
@@ -432,6 +433,11 @@ export default function SearchResults({ initialFilters, onNavigate }) {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filters, setFilters] = useState(() => buildFilters(initialFilters));
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters(buildFilters(initialFilters));
+    }
+  }, [initialFilters]);
   const [listings, setListings] = useState(null); // null = still loading, [] = loaded but empty
   const [loadError, setLoadError] = useState("");
   const [fieldOptions, setFieldOptions] = useState(null);
@@ -476,11 +482,22 @@ export default function SearchResults({ initialFilters, onNavigate }) {
     if (filters.types.length && !filters.types.includes(p.type)) return false;
     if (filters.bhk.length && !filters.bhk.some(b => p.bhk.includes(b))) return false;
     if (filters.possession.length && !filters.possession.includes(p.status)) return false;
-    if (filters.postedBy.length && !filters.postedBy.includes(p.postedBy)) return false;
+    if (filters.postedBy?.length && !filters.postedBy.includes(p.postedBy)) return false;
     if (filters.verifiedOnly && !p.verified) return false;
-    if (filters.amenities.length && !filters.amenities.some(a => p.amenities.includes(a))) return false;
-    if (filters.tags.length && !filters.tags.some(t => p.tags.includes(t))) return false;
-    if (filters.location.trim() && !(p.location || "").toLowerCase().includes(filters.location.trim().toLowerCase())) return false;
+    if (filters.amenities?.length && !filters.amenities.some(a => (p.amenities || []).includes(a))) return false;
+    if (filters.tags?.length && !filters.tags.some(t => (p.tags || []).includes(t))) return false;
+    if (filters.location.trim()) {
+      const q = filters.location.trim().toLowerCase();
+      const match = [
+        p.location,
+        p.city,
+        p.locality,
+        p.projectName,
+        p.landmark,
+        p.title,
+      ].some((val) => typeof val === "string" && val.toLowerCase().includes(q));
+      if (!match) return false;
+    }
     return true;
   });
 
@@ -685,21 +702,64 @@ export default function SearchResults({ initialFilters, onNavigate }) {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
                   </svg>
                 </span>
-                <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>No properties found</p>
-                <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Try adjusting your filters</p>
-                <button onClick={resetFilters}
-                  className="px-5 py-2.5 rounded-xl text-sm font-bold"
-                  style={{ background: "#1565C0", color: "#FFFFFF" }}>
-                  Reset Filters
-                </button>
+                <p className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>
+                  {filters.location.trim() ? `No properties found in "${filters.location.trim()}"` : "No properties match your filters"}
+                </p>
+                <p className="text-sm mb-4 max-w-md" style={{ color: "#6B7280" }}>
+                  {filters.location.trim()
+                    ? "Currently, our featured properties are in Bhubaneswar and Odisha. Explore all listings or clear your location search."
+                    : "Try adjusting your budget, BHK, or other filter criteria."}
+                </p>
+                <div className="flex flex-wrap gap-2.5 justify-center">
+                  {filters.location.trim() && (
+                    <button onClick={() => setFilters(f => ({ ...f, location: "" }))}
+                      className="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer"
+                      style={{ background: "#1565C0", color: "#FFFFFF" }}>
+                      Clear Location ({filters.location.trim()})
+                    </button>
+                  )}
+                  <button onClick={resetFilters}
+                    className="px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer"
+                    style={{ background: "#F1F5F9", color: "#1F2937", border: "1px solid #E2E8F0" }}>
+                    Reset All Filters
+                  </button>
+                </div>
               </div>
             ) : viewMode === "list" ? (
               <div className="space-y-4">
-                {sorted.map(p => <PropertyCardList key={p.id} property={p} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />)}
+                {sorted.map((p, idx) => (
+                  <React.Fragment key={p.id}>
+                    <PropertyCardList property={p} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
+                    {idx === 2 && (
+                      <div className="my-6">
+                        <AdvertisementBanner placement="search" onNavigate={onNavigate} />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+                {sorted.length < 3 && (
+                  <div className="my-6">
+                    <AdvertisementBanner placement="search" onNavigate={onNavigate} />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {sorted.map(p => <PropertyCardGrid key={p.id} property={p} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />)}
+                {sorted.map((p, idx) => (
+                  <React.Fragment key={p.id}>
+                    <PropertyCardGrid property={p} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
+                    {idx === 3 && (
+                      <div className="col-span-full my-4">
+                        <AdvertisementBanner placement="search" onNavigate={onNavigate} />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+                {sorted.length < 4 && (
+                  <div className="col-span-full my-4">
+                    <AdvertisementBanner placement="search" onNavigate={onNavigate} />
+                  </div>
+                )}
               </div>
             )}
 

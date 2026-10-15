@@ -230,6 +230,7 @@ export default function Hero({ onNavigate }) {
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
                     placeholder="Search locality, city, project..."
                     className="flex-1 text-sm text-[#1F2937] placeholder-[#6B7280] bg-transparent focus:outline-none min-w-0"
                   />
@@ -359,11 +360,6 @@ export default function Hero({ onNavigate }) {
                         {content.promoCtaLabel}
                       </button>
                     )}
-                    <div className="flex justify-center gap-1.5 mt-3">
-                      {[0, 1, 2].map((i) => (
-                        <span key={i} className={`block w-1.5 h-1.5 rounded-full ${i === 1 ? "bg-[#1565C0]" : "bg-[#E2E8F0]"}`} />
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>

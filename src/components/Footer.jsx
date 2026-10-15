@@ -503,10 +503,19 @@ export default function Footer({ onNavigate }) {
   <h4 className="font-bold text-[#1F2937] mb-4">Contact</h4>
 
   <div className="space-y-3 text-sm text-slate-600">
-    <p>{info.phone}</p>
-    <p>{info.email}</p>
-    <p>{info.website}</p>
-    <p>{info.address}</p>
+    <a href={`tel:${info.phone.replace(/[^\d+]/g, "")}`} className="block hover:text-[#1565C0] transition font-medium">
+      {info.phone}
+    </a>
+    <a href={`https://wa.me/${info.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="block hover:text-green-600 transition font-medium">
+      WhatsApp: {info.whatsapp}
+    </a>
+    <a href={`mailto:${info.email}`} className="block hover:text-[#1565C0] transition">
+      {info.email}
+    </a>
+    <a href={`https://${info.website.replace(/^https?:\/\//, "")}`} target="_blank" rel="noopener noreferrer" className="block hover:text-[#1565C0] transition">
+      {info.website}
+    </a>
+    <p className="text-xs text-slate-500 leading-relaxed">{info.address}</p>
   </div>
 </div>
           

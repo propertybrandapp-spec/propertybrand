@@ -36,30 +36,69 @@ function approximateOffset(lat, lng, seed) {
 // only ever had a plain Google Maps link, or ones nobody's set a pin for),
 // or if the listing's address visibility is set to "Locality Only" — callers
 // should show a text-only locality/city note in that case instead of a map.
-export default function LocationMap({ latitude, longitude, label, className = "", addressVisibility = "Exact Address", listingId = "" }) {
-  if (latitude == null || longitude == null) return null;
+export default function LocationMap({
+  latitude,
+  longitude,
+  label,
+  locationQuery = "",
+  className = "",
+  addressVisibility = "Exact Address",
+  listingId = ""
+}) {
   if (addressVisibility === "Locality Only") return null;
 
+  const hasCoords = latitude != null && longitude != null;
   const isApproximate = addressVisibility === "Approximate Location";
-  const position = isApproximate ? approximateOffset(latitude, longitude, listingId) : [latitude, longitude];
+
+  // Compute position or query for Google Maps embed
+  let embedUrl = "";
+  let externalMapUrl = "";
+
+  if (hasCoords) {
+    const position = isApproximate ? approximateOffset(latitude, longitude, listingId) : [latitude, longitude];
+    embedUrl = `https://maps.google.com/maps?q=${position[0]},${position[1]}&hl=en&z=${isApproximate ? 14 : 16}&output=embed`;
+    externalMapUrl = `https://www.google.com/maps/search/?api=1&query=${position[0]},${position[1]}`;
+  } else {
+    const query = locationQuery || label;
+    if (query) {
+      embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&hl=en&z=15&output=embed`;
+      externalMapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+  }
+
+  if (!embedUrl) return null;
 
   return (
-    <div className={`rounded-2xl overflow-hidden ${className}`} style={{ border: "1px solid #E2E8F0", height: 280 }}>
-      <MapContainer center={position} zoom={isApproximate ? 14 : 15} scrollWheelZoom={false} style={{ width: "100%", height: "100%" }}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {isApproximate ? (
-          <Circle center={position} radius={350} pathOptions={{ color: "#1565C0", fillColor: "#1565C0", fillOpacity: 0.15 }}>
-            <Popup>Approximate area — exact address shared after inquiry</Popup>
-          </Circle>
-        ) : (
-          <Marker position={position} icon={pinIcon("#1565C0")}>
-            {label && <Popup>{label}</Popup>}
-          </Marker>
-        )}
-      </MapContainer>
+    <div className={`rounded-2xl overflow-hidden relative group ${className}`} style={{ border: "1px solid #E2E8F0", height: 280 }}>
+      <iframe
+        title="Google Map Location"
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        loading="lazy"
+        allowFullScreen
+        referrerPolicy="no-referrer-when-downgrade"
+        src={embedUrl}
+      />
+      {externalMapUrl && (
+        <a
+          href={externalMapUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg shadow-md transition hover:opacity-95"
+          style={{ background: "#FFFFFF", color: "#1565C0", border: "1px solid #E2E8F0" }}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Open in Google Maps
+        </a>
+      )}
+      {isApproximate && (
+        <div className="absolute top-3 left-3 z-10 text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-sm" style={{ background: "rgba(255,255,255,0.95)", color: "#475569" }}>
+          Approximate Area
+        </div>
+      )}
     </div>
   );
 }
