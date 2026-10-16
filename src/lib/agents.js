@@ -74,7 +74,7 @@ export async function deleteAgent(id) {
 // Used by the public "Become a Channel Partner" form (ChannelPartner.jsx).
 // RLS only allows inserting with status='Pending' — applicants can never
 // self-approve.
-export async function submitPartnerApplication({ name, phone, email, city, experience, reraNumber }) {
+export async function submitPartnerApplication({ name, phone, email, city, experience, reraNumber, tier }) {
   const { error } = await safeQuery(
     supabase.from("agents").insert({
       name,
@@ -83,7 +83,7 @@ export async function submitPartnerApplication({ name, phone, email, city, exper
       city: city || null,
       experience: experience || null,
       rera_number: reraNumber || null,
-      tier: "Associate",
+      tier: tier || "Associate",
       status: "Pending",
       member_since: new Date().getFullYear().toString(),
     })

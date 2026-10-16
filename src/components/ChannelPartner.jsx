@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { submitPartnerApplication } from "../lib/agents";
 import { fetchPartnerTiers } from "../lib/siteContent";
+import { submitLead } from "../lib/leads";
 import { Package, BarChart3, Smartphone, GraduationCap, MessageCircle, DollarSign } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -117,7 +118,7 @@ const STEPS = [
 ];
 
 // ── Tier Card ─────────────────────────────────────────────────────────────────
-function TierCard({ tier }) {
+function TierCard({ tier, onSelectTier }) {
   return (
     <div
       className="relative rounded-2xl p-6 flex flex-col transition-transform duration-200 hover:-translate-y-1"
@@ -129,7 +130,7 @@ function TierCard({ tier }) {
     >
       {tier.popular && (
         <div
-          className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[11px] font-bold px-4 py-1 rounded-full"
+          className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[11px] font-bold px-4 py-1 rounded-full whitespace-nowrap"
           style={{ background: "#1565C0", color: "#FFFFFF" }}
         >
           Most Popular
@@ -165,7 +166,8 @@ function TierCard({ tier }) {
       </ul>
 
       <button
-        className="w-full py-2.5 rounded-xl text-sm font-bold transition-all"
+        onClick={() => onSelectTier && onSelectTier(tier)}
+        className="w-full py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer"
         style={{
           background: tier.popular ? "#1565C0" : "transparent",
           color: tier.popular ? "#FFFFFF" : tier.color,
@@ -181,49 +183,71 @@ function TierCard({ tier }) {
 }
 
 // ── Registration Form ─────────────────────────────────────────────────────────
-function PartnerForm({ onNavigate }) {
+function PartnerForm({ onNavigate, selectedTier, onClearTier }) {
   const [form, setForm] = useState({ name: "", phone: "", email: "", city: "", rera: "", experience: "" });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSubmit() {
-    if (!(form.name && form.phone && form.email)) return;
-    setSubmitting(true);
-    setError("");
-    const { error } = await submitPartnerApplication({
-      name: form.name,
-      phone: form.phone,
-      email: form.email,
-      city: form.city,
-      experience: form.experience,
-      reraNumber: form.rera,
-    });
-    setSubmitting(false);
-    if (error) {
-      setError("Something went wrong submitting your application. Please try again.");
+    if (!(form.name && form.phone && form.email)) {
+      setError("Please fill in your name, phone number, and email.");
       return;
     }
-    setSubmitted(true);
+    setSubmitting(true);
+    setError("");
+
+    try {
+      await submitPartnerApplication({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        city: form.city,
+        experience: form.experience,
+        reraNumber: form.rera,
+        tier: selectedTier?.name || "Associate",
+      });
+      await submitLead({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        city: form.city || "Bhubaneswar",
+        source: "channel-partner",
+        interest: `[CHANNEL PARTNER] Tier: ${selectedTier?.name || "Associate"} (${selectedTier?.commission || "1.5%"} commission) | Exp: ${form.experience || "N/A"} | RERA: ${form.rera || "N/A"} | City: ${form.city || "N/A"}`,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message || "Something went wrong submitting your application. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (submitted) {
     return (
       <div className="flex flex-col items-center justify-center py-14 text-center">
-        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: "#EFF6FF" }}>
-          <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" style={{ color: "#1565C0" }}>
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-emerald-100 text-emerald-600">
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <p className="font-bold text-lg mb-1" style={{ color: "#1F2937" }}>Application Submitted!</p>
-        <p className="text-sm" style={{ color: "#6B7280" }}>Our partner team will contact you within 24 hours.</p>
-        <button onClick={() => setSubmitted(false)} className="mt-5 text-xs underline" style={{ color: "#1565C0" }}>Submit another</button>
+        <p className="font-bold text-lg mb-1" style={{ color: "#1F2937" }}>
+          Application Submitted for {selectedTier ? `${selectedTier.name} Tier` : "Partner Program"}!
+        </p>
+        <p className="text-sm" style={{ color: "#6B7280" }}>Our partner desk will contact you at {form.phone} within 24 hours.</p>
+        <button onClick={() => setSubmitted(false)} className="mt-5 text-xs underline cursor-pointer" style={{ color: "#1565C0" }}>Submit another application</button>
       </div>
     );
   }
 
   return (
     <div className="space-y-3">
+      {selectedTier && (
+        <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-blue-50 border border-blue-200 text-xs mb-3 text-blue-900">
+          <span>Targeting: <strong>{selectedTier.name} Tier</strong> ({selectedTier.commission} commission)</span>
+          <button type="button" onClick={onClearTier} className="text-gray-400 hover:text-red-600 font-bold ml-2">✕</button>
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-3">
         {[
           { key: "name", placeholder: "Full Name *", type: "text" },
@@ -292,6 +316,7 @@ function PartnerForm({ onNavigate }) {
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function ChannelPartner({ onNavigate }) {
   const [tiers, setTiers] = useState(null); // null = loading
+  const [selectedTier, setSelectedTier] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -302,6 +327,11 @@ export default function ChannelPartner({ onNavigate }) {
   }, []);
 
   const TIERS = tiers || DEMO_TIERS;
+
+  function handleSelectTier(tier) {
+    setSelectedTier(tier);
+    document.getElementById("partner-application-form")?.scrollIntoView({ behavior: "smooth" });
+  }
 
   return (
     <section style={{ background: "#FFFFFF" }} className="py-12 px-4">
@@ -338,16 +368,22 @@ export default function ChannelPartner({ onNavigate }) {
             </div>
 
             <div className="flex flex-wrap justify-center gap-3">
-              <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
+              <button
+                onClick={() => document.getElementById("partner-application-form")?.scrollIntoView({ behavior: "smooth" })}
+                className="px-7 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer"
                 style={{ background: "#1565C0", color: "#FFFFFF" }}
                 onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
-                onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
+                onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}
+              >
                 Become a Partner
               </button>
-              <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
+              <button
+                onClick={() => document.getElementById("partner-tiers")?.scrollIntoView({ behavior: "smooth" })}
+                className="px-7 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer"
                 style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
                 onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}
+              >
                 Learn More
               </button>
             </div>
@@ -384,14 +420,16 @@ export default function ChannelPartner({ onNavigate }) {
         </div>
 
         {/* ── Tier Cards ── */}
-        <div>
+        <div id="partner-tiers">
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-bold" style={{ color: "#1F2937" }}>Partner Tiers</h2>
             <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1565C0" }} />
             <p className="text-sm mt-2" style={{ color: "#6B7280" }}>Progress through tiers as you close more deals</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TIERS.map((tier) => <TierCard key={tier.name} tier={tier} />)}
+            {TIERS.map((tier) => (
+              <TierCard key={tier.name} tier={tier} onSelectTier={handleSelectTier} />
+            ))}
           </div>
         </div>
 
@@ -420,7 +458,7 @@ export default function ChannelPartner({ onNavigate }) {
         {/* ── Registration Form + CTA ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left – form */}
-          <div className="rounded-2xl p-8" style={{ background: "#FFFFFF", border: "1px solid #1565C0" }}>
+          <div id="partner-application-form" className="rounded-2xl p-8" style={{ background: "#FFFFFF", border: "1.5px solid #1565C0" }}>
             <span className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: "#1565C0" }}>
               Join Now
             </span>
@@ -428,7 +466,7 @@ export default function ChannelPartner({ onNavigate }) {
             <p className="text-sm mb-6" style={{ color: "#6B7280" }}>
               Fill in your details and our team will onboard you within 24 hours.
             </p>
-            <PartnerForm onNavigate={onNavigate} />
+            <PartnerForm onNavigate={onNavigate} selectedTier={selectedTier} onClearTier={() => setSelectedTier(null)} />
           </div>
 
           {/* Right – testimonial + perks highlight */}

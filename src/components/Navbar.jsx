@@ -2,201 +2,184 @@ import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { useAuth } from "../lib/AuthContext";
 import AuthModal from "./AuthModal";
 import ClientAccountMenu from "./ClientAccountMenu";
+import SelectMembershipModal from "./SelectMembershipModal";
+import BookExpertModal from "./BookExpertModal";
 
 const CITIES = [
-  "Bhubaneswar", "Delhi", "Mumbai", "Bangalore", "Hyderabad",
+  "Bhubaneswar", "Delhi NCR", "Mumbai", "Bangalore", "Hyderabad",
   "Chennai", "Pune", "Kolkata", "Ahmedabad", "Jaipur",
 ];
 
-// ── NAV URL MAP ───────────────────────────────────────────────────────────────
-// Paste real URLs/page-ids here for each nav destination. To point any link
-// elsewhere, just change the value on the right — no need to touch markup below.
-const NAV_URL_MAP = {
-  // Buy Property (per spec: Residential / Commercial / Plotted Developments)
-  readyToMove: "search",
-  underConstruction: "search",
-  luxuryApartments: "search",
-  affordableHousing: "search",
-  gatedCommunities: "search",
-  villasRowHouses: "search",
-  residentialPlots: "search",
-  officeSpaces: "search",
-  retailSpaces: "search",
-  industrialProperties: "search",
-
-  // Rent Property (per spec: Rental Services)
-  rentApartments: "search",
-  rentVillas: "search",
-  rentOfficeSpaces: "search",
-  rentShops: "search",
-  coLivingSpaces: "search",
-  studentAccommodation: "search",
-
-  // Investment Advisory (per spec)
-  highGrowthCorridors: "investment-advisory",
-  rentalYieldOpportunities: "investment-advisory",
-  commercialInvestments: "investment-advisory",
-  landBanking: "investment-advisory",
-  retirementHomes: "investment-advisory",
-  nriInvestments: "investment-advisory",
-  roiCalculator: "investment-advisory",
-  rentalYieldCalculator: "investment-advisory",
-
-  // Home Loan Assistance (per spec)
-  emiCalculator: "investment-advisory",
-  eligibilityCheck: "investment-advisory",
-  loanComparison: "investment-advisory",
-
-  // Architects & Interior Design (per spec)
-  housePlanning: "architects-design",
-  residentialDesign: "architects-design",
-  modularKitchen: "architects-design",
-  interiorPackages: "architects-design",
-
-  // Property Management (per spec)
-  tenantManagement: "property-management",
-  rentCollection: "property-management",
-  maintenanceCoordination: "property-management",
-
-  // Help (per spec: FAQ + Contact)
-  howToBuy: "faq",
-  howToRent: "faq",
-  howToApplyLoan: "faq",
-  whatIsRera: "faq",
-  howToCalculateEmi: "faq",
-  howToRentProperty: "faq",
-  blog: "blog",
-  contact: "contact",
-};
-
+// ── REDESIGNED 6-PILLAR MASTER NAVIGATION ────────────────────────────────────
+// As specified in the Discover Website blueprint:
+// 1. Discover: Buy, rent, sell and lease every type of property.
+// 2. Invest: REITs, income-generating assets, shared ownership and land opportunities.
+// 3. Land & Develop: Land acquisition, feasibility, due diligence, construction and JDA.
+// 4. Legal & Finance: Documentation, agreements, professional verification and loans.
+// 5. Build & Move: Architecture, interiors, materials, logistics and relocation.
+// 6. Own & Manage: Property management, rentals, maintenance and resale.
 const NAV_ITEMS = [
   {
-    label: "Buy",
+    label: "Discover",
+    tagline: "Buy · Rent · Sell · Lease",
     columns: [
       {
-        heading: "Residential Properties",
+        heading: "Buy Properties",
         links: [
-          { label: "Ready-to-Move Apartments", page: NAV_URL_MAP.readyToMove, filters: { transactionType: "Buy", types: ["Apartment"], possession: ["Ready to Move"] } },
-          { label: "Under Construction Projects", page: NAV_URL_MAP.underConstruction, filters: { transactionType: "Buy", possession: ["Under Construction"] } },
-          { label: "Luxury Apartments", page: NAV_URL_MAP.luxuryApartments, filters: { transactionType: "Buy", types: ["Apartment"], tags: ["Luxury"] } },
-          { label: "Affordable Housing", page: NAV_URL_MAP.affordableHousing, filters: { transactionType: "Buy", tags: ["Affordable"] } },
-          { label: "Gated Communities", page: NAV_URL_MAP.gatedCommunities, filters: { transactionType: "Buy", tags: ["Gated Community"] } },
-          { label: "Villas & Row Houses", page: NAV_URL_MAP.villasRowHouses, filters: { transactionType: "Buy", types: ["Villa"] } },
-          { label: "Residential Plots", page: NAV_URL_MAP.residentialPlots, filters: { transactionType: "Buy", types: ["Plot"] } },
+          { label: "Residential Apartments & Villas", page: "search", filters: { transactionType: "Buy", types: ["Apartment", "Villa"] } },
+          { label: "Luxury & Gated Communities", page: "search", filters: { transactionType: "Buy", tags: ["Luxury", "Gated Community"] } },
+          { label: "Commercial Offices & Retail", page: "search", filters: { transactionType: "Buy", types: ["Commercial", "Office Space", "Shop / Showroom"] } },
+          { label: "Industrial & Logistics Sheds", page: "search", filters: { transactionType: "Buy", types: ["Warehouse / Industrial Shed"] } },
+          { label: "Residential & Commercial Plots", page: "search", filters: { transactionType: "Buy", types: ["Plot"] } },
+          { label: "All Properties for Sale", page: "search", filters: { transactionType: "Buy" } },
         ],
       },
       {
-        heading: "Commercial Properties",
+        heading: "Rent & Lease",
         links: [
-          { label: "Office Spaces", page: NAV_URL_MAP.officeSpaces, filters: { transactionType: "Buy", types: ["Commercial"], tags: ["Office"] } },
-          { label: "Retail Spaces", page: NAV_URL_MAP.retailSpaces, filters: { transactionType: "Buy", types: ["Commercial"], tags: ["Retail"] } },
-          { label: "Industrial Properties", page: NAV_URL_MAP.industrialProperties, filters: { transactionType: "Buy", types: ["Commercial"], tags: ["Industrial"] } },
+          { label: "Apartments & Independent Homes", page: "search", filters: { transactionType: "Rent", types: ["Apartment", "Independent House"] } },
+          { label: "Commercial Offices & Retail", page: "search", filters: { transactionType: "Rent", types: ["Commercial", "Office Space", "Shop / Showroom"] } },
+          { label: "Co-Living & Student Housing", page: "search", filters: { transactionType: "Rent", tags: ["Co-living", "Student Accommodation"] } },
+          { label: "Warehouses & Storage Facilities", page: "search", filters: { transactionType: "Rent", types: ["Warehouse / Industrial Shed"] } },
+          { label: "RentReady™ Digital Agreement", page: "rent-ready" },
+          { label: "All Rental Properties", page: "search", filters: { transactionType: "Rent" } },
+        ],
+      },
+      {
+        heading: "Direct Portals",
+        links: [
+          { label: "Post Property (100% Free)", page: "post-property" },
+          { label: "Channel Partner Network", page: "channel-partner" },
+          { label: "Preferred Agents Directory", page: "agents" },
+          { label: "Client Inquiries Dashboard", page: "inquiries" },
         ],
       },
     ],
   },
   {
-    label: "Rent",
+    label: "Invest",
+    tagline: "REITs · Shared · Income",
     columns: [
       {
-        heading: "Rental Properties",
+        heading: "Investment Opportunities",
         links: [
-          { label: "Apartments", page: NAV_URL_MAP.rentApartments, filters: { transactionType: "Rent", types: ["Apartment"] } },
-          { label: "Villas", page: NAV_URL_MAP.rentVillas, filters: { transactionType: "Rent", types: ["Villa"] } },
-          { label: "Office Spaces", page: NAV_URL_MAP.rentOfficeSpaces, filters: { transactionType: "Rent", types: ["Commercial"], tags: ["Office"] } },
-          { label: "Shops", page: NAV_URL_MAP.rentShops, filters: { transactionType: "Rent", types: ["Commercial"], tags: ["Retail"] } },
-          { label: "Co-living Spaces", page: NAV_URL_MAP.coLivingSpaces, filters: { transactionType: "Rent", tags: ["Co-living"] } },
-          { label: "Student Accommodation", page: NAV_URL_MAP.studentAccommodation, filters: { transactionType: "Rent", tags: ["Student Accommodation"] } },
+          { label: "High Growth Corridors", page: "investment-advisory", anchor: "high-growth-corridors" },
+          { label: "Rental Yield Opportunities", page: "investment-advisory", anchor: "rental-yield-opportunities" },
+          { label: "Commercial Pre-Leased Assets", page: "investment-advisory", anchor: "commercial-investments" },
+          { label: "Land Banking & Strategic Plots", page: "investment-advisory", anchor: "land-banking" },
+          { label: "Retirement & Senior Living Hub", page: "lifestyle" },
+          { label: "NRI Investment Advisory", page: "investment-advisory", anchor: "nri-investments" },
+        ],
+      },
+      {
+        heading: "Calculators & Advisory",
+        links: [
+          { label: "ROI & Cap Rate Calculator", page: "investment-advisory", anchor: "roi-calculator" },
+          { label: "Rental Yield Calculator", page: "investment-advisory", anchor: "rental-yield-calculator" },
+          { label: "Book Investment Consultant", page: "modal:book-expert", consultTopic: "investment" },
+          { label: "Select Invest Membership", page: "modal:membership" },
         ],
       },
     ],
   },
   {
-    label: "Investment Advisory",
+    label: "Land & Develop",
+    tagline: "Buy · Verify · Build",
     columns: [
       {
-        heading: "Investment Options",
+        heading: "Land Opportunities",
         links: [
-          { label: "High Growth Corridors", page: NAV_URL_MAP.highGrowthCorridors, anchor: "high-growth-corridors" },
-          { label: "Rental Yield Opportunities", page: NAV_URL_MAP.rentalYieldOpportunities, anchor: "rental-yield-opportunities" },
-          { label: "Commercial Investments", page: NAV_URL_MAP.commercialInvestments, anchor: "commercial-investments" },
-          { label: "Land Banking Opportunities", page: NAV_URL_MAP.landBanking, anchor: "land-banking" },
-          { label: "Retirement Homes", page: NAV_URL_MAP.retirementHomes, anchor: "retirement-homes" },
-          { label: "NRI Investments", page: NAV_URL_MAP.nriInvestments, anchor: "nri-investments" },
+          { label: "Buy Residential & Commercial Plots", page: "search", filters: { transactionType: "Buy", types: ["Plot"] } },
+          { label: "Farmland & Agricultural Land", page: "search", filters: { transactionType: "Buy", types: ["Agricultural Land", "Farmhouse"] } },
+          { label: "Joint Development (JDA) Matching", page: "land-develop" },
+          { label: "List Land for Sale / JDA", page: "post-property" },
         ],
       },
       {
-        heading: "Investment Tools",
+        heading: "Verification & Development",
         links: [
-          { label: "ROI Calculator", page: NAV_URL_MAP.roiCalculator, anchor: "roi-calculator" },
-          { label: "Rental Yield Calculator", page: NAV_URL_MAP.rentalYieldCalculator, anchor: "rental-yield-calculator" },
+          { label: "Land Title & 30-Yr Encumbrance Check", page: "modal:book-expert", consultTopic: "legal" },
+          { label: "Zoning & Conversion Feasibility", page: "land-develop" },
+          { label: "Architects & Turnkey Builders", page: "modal:book-expert", consultTopic: "land" },
+          { label: "Land & Development Hub", page: "land-develop" },
         ],
       },
     ],
   },
   {
-    label: "Home Loans",
+    label: "Legal & Finance",
+    tagline: "Agreements · Loans · Checks",
     columns: [
       {
-        heading: "Home Loan Assistance",
+        heading: "Agreements & Contracts",
         links: [
-          { label: "EMI Calculator", page: NAV_URL_MAP.emiCalculator, anchor: "emi-calculator" },
-          { label: "Eligibility Check", page: NAV_URL_MAP.eligibilityCheck, anchor: "eligibility-check" },
-          { label: "Loan Comparison", page: NAV_URL_MAP.loanComparison, anchor: "loan-comparison" },
+          { label: "RentReady™ Digital Agreement", page: "rent-ready" },
+          { label: "Commercial Lease Agreements", page: "modal:book-expert", consultTopic: "legal" },
+          { label: "Sale Agreement & MOU Review", page: "contact", anchor: "legal" },
+        ],
+      },
+      {
+        heading: "Home Loans & Financing",
+        links: [
+          { label: "Home Loan Assistance", page: "investment-advisory", anchor: "emi-calculator" },
+          { label: "EMI Calculator", page: "investment-advisory", anchor: "emi-calculator" },
+          { label: "Loan Eligibility Check", page: "investment-advisory", anchor: "eligibility-check" },
+          { label: "Bank Rate Comparison", page: "investment-advisory", anchor: "loan-comparison" },
+        ],
+      },
+      {
+        heading: "Legal Due Diligence",
+        links: [
+          { label: "Title Verification & Search Report", page: "modal:book-expert", consultTopic: "legal" },
+          { label: "What is RERA? Guide & Checks", page: "faq", anchor: "what-is-rera" },
+          { label: "Property Snagging & Inspection", page: "build-move" },
         ],
       },
     ],
   },
   {
-    label: "Architects & Design",
+    label: "Build & Move",
+    tagline: "Design · Materials · Shifting",
     columns: [
       {
-        heading: "Architects & Design Consultation",
+        heading: "Architecture & Interiors",
         links: [
-          { label: "House Planning", page: NAV_URL_MAP.housePlanning, anchor: "house-planning" },
-          { label: "Residential Design", page: NAV_URL_MAP.residentialDesign, anchor: "residential-design" },
+          { label: "House Planning & Structural Vetting", page: "architects-design", anchor: "house-planning" },
+          { label: "Residential Design Consultation", page: "architects-design", anchor: "residential-design" },
+          { label: "Modular Kitchen Design", page: "architects-design", anchor: "modular-kitchen" },
+          { label: "Turnkey Interior Packages", page: "architects-design", anchor: "interior-packages" },
         ],
       },
       {
-        heading: "Interior Design Services",
+        heading: "Materials & Relocation",
         links: [
-          { label: "Modular Kitchen Design", page: NAV_URL_MAP.modularKitchen, anchor: "modular-kitchen" },
-          { label: "Interior Packages", page: NAV_URL_MAP.interiorPackages, anchor: "interior-packages" },
+          { label: "Building Materials Marketplace Connect", page: "build-move" },
+          { label: "Packers & Movers Shifting Quotes", page: "build-move" },
+          { label: "Pre-Possession Snagging & Inspection", page: "build-move" },
+          { label: "Move-In Deep Cleaning & Sanitization", page: "rent-ready" },
         ],
       },
     ],
   },
   {
-    label: "Property Management",
+    label: "Manage",
+    tagline: "Rentals · Maintenance · Resale",
     columns: [
       {
-        heading: "Complete Property Care",
+        heading: "Rental Management",
         links: [
-          { label: "Tenant Management", page: NAV_URL_MAP.tenantManagement, anchor: "tenant-management" },
-          { label: "Rent Collection", page: NAV_URL_MAP.rentCollection, anchor: "rent-collection" },
-          { label: "Maintenance Coordination", page: NAV_URL_MAP.maintenanceCoordination, anchor: "maintenance-coordination" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Help",
-    columns: [
-      {
-        heading: "FAQ",
-        links: [
-          { label: "How to Buy a Property", page: NAV_URL_MAP.howToBuy, anchor: "how-to-buy" },
-          { label: "How to Apply for a Home Loan", page: NAV_URL_MAP.howToApplyLoan, anchor: "how-to-apply-loan" },
-          { label: "What is RERA?", page: NAV_URL_MAP.whatIsRera, anchor: "what-is-rera" },
-          { label: "How to Calculate EMI", page: NAV_URL_MAP.howToCalculateEmi, anchor: "how-to-calculate-emi" },
-          { label: "How to Rent a Property", page: NAV_URL_MAP.howToRentProperty, anchor: "how-to-rent" },
+          { label: "Tenant Sourcing & Screening", page: "property-management", anchor: "tenant-management" },
+          { label: "Automated Rent Collection", page: "property-management", anchor: "rent-collection" },
+          { label: "Move-In & Move-Out Inspections", page: "rent-ready" },
         ],
       },
       {
-        heading: "Resources",
+        heading: "Property Care & Resale",
         links: [
-          { label: "Real Estate Blog", page: NAV_URL_MAP.blog },
-          { label: "Contact Us", page: NAV_URL_MAP.contact },
+          { label: "Maintenance & Repairs Coordination", page: "property-management", anchor: "maintenance-coordination" },
+          { label: "Remote Care for NRIs & Investors", page: "property-management" },
+          { label: "Property Valuation & Resale Assistance", page: "contact", anchor: "resale" },
+          { label: "Second Home & Farmhouse Care", page: "lifestyle" },
         ],
       },
     ],
@@ -211,21 +194,17 @@ function ChevronDown({ className = "" }) {
   );
 }
 
-function DropdownMenu({ item, isOpen, onNavigate, index }) {
+function DropdownMenu({ item, isOpen, onNavigate, onOpenModal }) {
   const panelRef = useRef(null);
   const [align, setAlign] = useState("left");
 
   useLayoutEffect(() => {
     if (!isOpen || !panelRef.current) return;
-    // Default to left-aligned, then measure against the viewport and flip to
-    // right-aligned only if it would actually overflow — this stays correct
-    // regardless of label length, font rendering, or viewport width, instead
-    // of guessing at pixel positions per nav item.
     setAlign("left");
     const raf = requestAnimationFrame(() => {
       if (!panelRef.current) return;
       const rect = panelRef.current.getBoundingClientRect();
-      if (rect.right > window.innerWidth - 12) {
+      if (rect.right > window.innerWidth - 16) {
         setAlign("right");
       }
     });
@@ -233,45 +212,46 @@ function DropdownMenu({ item, isOpen, onNavigate, index }) {
   }, [isOpen]);
 
   if (!isOpen || !item.columns) return null;
+
   return (
-<div
-  ref={panelRef}
-  className={`absolute top-full mt-0 z-50 min-w-max ${
-    align === "right" ? "right-0" : "left-0"
-  }`}
->
-        <div
-  className={`flex ${
-    index === 0
-      ? "justify-start pl-8"
-      : index === 1
-      ? "justify-start pl-9"
-      : align === "right"
-      ? "justify-end pr-8"
-      : "justify-start pl-8"
-  }`}
->
-        <div className="w-3 h-3 rotate-45 -mb-1.5 z-10 relative border-l border-t" style={{ background: "#FFFFFF", borderColor: "#1565C0" }} />
+    <div
+      ref={panelRef}
+      className={`absolute top-full mt-1 z-50 min-w-max shadow-2xl rounded-2xl overflow-hidden border border-blue-100 bg-white animate-fade-in ${
+        align === "right" ? "right-0" : "left-0"
+      }`}
+    >
+      <div className="flex gap-0 divide-x divide-gray-100 p-2">
+        {item.columns.map((col) => (
+          <div key={col.heading} className="px-5 py-4 min-w-[200px]">
+            <p className="text-[11px] font-bold uppercase tracking-wider mb-2.5 text-blue-900">
+              {col.heading}
+            </p>
+            <ul className="space-y-1">
+              {col.links.map((link) => (
+                <li key={link.label}>
+                  <button
+                    onClick={() => {
+                      if (link.page === "modal:membership") {
+                        onOpenModal("membership");
+                      } else if (link.page === "modal:book-expert") {
+                        onOpenModal("expert", link.consultTopic);
+                      } else if (onNavigate) {
+                        onNavigate(link.page, link.filters || link.anchor);
+                      }
+                    }}
+                    className="text-xs text-gray-600 hover:text-blue-700 hover:font-medium block py-1 transition-colors text-left w-full"
+                  >
+                    {link.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
-      <div className="rounded-xl shadow-2xl overflow-hidden border" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
-        <div className="flex gap-0 divide-x" style={{ borderColor: "#1565C0" }}>
-          {item.columns.map((col) => (
-            <div key={col.heading} className="px-5 pb-5 pt-7 min-w-[180px]" style={{ borderColor: "#1565C0" }}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#1565C0" }}>{col.heading}</p>
-              <ul className="space-y-1.5">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <button onClick={() => onNavigate && onNavigate(link.page, link.filters || link.anchor)} className="text-sm block py-0.5 transition-colors text-left w-full" style={{ color: "#6B7280" }}
-                      onMouseEnter={e => e.target.style.color = "#1565C0"}
-                      onMouseLeave={e => e.target.style.color = "#6B7280"}>
-                      {link.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+      <div className="bg-gray-50/80 px-5 py-2.5 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
+        <span className="font-medium text-blue-900">{item.tagline}</span>
+        <span className="text-gray-400">Verified by Property Brands</span>
       </div>
     </div>
   );
@@ -280,22 +260,28 @@ function DropdownMenu({ item, isOpen, onNavigate, index }) {
 function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
   return (
     <div className="relative">
-      <button onClick={onToggle} className="flex items-center gap-1.5 text-sm font-medium transition ml-3" style={{ color: "#1F2937" }}>
-        <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-gray-200 hover:border-blue-300 text-gray-800 transition"
+      >
+        <svg className="w-3.5 h-3.5 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
         </svg>
-        <span className="hidden sm:inline">{selectedCity}</span>
+        <span>{selectedCity}</span>
         <ChevronDown className={isOpen ? "rotate-180" : ""} />
       </button>
+
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-44 rounded-xl shadow-2xl z-50 py-2 overflow-hidden border" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
-          <p className="text-[10px] font-bold uppercase tracking-widest px-3 pb-1" style={{ color: "#1565C0" }}>Select City</p>
+        <div className="absolute top-full left-0 mt-1.5 w-48 rounded-xl shadow-2xl z-50 py-2 bg-white border border-gray-200 animate-fade-in">
+          <p className="text-[10px] font-bold uppercase tracking-widest px-3 pb-1 text-gray-400">Select City</p>
           {CITIES.map((city) => (
-            <button key={city} onClick={() => onSelect(city)}
-              className="block w-full text-left px-3 py-2 text-sm transition"
-              style={{ color: city === selectedCity ? "#1565C0" : "#6B7280" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#1565C0"}
-              onMouseLeave={e => e.currentTarget.style.color = city === selectedCity ? "#1565C0" : "#6B7280"}>
+            <button
+              key={city}
+              onClick={() => onSelect(city)}
+              className={`block w-full text-left px-3 py-1.5 text-xs transition ${
+                city === selectedCity ? "bg-blue-50 text-blue-700 font-bold" : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+              }`}
+            >
               {city}
             </button>
           ))}
@@ -305,46 +291,13 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
   );
 }
 
-function MobileNavItem({ item, onNavigate, onLinkClick }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b last:border-0" style={{ borderColor: "#1565C0" }}>
-      <button onClick={() => setOpen(!open)} className="flex items-center justify-between w-full px-5 py-3.5 text-sm font-semibold" style={{ color: "#1F2937" }}>
-        <span className="flex items-center gap-2">
-          {item.label}
-          {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: "#F59E0B", color: "#FFFFFF" }}>{item.badge}</span>}
-        </span>
-        <ChevronDown className={open ? "rotate-180" : ""} style={{ color: open ? "#1565C0" : "#6B7280" }} />
-      </button>
-      {open && item.columns && (
-        <div className="px-5 pb-4" style={{ background: "#FFFFFF" }}>
-          {item.columns.map((col) => (
-            <div key={col.heading} className="mt-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: "#1565C0" }}>{col.heading}</p>
-              <ul className="space-y-1">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <button
-                      onClick={() => { onNavigate && onNavigate(link.page, link.filters || link.anchor); onLinkClick && onLinkClick(); }}
-                      className="text-sm block py-0.5 transition text-left w-full"
-                      style={{ color: "#6B7280" }}
-                    >
-                      {link.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function Navbar({ onNavigate }) {
+export default function Navbar({ onNavigate, currentPage }) {
   const { isLoggedIn, profile } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [membershipModalOpen, setMembershipModalOpen] = useState(false);
+  const [expertModalOpen, setExpertModalOpen] = useState(false);
+  const [expertInitialTopic, setExpertInitialTopic] = useState(null);
+
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [cityOpen, setCityOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState("Bhubaneswar");
@@ -354,200 +307,316 @@ export default function Navbar({ onNavigate }) {
 
   useEffect(() => {
     function handleClick(e) {
-      if (navRef.current && !navRef.current.contains(e.target)) { setActiveDropdown(null); setCityOpen(false); }
+      if (navRef.current && !navRef.current.contains(e.target)) {
+        setActiveDropdown(null);
+        setCityOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   useEffect(() => {
-    function handleResize() { if (window.innerWidth >= 1024) setMobileOpen(false); }
+    function handleResize() {
+      if (window.innerWidth >= 1024) setMobileOpen(false);
+    }
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  function handleMouseEnter(label) { clearTimeout(timeoutRef.current); setActiveDropdown(label); setCityOpen(false); }
-  function handleMouseLeave() { timeoutRef.current = setTimeout(() => setActiveDropdown(null), 120); }
+  function handleMouseEnter(label) {
+    clearTimeout(timeoutRef.current);
+    setActiveDropdown(label);
+    setCityOpen(false);
+  }
+
+  function handleMouseLeave() {
+    timeoutRef.current = setTimeout(() => setActiveDropdown(null), 120);
+  }
+
   function handleCitySelect(city) {
     setSelectedCity(city);
     setCityOpen(false);
     onNavigate && onNavigate("search", { location: city });
   }
 
+  function openModalHandler(type, topic) {
+    setActiveDropdown(null);
+    if (type === "membership") {
+      setMembershipModalOpen(true);
+    } else if (type === "expert") {
+      setExpertInitialTopic(topic || "investment");
+      setExpertModalOpen(true);
+    }
+  }
+
   return (
-    <header ref={navRef} className="sticky top-0 z-50">
-      {/* Top Bar */}
-      <div
-  className="bg-white border-b shadow-sm"
-  style={{ borderBottomColor: "#1565C0" }}
->
-  <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
+    <header ref={navRef} className="sticky top-0 z-40 bg-white border-b border-gray-200">
+      {/* ── TOP PRIMARY BAR ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        {/* Brand Logo & Tagline */}
+        <div className="flex items-center gap-4 sm:gap-6">
+          <button
+            onClick={() => onNavigate && onNavigate("home")}
+            className="flex items-center gap-3 text-left group"
+          >
+            <img
+              src="/cropped_logo.png"
+              alt="PropertyBrands"
+              className="h-11 w-auto object-contain"
+            />
+            <div className="hidden sm:flex flex-col border-l border-gray-200 pl-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-900 leading-tight">
+                Property Brands
+              </span>
+              <span className="text-[10px] font-semibold text-gray-500 tracking-tight">
+                Discover · Invest · Build · Manage
+              </span>
+            </div>
+          </button>
 
-    {/* Left */}
-    <div className="flex items-center gap-6">
+          {/* City Selector */}
+          <CityDropdown
+            selectedCity={selectedCity}
+            onSelect={handleCitySelect}
+            isOpen={cityOpen}
+            onToggle={() => {
+              setCityOpen(!cityOpen);
+              setActiveDropdown(null);
+            }}
+          />
+        </div>
 
-      <button
-        onClick={() => onNavigate && onNavigate("home")}
-        className="flex items-center py-1 transition hover:opacity-90"
-      >
-        <img
-          src="/cropped_logo.png"
-          alt="PropertyBrands"
-          className="h-14 w-auto object-contain"
-        />
-      </button>
+        {/* Right Action Cluster */}
+        <div className="hidden lg:flex items-center gap-4">
+          {/* Select Membership CTA */}
+          <button
+            onClick={() => setMembershipModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition shadow-sm hover:shadow hover:scale-105"
+            style={{
+              background: "linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)",
+              color: "#FFFFFF",
+            }}
+          >
+            <span className="text-amber-300">✨</span>
+            <span>Select Membership</span>
+          </button>
 
-      <CityDropdown
-        selectedCity={selectedCity}
-        onSelect={handleCitySelect}
-        isOpen={cityOpen}
-        onToggle={() => {
-          setCityOpen(!cityOpen);
-          setActiveDropdown(null);
-        }}
-      />
-    </div>
+          {/* Book an Expert CTA */}
+          <button
+            onClick={() => {
+              setExpertInitialTopic("investment");
+              setExpertModalOpen(true);
+            }}
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-blue-200 text-blue-800 hover:bg-blue-50 transition"
+          >
+            Book an Expert
+          </button>
 
-    {/* Right */}
-    <div className="hidden lg:flex items-center gap-6">
+          <div className="w-px h-5 bg-gray-200" />
 
-      <button
-        onClick={() => onNavigate && onNavigate("contact", "prime")}
-        className="px-3 py-1 rounded-full text-sm font-semibold transition"
-        style={{
-          background: "#E3F2FD",
-          color: "#1565C0",
-        }}
-      >
-        PB Prime
-      </button>
+          {/* User Sign In / Account */}
+          {isLoggedIn ? (
+            <ClientAccountMenu onNavigate={onNavigate} />
+          ) : (
+            <button
+              onClick={() => setAuthModalOpen(true)}
+              className="text-xs font-bold text-gray-700 hover:text-blue-700 transition"
+            >
+              Sign In
+            </button>
+          )}
 
-      <div
-        className="w-px h-6"
-        style={{ background: "#D1D5DB" }}
-      />
+          {/* Post Property / List a Project */}
+          <button
+            onClick={() => onNavigate && onNavigate("post-property")}
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold shadow-sm transition hover:shadow-md hover:bg-blue-700 text-white"
+            style={{ background: "#1565C0" }}
+          >
+            <span>Post Property / Project</span>
+            <span className="rounded px-1.5 py-0.5 text-[9px] font-black bg-amber-400 text-gray-950">
+              FREE
+            </span>
+          </button>
+        </div>
 
-      {isLoggedIn ? (
-        <ClientAccountMenu onNavigate={onNavigate} />
-      ) : (
+        {/* Mobile Hamburger */}
         <button
-          onClick={() => setAuthModalOpen(true)}
-          className="text-sm font-semibold text-gray-800 hover:text-blue-600 transition"
+          className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5 rounded-lg border border-gray-200 p-1.5"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle navigation menu"
         >
-          Login
+          <span className={`block w-5 h-0.5 bg-gray-800 transition ${mobileOpen ? "rotate-45 translate-y-2" : ""}`} />
+          <span className={`block w-5 h-0.5 bg-gray-800 transition ${mobileOpen ? "opacity-0" : ""}`} />
+          <span className={`block w-5 h-0.5 bg-gray-800 transition ${mobileOpen ? "-rotate-45 -translate-y-2" : ""}`} />
         </button>
-      )}
+      </div>
 
-      <button
-        onClick={() => onNavigate && onNavigate("post-property")}
-        className="flex items-center gap-2 rounded-lg px-5 py-2 font-semibold shadow-sm transition hover:shadow-md"
-        style={{
-          background: "#1565C0",
-          color: "#FFFFFF",
-        }}
-      >
-        Post Property
+      {/* ── SECONDARY 6-PILLAR NAVIGATION STRIP ── */}
+      <nav className="hidden lg:block border-t border-gray-100 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <ul className="flex items-center space-x-1">
+            {NAV_ITEMS.map((item) => {
+              const isOpen = activeDropdown === item.label;
+              return (
+                <li
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => handleMouseEnter(item.label)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <button
+                    onClick={() => {
+                      if (item.label === "Discover") onNavigate && onNavigate("search");
+                      if (item.label === "Invest") onNavigate && onNavigate("investment-advisory");
+                      if (item.label === "Land & Develop") onNavigate && onNavigate("land-develop");
+                      if (item.label === "Build & Move") onNavigate && onNavigate("build-move");
+                      if (item.label === "Manage") onNavigate && onNavigate("property-management");
+                      if (item.label === "Legal & Finance") onNavigate && onNavigate("rent-ready");
+                    }}
+                    className={`flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-bold transition-all border-b-2 -mb-px ${
+                      isOpen
+                        ? "text-blue-700 border-blue-600 bg-blue-50/50"
+                        : "text-gray-700 border-transparent hover:text-blue-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    <ChevronDown className={isOpen ? "rotate-180 text-blue-600" : "text-gray-400"} />
+                  </button>
 
-        <span
-          className="rounded px-1.5 py-0.5 text-[9px] font-extrabold"
-          style={{
-            background: "#F59E0B",
-            color: "#FFFFFF",
-          }}
-        >
-          FREE
-        </span>
-      </button>
+                  <DropdownMenu
+                    item={item}
+                    isOpen={isOpen}
+                    onNavigate={onNavigate}
+                    onOpenModal={openModalHandler}
+                  />
+                </li>
+              );
+            })}
 
-    </div>
-
-    {/* Mobile Menu */}
-    <button
-      className="lg:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5"
-      onClick={() => setMobileOpen(!mobileOpen)}
-    >
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className="block w-5 h-0.5 transition-all duration-300"
-          style={{
-            background: "#1F2937",
-            transform: mobileOpen
-              ? i === 0
-                ? "rotate(45deg) translateY(8px)"
-                : i === 2
-                ? "rotate(-45deg) translateY(-8px)"
-                : ""
-              : "",
-            opacity: mobileOpen && i === 1 ? 0 : 1,
-          }}
-        />
-      ))}
-    </button>
-
-  </div>
-</div>
-
-      {/* Secondary Nav */}
-      <nav className="hidden lg:block border-b" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
-        <div className="max-w-7xl mx-auto px-4">
-          <ul className="flex items-center">
-            {NAV_ITEMS.map((item,index) => (
-              <li key={item.label} className="relative" onMouseEnter={() => handleMouseEnter(item.label)} onMouseLeave={handleMouseLeave}>
-                <button className="flex items-center gap-1 px-4 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors border-b-2 -mb-px"
-                  style={{ color: activeDropdown === item.label ? "#1565C0" : "#6B7280", borderBottomColor: activeDropdown === item.label ? "#1565C0" : "transparent" }}>
-                  {item.label}
-                  {item.badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded leading-none" style={{ background: "#F59E0B", color: "#FFFFFF" }}>{item.badge}</span>}
-                  <ChevronDown className={activeDropdown === item.label ? "rotate-180" : ""} />
-                </button>
-                <DropdownMenu item={item} isOpen={activeDropdown === item.label} index={index} onNavigate={onNavigate} />
-              </li>
-            ))}
+            {/* Quick RentReady link pill */}
+            <li className="ml-auto">
+              <button
+                onClick={() => onNavigate && onNavigate("rent-ready")}
+                className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-1 rounded-full border border-amber-200 transition"
+              >
+                <span>⚡</span> RentReady™ Agreement
+              </button>
+            </li>
           </ul>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      <div className={`lg:hidden border-t overflow-hidden transition-all duration-300 ${mobileOpen ? "max-h-[85vh] overflow-y-auto" : "max-h-0"}`}
-        style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
-        <div className="flex items-center justify-between px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
-          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("contact", "prime"); }} className="text-sm font-semibold" style={{ color: "#1565C0" }}>PB Prime</button>
-          {isLoggedIn ? (
-            <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("profile"); }} className="flex items-center gap-2 text-sm font-semibold" style={{ color: "#1F2937" }}>
-              {profile?.avatar_url && (
-                <img src={profile.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
-              )}
-              My Account
+      {/* ── MOBILE MENU ── */}
+      {mobileOpen && (
+        <div className="lg:hidden border-t border-gray-200 bg-white max-h-[80vh] overflow-y-auto p-4 space-y-4">
+          <div className="grid grid-cols-2 gap-2 pb-3 border-b border-gray-200">
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                setMembershipModalOpen(true);
+              }}
+              className="py-2 px-3 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200"
+            >
+              ✨ Select Membership
             </button>
-          ) : (
-            <button onClick={() => { setMobileOpen(false); setAuthModalOpen(true); }} className="text-sm font-semibold" style={{ color: "#1F2937" }}>Login</button>
-          )}
-          <button onClick={() => { setMobileOpen(false); onNavigate && onNavigate("post-property"); }} className="text-sm font-bold px-4 py-1.5 rounded-md flex items-center gap-1.5" style={{ background: "#1565C0", color: "#FFFFFF" }}>
-            Post Property <span className="text-[9px] font-extrabold px-1 py-0.5 rounded" style={{ background: "#F59E0B", color: "#FFFFFF" }}>FREE</span>
-          </button>
-        </div>
-        <div className="px-5 py-3 border-b flex items-center gap-2" style={{ borderColor: "#1565C0" }}>
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1565C0" }}>
-            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-          </svg>
-          <span className="text-sm font-medium" style={{ color: "#1F2937" }}>{selectedCity}</span>
-          <button className="ml-auto text-xs font-semibold" style={{ color: "#1565C0" }} onClick={() => setCityOpen(!cityOpen)}>Change City</button>
-        </div>
-        {cityOpen && (
-          <div className="grid grid-cols-3 gap-2 px-5 py-3 border-b" style={{ background: "#FFFFFF", borderColor: "#1565C0" }}>
-            {CITIES.map((city) => (
-              <button key={city} onClick={() => { handleCitySelect(city); setMobileOpen(false); }}
-                className="text-sm py-1.5 px-2 rounded-md text-center transition"
-                style={{ background: city === selectedCity ? "#1565C0" : "transparent", color: city === selectedCity ? "#FFFFFF" : "#6B7280" }}>
-                {city}
-              </button>
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                setExpertModalOpen(true);
+              }}
+              className="py-2 px-3 rounded-xl text-xs font-bold bg-gray-100 text-gray-800"
+            >
+              Book an Expert
+            </button>
+          </div>
+
+          {/* 6 Pillars Accordion in Mobile */}
+          <div className="space-y-2">
+            {NAV_ITEMS.map((item) => (
+              <div key={item.label} className="border border-gray-200 rounded-xl overflow-hidden">
+                <div className="p-3 bg-gray-50 flex items-center justify-between font-bold text-xs text-gray-900">
+                  <span>{item.label}</span>
+                  <span className="text-[10px] font-normal text-gray-500">{item.tagline}</span>
+                </div>
+                <div className="p-3 space-y-3 bg-white">
+                  {item.columns.map((col) => (
+                    <div key={col.heading}>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-blue-900 mb-1">
+                        {col.heading}
+                      </p>
+                      <div className="space-y-1 pl-1">
+                        {col.links.map((link) => (
+                          <button
+                            key={link.label}
+                            onClick={() => {
+                              setMobileOpen(false);
+                              if (link.page === "modal:membership") setMembershipModalOpen(true);
+                              else if (link.page === "modal:book-expert") openModalHandler("expert", link.consultTopic);
+                              else if (onNavigate) onNavigate(link.page, link.filters || link.anchor);
+                            }}
+                            className="block text-left text-xs text-gray-600 hover:text-blue-600 py-0.5"
+                          >
+                            {link.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
-        )}
-        <div>{NAV_ITEMS.map((item) => <MobileNavItem key={item.label} item={item} onNavigate={onNavigate} onLinkClick={() => setMobileOpen(false)} />)}</div>
-      </div>
 
+          {/* Bottom mobile actions */}
+          <div className="pt-3 border-t border-gray-200 flex flex-col gap-2">
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                onNavigate && onNavigate("post-property");
+              }}
+              className="w-full py-2.5 rounded-xl font-bold text-xs text-white text-center shadow"
+              style={{ background: "#1565C0" }}
+            >
+              Post Property / Project (FREE)
+            </button>
+            {!isLoggedIn ? (
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  setAuthModalOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl font-bold text-xs border border-gray-300 text-gray-800"
+              >
+                Sign In / Register
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  onNavigate && onNavigate("profile");
+                }}
+                className="w-full py-2.5 rounded-xl font-bold text-xs border border-gray-300 text-gray-800"
+              >
+                My Account
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Global Modals triggered from Navbar */}
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+      <SelectMembershipModal
+        isOpen={membershipModalOpen}
+        onClose={() => setMembershipModalOpen(false)}
+        onNavigate={onNavigate}
+      />
+      <BookExpertModal
+        isOpen={expertModalOpen}
+        onClose={() => setExpertModalOpen(false)}
+        initialTopic={expertInitialTopic}
+      />
     </header>
   );
 }

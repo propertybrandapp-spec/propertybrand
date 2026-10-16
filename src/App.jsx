@@ -31,12 +31,17 @@ import PostProperty from "./components/PostProperty";
 import MyProperties from "./components/MyProperties";
 import ArchitectsDesign from "./components/ArchitectsDesign";
 import AdvertisementBanner from "./components/AdvertisementBanner";
+import LandDevelopHub from "./components/LandDevelopHub";
+import RentReadyHub from "./components/RentReadyHub";
+import BuildMoveHub from "./components/BuildMoveHub";
+import LifestyleHub from "./components/LifestyleHub";
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"
 //      | "investment-advisory" | "agents" | "about" | "contact" | "careers"
 //      | "blog" | "faq" | "privacy-policy" | "terms-conditions" | "disclaimer"
 //      | "sitemap" | "profile" | "saved" | "inquiries" | "compare"
+//      | "land-develop" | "rent-ready" | "build-move" | "lifestyle"
 //
 // The admin console used to render here (page === "admin") but now lives in
 // its own separate project/deployment — see /admin-console (or wherever you
@@ -139,6 +144,14 @@ function AppContent() {
         {page === "inquiries" && <MyInquiries onNavigate={navigate} />}
 
         {page === "compare" && <ComparePage onNavigate={navigate} />}
+
+        {page === "land-develop" && <LandDevelopHub onNavigate={navigate} />}
+
+        {page === "rent-ready" && <RentReadyHub onNavigate={navigate} />}
+
+        {page === "build-move" && <BuildMoveHub onNavigate={navigate} />}
+
+        {page === "lifestyle" && <LifestyleHub onNavigate={navigate} />}
       </main>
 
       {/* ── Floating compare bar (visible on every page once something's selected) ── */}

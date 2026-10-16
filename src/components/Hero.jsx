@@ -170,14 +170,45 @@ export default function Hero({ onNavigate }) {
   const currentTab = activeTab && SEARCH_TABS.includes(activeTab) ? activeTab : SEARCH_TABS[0];
   const currentPropertyType = propertyType && PROPERTY_TYPES.includes(propertyType) ? propertyType : PROPERTY_TYPES[0];
 
+  function handleTabClick(tab) {
+    if (tab === "Post Free Property Ad") {
+      onNavigate && onNavigate("post-property");
+      return;
+    }
+    setActiveTab(tab);
+    if (tab === "Plot") {
+      setPropertyType("Plot");
+    } else if (tab === "Commercial") {
+      setPropertyType("Commercial");
+    } else if (tab === "New Projects") {
+      setPropertyType("Apartment");
+    }
+  }
+
   function handleSearch() {
     if (currentTab === "Post Free Property Ad") {
       onNavigate && onNavigate("post-property");
       return;
     }
+
+    let types = currentPropertyType ? [currentPropertyType] : [];
+    let possession = [];
+    let tags = [];
+
+    if (currentTab === "Plot") {
+      types = ["Plot", "Agricultural Land"];
+    } else if (currentTab === "Commercial") {
+      types = ["Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed"];
+    } else if (currentTab === "New Projects") {
+      possession = ["Under Construction"];
+      tags = ["New Launch"];
+    }
+
     onNavigate && onNavigate("search", {
       transactionType: currentTab === "Rent" ? "Rent" : "Buy",
-      types: currentPropertyType ? [currentPropertyType] : [],
+      types,
+      possession,
+      tags,
       location: location.trim() || undefined,
     });
   }
@@ -207,10 +238,11 @@ export default function Hero({ onNavigate }) {
                 {SEARCH_TABS.map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px ${
+                    id={`hero-tab-${tab.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+                    onClick={() => handleTabClick(tab)}
+                    className={`px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap border-b-2 -mb-px cursor-pointer ${
                       currentTab === tab
-                        ? "text-[#1565C0] border-[#1565C0]"
+                        ? "text-[#1565C0] border-[#1565C0] font-bold"
                         : "text-[#6B7280] border-transparent hover:text-[#1565C0]"
                     }`}
                   >

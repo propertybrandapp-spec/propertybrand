@@ -13,6 +13,14 @@ function daysAgo(isoDate) {
 }
 
 export function normalizeLead(row, adminsById) {
+  let detectedSource = row.source;
+  if (row.interest?.includes("[PROPERTY MANAGEMENT]")) detectedSource = "property-management";
+  else if (row.interest?.includes("[CHANNEL PARTNER]")) detectedSource = "channel-partner";
+  else if (row.interest?.includes("[RENTREADY")) detectedSource = "rent-ready";
+  else if (row.interest?.includes("[SELECT MEMBERSHIP")) detectedSource = "select-membership";
+  else if (row.interest?.includes("[BUILD & MOVE")) detectedSource = "build-move";
+  else if (row.interest?.includes("[CONSULTATION")) detectedSource = "book-expert";
+
   return {
     id: row.id,
     dbId: row.id,
@@ -22,7 +30,7 @@ export function normalizeLead(row, adminsById) {
     interest: row.interest,
     budget: row.budget_label,
     stage: row.stage,
-    source: row.source,
+    source: detectedSource,
     assignedTo: row.assigned_to ? (adminsById[row.assigned_to]?.full_name || "Unassigned") : "Unassigned",
     assignedToId: row.assigned_to,
     listingId: row.listing_id,
@@ -119,18 +127,42 @@ export async function deleteLead(id) {
 // wantsManagedRental }. A lead only ever fills in one or the other in
 // practice (ContactUs.jsx picks based on the property's transaction type),
 // but both are accepted independently here.
-export async function submitLead({ name, phone, email, interest, budget, source = "Website", listingId, stage, buyerPreferences = {}, renterPreferences = {} }) {
+export async function submitLead({ name, phone, email, interest, message, budget, source = "Website", listingId, stage, buyerPreferences = {}, renterPreferences = {} }) {
   const { data: sessionData } = await safeQuery(supabase.auth.getSession());
   const b = buyerPreferences;
   const r = renterPreferences;
+
+  // DB constraint: check (source in ('Website', 'Referral', 'WhatsApp', 'Cold Call', 'Walk-in'))
+  const ALLOWED_DB_SOURCES = ["Website", "Referral", "WhatsApp", "Cold Call", "Walk-in"];
+  const dbSource = ALLOWED_DB_SOURCES.includes(source) ? source : "Website";
+
+  // Ensure channel identifier tag is prefixed to interest for categorization in admin
+  let finalInterest = interest || message || "";
+  if (source === "property-management" && !finalInterest.includes("[PROPERTY MANAGEMENT]")) {
+    finalInterest = `[PROPERTY MANAGEMENT] ${finalInterest}`.trim();
+  } else if (source === "channel-partner" && !finalInterest.includes("[CHANNEL PARTNER]")) {
+    finalInterest = `[CHANNEL PARTNER] ${finalInterest}`.trim();
+  } else if (source === "rent-ready" && !finalInterest.includes("[RENTREADY")) {
+    finalInterest = `[RENTREADY DRAFT] ${finalInterest}`.trim();
+  } else if (source === "select-membership" && !finalInterest.includes("[SELECT MEMBERSHIP")) {
+    finalInterest = `[SELECT MEMBERSHIP] ${finalInterest}`.trim();
+  } else if (source === "build-move" && !finalInterest.includes("[BUILD & MOVE")) {
+    finalInterest = `[BUILD & MOVE] ${finalInterest}`.trim();
+  } else if (source === "book-expert" && !finalInterest.includes("[CONSULTATION")) {
+    finalInterest = `[CONSULTATION BOOKING] ${finalInterest}`.trim();
+  }
+
+  const leadId = (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : ("lead-" + Date.now());
+
   const { error } = await safeQuery(
     supabase.from("leads").insert({
+      id: leadId,
       name,
       phone,
       email: email || null,
-      interest: interest || null,
+      interest: finalInterest || null,
       budget_label: budget || null,
-      source,
+      source: dbSource,
       stage: stage || "New",
       listing_id: listingId || null,
       client_id: sessionData?.session?.user?.id || null,
@@ -160,5 +192,26 @@ export async function submitLead({ name, phone, email, interest, budget, source 
       renter_wants_managed_rental: !!r.wantsManagedRental,
     })
   );
+
+  // Sync to local dev leads store so it instantly reflects in admin panel
+  try {
+    const devLeadPayload = {
+      id: leadId,
+      name,
+      phone,
+      email: email || null,
+      interest: finalInterest || null,
+      budget_label: budget || null,
+      source: dbSource,
+      stage: stage || "New",
+      created_at: new Date().toISOString(),
+    };
+    fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(devLeadPayload),
+    }).catch(() => {});
+  } catch {}
+
   return { error };
 }

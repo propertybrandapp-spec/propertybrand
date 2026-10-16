@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
 import { fetchSubscriptionPlans } from "../lib/siteContent";
+import { submitLead } from "../lib/leads";
 import { Globe, TrendingUp, Briefcase, BarChart3, Camera, Wrench, FileText, CreditCard, Phone } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -167,7 +168,7 @@ const DASHBOARD_FEATURES = [
 ];
 
 // ── Plan Card ─────────────────────────────────────────────────────────────────
-function PlanCard({ plan }) {
+function PlanCard({ plan, onSelectPlan }) {
   return (
     <div
       className="relative rounded-2xl p-6 flex flex-col transition-transform duration-200 hover:-translate-y-1"
@@ -216,7 +217,10 @@ function PlanCard({ plan }) {
       </ul>
 
       <button
-        className="w-full py-2.5 rounded-xl text-sm font-bold transition-all"
+        id={`plan-card-btn-${plan.name.toLowerCase()}`}
+        data-testid={`plan-card-btn-${plan.name.toLowerCase()}`}
+        onClick={() => onSelectPlan && onSelectPlan(plan)}
+        className="w-full py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer"
         style={{
           background: plan.popular ? "#1565C0" : "transparent",
           color: plan.popular ? "#FFFFFF" : plan.color,
@@ -231,6 +235,202 @@ function PlanCard({ plan }) {
   );
 }
 
+// ── Plan Enrollment Modal ────────────────────────────────────────────────────
+function PlanEnrollModal({ plan, onClose }) {
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    city: "Bhubaneswar",
+    propertyAddress: "",
+    propertyType: "2 BHK Apartment",
+    expectedRent: "",
+    notes: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  if (!plan) return null;
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim() || !form.propertyAddress.trim()) {
+      setErrorMsg("Please fill in your name, phone number, and property address.");
+      return;
+    }
+    setSubmitting(true);
+    setErrorMsg("");
+
+    try {
+      await submitLead({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim() || null,
+        city: form.city.trim() || "Bhubaneswar",
+        source: "property-management",
+        interest: `[PROPERTY MANAGEMENT] Plan: ${plan.name} (${plan.price}${plan.period}) | Property: ${form.propertyAddress}, ${form.city} | Unit: ${form.propertyType} | Est Rent: ₹${form.expectedRent || "N/A"} | Notes: ${form.notes}`,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setErrorMsg(err.message || "Failed to submit request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-y-auto flex justify-center items-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+      <div className="relative w-full max-w-lg rounded-3xl bg-white border border-gray-200 shadow-2xl p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center font-bold text-base transition"
+        >
+          ✕
+        </button>
+
+        {!submitted ? (
+          <div>
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-5 pr-8">
+              <div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider text-white" style={{ background: plan.color }}>
+                  {plan.name} Plan
+                </span>
+                <h3 className="text-xl font-black text-gray-900 mt-1">
+                  Enroll in Property Management
+                </h3>
+                <p className="text-xs text-gray-500">{plan.idealFor}</p>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-black text-gray-900">{plan.price}</div>
+                <div className="text-xs text-gray-500">{plan.period}</div>
+              </div>
+            </div>
+
+            {errorMsg && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 text-red-700 text-xs font-semibold">
+                {errorMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Suresh Mohanty"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="e.g. 9876543210"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="e.g. suresh@example.com"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Property Location / Address *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Flat 302, Royal Palms, Patia"
+                  value={form.propertyAddress}
+                  onChange={(e) => setForm({ ...form, propertyAddress: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">City</label>
+                  <input
+                    type="text"
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    placeholder="Bhubaneswar"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Property Type</label>
+                  <select
+                    value={form.propertyType}
+                    onChange={(e) => setForm({ ...form, propertyType: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                  >
+                    <option value="1 BHK Apartment">1 BHK Apartment</option>
+                    <option value="2 BHK Apartment">2 BHK Apartment</option>
+                    <option value="3 BHK Apartment">3 BHK Apartment</option>
+                    <option value="4+ BHK Villa">4+ BHK Villa</option>
+                    <option value="Commercial Space">Commercial Space</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-1/3 py-2.5 rounded-xl border border-gray-300 text-xs sm:text-sm font-bold text-gray-700 hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-2/3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md hover:opacity-90 transition disabled:opacity-50"
+                  style={{ background: "#1565C0" }}
+                >
+                  {submitting ? "Submitting..." : `Confirm Plan (${plan.price})`}
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : (
+          <div className="text-center py-6">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              ✓
+            </div>
+            <h3 className="text-2xl font-black text-gray-900">Application Submitted!</h3>
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              Thank you, <strong>{form.name}</strong>. Your management request for <strong>{plan.name} Plan</strong> has been received. Our property operations manager will contact you at <strong>{form.phone}</strong> within 2 hours.
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-6 px-6 py-2.5 rounded-xl text-sm font-bold text-white shadow-md hover:bg-blue-700 transition"
+              style={{ background: "#1565C0" }}
+            >
+              Done & Continue
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Maps each service card's title to the anchor id its navbar link points at
 const SERVICE_ANCHORS = {
   "Tenant Management": "tenant-management",
@@ -241,6 +441,7 @@ const SERVICE_ANCHORS = {
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
   const [activeTab, setActiveTab] = useState("All");
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const tabs = ["All", "Tenant", "Financial", "Maintenance", "Legal"];
   const highlighted = useScrollToAnchor(scrollTo, [navKey]);
   const [plans, setPlans] = useState(null); // null = loading
@@ -280,16 +481,22 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
             </p>
           </div>
           <div className="flex gap-3 shrink-0">
-            <button className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
+            <button
+              onClick={() => setSelectedPlan(PLANS[1] || PLANS[0])}
+              className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer"
               style={{ background: "#1565C0", color: "#FFFFFF" }}
               onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
-              onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
+              onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}
+            >
               Enquire Now
             </button>
-            <button className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
+            <button
+              onClick={() => document.getElementById("pricing-plans")?.scrollIntoView({ behavior: "smooth" })}
+              className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer"
               style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}
+            >
               View Plans
             </button>
           </div>
@@ -441,14 +648,16 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
         </div>
 
         {/* ── Pricing Plans ── */}
-        <div>
+        <div id="pricing-plans">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold" style={{ color: "#1F2937" }}>Simple, Transparent Pricing</h2>
             <div className="w-10 h-0.5 rounded-full mt-2 mx-auto" style={{ background: "#1565C0" }} />
             <p className="text-sm mt-2" style={{ color: "#6B7280" }}>No hidden charges. Cancel anytime.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {PLANS.map((plan) => <PlanCard key={plan.name} plan={plan} />)}
+            {PLANS.map((plan) => (
+              <PlanCard key={plan.name} plan={plan} onSelectPlan={setSelectedPlan} />
+            ))}
           </div>
           <p className="text-center text-xs mt-5" style={{ color: "#6B7280" }}>
             All plans include GST. Custom pricing available for{" "}
@@ -470,16 +679,22 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
               Talk to our property management experts today. First consultation is free.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
+              <button
+                onClick={() => setSelectedPlan(PLANS[1] || PLANS[0])}
+                className="px-7 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer"
                 style={{ background: "#1565C0", color: "#FFFFFF" }}
                 onMouseEnter={e => e.currentTarget.style.background = "#0D47A1"}
-                onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}>
+                onMouseLeave={e => e.currentTarget.style.background = "#1565C0"}
+              >
                 Book Free Consultation
               </button>
-              <button className="px-7 py-3 rounded-xl text-sm font-bold transition-all"
+              <button
+                onClick={() => document.getElementById("pricing-plans")?.scrollIntoView({ behavior: "smooth" })}
+                className="px-7 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer"
                 style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
                 onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}
+              >
                 View All Plans
               </button>
             </div>
@@ -487,6 +702,11 @@ export default function PropertyManagement({ onNavigate, scrollTo, navKey }) {
         </div>
 
       </div>
+
+      {/* Enrollment Modal */}
+      {selectedPlan && (
+        <PlanEnrollModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
+      )}
     </section>
   );
 }

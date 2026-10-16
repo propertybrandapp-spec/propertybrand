@@ -16,6 +16,16 @@ const SORT_OPTIONS = ["Relevance", "Price: Low to High", "Price: High to Low", "
 const DEFAULT_BHK_OPTIONS = ["1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK", "5+ BHK"];
 const DEFAULT_TAGS_LIST = ["Luxury", "Affordable", "Gated Community", "Office", "Retail", "Industrial", "Co-living", "Student Accommodation", "New Launch", "Ready to Move", "RERA Approved", "Corner Plot", "Investment Opportunity"];
 
+// ── Complete Property Category Architecture (Section 2 of Blueprint) ────────
+export const PROPERTY_SECTORS = [
+  { id: "all", label: "All Categories", icon: "🏢" },
+  { id: "residential", label: "Residential", icon: "🏡", types: ["Apartment", "Villa", "Independent House", "Penthouse", "Studio Apartment"] },
+  { id: "commercial", label: "Commercial", icon: "🏬", types: ["Commercial", "Office Space", "Shop / Showroom"] },
+  { id: "industrial", label: "Industrial & Logistics", icon: "🏭", types: ["Warehouse / Industrial Shed"] },
+  { id: "land", label: "Land & Plots", icon: "🗺️", types: ["Plot", "Agricultural Land", "Farmhouse"] },
+  { id: "lifestyle", label: "Lifestyle & Co-living", icon: "🌴", tags: ["Luxury", "Gated Community", "Co-living", "Student Accommodation"] },
+];
+
 // Default budget ceilings differ a lot between buying (crores) and renting (thousands/month)
 const BUDGET_MAX = { Buy: 100000000, Rent: 300000 };
 
@@ -82,14 +92,21 @@ function Sidebar({
     }));
   };
 
+  const WAREHOUSE_OPTIONS = ["20ft+ Ceiling", "30ft+ Ceiling", "Multiple Loading Docks", "Heavy Power Load (100kVA+)", "Wide 40ft+ Truck Road"];
+  const LAND_OPTIONS = ["Freehold Land", "NA / Conversion Approved", "Corner Plot", "RERA Approved Layout", "Irrigated Farmland"];
+  const FURNISHING_OPTIONS = ["Furnished", "Semi-Furnished", "Unfurnished"];
+
   const sections = [
     { title: "Property Type", key: "types", options: propertyTypes },
     { title: "BHK", key: "bhk", options: bhkOptions },
-    { title: "Possession", key: "possession", options: POSSESSION },
+    filters.transactionType === "Rent" && { title: "Rental Furnishing", key: "furnishing", options: FURNISHING_OPTIONS },
+    { title: "Possession / Stage", key: "possession", options: POSSESSION },
+    { title: "Industrial & Warehouse Specs", key: "warehouseSpecs", options: WAREHOUSE_OPTIONS },
+    { title: "Land Zoning & Clearances", key: "landZoning", options: LAND_OPTIONS },
     { title: "Category", key: "tags", options: tagsList },
     { title: "Posted By", key: "postedBy", options: POSTED_BY },
     { title: "Amenities", key: "amenities", options: amenitiesList },
-  ];
+  ].filter(Boolean);
 
   return (
     <aside className="w-64 shrink-0 hidden lg:block">
@@ -423,6 +440,9 @@ function buildFilters(overrides) {
     amenities: overrides?.amenities || [],
     tags: overrides?.tags || [],
     verifiedOnly: overrides?.verifiedOnly || false,
+    furnishing: overrides?.furnishing || [],
+    warehouseSpecs: overrides?.warehouseSpecs || [],
+    landZoning: overrides?.landZoning || [],
   };
 }
 
@@ -486,6 +506,9 @@ export default function SearchResults({ initialFilters, onNavigate }) {
     if (filters.verifiedOnly && !p.verified) return false;
     if (filters.amenities?.length && !filters.amenities.some(a => (p.amenities || []).includes(a))) return false;
     if (filters.tags?.length && !filters.tags.some(t => (p.tags || []).includes(t))) return false;
+    if (filters.furnishing?.length && !filters.furnishing.some(f => (p.furnishingStatus || p.tags || []).includes(f) || (p.description || "").toLowerCase().includes(f.toLowerCase()))) return false;
+    if (filters.warehouseSpecs?.length && !filters.warehouseSpecs.some(w => (p.unitFeatures || p.amenities || p.tags || []).some(x => typeof x === "string" && x.toLowerCase().includes(w.toLowerCase().split(" ")[0])) || (p.description || "").toLowerCase().includes(w.toLowerCase().split(" ")[0]))) return false;
+    if (filters.landZoning?.length && !filters.landZoning.some(z => (p.tags || p.approvals || []).some(x => typeof x === "string" && x.toLowerCase().includes(z.toLowerCase().split(" ")[0])) || (p.title || "").toLowerCase().includes(z.toLowerCase().split(" ")[0]))) return false;
     if (filters.location.trim()) {
       const q = filters.location.trim().toLowerCase();
       const match = [
@@ -520,29 +543,82 @@ export default function SearchResults({ initialFilters, onNavigate }) {
   const activeFilterCount = filters.types.length + filters.bhk.length + filters.possession.length +
     filters.postedBy.length + filters.amenities.length + filters.tags.length + (filters.verifiedOnly ? 1 : 0);
 
+  const activeSector = (() => {
+    if (filters.types.length === 1 && (filters.types[0] === "Plot" || filters.types[0] === "Agricultural Land")) return "land";
+    if (filters.types.length === 1 && filters.types[0] === "Warehouse / Industrial Shed") return "industrial";
+    if (filters.types.length && filters.types.every(t => ["Commercial", "Office Space", "Shop / Showroom"].includes(t))) return "commercial";
+    if (filters.types.length && filters.types.every(t => ["Apartment", "Villa", "Independent House", "Penthouse", "Studio Apartment"].includes(t))) return "residential";
+    if (filters.tags.length && filters.tags.every(t => ["Luxury", "Gated Community", "Co-living", "Student Accommodation"].includes(t))) return "lifestyle";
+    return "all";
+  })();
+
+  function handleSectorSelect(sector) {
+    if (sector.id === "all") {
+      setFilters(f => ({ ...f, types: [], tags: [] }));
+    } else if (sector.types) {
+      setFilters(f => ({ ...f, types: sector.types, tags: [] }));
+    } else if (sector.tags) {
+      setFilters(f => ({ ...f, types: [], tags: sector.tags }));
+    }
+  }
+
   return (
     <div style={{ background: "#FFFFFF", minHeight: "100vh" }} className="px-4 py-8">
       <div className="max-w-7xl mx-auto">
 
-        {/* ── Buy / Rent toggle ── */}
-        <div className="flex items-center gap-1 mb-5 p-1 rounded-xl w-fit" style={{ background: "#F1F5F9" }}>
-          {["Buy", "Rent"].map((tt) => (
+        {/* ── Top Transaction & Category Architecture Strip ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          {/* Buy / Rent toggle */}
+          <div className="flex items-center gap-1 p-1 rounded-xl w-fit" style={{ background: "#F1F5F9" }}>
+            {["Buy", "Rent"].map((tt) => (
+              <button
+                key={tt}
+                onClick={() => setTransactionType(tt)}
+                className="px-5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all"
+                style={{
+                  background: filters.transactionType === tt ? "#1565C0" : "transparent",
+                  color: filters.transactionType === tt ? "#FFFFFF" : "#6B7280",
+                }}
+              >
+                {tt === "Buy" ? "For Sale" : "For Rent"}
+              </button>
+            ))}
+          </div>
+
+          {/* Quick RentReady link for rentals */}
+          {filters.transactionType === "Rent" && (
             <button
-              key={tt}
-              onClick={() => setTransactionType(tt)}
-              className="px-6 py-2 rounded-lg text-sm font-bold transition-all"
-              style={{
-                background: filters.transactionType === tt ? "#1565C0" : "transparent",
-                color: filters.transactionType === tt ? "#FFFFFF" : "#6B7280",
-              }}
+              onClick={() => onNavigate && onNavigate("rent-ready")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 hover:bg-amber-100 transition"
             >
-              {tt === "Buy" ? "For Sale" : "For Rent"}
+              <span>⚡</span> RentReady™ Agreement & Move-In Suite
             </button>
-          ))}
+          )}
+        </div>
+
+        {/* ── Category Architecture Strip (Section 2 of Blueprint) ── */}
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
+          {PROPERTY_SECTORS.map((sector) => {
+            const isSelected = activeSector === sector.id;
+            return (
+              <button
+                key={sector.id}
+                onClick={() => handleSectorSelect(sector)}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+                  isSelected
+                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                    : "bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                }`}
+              >
+                <span>{sector.icon}</span>
+                <span>{sector.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* ── Search Bar (top) ── */}
-        <div className="rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-3"
+        <div className="rounded-2xl p-4 mb-4 flex flex-col sm:flex-row gap-3"
           style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
           <div className="flex items-center gap-2 flex-1 rounded-xl px-4 py-2.5"
             style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
@@ -570,6 +646,90 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
             </svg>
             Search
+          </button>
+        </div>
+
+        {/* ── Quick Filter Tags & Badges Strip ── */}
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none text-xs">
+          <span className="text-gray-400 font-bold uppercase tracking-wider text-[10px] shrink-0">Quick Filters:</span>
+          
+          <button
+            onClick={() => setFilters(f => ({ ...f, verifiedOnly: !f.verifiedOnly }))}
+            className={`px-3 py-1.5 rounded-full font-semibold transition border flex items-center gap-1.5 shrink-0 ${
+              filters.verifiedOnly
+                ? "bg-emerald-50 text-emerald-800 border-emerald-300 ring-1 ring-emerald-400 font-bold"
+                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            <span>✓</span> Verified Only
+          </button>
+
+          <button
+            onClick={() => {
+              const hasRera = filters.tags.includes("RERA Approved");
+              setFilters(f => ({
+                ...f,
+                tags: hasRera ? f.tags.filter(t => t !== "RERA Approved") : [...f.tags, "RERA Approved"],
+              }));
+            }}
+            className={`px-3 py-1.5 rounded-full font-semibold transition border shrink-0 ${
+              filters.tags.includes("RERA Approved")
+                ? "bg-blue-50 text-blue-800 border-blue-300 ring-1 ring-blue-400 font-bold"
+                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            🏛️ RERA Approved
+          </button>
+
+          <button
+            onClick={() => {
+              const hasReady = filters.possession.includes("Ready to Move");
+              setFilters(f => ({
+                ...f,
+                possession: hasReady ? f.possession.filter(p => p !== "Ready to Move") : [...f.possession, "Ready to Move"],
+              }));
+            }}
+            className={`px-3 py-1.5 rounded-full font-semibold transition border shrink-0 ${
+              filters.possession.includes("Ready to Move")
+                ? "bg-blue-50 text-blue-800 border-blue-300 ring-1 ring-blue-400 font-bold"
+                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            🔑 Ready to Move
+          </button>
+
+          <button
+            onClick={() => {
+              const hasLuxury = filters.tags.includes("Luxury");
+              setFilters(f => ({
+                ...f,
+                tags: hasLuxury ? f.tags.filter(t => t !== "Luxury") : [...f.tags, "Luxury"],
+              }));
+            }}
+            className={`px-3 py-1.5 rounded-full font-semibold transition border shrink-0 ${
+              filters.tags.includes("Luxury")
+                ? "bg-amber-50 text-amber-800 border-amber-300 ring-1 ring-amber-400 font-bold"
+                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            ✨ Luxury
+          </button>
+
+          <button
+            onClick={() => {
+              const hasOwner = filters.postedBy.includes("Owner");
+              setFilters(f => ({
+                ...f,
+                postedBy: hasOwner ? f.postedBy.filter(p => p !== "Owner") : [...f.postedBy, "Owner"],
+              }));
+            }}
+            className={`px-3 py-1.5 rounded-full font-semibold transition border shrink-0 ${
+              filters.postedBy.includes("Owner")
+                ? "bg-indigo-50 text-indigo-800 border-indigo-300 ring-1 ring-indigo-400 font-bold"
+                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            👤 By Owner
           </button>
         </div>
 
