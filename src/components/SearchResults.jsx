@@ -5,6 +5,9 @@ import { useSavedItems } from "../lib/SavedItemsContext";
 import { useCompare } from "../lib/CompareContext";
 import QuickViewModal from "./QuickViewModal";
 import AdvertisementBanner from "./AdvertisementBanner";
+import {
+  budgetSteps, formatBudget, isBudgetActive, matchesBudget, matchesLocation, sameText,
+} from "../lib/searchFilters";
 
 // Fallback defaults for the filter sidebar — kept in sync with "Site
 // Content" → Listing Options in the admin console (see the fetch below).
@@ -26,8 +29,9 @@ export const PROPERTY_SECTORS = [
   { id: "lifestyle", label: "Lifestyle & Co-living", icon: "🌴", tags: ["Luxury", "Gated Community", "Co-living", "Student Accommodation"] },
 ];
 
-// Default budget ceilings differ a lot between buying (crores) and renting (thousands/month)
-const BUDGET_MAX = { Buy: 100000000, Rent: 300000 };
+// Budget filter shape: [min, max]. min 0 = no lower limit, max null = no upper
+// limit (so listings above any fixed ceiling are never silently hidden).
+const NO_BUDGET = [0, null];
 
 // ── Helper ─────────────────────────────────────────────────────────────────────
 function CheckBox({ label, checked, onChange }) {
@@ -52,25 +56,48 @@ function CheckBox({ label, checked, onChange }) {
   );
 }
 
-// ── Price Range Slider ─────────────────────────────────────────────────────────
-function PriceRange({ min, max, value, onChange, mode = "Buy" }) {
-  const format = (n) => {
-    if (mode === "Rent") return `₹${n.toLocaleString("en-IN")}/mo`;
-    return n >= 10000000 ? `₹${(n / 10000000).toFixed(1)} Cr` : `₹${(n / 100000).toFixed(0)} Lac`;
-  };
-  const step = mode === "Rent" ? 1000 : 500000;
+// ── Budget (min / max) ─────────────────────────────────────────────────────────
+function BudgetFilter({ value, onChange, mode = "Buy" }) {
+  const steps = budgetSteps(mode);
+  const [min, max] = value;
+  // Keep a value that came from the Hero (e.g. exactly ₹30 Lac) selectable
+  // even if it isn't one of the preset steps.
+  const withCurrent = (current) => (current && !steps.includes(current) ? [...steps, current].sort((a, b) => a - b) : steps);
+  const minOptions = withCurrent(min);
+  const maxOptions = withCurrent(max);
+
+  const selectStyle = { background: "#FFFFFF", border: "1px solid #E2E8F0", color: "#1F2937" };
+
+  function setMin(raw) {
+    const nextMin = raw === "" ? 0 : Number(raw);
+    // never leave min above max — push max out to "no limit" instead of producing an impossible range
+    const nextMax = max !== null && nextMin > max ? null : max;
+    onChange([nextMin, nextMax]);
+  }
+  function setMax(raw) {
+    const nextMax = raw === "" ? null : Number(raw);
+    const nextMin = nextMax !== null && min > nextMax ? 0 : min;
+    onChange([nextMin, nextMax]);
+  }
+
   return (
-    <div>
-      <div className="flex justify-between mb-2">
-        <span className="text-xs" style={{ color: "#6B7280" }}>Min: <span style={{ color: "#1565C0" }}>{format(value[0])}</span></span>
-        <span className="text-xs" style={{ color: "#6B7280" }}>Max: <span style={{ color: "#1565C0" }}>{format(value[1])}</span></span>
-      </div>
-      <input type="range" min={min} max={max} step={step}
-        value={value[1]}
-        onChange={e => onChange([value[0], Number(e.target.value)])}
-        className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-        style={{ accentColor: "#1565C0", background: "#E2E8F0" }}
-      />
+    <div className="grid grid-cols-2 gap-2">
+      <label className="block">
+        <span className="block text-[11px] mb-1" style={{ color: "#6B7280" }}>Min</span>
+        <select value={min > 0 ? String(min) : ""} onChange={e => setMin(e.target.value)}
+          aria-label="Minimum budget" className="w-full rounded-lg px-2 py-2 text-xs focus:outline-none" style={selectStyle}>
+          <option value="">No min</option>
+          {minOptions.map(v => <option key={v} value={v}>{formatBudget(v, mode)}</option>)}
+        </select>
+      </label>
+      <label className="block">
+        <span className="block text-[11px] mb-1" style={{ color: "#6B7280" }}>Max</span>
+        <select value={max !== null && max !== undefined ? String(max) : ""} onChange={e => setMax(e.target.value)}
+          aria-label="Maximum budget" className="w-full rounded-lg px-2 py-2 text-xs focus:outline-none" style={selectStyle}>
+          <option value="">No max</option>
+          {maxOptions.map(v => <option key={v} value={v}>{formatBudget(v, mode)}</option>)}
+        </select>
+      </label>
     </div>
   );
 }
@@ -84,7 +111,9 @@ function Sidebar({
   bhkOptions,
   amenitiesList,
   tagsList,
+  variant = "desktop", // "desktop" = sticky card shown from lg up; "drawer" = bare, always visible (mobile filter drawer)
 }) {
+  const isDrawer = variant === "drawer";
   const toggle = (key, val) => {
     setFilters(f => ({
       ...f,
@@ -109,22 +138,30 @@ function Sidebar({
   ].filter(Boolean);
 
   return (
-    <aside className="w-64 shrink-0 hidden lg:block">
-      <div className="rounded-2xl overflow-hidden sticky top-20" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-        {/* Header */}
-        <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #E2E8F0" }}>
-          <h3 className="text-sm font-bold" style={{ color: "#1F2937" }}>Filters</h3>
-          <button onClick={onReset} className="text-xs font-semibold transition-colors hover:underline" style={{ color: "#1565C0" }}>
-            Reset All
-          </button>
-        </div>
+    <aside className={isDrawer ? "w-full" : "w-64 shrink-0 hidden lg:block"}>
+      <div className={isDrawer ? "" : "rounded-2xl overflow-hidden sticky top-20"} style={isDrawer ? undefined : { background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+        {/* Header (the drawer has its own header, so only the desktop card shows this one) */}
+        {!isDrawer && (
+          <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #E2E8F0" }}>
+            <h3 className="text-sm font-bold" style={{ color: "#1F2937" }}>Filters</h3>
+            <button onClick={onReset} className="text-xs font-semibold transition-colors hover:underline" style={{ color: "#1565C0" }}>
+              Reset All
+            </button>
+          </div>
+        )}
 
-        <div className="p-5 space-y-6 max-h-[80vh] overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+        <div className={isDrawer ? "space-y-6" : "p-5 space-y-6 max-h-[80vh] overflow-y-auto"} style={isDrawer ? undefined : { scrollbarWidth: "none" }}>
           {/* Price Range */}
           <div>
             <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#6B7280" }}>Budget</p>
-            <PriceRange min={0} max={BUDGET_MAX[filters.transactionType]} value={filters.budget} mode={filters.transactionType}
+            <BudgetFilter value={filters.budget} mode={filters.transactionType}
               onChange={val => setFilters(f => ({ ...f, budget: val }))} />
+            {isBudgetActive(filters.budget) && (
+              <button type="button" onClick={() => setFilters(f => ({ ...f, budget: NO_BUDGET }))}
+                className="mt-2 text-[11px] font-semibold hover:underline" style={{ color: "#1565C0" }}>
+                Clear budget
+              </button>
+            )}
           </div>
 
           {/* Dynamic sections */}
@@ -429,10 +466,14 @@ function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
 // ── Build the filters object, merging any nav-provided overrides over sensible defaults ──
 function buildFilters(overrides) {
   const transactionType = overrides?.transactionType || "Buy";
+  const b = overrides?.budget;
+  const budget = Array.isArray(b)
+    ? [Number(b[0]) > 0 ? Number(b[0]) : 0, b[1] !== null && b[1] !== undefined && Number.isFinite(Number(b[1])) ? Number(b[1]) : null]
+    : NO_BUDGET;
   return {
     transactionType,
     location: overrides?.location || "",
-    budget: overrides?.budget || [0, BUDGET_MAX[transactionType]],
+    budget,
     types: overrides?.types || [],
     bhk: overrides?.bhk || [],
     possession: overrides?.possession || [],
@@ -487,40 +528,43 @@ export default function SearchResults({ initialFilters, onNavigate }) {
 
   const [quickViewProperty, setQuickViewProperty] = useState(null);
 
+  // "Reset All" clears the sidebar filters but keeps the location search —
+  // that has its own × button and a "Clear Location" button on the empty state.
   function resetFilters() {
-    setFilters(buildFilters({ transactionType: filters.transactionType }));
+    setFilters(buildFilters({ transactionType: filters.transactionType, location: filters.location }));
   }
 
+  // Switching Buy <-> Rent keeps what the user typed/picked (location, property
+  // type, BHK, ...). Only the budget is reset (lakhs/crores vs. rupees per
+  // month aren't comparable) along with the rent-only furnishing choice.
   function setTransactionType(tt) {
-    setFilters(buildFilters({ transactionType: tt }));
+    if (tt === filters.transactionType) return;
+    setFilters(f => ({ ...f, transactionType: tt, budget: NO_BUDGET, furnishing: [] }));
   }
 
   // Apply filters
   const filtered = ALL_PROPERTIES.filter(p => {
     if (p.transactionType !== filters.transactionType) return false;
-    if (p.priceRaw > filters.budget[1]) return false;
-    if (filters.types.length && !filters.types.includes(p.type)) return false;
+    if (!matchesBudget(p, filters.budget)) return false;
+    if (filters.types.length && !filters.types.some(t => sameText(t, p.type))) return false;
     if (filters.bhk.length && !filters.bhk.some(b => p.bhk.includes(b))) return false;
     if (filters.possession.length && !filters.possession.includes(p.status)) return false;
     if (filters.postedBy?.length && !filters.postedBy.includes(p.postedBy)) return false;
     if (filters.verifiedOnly && !p.verified) return false;
     if (filters.amenities?.length && !filters.amenities.some(a => (p.amenities || []).includes(a))) return false;
     if (filters.tags?.length && !filters.tags.some(t => (p.tags || []).includes(t))) return false;
-    if (filters.furnishing?.length && !filters.furnishing.some(f => (p.furnishingStatus || p.tags || []).includes(f) || (p.description || "").toLowerCase().includes(f.toLowerCase()))) return false;
+    if (filters.furnishing?.length) {
+      // The listing's own Furnishing field is the source of truth; only fall back
+      // to tags/description for older listings that never set it. (The old
+      // substring check on description made "Furnished" also match "Unfurnished".)
+      const ok = p.furnishing
+        ? filters.furnishing.some(f => sameText(f, p.furnishing))
+        : filters.furnishing.some(f => (p.tags || []).some(t => sameText(t, f)));
+      if (!ok) return false;
+    }
     if (filters.warehouseSpecs?.length && !filters.warehouseSpecs.some(w => (p.unitFeatures || p.amenities || p.tags || []).some(x => typeof x === "string" && x.toLowerCase().includes(w.toLowerCase().split(" ")[0])) || (p.description || "").toLowerCase().includes(w.toLowerCase().split(" ")[0]))) return false;
     if (filters.landZoning?.length && !filters.landZoning.some(z => (p.tags || p.approvals || []).some(x => typeof x === "string" && x.toLowerCase().includes(z.toLowerCase().split(" ")[0])) || (p.title || "").toLowerCase().includes(z.toLowerCase().split(" ")[0]))) return false;
-    if (filters.location.trim()) {
-      const q = filters.location.trim().toLowerCase();
-      const match = [
-        p.location,
-        p.city,
-        p.locality,
-        p.projectName,
-        p.landmark,
-        p.title,
-      ].some((val) => typeof val === "string" && val.toLowerCase().includes(q));
-      if (!match) return false;
-    }
+    if (!matchesLocation(p, filters.location)) return false;
     return true;
   });
 
@@ -536,12 +580,14 @@ export default function SearchResults({ initialFilters, onNavigate }) {
       return sortBy === "Price: Low to High" ? a.priceRaw - b.priceRaw : b.priceRaw - a.priceRaw;
     }
     if (sortBy === "Newest First") return a.postedDays - b.postedDays;
-    if (sortBy === "Area: Large to Small") return parseInt(b.area) - parseInt(a.area);
+    if (sortBy === "Area: Large to Small") return (parseInt(b.area) || 0) - (parseInt(a.area) || 0);
     return b.featured - a.featured;
   });
 
   const activeFilterCount = filters.types.length + filters.bhk.length + filters.possession.length +
-    filters.postedBy.length + filters.amenities.length + filters.tags.length + (filters.verifiedOnly ? 1 : 0);
+    filters.postedBy.length + filters.amenities.length + filters.tags.length + (filters.verifiedOnly ? 1 : 0) +
+    filters.furnishing.length + filters.warehouseSpecs.length + filters.landZoning.length +
+    (isBudgetActive(filters.budget) ? 1 : 0);
 
   const activeSector = (() => {
     if (filters.types.length === 1 && (filters.types[0] === "Plot" || filters.types[0] === "Agricultural Land")) return "land";
@@ -957,14 +1003,15 @@ export default function SearchResults({ initialFilters, onNavigate }) {
               </div>
               <div className="p-5">
                 <Sidebar
-  filters={filters}
-  setFilters={setFilters}
-  onReset={resetFilters}
-  propertyTypes={PROPERTY_TYPES}
-  bhkOptions={BHK_OPTIONS}
-  amenitiesList={AMENITIES_LIST}
-  tagsList={TAGS_LIST}
-/>
+                  variant="drawer"
+                  filters={filters}
+                  setFilters={setFilters}
+                  onReset={resetFilters}
+                  propertyTypes={PROPERTY_TYPES}
+                  bhkOptions={BHK_OPTIONS}
+                  amenitiesList={AMENITIES_LIST}
+                  tagsList={TAGS_LIST}
+                />
               </div>
               <div className="sticky bottom-0 px-5 py-4" style={{ background: "#FFFFFF", borderTop: "1px solid #E2E8F0" }}>
                 <button onClick={() => setShowMobileFilters(false)}

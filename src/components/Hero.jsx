@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchHeroContent, fetchHeroCards } from "../lib/siteContent";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
+import { parseBudgetRange, DEFAULT_RENT_BUDGET_RANGES } from "../lib/searchFilters";
 
 // ── Fallback content ──────────────────────────────────────────────────────────
 // Everything below is shown only until an admin sets real values in
@@ -74,6 +75,10 @@ const DEMO_HERO_CARDS = [
 const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space"];
 const DEFAULT_BUDGET_RANGES = ["Under ₹30 Lac", "₹30 - 50 Lac", "₹50 Lac - 1 Cr", "₹1 - 1.5 Cr", "₹1.5 - 2 Cr", "Above ₹2 Cr"];
 
+// "no choice made" labels for the two dropdowns — picking one clears that filter
+const ANY_TYPE_LABEL = "All Property Types";
+const ANY_BUDGET_LABEL = "Any Budget";
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 // Every editable link on the Hero (cards, quick CTAs, promo button) is either
@@ -146,7 +151,7 @@ export default function Hero({ onNavigate }) {
   const [activeTab, setActiveTab] = useState(null);
   const [location, setLocation] = useState("");
   const [propertyType, setPropertyType] = useState(null);
-  const [budget, setBudget] = useState("Budget");
+  const [budget, setBudget] = useState(null); // null = Any Budget
   const [showPropertyDropdown, setShowPropertyDropdown] = useState(false);
   const [showBudgetDropdown, setShowBudgetDropdown] = useState(false);
 
@@ -163,12 +168,19 @@ export default function Hero({ onNavigate }) {
   const SEARCH_TABS = content.searchTabs?.length ? content.searchTabs : DEFAULT_HERO_CONTENT.searchTabs;
   const QUICK_CTAS = content.quickCtas?.length ? content.quickCtas : DEFAULT_HERO_CONTENT.quickCtas;
   const PROPERTY_TYPES = fieldOptions?.propertyTypes?.length ? fieldOptions.propertyTypes : DEFAULT_PROPERTY_TYPES;
-  const BUDGET_RANGES = fieldOptions?.budgetRanges?.length ? fieldOptions.budgetRanges : DEFAULT_BUDGET_RANGES;
+  const BUY_BUDGET_RANGES = fieldOptions?.budgetRanges?.length ? fieldOptions.budgetRanges : DEFAULT_BUDGET_RANGES;
 
   // Derived instead of synced via effect — stays valid even if the admin
   // changes the underlying lists after the page has already loaded.
   const currentTab = activeTab && SEARCH_TABS.includes(activeTab) ? activeTab : SEARCH_TABS[0];
-  const currentPropertyType = propertyType && PROPERTY_TYPES.includes(propertyType) ? propertyType : PROPERTY_TYPES[0];
+  // null = "All Property Types" (the default) — previously this silently fell
+  // back to the first type in the list, so every search was an Apartment search.
+  const currentPropertyType = propertyType && PROPERTY_TYPES.includes(propertyType) ? propertyType : null;
+  const isRentTab = currentTab === "Rent";
+  // The admin-editable Budget Ranges are written in Lac/Cr, which only makes
+  // sense for buying; rentals get monthly-rent ranges instead.
+  const BUDGET_RANGES = isRentTab ? DEFAULT_RENT_BUDGET_RANGES : BUY_BUDGET_RANGES;
+  const currentBudget = budget && BUDGET_RANGES.includes(budget) ? budget : null;
 
   function handleTabClick(tab) {
     if (tab === "Post Free Property Ad") {
@@ -204,12 +216,15 @@ export default function Hero({ onNavigate }) {
       tags = ["New Launch"];
     }
 
+    const budgetRange = currentBudget ? parseBudgetRange(currentBudget) : null;
+
     onNavigate && onNavigate("search", {
-      transactionType: currentTab === "Rent" ? "Rent" : "Buy",
+      transactionType: isRentTab ? "Rent" : "Buy",
       types,
       possession,
       tags,
       location: location.trim() || undefined,
+      budget: budgetRange || undefined,
     });
   }
 
@@ -280,13 +295,22 @@ export default function Hero({ onNavigate }) {
                     <svg className="w-4 h-4 text-[#1565C0]" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                     </svg>
-                    {currentPropertyType}
+                    {currentPropertyType || ANY_TYPE_LABEL}
                     <svg className="w-3.5 h-3.5 text-[#6B7280]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
                   </button>
                   {showPropertyDropdown && (
-                    <div className="absolute top-full left-0 mt-1 w-48 bg-[#FFFFFF] border border-[#E2E8F0] rounded-lg shadow-xl z-50 py-1">
+                    <div className="absolute top-full left-0 mt-1 w-48 bg-[#FFFFFF] border border-[#E2E8F0] rounded-lg shadow-xl z-50 py-1 max-h-72 overflow-y-auto">
+                      <button
+                        onClick={() => {
+                          setPropertyType(null);
+                          setShowPropertyDropdown(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-[#1F2937] hover:bg-[#EFF6FF] hover:text-[#1565C0] transition"
+                      >
+                        {ANY_TYPE_LABEL}
+                      </button>
                       {PROPERTY_TYPES.map((type) => (
                         <button
                           key={type}
@@ -316,13 +340,22 @@ export default function Hero({ onNavigate }) {
                       <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                     </svg>
-                    {budget}
+                    {currentBudget || ANY_BUDGET_LABEL}
                     <svg className="w-3.5 h-3.5 text-[#6B7280]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
                   </button>
                   {showBudgetDropdown && (
                     <div className="absolute top-full left-0 mt-1 w-52 bg-[#FFFFFF] border border-[#E2E8F0] rounded-lg shadow-xl z-50 py-1">
+                      <button
+                        onClick={() => {
+                          setBudget(null);
+                          setShowBudgetDropdown(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-[#1F2937] hover:bg-[#EFF6FF] hover:text-[#1565C0] transition"
+                      >
+                        {ANY_BUDGET_LABEL}
+                      </button>
                       {BUDGET_RANGES.map((range) => (
                         <button
                           key={range}
