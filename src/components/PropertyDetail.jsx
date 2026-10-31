@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
+import { useAuth } from "../lib/AuthContext";
+import { submitLead } from "../lib/leads";
 import { fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS, AMENITY_CATEGORIES, groupedAmenities } from "../lib/listings";
 import { fetchSiteSettings } from "../lib/siteContent";
 import { useCompare } from "../lib/CompareContext";
@@ -175,6 +177,62 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const [showBrochureModal, setShowBrochureModal] = useState(false);
   const brochureSheetRef = useRef(null);
   const [brochureNote, setBrochureNote] = useState("");
+
+  // ── Request Brochure form ──
+  // The brochure is released after the visitor leaves their contact details;
+  // that submission is saved as a lead tagged to this listing (admin console
+  // → Leads → Property). Once submitted, the brochure stays unlocked for this
+  // listing for the rest of the browser session.
+  const { profile } = useAuth();
+  const brochureKey = `pb_brochure_${property?.dbId || property?.id || ""}`;
+  const [showBrochureForm, setShowBrochureForm] = useState(false);
+  const [brochureUnlocked, setBrochureUnlocked] = useState(() => {
+    try { return sessionStorage.getItem(brochureKey) === "1"; } catch { return false; }
+  });
+  const [brochureForm, setBrochureForm] = useState({ name: "", phone: "", email: "" });
+  const [brochureFormError, setBrochureFormError] = useState("");
+  const [brochureSubmitting, setBrochureSubmitting] = useState(false);
+
+  function openBrochureRequest() {
+    if (brochureUnlocked) { setShowBrochureModal(true); return; }
+    // Pre-fill from the signed-in client's profile, without overwriting what they've already typed
+    setBrochureForm((f) => ({
+      name: f.name || profile?.full_name || "",
+      phone: f.phone || profile?.phone || "",
+      email: f.email,
+    }));
+    setBrochureFormError("");
+    setShowBrochureForm(true);
+  }
+
+  async function submitBrochureRequest(e) {
+    e.preventDefault();
+    if (brochureSubmitting) return;
+    const name = brochureForm.name.trim();
+    const digits = brochureForm.phone.replace(/\D/g, "").slice(-10); // accepts +91 / spaces / dashes
+    const email = brochureForm.email.trim();
+    if (name.length < 2) { setBrochureFormError("Please enter your name."); return; }
+    if (!/^[6-9]\d{9}$/.test(digits)) { setBrochureFormError("Please enter a valid 10-digit mobile number."); return; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setBrochureFormError("That email address doesn't look right."); return; }
+
+    setBrochureFormError("");
+    setBrochureSubmitting(true);
+    const { error } = await submitLead({
+      name,
+      phone: digits,
+      email,
+      interest: `[BROCHURE REQUEST] Requested the brochure for ${property.title}, ${property.location}${property.price ? `, ${property.price}` : ""}`,
+      budget: property.price,
+      listingId: property.dbId,
+    });
+    setBrochureSubmitting(false);
+    if (error) { setBrochureFormError("Something went wrong sending your request. Please try again."); return; }
+
+    try { sessionStorage.setItem(brochureKey, "1"); } catch { /* private mode etc. — just won't persist */ }
+    setBrochureUnlocked(true);
+    setShowBrochureForm(false);
+    setShowBrochureModal(true);
+  }
 
   // Download Brochure: the uploaded file is saved to the device; a listing
   // with no uploaded brochure gets its auto-generated property sheet, which
@@ -1214,7 +1272,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowBrochureModal(true)}
+                  onClick={openBrochureRequest}
                   className="w-full py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow"
                   style={{ background: "#FFFFFF", color: "#1565C0", border: "1.5px solid #1565C0" }}
                 >
@@ -1443,6 +1501,55 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
           </div>
         );
       })()}
+
+      {/* ── Request Brochure form ── */}
+      {showBrochureForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm animate-fade-in" onClick={() => setShowBrochureForm(false)}>
+          <form
+            onSubmit={submitBrochureRequest}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl"
+            noValidate
+          >
+            <div className="flex items-start justify-between gap-3 px-6 py-4 border-b border-slate-200 bg-slate-50">
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-[#1565C0] uppercase tracking-wider inline-block">Request Brochure</p>
+                <p className="text-sm font-bold text-slate-800 mt-1.5 truncate">{property.title}</p>
+                <p className="text-xs text-slate-500 truncate">{property.location}</p>
+              </div>
+              <button type="button" onClick={() => setShowBrochureForm(false)} aria-label="Close"
+                className="w-8 h-8 shrink-0 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-500 transition">✕</button>
+            </div>
+
+            <div className="px-6 py-5 space-y-3.5">
+              <p className="text-xs text-slate-600">Share your details and the brochure opens right away. Our team may also get in touch about this property.</p>
+              <div>
+                <label htmlFor="brochure-name" className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+                <input id="brochure-name" type="text" autoComplete="name" value={brochureForm.name}
+                  onChange={(e) => setBrochureForm((f) => ({ ...f, name: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+              </div>
+              <div>
+                <label htmlFor="brochure-phone" className="block text-xs font-bold text-slate-700 mb-1">Mobile Number *</label>
+                <input id="brochure-phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="10-digit mobile number" value={brochureForm.phone}
+                  onChange={(e) => setBrochureForm((f) => ({ ...f, phone: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+              </div>
+              <div>
+                <label htmlFor="brochure-email" className="block text-xs font-bold text-slate-700 mb-1">Email <span className="font-normal text-slate-400">(optional)</span></label>
+                <input id="brochure-email" type="email" autoComplete="email" value={brochureForm.email}
+                  onChange={(e) => setBrochureForm((f) => ({ ...f, email: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+              </div>
+              {brochureFormError && <p role="alert" className="text-xs font-semibold text-red-600">{brochureFormError}</p>}
+              <button type="submit" disabled={brochureSubmitting}
+                className="w-full py-3 rounded-xl text-sm font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] disabled:opacity-60 transition">
+                {brochureSubmitting ? "Sending…" : "Get Brochure"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* ── Brochure Viewer & Downloader Modal ── */}
       {showBrochureModal && (
