@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS, AMENITY_CATEGORIES, groupedAmenities } from "../lib/listings";
 import { fetchSiteSettings } from "../lib/siteContent";
 import { useCompare } from "../lib/CompareContext";
 import LocationMap from "./LocationMap";
 import AdvertisementBanner from "./AdvertisementBanner";
+import { printElement, downloadFromUrl, fileExtensionOf, isImageUrl } from "../lib/printUtil";
 
 // Converts a YouTube/Vimeo share link into an embeddable iframe URL. Returns
 // null for anything else (Google Drive links, direct .mp4 links, etc.) so
@@ -172,6 +173,31 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const [showStickyBar, setShowStickyBar] = useState(false);
   const [showLocationVideoModal, setShowLocationVideoModal] = useState(false);
   const [showBrochureModal, setShowBrochureModal] = useState(false);
+  const brochureSheetRef = useRef(null);
+  const [brochureNote, setBrochureNote] = useState("");
+
+  // Download Brochure: the uploaded file is saved to the device; a listing
+  // with no uploaded brochure gets its auto-generated property sheet, which
+  // opens in the print dialog (choose "Save as PDF" to keep it as a file).
+  async function handleBrochureDownload() {
+    setBrochureNote("");
+    if (property.brochureUrl) {
+      const ext = fileExtensionOf(property.brochureUrl) || "pdf";
+      const name = `${(property.title || "Property").replace(/[^a-zA-Z0-9_-]+/g, "_")}_Brochure.${ext}`;
+      const { method } = await downloadFromUrl(property.brochureUrl, name);
+      if (method === "opened") setBrochureNote("Your browser opened the brochure in a new tab — use its Save / Download button to keep a copy.");
+    } else if (!printElement(brochureSheetRef.current, `${property.title || "Property"} — Brochure`)) {
+      setBrochureNote("Your browser blocked the print window. Allow pop-ups for this site and try again.");
+    }
+  }
+  function handleBrochurePrint() {
+    setBrochureNote("");
+    if (property.brochureUrl) {
+      window.open(property.brochureUrl, "_blank", "noopener,noreferrer");
+    } else if (!printElement(brochureSheetRef.current, `${property.title || "Property"} — Brochure`)) {
+      setBrochureNote("Your browser blocked the print window. Allow pop-ups for this site and try again.");
+    }
+  }
   useEffect(() => {
     const onScroll = () => setShowStickyBar(window.scrollY > 480);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -1437,28 +1463,17 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               <div className="flex items-center gap-2.5 shrink-0">
                 <button
                   type="button"
-                  onClick={() => {
-                    if (property.brochureUrl) {
-                      const a = document.createElement("a");
-                      a.href = property.brochureUrl;
-                      a.download = `${property.title.replace(/[^a-zA-Z0-9_-]/g, "_")}_Brochure.pdf`;
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                    } else {
-                      window.print();
-                    }
-                  }}
+                  onClick={handleBrochureDownload}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] shadow-sm transition cursor-pointer"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                   </svg>
-                  Download PDF
+                  {property.brochureUrl ? "Download" : "Download PDF"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => window.print()}
+                  onClick={handleBrochurePrint}
                   className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 transition cursor-pointer"
                 >
                   🖨️ Print
@@ -1474,19 +1489,23 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               </div>
             </div>
 
+            {brochureNote && (
+              <p className="px-6 py-2 text-xs font-semibold bg-amber-50 text-amber-800 border-b border-amber-200 shrink-0">{brochureNote}</p>
+            )}
+
             {/* Modal Content / Preview */}
             <div className="flex-1 overflow-y-auto p-6 bg-slate-100">
               {property.brochureUrl ? (
                 <div className="w-full h-[65vh] bg-white rounded-2xl overflow-hidden shadow-inner border border-slate-200">
-                  {property.brochureUrl.endsWith(".pdf") || property.brochureUrl.includes("application/pdf") ? (
-                    <iframe src={property.brochureUrl} title="Property Brochure" className="w-full h-full" />
-                  ) : (
+                  {isImageUrl(property.brochureUrl) ? (
                     <img src={property.brochureUrl} alt="Brochure preview" className="w-full h-full object-contain p-2" />
+                  ) : (
+                    <iframe src={property.brochureUrl} title="Property Brochure" className="w-full h-full" />
                   )}
                 </div>
               ) : (
                 /* Beautiful Property Factsheet Brochure */
-                <div className="max-w-3xl mx-auto bg-white rounded-2xl p-8 border border-slate-200 shadow-md print:shadow-none print:border-0">
+                <div ref={brochureSheetRef} className="max-w-3xl mx-auto bg-white rounded-2xl p-8 border border-slate-200 shadow-md print:shadow-none print:border-0">
                   {/* Brand header */}
                   <div className="flex items-center justify-between pb-6 border-b border-slate-200">
                     <img src="/cropped_logo.png" alt="PropertyBrands" className="h-10 w-auto object-contain" />
@@ -1505,7 +1524,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-black text-[#1565C0]">{property.price}</p>
-                        {property.pricePerSqFt && <p className="text-xs text-slate-500">₹{property.pricePerSqFt.toLocaleString("en-IN")}/sq.ft</p>}
+                        {property.pricePerSqft && <p className="text-xs text-slate-500">₹{Math.round(property.pricePerSqft).toLocaleString("en-IN")}/sq.ft</p>}
                       </div>
                     </div>
 

@@ -4,6 +4,7 @@ import { createListing, LANDMARK_CATEGORIES } from "../lib/listings";
 import { uploadToR2, validateImageFile, validateDocumentFile, computeImageHash, hammingDistance, looksLikeScreenshot, getImageDimensions } from "../lib/r2Upload";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
 import LocationPicker, { reverseGeocode } from "./LocationPicker";
+import { parseGoogleMapsLocation } from "../lib/googleMaps";
 import AuthModal from "./AuthModal";
 import { Home, CheckCircle2 } from "lucide-react";
 
@@ -316,6 +317,22 @@ export default function PostProperty({ onNavigate }) {
     }
   }
 
+  // Pasting a Google Maps link into the link field also drops the map pin on
+  // that spot (when the link contains coordinates), so the two never disagree.
+  const [googleLinkNote, setGoogleLinkNote] = useState("");
+  function handleGoogleLinkChange(value) {
+    set("googleMapsLink", value);
+    const parsed = parseGoogleMapsLocation(value);
+    if (parsed?.short) {
+      setGoogleLinkNote("This is a short link — it works for \"Get Directions\", but it doesn't contain coordinates, so the pin wasn't moved. Open it and paste the full address-bar URL to place the pin from it.");
+    } else if (parsed) {
+      setGoogleLinkNote("Pin placed from this link.");
+      handlePinChange({ latitude: parsed.latitude, longitude: parsed.longitude });
+    } else {
+      setGoogleLinkNote("");
+    }
+  }
+
   function addVideoUrl() {
     if (!videoDraft.trim()) return;
     set("videoUrls", [...form.videoUrls, videoDraft.trim()]);
@@ -621,9 +638,10 @@ export default function PostProperty({ onNavigate }) {
               />
             </Field>
 
-            <Field label="Google Maps Link (optional)" hint="Only needed if you want the &quot;Get Directions&quot; button to open a specific saved link instead of the pin above.">
-              <TextInput value={form.googleMapsLink} onChange={(e) => set("googleMapsLink", e.target.value)}
+            <Field label="Google Maps Link (optional)" hint="Paste a full Google Maps link and the pin above moves to it. Also used for the &quot;Get Directions&quot; button.">
+              <TextInput value={form.googleMapsLink} onChange={(e) => handleGoogleLinkChange(e.target.value)}
                 placeholder="Paste a Google Maps share link (optional)" />
+              {googleLinkNote && <p className="text-xs mt-1.5" style={{ color: googleLinkNote.startsWith("Pin placed") ? "#16A34A" : "#B45309" }}>{googleLinkNote}</p>}
             </Field>
 
             <div className="grid grid-cols-2 gap-4">

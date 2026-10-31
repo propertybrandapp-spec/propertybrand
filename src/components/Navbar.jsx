@@ -5,10 +5,7 @@ import ClientAccountMenu from "./ClientAccountMenu";
 import SelectMembershipModal from "./SelectMembershipModal";
 import BookExpertModal from "./BookExpertModal";
 
-const CITIES = [
-  "Bhubaneswar", "Delhi NCR", "Mumbai", "Bangalore", "Hyderabad",
-  "Chennai", "Pune", "Kolkata", "Ahmedabad", "Jaipur",
-];
+import { SERVICE_CITIES as CITIES } from "../lib/cities";
 
 // ── REDESIGNED 6-PILLAR MASTER NAVIGATION ────────────────────────────────────
 // As specified in the Discover Website blueprint:
@@ -272,7 +269,7 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1.5 w-48 rounded-xl shadow-2xl z-50 py-2 bg-white border border-gray-200 animate-fade-in">
+        <div className="absolute top-full left-0 mt-1.5 w-48 max-h-80 overflow-y-auto rounded-xl shadow-2xl z-50 py-2 bg-white border border-gray-200 animate-fade-in">
           <p className="text-[10px] font-bold uppercase tracking-widest px-3 pb-1 text-gray-400">Select City</p>
           {CITIES.map((city) => (
             <button

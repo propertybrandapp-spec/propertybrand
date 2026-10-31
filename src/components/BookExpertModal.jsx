@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { submitLead } from "../lib/leads";
+import { SERVICE_CITIES } from "../lib/cities";
 
 const CONSULTATION_TOPICS = [
   { id: "investment", label: "Investment Planning & ROI Analysis", icon: "📈", desc: "Rental yields, high-growth corridors & portfolio allocation" },
@@ -25,10 +26,7 @@ const BUDGET_RANGES = [
   "₹10 Crore+ / Institutional",
 ];
 
-const CITIES = [
-  "Bhubaneswar", "Delhi NCR", "Mumbai", "Bangalore", "Hyderabad",
-  "Pune", "Kolkata", "Chennai", "Ahmedabad", "Jaipur", "Other City",
-];
+const CITIES = [...SERVICE_CITIES, "Other City"];
 
 export default function BookExpertModal({ isOpen, onClose, initialTopic = null }) {
   const [topic, setTopic] = useState(initialTopic || "investment");

@@ -29,6 +29,9 @@ export const PROPERTY_SECTORS = [
   { id: "lifestyle", label: "Lifestyle & Co-living", icon: "🌴", tags: ["Luxury", "Gated Community", "Co-living", "Student Accommodation"] },
 ];
 
+// The tags that belong to the "Lifestyle & Co-living" category chip
+const LIFESTYLE_TAGS = ["Luxury", "Gated Community", "Co-living", "Student Accommodation"];
+
 // Budget filter shape: [min, max]. min 0 = no lower limit, max null = no upper
 // limit (so listings above any fixed ceiling are never silently hidden).
 const NO_BUDGET = [0, null];
@@ -487,7 +490,7 @@ function buildFilters(overrides) {
   };
 }
 
-export default function SearchResults({ initialFilters, onNavigate }) {
+export default function SearchResults({ initialFilters, onNavigate, onFiltersChange }) {
   const [viewMode, setViewMode] = useState("list"); // list | grid
   const resultsRef = useRef(null);
   const [sortBy, setSortBy] = useState("Relevance");
@@ -499,6 +502,9 @@ export default function SearchResults({ initialFilters, onNavigate }) {
       setFilters(buildFilters(initialFilters));
     }
   }, [initialFilters]);
+  useEffect(() => {
+    if (onFiltersChange) onFiltersChange(filters);
+  }, [filters, onFiltersChange]);
   const [listings, setListings] = useState(null); // null = still loading, [] = loaded but empty
   const [loadError, setLoadError] = useState("");
   const [fieldOptions, setFieldOptions] = useState(null);
@@ -589,23 +595,34 @@ export default function SearchResults({ initialFilters, onNavigate }) {
     filters.furnishing.length + filters.warehouseSpecs.length + filters.landZoning.length +
     (isBudgetActive(filters.budget) ? 1 : 0);
 
+  // Which category chip is highlighted. "All Categories" means no category
+  // narrowing at all (no property types picked, no lifestyle tags). Any other
+  // chip is highlighted when everything picked belongs to that category — so
+  // multi-type categories like Land & Plots and searches that arrive from the
+  // homepage (e.g. Plot + Agricultural Land) light up the right chip instead
+  // of "All Categories".
   const activeSector = (() => {
-    if (filters.types.length === 1 && (filters.types[0] === "Plot" || filters.types[0] === "Agricultural Land")) return "land";
-    if (filters.types.length === 1 && filters.types[0] === "Warehouse / Industrial Shed") return "industrial";
-    if (filters.types.length && filters.types.every(t => ["Commercial", "Office Space", "Shop / Showroom"].includes(t))) return "commercial";
-    if (filters.types.length && filters.types.every(t => ["Apartment", "Villa", "Independent House", "Penthouse", "Studio Apartment"].includes(t))) return "residential";
-    if (filters.tags.length && filters.tags.every(t => ["Luxury", "Gated Community", "Co-living", "Student Accommodation"].includes(t))) return "lifestyle";
-    return "all";
+    const lifestyleTagsPicked = filters.tags.filter(t => LIFESTYLE_TAGS.includes(t));
+    if (filters.types.length === 0) {
+      if (lifestyleTagsPicked.length === 0) return "all";
+      return "lifestyle";
+    }
+    if (lifestyleTagsPicked.length > 0) return null; // mixed selection — no single category
+    const match = PROPERTY_SECTORS.find(sec => sec.types && filters.types.every(t => sec.types.some(x => sameText(x, t))));
+    return match ? match.id : null;
   })();
 
+  // Choosing a category replaces the property-type / lifestyle-tag selection
+  // and leaves every other filter (budget, location, BHK, quick filters like
+  // RERA Approved…) exactly as it was. "All Categories" clears just those.
   function handleSectorSelect(sector) {
-    if (sector.id === "all") {
-      setFilters(f => ({ ...f, types: [], tags: [] }));
-    } else if (sector.types) {
-      setFilters(f => ({ ...f, types: sector.types, tags: [] }));
-    } else if (sector.tags) {
-      setFilters(f => ({ ...f, types: [], tags: sector.tags }));
-    }
+    setFilters(f => {
+      const keepTags = f.tags.filter(t => !LIFESTYLE_TAGS.includes(t));
+      if (sector.id === "all") return { ...f, types: [], tags: keepTags };
+      if (sector.types) return { ...f, types: sector.types, tags: keepTags };
+      if (sector.tags) return { ...f, types: [], tags: [...keepTags, ...sector.tags] };
+      return f;
+    });
   }
 
   return (

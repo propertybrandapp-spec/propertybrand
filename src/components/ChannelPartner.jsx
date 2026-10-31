@@ -3,6 +3,7 @@ import { submitPartnerApplication } from "../lib/agents";
 import { fetchPartnerTiers } from "../lib/siteContent";
 import { submitLead } from "../lib/leads";
 import { Package, BarChart3, Smartphone, GraduationCap, MessageCircle, DollarSign } from "lucide-react";
+import { SERVICE_CITIES } from "../lib/cities";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -274,7 +275,7 @@ function PartnerForm({ onNavigate, selectedTier, onClearTier }) {
           className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
           style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", color: form.city ? "#1F2937" : "#6B7280" }}>
           <option value="">Select City</option>
-          {["Bhubaneswar", "Delhi", "Mumbai", "Bangalore", "Hyderabad", "Pune", "Kolkata"].map(c => (
+          {SERVICE_CITIES.map(c => (
             <option key={c} value={c} style={{ background: "#FFFFFF", color: "#1F2937" }}>{c}</option>
           ))}
         </select>

@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { submitLead } from "../lib/leads";
+import { printElement } from "../lib/printUtil";
+import RentAgreementDocument from "./RentAgreementDocument";
 
 const STEPS = [
   { num: 1, title: "Property Details", desc: "Address, unit type & rent" },
@@ -14,6 +16,12 @@ export default function RentReadyHub({ onNavigate }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     propertyAddress: "",
+    flatNo: "",
+    floor: "",
+    buildingName: "",
+    parkingDetails: "",
+    furnishing: "Semi-furnished",
+    rentDueDay: "5",
     city: "Bhubaneswar",
     propertyType: "2 BHK Apartment",
     monthlyRent: "22000",
@@ -38,6 +46,15 @@ export default function RentReadyHub({ onNavigate }) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const agreementRef = useRef(null);
+  const [printNote, setPrintNote] = useState("");
+
+  function handlePrintAgreement() {
+    setPrintNote("");
+    if (!printElement(agreementRef.current, "Residential Rent Agreement")) {
+      setPrintNote("Your browser blocked the print window. Allow pop-ups for this site and try again.");
+    }
+  }
 
   function updateField(key, val) {
     setFormData((prev) => ({ ...prev, [key]: val }));
@@ -198,6 +215,38 @@ export default function RentReadyHub({ onNavigate }) {
                       className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none resize-none"
                     />
                   </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Flat / House No.</label>
+                      <input type="text" value={formData.flatNo} onChange={(e) => updateField("flatNo", e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Floor</label>
+                      <input type="text" value={formData.floor} onChange={(e) => updateField("floor", e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Building / Society Name</label>
+                      <input type="text" value={formData.buildingName} onChange={(e) => updateField("buildingName", e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Parking Details (if applicable)</label>
+                      <input type="text" value={formData.parkingDetails} onChange={(e) => updateField("parkingDetails", e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Furnishing Status</label>
+                      <select value={formData.furnishing} onChange={(e) => updateField("furnishing", e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                        <option value="Furnished">Furnished</option>
+                        <option value="Semi-furnished">Semi-furnished</option>
+                        <option value="Unfurnished">Unfurnished</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -325,6 +374,30 @@ export default function RentReadyHub({ onNavigate }) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Rent Due By (Day of Month)</label>
+                      <select
+                        value={formData.rentDueDay}
+                        onChange={(e) => updateField("rentDueDay", e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm bg-white"
+                      >
+                        {Array.from({ length: 28 }, (_, i) => String(i + 1)).map((d) => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Tenancy Start Date</label>
+                      <input
+                        type="date"
+                        value={formData.moveInDate}
+                        onChange={(e) => updateField("moveInDate", e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm bg-white"
+                      />
+                    </div>
+                  </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1">Tenure (Months)</label>
                       <select
                         value={formData.leaseDurationMonths}
@@ -370,34 +443,31 @@ export default function RentReadyHub({ onNavigate }) {
                 <div className="space-y-5 animate-fade-in">
                   <div className="border-b border-gray-100 pb-3 flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">Step 4: State-Compliant Legal Template Preview</h3>
-                      <p className="text-xs text-gray-500">Drafted per state tenancy laws with verified dispute clauses</p>
+                      <h3 className="text-lg font-bold text-gray-900">Step 4: Rent Agreement Preview</h3>
+                      <p className="text-xs text-gray-500">Residential Rent Agreement — your details are filled in below</p>
                     </div>
                     <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">
-                      Standard Verified Clause Set
+                      18 Clauses + Inventory Annexure
                     </span>
                   </div>
 
-                  <div className="p-5 rounded-2xl bg-gray-50 border border-gray-200 text-xs font-mono text-gray-800 space-y-3 leading-relaxed max-h-72 overflow-y-auto">
-                    <p className="text-center font-bold text-sm text-gray-900 border-b pb-2">
-                      RESIDENTIAL LEASE / RENTAL AGREEMENT
-                    </p>
-                    <p>
-                      THIS LEASE AGREEMENT is made on this day between <strong>{formData.ownerName || "[LANDLORD NAME]"}</strong> (hereinafter referred to as the "LESSOR") AND <strong>{formData.tenantName || "[TENANT NAME]"}</strong> (hereinafter referred to as the "LESSEE").
-                    </p>
-                    <p>
-                      <strong>1. PREMISES:</strong> The Lessor hereby lets and the Lessee takes on lease the premises situated at: <strong>{formData.propertyAddress || "[PROPERTY ADDRESS]"}</strong> ({formData.propertyType}).
-                    </p>
-                    <p>
-                      <strong>2. RENT & DEPOSIT:</strong> The agreed monthly rent is <strong>₹{formData.monthlyRent}</strong> payable by the 5th of each calendar month. The Lessee has deposited an interest-free refundable security deposit of <strong>₹{formData.securityDeposit}</strong>.
-                    </p>
-                    <p>
-                      <strong>3. TERM & LOCK-IN:</strong> This lease is for a period of <strong>{formData.leaseDurationMonths} months</strong> with an agreed lock-in period of <strong>{formData.lockInPeriodMonths} months</strong> and a notice period of <strong>{formData.noticePeriodDays} days</strong>.
-                    </p>
-                    <p>
-                      <strong>4. REPAIRS & INVENTORY:</strong> Minor day-to-day repairs will be handled by the Lessee; structural repairs and major seepage will be the responsibility of the Lessor.
+                  <div className="p-5 sm:p-6 rounded-2xl bg-white border border-gray-200 shadow-inner max-h-[28rem] overflow-y-auto">
+                    <RentAgreementDocument ref={agreementRef} data={formData} />
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handlePrintAgreement}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] transition"
+                    >
+                      Print / Save Agreement as PDF
+                    </button>
+                    <p className="text-[11px] text-gray-500">
+                      Lines left blank (ages, parents' names, addresses, utilities) are filled in by hand before signing.
                     </p>
                   </div>
+                  {printNote && <p className="text-xs font-semibold text-amber-700">{printNote}</p>}
                 </div>
               )}
 

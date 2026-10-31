@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { AuthProvider } from "./lib/AuthContext";
 import { SavedItemsProvider } from "./lib/SavedItemsContext";
 import { CompareProvider } from "./lib/CompareContext";
@@ -47,8 +47,23 @@ import LifestyleHub from "./components/LifestyleHub";
 // its own separate project/deployment — see /admin-console (or wherever you
 // deployed it) instead. Nothing in this file talks to it anymore.
 
+// Pages that can be restored from the URL hash alone (i.e. they need no
+// payload). "property-detail" is deliberately absent — it needs the property
+// object, so a reload on it falls back to the home page.
+const HASH_PAGES = [
+  "home", "search", "channel-partner", "property-management", "investment-advisory", "agents", "about",
+  "contact", "careers", "blog", "faq", "privacy-policy", "terms-conditions", "disclaimer", "sitemap",
+  "post-property", "my-properties", "profile", "saved", "inquiries", "compare", "architects-design",
+  "land-develop", "rent-ready", "build-move", "lifestyle",
+];
+
+function pageFromHash() {
+  const p = (window.location.hash || "").replace(/^#\/?/, "");
+  return HASH_PAGES.includes(p) ? p : "home";
+}
+
 function AppContent() {
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(() => pageFromHash());
   const [navNonce, setNavNonce] = useState(0);
   const [searchFilters, setSearchFilters] = useState(null);
   const [contactSubject, setContactSubject] = useState(null);
@@ -57,6 +72,46 @@ function AppContent() {
 
   const ANCHOR_PAGES = ["investment-advisory", "property-management", "architects-design", "faq"];
 
+  // ── Browser Back / Forward support ─────────────────────────────────────────
+  // The site is one page that swaps components, so without this the browser's
+  // Back button (and a phone's back gesture) would leave the site entirely.
+  // Every navigate() adds a history entry; Back/Forward replays the entry —
+  // page plus its payload (search filters, viewed property, …) — and restores
+  // the scroll position. Payloads live in memory (entriesRef), not in the URL.
+  const entriesRef = useRef(new Map());   // entry id -> { page, payload, scrollY }
+  const currentIdRef = useRef(0);
+  const nextIdRef = useRef(1);
+
+  function applyEntry(to, payload) {
+    setPage(to);
+    setNavNonce((n) => n + 1);
+    if (to === "search") setSearchFilters(payload || null);
+    if (to === "contact") setContactSubject(payload || null);
+    if (to === "property-detail") setViewingProperty(payload || null);
+    if (ANCHOR_PAGES.includes(to)) setPageAnchor(payload || null);
+  }
+
+  useEffect(() => {
+    const first = { page: pageFromHash(), payload: null, scrollY: 0 };
+    entriesRef.current.set(0, first);
+    currentIdRef.current = 0;
+    try { window.history.replaceState({ pbId: 0 }, "", window.location.hash || `#/${first.page}`); } catch { /* sandboxed iframe etc. */ }
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+
+    function onPop(e) {
+      const id = e.state?.pbId;
+      let entry = id != null ? entriesRef.current.get(id) : null;
+      if (id != null) currentIdRef.current = id;
+      // Entry unknown (e.g. page was reloaded in between) — rebuild from the URL
+      if (!entry) entry = { page: pageFromHash(), payload: null, scrollY: 0 };
+      applyEntry(entry.page, entry.payload);
+      setTimeout(() => window.scrollTo({ top: entry.scrollY || 0, behavior: "auto" }), 60);
+    }
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // `payload` is optional and its meaning depends on the destination:
   //  - "search"           → an initial filters object (transactionType, types, tags, possession, etc.)
   //  - "contact"          → a subject value to preselect in the contact form dropdown
@@ -64,14 +119,33 @@ function AppContent() {
   //  - investment-advisory / property-management / architects-design / faq
   //                       → an anchor id string — scrolls to and briefly highlights that exact section
   function navigate(to, payload) {
-    setPage(to);
-    setNavNonce((n) => n + 1);
-    if (to === "search") setSearchFilters(payload || null);
-    if (to === "contact") setContactSubject(payload || null);
-    if (to === "property-detail") setViewingProperty(payload || null);
-    if (ANCHOR_PAGES.includes(to)) setPageAnchor(payload || null);
+    // Remember where the user was scrolled on the page they're leaving
+    const leaving = entriesRef.current.get(currentIdRef.current);
+    if (leaving) leaving.scrollY = window.scrollY;
+
+    const id = nextIdRef.current++;
+    entriesRef.current.set(id, { page: to, payload: payload ?? null, scrollY: 0 });
+    currentIdRef.current = id;
+    try { window.history.pushState({ pbId: id }, "", `#/${to}`); } catch { /* ignore */ }
+
+    applyEntry(to, payload);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  // The results page reports its live filters here so that coming Back to it
+  // (e.g. after opening a property) restores what the visitor had chosen, not
+  // just the filters the page was first opened with. Stored on the history
+  // entry only — no state update, so nothing re-renders or resets.
+  const rememberSearchFilters = useCallback((filters) => {
+    const entry = entriesRef.current.get(currentIdRef.current);
+    if (entry && entry.page === "search") entry.payload = filters;
+  }, []);
+
+  const goBack = useCallback(() => {
+    if (window.history.length > 1 && currentIdRef.current > 0) window.history.back();
+    else navigate("home");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div
@@ -84,6 +158,23 @@ function AppContent() {
       {/* ── Dev nav strip (remove in production) ── */}
 
       {/* ── Page rendering ── */}
+      {/* ── Back bar: one step back through the pages the visitor has seen ── */}
+      {page !== "home" && (
+        <div className="max-w-7xl mx-auto px-4 pt-3">
+          <button
+            type="button"
+            onClick={goBack}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:text-[#1565C0] hover:border-[#1565C0] transition"
+            aria-label="Go back to the previous page"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+        </div>
+      )}
+
       <main>
         {page === "home" && (
           <>
@@ -99,7 +190,7 @@ function AppContent() {
           </>
         )}
 
-        {page === "search" && <SearchResults key={navNonce} initialFilters={searchFilters} onNavigate={navigate} />}
+        {page === "search" && <SearchResults key={navNonce} initialFilters={searchFilters} onNavigate={navigate} onFiltersChange={rememberSearchFilters} />}
 
         {page === "property-detail" && (
           <PropertyDetail key={navNonce} property={viewingProperty?.property} pool={viewingProperty?.pool} onNavigate={navigate} />
