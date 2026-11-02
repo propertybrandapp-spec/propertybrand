@@ -9,6 +9,17 @@ import LocationMap from "./LocationMap";
 import AdvertisementBanner from "./AdvertisementBanner";
 import { printElement, downloadFromUrl, fileExtensionOf, isImageUrl } from "../lib/printUtil";
 
+// ── Request Brochure form options ──
+const BROCHURE_PURPOSES = {
+  Buy: ["Buying to live in it myself", "Buying as an investment", "Not sure yet"],
+  Rent: ["Renting for myself / my family", "Renting for shared stay / co-living", "Renting for a company / business"],
+};
+const BROCHURE_TIMELINES = {
+  Buy: ["Immediately", "Within 1 month", "1–3 months", "3–6 months", "Just exploring"],
+  Rent: ["Immediately", "Within 1 month", "1–3 months", "3–6 months", "Just exploring"],
+};
+const BROCHURE_CONTACT_TIMES = ["Anytime", "Morning (9 AM – 12 PM)", "Afternoon (12 – 4 PM)", "Evening (4 – 8 PM)"];
+
 // Converts a YouTube/Vimeo share link into an embeddable iframe URL. Returns
 // null for anything else (Google Drive links, direct .mp4 links, etc.) so
 // those just render as a plain "Watch Video" link instead of a broken embed.
@@ -189,7 +200,9 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const [brochureUnlocked, setBrochureUnlocked] = useState(() => {
     try { return sessionStorage.getItem(brochureKey) === "1"; } catch { return false; }
   });
-  const [brochureForm, setBrochureForm] = useState({ name: "", phone: "", email: "" });
+  const [brochureForm, setBrochureForm] = useState({
+    name: "", phone: "", email: "", purpose: "", timeline: "", contactTime: "Anytime", message: "", consent: false,
+  });
   const [brochureFormError, setBrochureFormError] = useState("");
   const [brochureSubmitting, setBrochureSubmitting] = useState(false);
 
@@ -197,9 +210,9 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
     if (brochureUnlocked) { setShowBrochureModal(true); return; }
     // Pre-fill from the signed-in client's profile, without overwriting what they've already typed
     setBrochureForm((f) => ({
+      ...f,
       name: f.name || profile?.full_name || "",
       phone: f.phone || profile?.phone || "",
-      email: f.email,
     }));
     setBrochureFormError("");
     setShowBrochureForm(true);
@@ -214,6 +227,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
     if (name.length < 2) { setBrochureFormError("Please enter your name."); return; }
     if (!/^[6-9]\d{9}$/.test(digits)) { setBrochureFormError("Please enter a valid 10-digit mobile number."); return; }
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setBrochureFormError("That email address doesn't look right."); return; }
+    if (!brochureForm.consent) { setBrochureFormError("Please tick the box to agree to be contacted about this property."); return; }
 
     setBrochureFormError("");
     setBrochureSubmitting(true);
@@ -221,9 +235,20 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
       name,
       phone: digits,
       email,
-      interest: `[BROCHURE REQUEST] Requested the brochure for ${property.title}, ${property.location}${property.price ? `, ${property.price}` : ""}`,
+      interest: [
+        `[BROCHURE REQUEST] Requested the brochure for ${property.title}, ${property.location}${property.price ? `, ${property.price}` : ""}`,
+        brochureForm.purpose && `Looking for: ${brochureForm.purpose}`,
+        brochureForm.timeline && `Timeline: ${brochureForm.timeline}`,
+        `Best time to call: ${brochureForm.contactTime}`,
+        brochureForm.message.trim() && `Message: ${brochureForm.message.trim()}`,
+      ].filter(Boolean).join(" | "),
       budget: property.price,
       listingId: property.dbId,
+      // Feeds the structured buyer fields the admin Leads page already shows
+      buyerPreferences: property.transactionType === "Rent" ? undefined : {
+        purpose: brochureForm.purpose || undefined,
+        purchaseTimeline: brochureForm.timeline || undefined,
+      },
     });
     setBrochureSubmitting(false);
     if (error) { setBrochureFormError("Something went wrong sending your request. Please try again."); return; }
@@ -1508,7 +1533,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
           <form
             onSubmit={submitBrochureRequest}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl"
+            className="relative w-full max-w-md max-h-[92vh] overflow-y-auto bg-white rounded-3xl shadow-2xl"
             noValidate
           >
             <div className="flex items-start justify-between gap-3 px-6 py-4 border-b border-slate-200 bg-slate-50">
@@ -1522,7 +1547,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
             </div>
 
             <div className="px-6 py-5 space-y-3.5">
-              <p className="text-xs text-slate-600">Share your details and the brochure opens right away. Our team may also get in touch about this property.</p>
+              <p className="text-xs text-slate-600">Tell us a little about what you're looking for and the brochure opens right away. Our team may follow up with details about this property.</p>
               <div>
                 <label htmlFor="brochure-name" className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
                 <input id="brochure-name" type="text" autoComplete="name" value={brochureForm.name}
@@ -1541,6 +1566,51 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   onChange={(e) => setBrochureForm((f) => ({ ...f, email: e.target.value }))}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none" />
               </div>
+              <div className="grid grid-cols-1 gap-3.5">
+                <div>
+                  <label htmlFor="brochure-purpose" className="block text-xs font-bold text-slate-700 mb-1">I'm interested in</label>
+                  <select id="brochure-purpose" value={brochureForm.purpose}
+                    onChange={(e) => setBrochureForm((f) => ({ ...f, purpose: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                    <option value="">Select (optional)</option>
+                    {(BROCHURE_PURPOSES[property.transactionType] || BROCHURE_PURPOSES.Buy).map((o) => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="brochure-timeline" className="block text-xs font-bold text-slate-700 mb-1">{property.transactionType === "Rent" ? "Planning to move in" : "Planning to buy"}</label>
+                    <select id="brochure-timeline" value={brochureForm.timeline}
+                      onChange={(e) => setBrochureForm((f) => ({ ...f, timeline: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                      <option value="">Select (optional)</option>
+                      {(BROCHURE_TIMELINES[property.transactionType] || BROCHURE_TIMELINES.Buy).map((o) => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="brochure-time" className="block text-xs font-bold text-slate-700 mb-1">Best time to call</label>
+                    <select id="brochure-time" value={brochureForm.contactTime}
+                      onChange={(e) => setBrochureForm((f) => ({ ...f, contactTime: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none">
+                      {BROCHURE_CONTACT_TIMES.map((o) => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="brochure-message" className="block text-xs font-bold text-slate-700 mb-1">Message <span className="font-normal text-slate-400">(optional)</span></label>
+                  <textarea id="brochure-message" rows={3} maxLength={500} value={brochureForm.message}
+                    placeholder="Anything you'd like to know — price negotiation, site visit, payment plan, loan help…"
+                    onChange={(e) => setBrochureForm((f) => ({ ...f, message: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none resize-none" />
+                </div>
+              </div>
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" checked={brochureForm.consent}
+                  onChange={(e) => setBrochureForm((f) => ({ ...f, consent: e.target.checked }))}
+                  className="mt-0.5 w-4 h-4 rounded shrink-0" />
+                <span className="text-[11px] leading-snug text-slate-600">
+                  I agree to be contacted by PropertyBrands about this property by phone, SMS, WhatsApp or email.
+                </span>
+              </label>
               {brochureFormError && <p role="alert" className="text-xs font-semibold text-red-600">{brochureFormError}</p>}
               <button type="submit" disabled={brochureSubmitting}
                 className="w-full py-3 rounded-xl text-sm font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] disabled:opacity-60 transition">
