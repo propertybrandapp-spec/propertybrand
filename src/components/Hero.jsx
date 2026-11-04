@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchHeroContent, fetchHeroCards } from "../lib/siteContent";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
+import { withExtraTypes } from "../lib/propertyTypes";
 import { parseBudgetRange, DEFAULT_RENT_BUDGET_RANGES } from "../lib/searchFilters";
 
 // ── Fallback content ──────────────────────────────────────────────────────────
@@ -72,7 +73,7 @@ const DEMO_HERO_CARDS = [
 
 // Fallback lists for the two search-bar dropdowns — kept in sync with "Site
 // Content" → Listing Options in the admin console (see the fetch below).
-const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space"];
+const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Duplex", "Plot", "Commercial", "Office Space"];
 const DEFAULT_BUDGET_RANGES = ["Under ₹30 Lac", "₹30 - 50 Lac", "₹50 Lac - 1 Cr", "₹1 - 1.5 Cr", "₹1.5 - 2 Cr", "Above ₹2 Cr"];
 
 // "no choice made" labels for the two dropdowns — picking one clears that filter
@@ -167,7 +168,7 @@ export default function Hero({ onNavigate }) {
   const cards = heroCards || DEMO_HERO_CARDS;
   const SEARCH_TABS = content.searchTabs?.length ? content.searchTabs : DEFAULT_HERO_CONTENT.searchTabs;
   const QUICK_CTAS = content.quickCtas?.length ? content.quickCtas : DEFAULT_HERO_CONTENT.quickCtas;
-  const PROPERTY_TYPES = fieldOptions?.propertyTypes?.length ? fieldOptions.propertyTypes : DEFAULT_PROPERTY_TYPES;
+  const PROPERTY_TYPES = withExtraTypes(fieldOptions?.propertyTypes?.length ? fieldOptions.propertyTypes : DEFAULT_PROPERTY_TYPES);
   const BUY_BUDGET_RANGES = fieldOptions?.budgetRanges?.length ? fieldOptions.budgetRanges : DEFAULT_BUDGET_RANGES;
 
   // Derived instead of synced via effect — stays valid even if the admin

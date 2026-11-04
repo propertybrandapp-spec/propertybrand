@@ -255,6 +255,18 @@ function DropdownMenu({ item, isOpen, onNavigate, onOpenModal }) {
 }
 
 function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
+  // Any city can be searched — the list is just shortcuts for the ones we serve.
+  const [typed, setTyped] = useState("");
+  const query = typed.trim();
+  const shown = query ? CITIES.filter((c) => c.toLowerCase().includes(query.toLowerCase())) : CITIES;
+  const exact = CITIES.some((c) => c.toLowerCase() === query.toLowerCase());
+  function submitTyped(e) {
+    e.preventDefault();
+    if (!query) return;
+    const match = CITIES.find((c) => c.toLowerCase() === query.toLowerCase());
+    onSelect(match || query.replace(/\b\w/g, (m) => m.toUpperCase()));
+    setTyped("");
+  }
   return (
     <div className="relative">
       <button
@@ -270,8 +282,25 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
 
       {isOpen && (
         <div className="absolute top-full left-0 mt-1.5 w-48 max-h-80 overflow-y-auto rounded-xl shadow-2xl z-50 py-2 bg-white border border-gray-200 animate-fade-in">
+          <form onSubmit={submitTyped} className="px-2 pb-2">
+            <input
+              value={typed}
+              onChange={(e) => setTyped(e.target.value)}
+              placeholder="Type any city…"
+              aria-label="Type any city"
+              className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-400"
+            />
+          </form>
           <p className="text-[10px] font-bold uppercase tracking-widest px-3 pb-1 text-gray-400">Select City</p>
-          {CITIES.map((city) => (
+          {query && !exact && (
+            <button
+              onClick={submitTyped}
+              className="block w-full text-left px-3 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 transition"
+            >
+              Search “{query}”
+            </button>
+          )}
+          {shown.map((city) => (
             <button
               key={city}
               onClick={() => onSelect(city)}

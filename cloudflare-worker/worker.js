@@ -38,6 +38,11 @@ export default {
       return handleDelete(request, env);
     }
 
+    // ── POST /send-agreement — emails the rent agreement draft to owner/tenant
+    if (url.pathname === "/send-agreement" && request.method === "POST") {
+      return handleSendAgreement(request, env);
+    }
+
     // ── GET /file/:key — public read proxy (only needed if your bucket isn't
     // already attached to a public R2.dev domain or custom domain)
     if (url.pathname.startsWith("/file/") && request.method === "GET") {
@@ -186,4 +191,65 @@ function json(data, status, request, env) {
     status,
     headers: { "Content-Type": "application/json", ...corsHeaders(request, env) },
   });
+}
+
+
+// ── Rent agreement email ────────────────────────────────────────────────────
+// Sends the RentReady agreement draft to the owner and/or tenant through
+// Resend (https://resend.com). Needs two secrets — see wrangler.toml:
+//   RESEND_API_KEY  – your Resend API key
+//   MAIL_FROM       – a sender on a domain verified in Resend,
+//                     e.g.  PropertyBrands <agreements@propertybrands.in>
+// Optional:  MAIL_BCC – an internal address that gets a copy of every agreement.
+//
+// Guard rails (this endpoint can send email, so it must not be an open relay):
+// the request must come from one of ALLOWED_ORIGINS, at most 3 recipients,
+// fixed subject prefix, and a size limit on the body.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+async function handleSendAgreement(request, env) {
+  if (!env.RESEND_API_KEY || !env.MAIL_FROM) {
+    return json({ error: "Email sending isn't set up yet (RESEND_API_KEY / MAIL_FROM missing)." }, 503, request, env);
+  }
+
+  // Only our own sites may call this (CORS alone doesn't stop non-browser callers).
+  const allowList = (env.ALLOWED_ORIGINS || env.ALLOWED_ORIGIN || "").split(",").map((o) => o.trim()).filter(Boolean);
+  const origin = request.headers.get("Origin") || "";
+  const isLocal = origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:");
+  if (allowList.length && !isLocal && !allowList.includes(origin)) {
+    return json({ error: "Origin not allowed" }, 403, request, env);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "Invalid JSON" }, 400, request, env);
+  }
+
+  const to = Array.from(new Set((Array.isArray(body.to) ? body.to : []).map((e) => String(e).trim().toLowerCase()).filter((e) => EMAIL_RE.test(e))));
+  if (to.length === 0 || to.length > 3) {
+    return json({ error: "Provide 1–3 valid recipient email addresses." }, 400, request, env);
+  }
+  const html = typeof body.html === "string" ? body.html : "";
+  if (!html || html.length > 400000) {
+    return json({ error: "Agreement content is missing or too large." }, 400, request, env);
+  }
+  const subject = `Rent Agreement Draft — ${String(body.subject || "PropertyBrands RentReady").slice(0, 150)}`;
+  const text = String(body.text || "Your rent agreement draft from PropertyBrands is attached in this email.").slice(0, 2000);
+
+  const payload = { from: env.MAIL_FROM, to, subject, html, text };
+  if (env.MAIL_BCC) payload.bcc = [env.MAIL_BCC];
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    console.error("Resend error", res.status, detail);
+    return json({ error: "The email service rejected the message.", status: res.status }, 502, request, env);
+  }
+  return json({ sent: to }, 200, request, env);
 }

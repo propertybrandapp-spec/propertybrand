@@ -186,6 +186,9 @@ function TierCard({ tier, onSelectTier }) {
 // ── Registration Form ─────────────────────────────────────────────────────────
 function PartnerForm({ onNavigate, selectedTier, onClearTier }) {
   const [form, setForm] = useState({ name: "", phone: "", email: "", city: "", rera: "", experience: "" });
+  const [otherCity, setOtherCity] = useState("");
+  // "Other City" lets applicants type any city we don't list.
+  const cityName = form.city === "Other City" ? otherCity.trim() : form.city;
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -203,7 +206,7 @@ function PartnerForm({ onNavigate, selectedTier, onClearTier }) {
         name: form.name.trim(),
         phone: form.phone.trim(),
         email: form.email.trim(),
-        city: form.city,
+        city: cityName,
         experience: form.experience,
         reraNumber: form.rera,
         tier: selectedTier?.name || "Associate",
@@ -212,9 +215,9 @@ function PartnerForm({ onNavigate, selectedTier, onClearTier }) {
         name: form.name.trim(),
         phone: form.phone.trim(),
         email: form.email.trim(),
-        city: form.city || "Bhubaneswar",
+        city: cityName || "Bhubaneswar",
         source: "channel-partner",
-        interest: `[CHANNEL PARTNER] Tier: ${selectedTier?.name || "Associate"} (${selectedTier?.commission || "1.5%"} commission) | Exp: ${form.experience || "N/A"} | RERA: ${form.rera || "N/A"} | City: ${form.city || "N/A"}`,
+        interest: `[CHANNEL PARTNER] Tier: ${selectedTier?.name || "Associate"} (${selectedTier?.commission || "1.5%"} commission) | Exp: ${form.experience || "N/A"} | RERA: ${form.rera || "N/A"} | City: ${cityName || "N/A"}`,
       });
       setSubmitted(true);
     } catch (err) {
@@ -278,6 +281,7 @@ function PartnerForm({ onNavigate, selectedTier, onClearTier }) {
           {SERVICE_CITIES.map(c => (
             <option key={c} value={c} style={{ background: "#FFFFFF", color: "#1F2937" }}>{c}</option>
           ))}
+          <option value="Other City" style={{ background: "#FFFFFF", color: "#1F2937" }}>Other City…</option>
         </select>
         <select value={form.experience} onChange={(e) => setForm({ ...form, experience: e.target.value })}
           className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
@@ -288,6 +292,13 @@ function PartnerForm({ onNavigate, selectedTier, onClearTier }) {
           ))}
         </select>
       </div>
+      {form.city === "Other City" && (
+        <input
+          type="text" value={otherCity} onChange={(e) => setOtherCity(e.target.value)} placeholder="Type your city"
+          className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"
+          style={{ background: "#FFFFFF", border: "1.5px solid #E2E8F0", color: "#1F2937" }}
+        />
+      )}
       <input type="text" placeholder="RERA Registration No. (if any)"
         value={form.rera} onChange={(e) => setForm({ ...form, rera: e.target.value })}
         className="w-full text-sm rounded-xl px-4 py-3 focus:outline-none transition"

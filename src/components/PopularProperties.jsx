@@ -290,10 +290,10 @@ export default function PopularProperties({ onNavigate }) {
 
   function matchesFilter(p, tab) {
     if (tab === "All") return true;
-    if (tab === "Apartments") return p.type === "Apartment";
-    if (tab === "Villas") return p.type === "Villa";
-    if (tab === "Plots") return p.type === "Plot";
-    if (tab === "Commercial") return p.type === "Commercial";
+    if (tab === "Apartments") return ["Apartment", "Studio Apartment", "Penthouse"].includes(p.type);
+    if (tab === "Villas") return ["Villa", "Independent House", "Duplex", "Farmhouse"].includes(p.type);
+    if (tab === "Plots") return ["Plot", "Agricultural Land"].includes(p.type);
+    if (tab === "Commercial") return ["Commercial", "Office Space", "Office", "Shop / Showroom", "Retail", "Warehouse / Industrial Shed", "Industrial"].includes(p.type);
     if (tab === "Budget Homes") return p.tags?.includes("Affordable");
     if (tab === "Luxury") return p.tags?.includes("Luxury");
     if (tab === "New Projects") return p.postedBy === "Builder";
@@ -302,8 +302,11 @@ export default function PopularProperties({ onNavigate }) {
 
   const filtered = ALL_PROPERTIES.filter((p) => matchesFilter(p, activeFilter));
 
+  // Owners get their own row; every other poster (builder, agent, channel
+  // partner, property manager, …) goes in "Featured Projects" so no listing
+  // is ever left out of the homepage.
   const ownerProperties = filtered.filter((p) => p.postedBy === "Owner");
-  const builderProperties = filtered.filter((p) => p.postedBy === "Builder" || p.postedBy === "Agent");
+  const builderProperties = filtered.filter((p) => p.postedBy !== "Owner");
 
   function openProperty(property) {
     onNavigate && onNavigate("property-detail", { property, pool: ALL_PROPERTIES });

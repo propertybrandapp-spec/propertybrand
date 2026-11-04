@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { submitLead } from "../lib/leads";
 import { useAuth } from "../lib/AuthContext";
-import { fetchSiteSettings, fetchOfficeLocations } from "../lib/siteContent";
+import { CONTACT_PHONE, CONTACT_PHONE_TEL, CONTACT_WHATSAPP_DIGITS } from "../lib/contactInfo";
+import { fetchSiteSettings } from "../lib/siteContent";
 
 // ── Contact Info ──────────────────────────────────────────────────────────────
 
@@ -49,19 +50,11 @@ const CONTACT_ICON_DEFS = [
 ];
 
 const DEFAULT_SETTINGS = {
-  address: "PropertyBrands Realty Services, Bhubaneswar, Odisha — 751001",
-  phone: "+91 94301 00000",
-  whatsapp: "+91 98765 00000",
+  phone: CONTACT_PHONE,
+  whatsapp: CONTACT_PHONE,
   email: "info@propertybrands.in",
   businessHours: "Mon – Sat, 9:00 AM – 7:00 PM",
 };
-
-// Shown until real offices are added in the admin console ("Site Content" → Office Locations)
-const DEMO_OFFICES = [
-  { city: "Bhubaneswar", address: "Main Road, Bhubaneswar, Odisha 751001", phone: "+91 94301 00000" },
-  { city: "Delhi", address: "Connaught Place, New Delhi 110001", phone: "+91 98765 00001" },
-  { city: "Bangalore", address: "MG Road, Bangalore, Karnataka 560001", phone: "+91 98765 00002" },
-];
 
 const FAQ = [
   { q: "How do I schedule a site visit?", a: "Use the 'Schedule Site Visit' button on any listing, or contact our team directly via phone or the form below. We also provide a free cab for every scheduled visit." },
@@ -117,26 +110,21 @@ export default function ContactUs({ onNavigate, initialSubject }) {
   const intent = isRichPayload ? initialSubject.intent : null; // "contact" | "site-visit" | "callback"
 
   const [settings, setSettings] = useState(null);
-  const [offices, setOffices] = useState(null); // null = loading
 
   useEffect(() => {
     let cancelled = false;
     fetchSiteSettings().then(({ data }) => { if (!cancelled) setSettings(data); });
-    fetchOfficeLocations().then(({ data }) => {
-      if (!cancelled) setOffices(data && data.length > 0 ? data : DEMO_OFFICES);
-    });
     return () => { cancelled = true; };
   }, []);
 
-  const info = { ...DEFAULT_SETTINGS, ...(settings || {}) };
-  const OFFICES = offices || DEMO_OFFICES;
+  // Phone is fixed company-wide; the postal address is intentionally not shown.
+  const info = { ...DEFAULT_SETTINGS, ...(settings || {}), phone: CONTACT_PHONE, whatsapp: CONTACT_PHONE };
   const CONTACT_HREFS = {
-    address: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(info.address)}`,
-    phone: `tel:${(info.phone || "").replace(/[^\d+]/g, "")}`,
+    phone: `tel:${CONTACT_PHONE_TEL}`,
     email: `mailto:${info.email}`,
     businessHours: null,
   };
-  const CONTACT_INFO = CONTACT_ICON_DEFS.map((def) => ({ ...def, value: info[def.key], href: CONTACT_HREFS[def.key] }));
+  const CONTACT_INFO = CONTACT_ICON_DEFS.filter((def) => def.key !== "address").map((def) => ({ ...def, value: info[def.key], href: CONTACT_HREFS[def.key] }));
 
   function defaultMessage() {
     if (!property) return "";
@@ -613,31 +601,14 @@ export default function ContactUs({ onNavigate, initialSubject }) {
             )}
           </div>
 
-          {/* Map + Offices */}
+          {/* Call us directly (no postal address is shown) */}
           <div className="space-y-5">
-            <div className="rounded-2xl overflow-hidden h-56" style={{ border: "1px solid #E2E8F0" }}>
-              <img
-                src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=700&h=400&fit=crop"
-                alt="Office location map"
-                className="w-full h-full object-cover"
-              />
+            <div className="rounded-2xl p-6" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+              <p className="text-sm font-bold mb-1" style={{ color: "#1F2937" }}>Talk to our team</p>
+              <p className="text-xs mb-4" style={{ color: "#6B7280" }}>{info.businessHours}</p>
+              <a href={`tel:${CONTACT_PHONE_TEL}`} className="block text-lg font-extrabold hover:underline" style={{ color: "#1565C0" }}>{CONTACT_PHONE}</a>
+              <a href={`https://wa.me/${CONTACT_WHATSAPP_DIGITS}`} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 text-xs font-bold px-4 py-2 rounded-lg" style={{ background: "#16A34A", color: "#FFFFFF" }}>Chat on WhatsApp</a>
             </div>
-            {OFFICES.map((office) => (
-              <div key={office.id || office.city} className="rounded-2xl p-5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-bold" style={{ color: "#1F2937" }}>{office.city} Office</p>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1565C0" }}>
-                    Open
-                  </span>
-                </div>
-                <p className="text-xs" style={{ color: "#6B7280" }}>{office.address}</p>
-                {office.phone && (
-                  <a href={`tel:${office.phone.replace(/[^\d+]/g, "")}`} className="text-xs mt-1 font-semibold block hover:underline" style={{ color: "#1F2937" }}>
-                    {office.phone}
-                  </a>
-                )}
-              </div>
-            ))}
           </div>
 
         </div>

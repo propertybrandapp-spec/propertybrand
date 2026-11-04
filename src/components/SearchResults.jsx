@@ -5,13 +5,14 @@ import { useSavedItems } from "../lib/SavedItemsContext";
 import { useCompare } from "../lib/CompareContext";
 import QuickViewModal from "./QuickViewModal";
 import AdvertisementBanner from "./AdvertisementBanner";
+import { withExtraTypes, matchesPropertyType } from "../lib/propertyTypes";
 import {
   budgetSteps, formatBudget, isBudgetActive, matchesBudget, matchesLocation, sameText,
 } from "../lib/searchFilters";
 
 // Fallback defaults for the filter sidebar — kept in sync with "Site
 // Content" → Listing Options in the admin console (see the fetch below).
-const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land"];
+const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Duplex", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land"];
 const POSSESSION = ["Ready to Move", "Under Construction"];
 const POSTED_BY = ["Owner", "Builder", "Agent"];
 const DEFAULT_AMENITIES_LIST = ["Lift", "Parking", "Visitor Parking", "Power Backup", "Security", "24x7 Security", "CCTV", "Intercom", "Swimming Pool", "Gym", "Garden", "Club House", "Multipurpose Hall", "Indoor Games", "Kids Play Area", "Jogging Track", "Amphitheatre", "Yoga / Meditation Area", "Senior Citizen Sitout", "Cafeteria", "WiFi", "Housekeeping", "Fire Safety", "Rain Water Harvesting", "Sewage Treatment Plant", "Solar Water Heating", "EV Charging Point", "Water Softener Plant", "Vaastu Compliant", "Pet Friendly", "Gated Community"];
@@ -22,7 +23,7 @@ const DEFAULT_TAGS_LIST = ["Luxury", "Affordable", "Gated Community", "Office", 
 // ── Complete Property Category Architecture (Section 2 of Blueprint) ────────
 export const PROPERTY_SECTORS = [
   { id: "all", label: "All Categories", icon: "🏢" },
-  { id: "residential", label: "Residential", icon: "🏡", types: ["Apartment", "Villa", "Independent House", "Penthouse", "Studio Apartment"] },
+  { id: "residential", label: "Residential", icon: "🏡", types: ["Apartment", "Villa", "Independent House", "Duplex", "Penthouse", "Studio Apartment"] },
   { id: "commercial", label: "Commercial", icon: "🏬", types: ["Commercial", "Office Space", "Shop / Showroom"] },
   { id: "industrial", label: "Industrial & Logistics", icon: "🏭", types: ["Warehouse / Industrial Shed"] },
   { id: "land", label: "Land & Plots", icon: "🗺️", types: ["Plot", "Agricultural Land", "Farmhouse"] },
@@ -36,12 +37,23 @@ const LIFESTYLE_TAGS = ["Luxury", "Gated Community", "Co-living", "Student Accom
 // limit (so listings above any fixed ceiling are never silently hidden).
 const NO_BUDGET = [0, null];
 
+// How many results are shown at first, and how many more each "Load More" click adds.
+const PAGE_STEP = 12;
+
 // ── Helper ─────────────────────────────────────────────────────────────────────
 function CheckBox({ label, checked, onChange }) {
   return (
-    <label className="flex items-center gap-2.5 cursor-pointer group">
+    // The whole row (box AND text) toggles — previously only the tiny box did,
+    // so clicking a label like "Duplex" appeared to do nothing.
+    <label
+      className="flex items-center gap-2.5 cursor-pointer group select-none"
+      role="checkbox"
+      aria-checked={!!checked}
+      tabIndex={0}
+      onClick={(e) => { e.preventDefault(); onChange(); }}
+      onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); onChange(); } }}
+    >
       <div
-        onClick={onChange}
         className="w-4 h-4 rounded flex items-center justify-center shrink-0 transition-all"
         style={{
           background: checked ? "#1565C0" : "transparent",
@@ -494,6 +506,8 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
   const [viewMode, setViewMode] = useState("list"); // list | grid
   const resultsRef = useRef(null);
   const [sortBy, setSortBy] = useState("Relevance");
+  // Results are shown a page at a time; "Load More Properties" reveals the next page.
+  const [visibleCount, setVisibleCount] = useState(PAGE_STEP);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filters, setFilters] = useState(() => buildFilters(initialFilters));
@@ -520,7 +534,7 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
     return () => { cancelled = true; };
   }, []);
 
-  const PROPERTY_TYPES = fieldOptions?.propertyTypes?.length ? fieldOptions.propertyTypes : DEFAULT_PROPERTY_TYPES;
+  const PROPERTY_TYPES = withExtraTypes(fieldOptions?.propertyTypes?.length ? fieldOptions.propertyTypes : DEFAULT_PROPERTY_TYPES);
   const BHK_OPTIONS = fieldOptions?.bhkOptions?.length ? fieldOptions.bhkOptions : DEFAULT_BHK_OPTIONS;
   const AMENITIES_LIST = fieldOptions?.amenities?.length ? fieldOptions.amenities : DEFAULT_AMENITIES_LIST;
   const TAGS_LIST = fieldOptions?.tags?.length ? fieldOptions.tags : DEFAULT_TAGS_LIST;
@@ -552,7 +566,7 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
   const filtered = ALL_PROPERTIES.filter(p => {
     if (p.transactionType !== filters.transactionType) return false;
     if (!matchesBudget(p, filters.budget)) return false;
-    if (filters.types.length && !filters.types.some(t => sameText(t, p.type))) return false;
+    if (!matchesPropertyType(filters.types, p)) return false;
     if (filters.bhk.length && !filters.bhk.some(b => p.bhk.includes(b))) return false;
     if (filters.possession.length && !filters.possession.includes(p.status)) return false;
     if (filters.postedBy?.length && !filters.postedBy.includes(p.postedBy)) return false;
@@ -589,6 +603,14 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
     if (sortBy === "Area: Large to Small") return (parseInt(b.area) || 0) - (parseInt(a.area) || 0);
     return b.featured - a.featured;
   });
+
+  const visible = sorted.slice(0, visibleCount);
+  const hasMore = sorted.length > visible.length;
+
+  // A new search / filter / sort starts again from the first page.
+  useEffect(() => {
+    setVisibleCount(PAGE_STEP);
+  }, [filters, sortBy]);
 
   const activeFilterCount = filters.types.length + filters.bhk.length + filters.possession.length +
     filters.postedBy.length + filters.amenities.length + filters.tags.length + (filters.verifiedOnly ? 1 : 0) +
@@ -950,7 +972,7 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
               </div>
             ) : viewMode === "list" ? (
               <div className="space-y-4">
-                {sorted.map((p, idx) => (
+                {visible.map((p, idx) => (
                   <React.Fragment key={p.id}>
                     <PropertyCardList property={p} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
                     {idx === 2 && (
@@ -968,7 +990,7 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {sorted.map((p, idx) => (
+                {visible.map((p, idx) => (
                   <React.Fragment key={p.id}>
                     <PropertyCardGrid property={p} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
                     {idx === 3 && (
@@ -988,13 +1010,21 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
 
             {/* Load more */}
             {sorted.length > 0 && (
-              <div className="mt-8 flex justify-center">
-                <button className="px-8 py-3 rounded-xl text-sm font-bold transition-all"
-                  style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
-                  Load More Properties
-                </button>
+              <div className="mt-8 flex flex-col items-center gap-2">
+                <p className="text-xs" style={{ color: "#6B7280" }}>
+                  Showing {visible.length} of {sorted.length} properties
+                </p>
+                {hasMore && (
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount((n) => n + PAGE_STEP)}
+                    className="px-8 py-3 rounded-xl text-sm font-bold transition-all"
+                    style={{ background: "transparent", color: "#1565C0", border: "1.5px solid #1565C0" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#1565C0"; e.currentTarget.style.color = "#FFFFFF"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1565C0"; }}>
+                    Load More Properties
+                  </button>
+                )}
               </div>
             )}
           </div>

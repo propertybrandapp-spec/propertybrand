@@ -27,3 +27,9 @@ bucket_name = "propertybrands-media"
 #       https://propertybrands.in,https://admin.propertybrands.in
 #     (no spaces, no trailing slashes). The older singular ALLOWED_ORIGIN
 #     secret still works as a single-origin fallback if you don't set this.
+
+# ── Rent agreement emails (POST /send-agreement) ─────────────────────────────
+#   wrangler secret put RESEND_API_KEY   # API key from https://resend.com
+#   wrangler secret put MAIL_FROM        # e.g.  PropertyBrands <agreements@propertybrands.in>
+#                                        # (the domain must be verified in Resend)
+#   wrangler secret put MAIL_BCC         # optional: internal inbox that gets a copy of each agreement

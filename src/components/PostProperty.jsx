@@ -7,12 +7,13 @@ import LocationPicker, { reverseGeocode } from "./LocationPicker";
 import { parseGoogleMapsLocation } from "../lib/googleMaps";
 import { isLandType, PLOT_AREA_UNITS, LAND_USE_OPTIONS, PLOT_APPROVAL_OPTIONS, LAND_PHOTO_LABELS, resolvePlotArea, landValidationMessage, formatPlotArea } from "../lib/landListing";
 import AuthModal from "./AuthModal";
+import { withExtraTypes } from "../lib/propertyTypes";
 import { Home, CheckCircle2 } from "lucide-react";
 
 // Fallback defaults — used until the dynamic options load (or if the
 // "Site Content" → Listing Options table is still empty). Admins can add
 // more of these from the admin console without a code change.
-const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land", "Office", "Retail", "Industrial", "Co-living", "Student Accommodation"];
+const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Duplex", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land", "Office", "Retail", "Industrial", "Co-living", "Student Accommodation"];
 const DEFAULT_BHK_OPTIONS = ["1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK", "5+ BHK"];
 const DEFAULT_AMENITIES = ["Lift", "Parking", "Visitor Parking", "Power Backup", "Security", "24x7 Security", "CCTV", "Intercom", "Swimming Pool", "Gym", "Garden", "Club House", "Multipurpose Hall", "Indoor Games", "Kids Play Area", "Jogging Track", "Amphitheatre", "Yoga / Meditation Area", "Senior Citizen Sitout", "Cafeteria", "WiFi", "Housekeeping", "Fire Safety", "Rain Water Harvesting", "Sewage Treatment Plant", "Solar Water Heating", "EV Charging Point", "Water Softener Plant", "Vaastu Compliant", "Pet Friendly", "Gated Community"];
 const POSSESSION_OPTIONS = ["Ready to Move", "Under Construction"];
@@ -280,7 +281,7 @@ export default function PostProperty({ onNavigate }) {
     return () => { cancelled = true; };
   }, []);
 
-  const PROPERTY_TYPES = options?.propertyTypes?.length ? options.propertyTypes : DEFAULT_PROPERTY_TYPES;
+  const PROPERTY_TYPES = withExtraTypes(options?.propertyTypes?.length ? options.propertyTypes : DEFAULT_PROPERTY_TYPES);
   const BHK_OPTIONS = options?.bhkOptions?.length ? options.bhkOptions : DEFAULT_BHK_OPTIONS;
   const AMENITIES = options?.amenities?.length ? options.amenities : DEFAULT_AMENITIES;
 

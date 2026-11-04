@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { submitLead } from "../lib/leads";
 import { printElement } from "../lib/printUtil";
 import RentAgreementDocument from "./RentAgreementDocument";
+import { renderToStaticMarkup } from "react-dom/server";
+import { sendAgreementEmail, validRecipients } from "../lib/sendAgreement";
 
 const STEPS = [
   { num: 1, title: "Property Details", desc: "Address, unit type & rent" },
@@ -48,10 +50,23 @@ export default function RentReadyHub({ onNavigate }) {
   const [isCompleted, setIsCompleted] = useState(false);
   const agreementRef = useRef(null);
   const [printNote, setPrintNote] = useState("");
+  // Result of emailing the agreement: { status: "sent" | "failed" | "no-email", to: [], error }
+  const [emailResult, setEmailResult] = useState(null);
 
   function handlePrintAgreement() {
     setPrintNote("");
     if (!printElement(agreementRef.current, "Residential Rent Agreement")) {
+      setPrintNote("Your browser blocked the print window. Allow pop-ups for this site and try again.");
+    }
+  }
+
+  // The on-screen agreement only exists on step 4, so for the completion screen
+  // render it into a detached element and print that.
+  function handlePrintAgreementFromData() {
+    setPrintNote("");
+    const holder = document.createElement("div");
+    holder.innerHTML = renderToStaticMarkup(<RentAgreementDocument data={formData} />);
+    if (!printElement(holder, "Residential Rent Agreement")) {
       setPrintNote("Your browser blocked the print window. Allow pop-ups for this site and try again.");
     }
   }
@@ -72,6 +87,24 @@ export default function RentReadyHub({ onNavigate }) {
         property_id: null,
         message: `[RENTREADY DRAFT] Property: ${formData.propertyAddress}, ${formData.city} | Rent: ₹${formData.monthlyRent}/mo | Deposit: ₹${formData.securityDeposit} | Owner: ${formData.ownerName} (${formData.ownerPhone}) | Tenant: ${formData.tenantName} (${formData.tenantPhone}) | Services: Packers=${formData.needPackers}, Cleaning=${formData.needDeepClean}, Inspection=${formData.needMoveInInspection}`,
       });
+
+      // Email the agreement draft to whoever gave an email address.
+      const recipients = validRecipients([formData.ownerEmail, formData.tenantEmail]);
+      if (recipients.length === 0) {
+        setEmailResult({ status: "no-email", to: [] });
+      } else {
+        const markup = renderToStaticMarkup(<RentAgreementDocument data={formData} />);
+        const html = `<div style="font-family:Georgia,serif;font-size:14px;line-height:1.6;color:#111;max-width:760px;margin:0 auto;padding:16px">`
+          + `<p style="font-family:Arial,sans-serif;font-size:13px;color:#444">Hello, here is the rent agreement draft you prepared on PropertyBrands RentReady. `
+          + `Please print it, fill in the blank lines and sign it on stamp paper.</p><hr/>${markup}</div>`;
+        const result = await sendAgreementEmail({
+          to: recipients,
+          subject: `${formData.propertyAddress || "Rental property"}, ${formData.city}`.slice(0, 150),
+          html,
+          text: "Your rent agreement draft from PropertyBrands RentReady is in this email.",
+        });
+        setEmailResult(result.ok ? { status: "sent", to: result.sent } : { status: "failed", to: recipients, error: result.error });
+      }
       setIsCompleted(true);
     } catch (err) {
       alert("Submission error: " + err.message);
@@ -150,9 +183,27 @@ export default function RentReadyHub({ onNavigate }) {
                 RentReady Application & Draft Initiated!
               </h2>
               <p className="text-sm text-gray-600 mt-2 max-w-lg mx-auto">
-                Your legally vetted rental agreement draft has been generated for <strong>{formData.propertyAddress}</strong>. Both Landlord and Tenant will receive a link to review, verify Aadhaar/PAN, and complete digital signing.
+                Your legally vetted rental agreement draft has been generated for <strong>{formData.propertyAddress}</strong>. Print it, fill in the blank lines and sign it on stamp paper.
               </p>
+              {emailResult?.status === "sent" && (
+                <p className="text-sm font-semibold text-emerald-700 mt-3">✓ A copy was emailed to {emailResult.to.join(", ")}.</p>
+              )}
+              {emailResult?.status === "failed" && (
+                <div className="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 max-w-lg mx-auto">
+                  <p className="font-semibold">We couldn't email the agreement just now{emailResult.error ? ` (${emailResult.error})` : ""}.</p>
+                  <p className="text-xs mt-1">Use "Print / Save as PDF" below, or <a className="underline font-semibold" href={`mailto:${emailResult.to.join(",")}?subject=${encodeURIComponent("Rent agreement draft")}`}>open your email app</a> and attach the saved PDF.</p>
+                </div>
+              )}
+              {emailResult?.status === "no-email" && (
+                <p className="text-xs text-gray-500 mt-3">No email address was entered, so nothing was emailed. Use "Print / Save as PDF" below.</p>
+              )}
               <div className="mt-8 flex flex-wrap justify-center gap-4">
+                <button
+                  onClick={handlePrintAgreementFromData}
+                  className="px-6 py-2.5 rounded-xl font-bold text-sm bg-[#1565C0] text-white hover:bg-[#0D47A1] transition"
+                >
+                  Print / Save as PDF
+                </button>
                 <button
                   onClick={() => onNavigate && onNavigate("home")}
                   className="px-6 py-2.5 rounded-xl font-bold text-sm bg-gray-900 text-white hover:bg-black transition"
@@ -166,6 +217,7 @@ export default function RentReadyHub({ onNavigate }) {
                   Browse More Rentals
                 </button>
               </div>
+              {printNote && <p className="mt-3 text-xs font-semibold text-amber-700">{printNote}</p>}
             </div>
           ) : (
             <div>

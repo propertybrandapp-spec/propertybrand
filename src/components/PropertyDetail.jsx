@@ -1767,7 +1767,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-100 text-xs text-slate-700 space-y-1">
                     <p className="font-bold text-[#1565C0]">Developer: {property.developer?.name || property.developerName || "Verified Partner Developer"}</p>
                     {property.project?.reraNumber && <p>RERA Registration Number: <span className="font-semibold">{property.project.reraNumber}</span></p>}
-                    <p className="text-[11px] text-slate-500 pt-1">For site visits &amp; inquiries: contact info@propertybrands.in | +91 94301 00000</p>
+                    <p className="text-[11px] text-slate-500 pt-1">For site visits &amp; inquiries: contact info@propertybrands.in | +91 99372 91200</p>
                   </div>
                 </div>
               )}

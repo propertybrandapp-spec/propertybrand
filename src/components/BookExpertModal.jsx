@@ -33,6 +33,9 @@ export default function BookExpertModal({ isOpen, onClose, initialTopic = null }
   const [mode, setMode] = useState("video");
   const [budget, setBudget] = useState("₹50 Lakh – ₹1 Crore");
   const [city, setCity] = useState("Bhubaneswar");
+  const [otherCity, setOtherCity] = useState("");
+  // "Other City" lets the visitor type any city we don't list.
+  const cityName = city === "Other City" ? (otherCity.trim() || "Other City") : city;
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -70,10 +73,10 @@ export default function BookExpertModal({ isOpen, onClose, initialTopic = null }
         name: name.trim(),
         phone: phone.trim(),
         email: email.trim() || null,
-        city,
+        city: cityName,
         source: "book-expert",
         property_id: null,
-        interest: `[CONSULTATION BOOKING] Topic: ${topicObj?.label || topic} | Mode: ${mode} | Budget: ${budget} | City: ${city} | Preferred Time: ${preferredDate} ${preferredTime} | Notes: ${notes.trim()}`,
+        interest: `[CONSULTATION BOOKING] Topic: ${topicObj?.label || topic} | Mode: ${mode} | Budget: ${budget} | City: ${cityName} | Preferred Time: ${preferredDate} ${preferredTime} | Notes: ${notes.trim()}`,
       });
       setSubmitted(true);
     } catch (err) {
@@ -234,6 +237,15 @@ export default function BookExpertModal({ isOpen, onClose, initialTopic = null }
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
+                {city === "Other City" && (
+                  <input
+                    type="text"
+                    value={otherCity}
+                    onChange={(e) => setOtherCity(e.target.value)}
+                    placeholder="Type your city"
+                    className="mt-2 w-full px-3 py-2 rounded-xl border border-gray-300 text-xs sm:text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  />
+                )}
               </div>
             </div>
 

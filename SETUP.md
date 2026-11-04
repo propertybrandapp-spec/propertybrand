@@ -117,3 +117,9 @@ Get the Supabase values from **Project Settings → API**. Restart `npm run dev`
 - **Photo upload fails (Post Property / profile avatar)** → check `VITE_R2_WORKER_URL` is set and the Worker deployed successfully (Step 4); check the Worker's secrets are all set (`wrangler secret list` from `cloudflare-worker/`), including `ALLOWED_ORIGINS` containing this site's exact origin.
 
 And run `supabase/migration_029_plot_listing_details.sql` — adds the plot / land fields (road width, plot length and width, corner plot, boundary wall, land use, approval). Choosing the **Plot** or **Agricultural Land** type in Post Property or the admin listing form now swaps the BHK / bathroom / floor fields for plot fields (area in sq ft, sq yd, sq m, decimal or acre). The site still saves plots if this migration has not been run yet — the plot details are then kept in the description — but run it to store them as proper fields.
+
+Also run `supabase/migration_030_duplex_type.sql` — adds **Duplex** as a property type. (The site offers Duplex even before you run it, but running it lets you manage it from the admin Listing Options screen.)
+
+**Rent agreement emails:** the RentReady page now emails the agreement draft to the owner/tenant addresses entered. This needs the Cloudflare Worker redeployed (`wrangler deploy` in `cloudflare-worker/`) and two secrets set: `wrangler secret put RESEND_API_KEY` (a free key from resend.com) and `wrangler secret put MAIL_FROM` (e.g. `PropertyBrands <agreements@propertybrands.in>` — the domain must be verified in Resend). Optional: `MAIL_BCC` for an internal copy. Until that is set up the page tells the user the email could not be sent and offers Print / Save as PDF instead.
+
+**Contact details:** the company phone (+91 99372 91200) is fixed in `src/lib/contactInfo.js`; the postal address is no longer shown on the site.
