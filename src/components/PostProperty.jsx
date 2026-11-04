@@ -5,6 +5,7 @@ import { uploadToR2, validateImageFile, validateDocumentFile, computeImageHash, 
 import { fetchListingFieldOptions } from "../lib/listingOptions";
 import LocationPicker, { reverseGeocode } from "./LocationPicker";
 import { parseGoogleMapsLocation } from "../lib/googleMaps";
+import { isLandType, PLOT_AREA_UNITS, LAND_USE_OPTIONS, PLOT_APPROVAL_OPTIONS, LAND_PHOTO_LABELS, resolvePlotArea, landValidationMessage, formatPlotArea } from "../lib/landListing";
 import AuthModal from "./AuthModal";
 import { Home, CheckCircle2 } from "lucide-react";
 
@@ -56,6 +57,9 @@ const ROOM_LABEL_OPTIONS = ["Exterior", "Living Room", "Kitchen", "Bedroom", "Ba
 const MANDATORY_ROOM_CATEGORIES = ["Exterior", "Living Room", "Kitchen", "Bedroom", "Bathroom", "Balcony"];
 const MIN_PHOTOS = 8;
 const MAX_RECOMMENDED_PHOTOS = 15;
+// Plots & land have no rooms — a few clear views of the land are what buyers want.
+const LAND_MANDATORY_CATEGORIES = ["Plot View"];
+const LAND_MIN_PHOTOS = 3;
 // ── New in Section 2H: Seller / Agent Information ──
 const POSTED_BY_OPTIONS = ["Owner", "Builder", "Channel Partner", "Agent", "Property Manager"];
 const CONTACT_METHOD_OPTIONS = ["Call", "WhatsApp", "Chat", "Email"];
@@ -96,6 +100,16 @@ const EMPTY_FORM = {
   superBuiltUpArea: "",
   carpetArea: "",
   plotArea: "",
+  // ── Plot / land details ──
+  plotAreaValue: "",
+  plotAreaUnit: "sqft",
+  plotLength: "",
+  plotWidth: "",
+  roadWidth: "",
+  cornerPlot: false,
+  boundaryWall: false,
+  landUse: "",
+  plotApproval: "",
   floorNumber: "",
   totalFloors: "",
   totalUnits: "",
@@ -253,6 +267,12 @@ export default function PostProperty({ onNavigate }) {
   function set(key, value) {
     setForm((f) => ({ ...f, [key]: value }));
   }
+
+  // Bare land (plots, agricultural land) is described by size/road/approvals, not rooms.
+  const isLand = isLandType(form.type);
+  const minPhotos = isLand ? LAND_MIN_PHOTOS : MIN_PHOTOS;
+  const mandatoryCategories = isLand ? LAND_MANDATORY_CATEGORIES : MANDATORY_ROOM_CATEGORIES;
+  const photoLabelOptions = isLand ? LAND_PHOTO_LABELS : ROOM_LABEL_OPTIONS;
 
   useEffect(() => {
     let cancelled = false;
@@ -457,7 +477,7 @@ export default function PostProperty({ onNavigate }) {
 
   function missingMandatoryCategories() {
     const covered = new Set(form.imageDetails.filter((d) => d.roomLabel).map((d) => d.roomLabel));
-    return MANDATORY_ROOM_CATEGORIES.filter((c) => !covered.has(c));
+    return mandatoryCategories.filter((c) => !covered.has(c));
   }
 
   function priceLabelFromRaw(raw) {
@@ -468,6 +488,7 @@ export default function PostProperty({ onNavigate }) {
 
   // ── Section 2B live previews — see AdminListingForm.jsx for the same logic ──
   function estimatedAreaSqft() {
+    if (isLand) return resolvePlotArea(form);
     return Number(form.builtUpArea) || Number(form.superBuiltUpArea) || Number(form.carpetArea) || Number(form.plotArea) || null;
   }
 
@@ -513,6 +534,12 @@ export default function PostProperty({ onNavigate }) {
 
     if (!form.title || !form.location || (!form.priceOnRequest && !form.priceRaw)) {
       setSaveError('Title, location, and price are required — or check "Call for Details" if you\'d rather not list a price.');
+      return;
+    }
+
+    const landProblem = landValidationMessage(form);
+    if (landProblem) {
+      setSaveError(landProblem);
       return;
     }
 
@@ -596,7 +623,7 @@ export default function PostProperty({ onNavigate }) {
 
           <div className="rounded-2xl p-6 space-y-5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
             <Field label="Title" required>
-              <TextInput value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. 3 BHK Apartment in Patia" required />
+              <TextInput value={form.title} onChange={(e) => set("title", e.target.value)} placeholder={isLand ? "e.g. 1800 sq ft Residential Plot in Patia" : "e.g. 3 BHK Apartment in Patia"} required />
             </Field>
 
             <Field label="Location" required>
@@ -622,6 +649,62 @@ export default function PostProperty({ onNavigate }) {
               </Field>
             </div>
 
+            {isLand ? (
+              <div className="rounded-xl p-4 space-y-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                <div>
+                  <p className="text-sm font-bold" style={{ color: "#1F2937" }}>Plot / Land Details</p>
+                  <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>Plots are searched by size, road access and approvals — fill in what you know.</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field label="Plot Area" required hint="Pick the unit you know — we store it in sq ft.">
+                    <div className="flex gap-2">
+                      <TextInput type="number" min="0" step="any" value={form.plotAreaValue} onChange={(e) => set("plotAreaValue", e.target.value)} placeholder="e.g. 1800" />
+                      <Select value={form.plotAreaUnit} onChange={(e) => set("plotAreaUnit", e.target.value)}>
+                        {PLOT_AREA_UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
+                      </Select>
+                    </div>
+                    {formatPlotArea(resolvePlotArea(form)) && (
+                      <p className="text-[11px] mt-1 font-semibold" style={{ color: "#16A34A" }}>= {formatPlotArea(resolvePlotArea(form))}</p>
+                    )}
+                  </Field>
+                  <Field label="Road Width (ft)" hint="Width of the road the plot faces">
+                    <TextInput type="number" min="0" step="any" value={form.roadWidth} onChange={(e) => set("roadWidth", e.target.value)} placeholder="e.g. 30" />
+                  </Field>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Length (ft)" hint="Optional">
+                    <TextInput type="number" min="0" step="any" value={form.plotLength} onChange={(e) => set("plotLength", e.target.value)} placeholder="e.g. 60" />
+                  </Field>
+                  <Field label="Width (ft)" hint="Optional">
+                    <TextInput type="number" min="0" step="any" value={form.plotWidth} onChange={(e) => set("plotWidth", e.target.value)} placeholder="e.g. 30" />
+                  </Field>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field label="Land Use">
+                    <Select value={form.landUse} onChange={(e) => set("landUse", e.target.value)}>
+                      <option value="">— Select —</option>
+                      {LAND_USE_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                    </Select>
+                  </Field>
+                  <Field label="Approval / Layout">
+                    <Select value={form.plotApproval} onChange={(e) => set("plotApproval", e.target.value)}>
+                      <option value="">— Select —</option>
+                      {PLOT_APPROVAL_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+                    </Select>
+                  </Field>
+                </div>
+                <div className="flex flex-wrap gap-x-6 gap-y-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
+                    <input type="checkbox" checked={form.cornerPlot} onChange={(e) => set("cornerPlot", e.target.checked)} className="w-4 h-4 rounded accent-[#1565C0]" />
+                    Corner plot
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
+                    <input type="checkbox" checked={form.boundaryWall} onChange={(e) => set("boundaryWall", e.target.checked)} className="w-4 h-4 rounded accent-[#1565C0]" />
+                    Boundary wall built
+                  </label>
+                </div>
+              </div>
+            ) : (
             <Field label="BHK" hint="Select all that apply — e.g. a project offering both 2 BHK and 3 BHK units.">
               <div className="flex flex-wrap gap-2">
                 {BHK_OPTIONS.map((b) => (
@@ -629,6 +712,7 @@ export default function PostProperty({ onNavigate }) {
                 ))}
               </div>
             </Field>
+            )}
 
             <Field label="Pin Location on Map" hint="This powers the interactive map buyers/tenants see on your listing.">
               <LocationPicker
@@ -832,6 +916,7 @@ export default function PostProperty({ onNavigate }) {
                 <TextInput value={form.developerName} onChange={(e) => set("developerName", e.target.value)} placeholder="e.g. Skyline Builders" />
               </Field>
             </div>
+            {!isLand && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Tower / Block">
                 <TextInput value={form.towerBlock} onChange={(e) => set("towerBlock", e.target.value)} placeholder="e.g. Tower B" />
@@ -840,6 +925,7 @@ export default function PostProperty({ onNavigate }) {
                 <TextInput value={form.unitNumber} onChange={(e) => set("unitNumber", e.target.value)} placeholder="e.g. 1204" />
               </Field>
             </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Ownership Type" hint="Optional">
@@ -858,10 +944,14 @@ export default function PostProperty({ onNavigate }) {
               Other legal details (title status, certificates, verification) are confirmed by our team after review.
             </p>
 
+            {!isLand && (
+            <>
             <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
               <input type="checkbox" checked={form.unitNumberPublic} onChange={(e) => set("unitNumberPublic", e.target.checked)} className="w-4 h-4 rounded accent-[#1565C0]" />
               Show my unit number on the public listing
             </label>
+            </>
+            )}
 
             <Field label="Listing Type">
               <Select value={form.listingType} onChange={(e) => set("listingType", e.target.value)}>
@@ -869,6 +959,8 @@ export default function PostProperty({ onNavigate }) {
               </Select>
             </Field>
 
+            {!isLand && (
+            <>
             <div className="grid grid-cols-3 gap-4">
               <Field label="Bathrooms">
                 <TextInput type="number" min="0" value={form.bathrooms} onChange={(e) => set("bathrooms", e.target.value)} placeholder="e.g. 2" />
@@ -883,7 +975,11 @@ export default function PostProperty({ onNavigate }) {
                 </label>
               </div>
             </div>
+            </>
+            )}
 
+            {!isLand && (
+            <>
             <Field label="Area Breakdown (sqft)" hint="Fill in whichever apply — e.g. plots typically only need Plot Area.">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <TextInput type="number" min="0" value={form.builtUpArea} onChange={(e) => set("builtUpArea", e.target.value)} placeholder="Built-up" />
@@ -904,6 +1000,8 @@ export default function PostProperty({ onNavigate }) {
                 <TextInput type="number" min="0" value={form.totalUnits} onChange={(e) => set("totalUnits", e.target.value)} placeholder="e.g. 240" />
               </Field>
             </div>
+            </>
+            )}
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <Field label="Facing">
@@ -925,6 +1023,8 @@ export default function PostProperty({ onNavigate }) {
               </Field>
             </div>
 
+            {!isLand && (
+            <>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               <Field label="Furnishing">
                 <Select value={form.furnishing} onChange={(e) => set("furnishing", e.target.value)}>
@@ -942,6 +1042,8 @@ export default function PostProperty({ onNavigate }) {
                 <TextInput value={form.age} onChange={(e) => set("age", e.target.value)} placeholder="e.g. 2 years / New" />
               </Field>
             </div>
+            </>
+            )}
           </div>
 
           <div className="rounded-2xl p-6 space-y-5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
@@ -1181,7 +1283,7 @@ export default function PostProperty({ onNavigate }) {
             {(() => {
               const missing = missingMandatoryCategories();
               const count = form.images.length;
-              if (count >= MIN_PHOTOS && missing.length === 0) {
+              if (count >= minPhotos && missing.length === 0) {
                 return (
                   <div className="px-3.5 py-2.5 rounded-xl text-xs font-semibold" style={{ background: "#F0FDF4", color: "#16A34A" }}>
                     ✓ {count} photos, all mandatory categories covered.
@@ -1191,9 +1293,9 @@ export default function PostProperty({ onNavigate }) {
               return (
                 <div className="px-3.5 py-2.5 rounded-xl text-xs" style={{ background: "#FFFBEB", color: "#92400E" }}>
                   <p className="font-semibold">
-                    {count} of {MIN_PHOTOS}–{MAX_RECOMMENDED_PHOTOS} recommended photos{count < MIN_PHOTOS ? ` (${MIN_PHOTOS - count} more recommended)` : ""}.
+                    {count} of {minPhotos}–{MAX_RECOMMENDED_PHOTOS} recommended photos{count < minPhotos ? ` (${minPhotos - count} more recommended)` : ""}.
                   </p>
-                  {missing.length > 0 && <p className="mt-0.5">Missing room labels for: {missing.join(", ")}.</p>}
+                  {missing.length > 0 && <p className="mt-0.5">Missing {isLand ? "photo" : "room"} labels for: {missing.join(", ")}.</p>}
                 </div>
               );
             })()}
@@ -1224,8 +1326,8 @@ export default function PostProperty({ onNavigate }) {
                     </div>
                     <div className="p-1.5 space-y-1">
                       <Select value={detail.roomLabel} onChange={(e) => setImageDetail(url, "roomLabel", e.target.value)}>
-                        <option value="">Room label…</option>
-                        {ROOM_LABEL_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                        <option value="">{isLand ? "Photo label…" : "Room label…"}</option>
+                        {photoLabelOptions.map((r) => <option key={r} value={r}>{r}</option>)}
                       </Select>
                       <TextInput value={detail.caption} onChange={(e) => setImageDetail(url, "caption", e.target.value)} placeholder="Caption (optional)" />
                     </div>

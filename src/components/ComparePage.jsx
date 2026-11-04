@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCompare } from "../lib/CompareContext";
 import { useSavedItems } from "../lib/SavedItemsContext";
+import { isLandType } from "../lib/landListing";
 import BookExpertModal from "./BookExpertModal";
 
 function Check({ on, text }) {
@@ -174,8 +175,8 @@ export default function ComparePage({ onNavigate }) {
         { label: "Property Type", render: (p) => p.type },
         { label: "Configuration / Bedrooms", render: (p) => p.bhkLabel || p.bhk?.join(", ") || "—" },
         { label: "Carpet / Super Built-up Area", render: (p) => p.area || "—" },
-        { label: "Floor Level", render: (p) => p.floor || "Mid Floor" },
-        { label: "Facing / Vaastu", render: (p) => p.facing || "North-East / Vaastu Compliant" },
+        { label: "Floor Level", render: (p) => p.floor || (isLandType(p.type) ? "—" : "Mid Floor") },
+        { label: "Facing / Vaastu", render: (p) => p.facing || (isLandType(p.type) ? "—" : "North-East / Vaastu Compliant") },
         { label: "Possession Date", render: (p) => p.project?.expectedPossessionDate || p.status || "Ready to Move" },
         { label: "Posted By", render: (p) => `${p.postedBy || "Owner"} ${p.postedDays ? `(${p.postedDays}d ago)` : ""}` },
       ],

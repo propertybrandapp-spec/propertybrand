@@ -8,6 +8,7 @@ import { useCompare } from "../lib/CompareContext";
 import LocationMap from "./LocationMap";
 import AdvertisementBanner from "./AdvertisementBanner";
 import { printElement, downloadFromUrl, fileExtensionOf, isImageUrl } from "../lib/printUtil";
+import { isLandType, formatPlotArea } from "../lib/landListing";
 
 // ── Request Brochure form options ──
 const BROCHURE_PURPOSES = {
@@ -561,9 +562,21 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 Listed-days-ago moved to the byline under the title instead.) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
-                property.bhkLabel && { label: "Configuration", value: property.bhkLabel },
-                (property.carpetArea || property.area) && { label: "Carpet Area", value: property.carpetArea ? `${property.carpetArea} sqft` : property.area },
-                property.floor && { label: "Floor", value: property.floor },
+                ...(isLandType(property.type)
+                  ? [
+                      (property.plotArea || property.area) && { label: "Plot Area", value: property.plotArea ? (formatPlotArea(property.plotArea) || `${property.plotArea} sqft`) : property.area },
+                      property.plotLength && property.plotWidth && { label: "Dimensions", value: `${property.plotLength} × ${property.plotWidth} ft` },
+                      property.roadWidth && { label: "Road Width", value: `${property.roadWidth} ft` },
+                      property.landUse && { label: "Land Use", value: property.landUse },
+                      property.plotApproval && { label: "Approval", value: property.plotApproval },
+                      property.cornerPlot && { label: "Plot Type", value: "Corner plot" },
+                      property.boundaryWall && { label: "Boundary Wall", value: "Built" },
+                    ]
+                  : [
+                      property.bhkLabel && { label: "Configuration", value: property.bhkLabel },
+                      (property.carpetArea || property.area) && { label: "Carpet Area", value: property.carpetArea ? `${property.carpetArea} sqft` : property.area },
+                      property.floor && { label: "Floor", value: property.floor },
+                    ]),
                 property.status && { label: "Possession", value: property.status },
                 property.furnishing && { label: "Furnishing", value: property.furnishing },
                 property.facing && { label: "Facing", value: property.facing },
@@ -1049,7 +1062,11 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 property.builtUpArea && { label: "Built-up Area", value: `${property.builtUpArea} sqft` },
                 property.superBuiltUpArea && { label: "Super Built-up Area", value: `${property.superBuiltUpArea} sqft` },
                 property.carpetArea && { label: "Carpet Area", value: `${property.carpetArea} sqft` },
-                property.plotArea && { label: "Plot Area", value: `${property.plotArea} sqft` },
+                property.plotArea && { label: "Plot Area", value: formatPlotArea(property.plotArea) || `${property.plotArea} sqft` },
+                property.plotLength && property.plotWidth && { label: "Plot Dimensions", value: `${property.plotLength} ft × ${property.plotWidth} ft` },
+                property.roadWidth && { label: "Road Width", value: `${property.roadWidth} ft` },
+                property.landUse && { label: "Land Use", value: property.landUse },
+                property.plotApproval && { label: "Approval / Layout", value: property.plotApproval },
                 property.totalFloors && { label: "Total Floors", value: property.totalFloors },
                 property.totalUnits && { label: "Total Units", value: property.totalUnits },
                 property.entranceDirection && { label: "Entrance Direction", value: property.entranceDirection },
@@ -1715,7 +1732,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   {/* Key Highlights Table */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 p-4 rounded-xl bg-slate-50 border border-slate-200">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase">Configuration</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase">{isLandType(property.type) ? "Property Type" : "Configuration"}</p>
                       <p className="text-sm font-bold text-slate-800">{property.bhkLabel || property.type}</p>
                     </div>
                     <div>

@@ -115,3 +115,5 @@ Get the Supabase values from **Project Settings → API**. Restart `npm run dev`
 
 - **"Couldn't load listings"** → check `.env` values and that you ran the SQL in Steps 0/1.
 - **Photo upload fails (Post Property / profile avatar)** → check `VITE_R2_WORKER_URL` is set and the Worker deployed successfully (Step 4); check the Worker's secrets are all set (`wrangler secret list` from `cloudflare-worker/`), including `ALLOWED_ORIGINS` containing this site's exact origin.
+
+And run `supabase/migration_029_plot_listing_details.sql` — adds the plot / land fields (road width, plot length and width, corner plot, boundary wall, land use, approval). Choosing the **Plot** or **Agricultural Land** type in Post Property or the admin listing form now swaps the BHK / bathroom / floor fields for plot fields (area in sq ft, sq yd, sq m, decimal or acre). The site still saves plots if this migration has not been run yet — the plot details are then kept in the description — but run it to store them as proper fields.
