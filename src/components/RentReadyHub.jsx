@@ -4,6 +4,7 @@ import { printElement } from "../lib/printUtil";
 import RentAgreementDocument from "./RentAgreementDocument";
 import { renderToStaticMarkup } from "react-dom/server";
 import { sendAgreementEmail, validRecipients } from "../lib/sendAgreement";
+import { createRentAgreement, signingLink } from "../lib/rentAgreements";
 
 const STEPS = [
   { num: 1, title: "Property Details", desc: "Address, unit type & rent" },
@@ -52,6 +53,10 @@ export default function RentReadyHub({ onNavigate }) {
   const [printNote, setPrintNote] = useState("");
   // Result of emailing the agreement: { status: "sent" | "failed" | "no-email", to: [], error }
   const [emailResult, setEmailResult] = useState(null);
+  // Personal review-and-sign links for each party ({ owner, tenant }), or null if they could not be created.
+  const [signLinks, setSignLinks] = useState(null);
+  const [signLinksError, setSignLinksError] = useState("");
+  const [copied, setCopied] = useState("");
 
   function handlePrintAgreement() {
     setPrintNote("");
@@ -88,22 +93,48 @@ export default function RentReadyHub({ onNavigate }) {
         message: `[RENTREADY DRAFT] Property: ${formData.propertyAddress}, ${formData.city} | Rent: ₹${formData.monthlyRent}/mo | Deposit: ₹${formData.securityDeposit} | Owner: ${formData.ownerName} (${formData.ownerPhone}) | Tenant: ${formData.tenantName} (${formData.tenantPhone}) | Services: Packers=${formData.needPackers}, Cleaning=${formData.needDeepClean}, Inspection=${formData.needMoveInInspection}`,
       });
 
-      // Email the agreement draft to whoever gave an email address.
-      const recipients = validRecipients([formData.ownerEmail, formData.tenantEmail]);
-      if (recipients.length === 0) {
+      // 1. Create the agreement record with a personal signing link for each party.
+      const ownerEmail = validRecipients([formData.ownerEmail])[0] || "";
+      const tenantEmail = validRecipients([formData.tenantEmail])[0] || "";
+      let links = null;
+      const created = await createRentAgreement({ form: formData, ownerEmail, tenantEmail });
+      if (created.data) {
+        links = { owner: signingLink(created.data.ownerToken), tenant: signingLink(created.data.tenantToken) };
+        setSignLinks(links);
+      } else {
+        setSignLinksError(created.error?.message || "unknown error");
+      }
+
+      // 2. Email each party their own link (plus the agreement itself).
+      const markup = renderToStaticMarkup(<RentAgreementDocument data={formData} />);
+      const buildHtml = (roleLabel, link) =>
+        `<div style="font-family:Georgia,serif;font-size:14px;line-height:1.6;color:#111;max-width:760px;margin:0 auto;padding:16px">`
+        + `<p style="font-family:Arial,sans-serif;font-size:14px;color:#222">Hello, a rent agreement for <b>${(formData.propertyAddress || "the rental property").replace(/</g, "&lt;")}</b> has been prepared on PropertyBrands RentReady. You are named as the <b>${roleLabel}</b>.</p>`
+        + (link
+          ? `<p style="font-family:Arial,sans-serif"><a href="${link}" style="display:inline-block;background:#1565C0;color:#fff;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:8px">Review &amp; sign the agreement</a></p>`
+            + `<p style="font-family:Arial,sans-serif;font-size:12px;color:#555">On that page you can read the agreement, confirm your Aadhaar and PAN, and sign. This link is personal to you — please do not forward it. If the button doesn't work, copy this address into your browser:<br/>${link}</p>`
+          : `<p style="font-family:Arial,sans-serif;font-size:13px;color:#444">Please print the draft below, fill in the blank lines and sign it on stamp paper.</p>`)
+        + `<hr/>${markup}</div>`;
+
+      const subject = `${formData.propertyAddress || "Rental property"}, ${formData.city}`.slice(0, 150);
+      const parties = [
+        { role: "Landlord", email: ownerEmail, link: links?.owner },
+        { role: "Tenant", email: tenantEmail, link: links?.tenant },
+      ].filter((p) => p.email);
+
+      if (parties.length === 0) {
         setEmailResult({ status: "no-email", to: [] });
       } else {
-        const markup = renderToStaticMarkup(<RentAgreementDocument data={formData} />);
-        const html = `<div style="font-family:Georgia,serif;font-size:14px;line-height:1.6;color:#111;max-width:760px;margin:0 auto;padding:16px">`
-          + `<p style="font-family:Arial,sans-serif;font-size:13px;color:#444">Hello, here is the rent agreement draft you prepared on PropertyBrands RentReady. `
-          + `Please print it, fill in the blank lines and sign it on stamp paper.</p><hr/>${markup}</div>`;
-        const result = await sendAgreementEmail({
-          to: recipients,
-          subject: `${formData.propertyAddress || "Rental property"}, ${formData.city}`.slice(0, 150),
-          html,
-          text: "Your rent agreement draft from PropertyBrands RentReady is in this email.",
-        });
-        setEmailResult(result.ok ? { status: "sent", to: result.sent } : { status: "failed", to: recipients, error: result.error });
+        const results = await Promise.all(parties.map(async (p) => ({
+          ...p,
+          result: await sendAgreementEmail({ to: [p.email], subject: `${p.link ? "Please review & sign — " : ""}${subject}`.slice(0, 150), html: buildHtml(p.role, p.link), text: p.link ? `Review and sign your rent agreement: ${p.link}` : "Your rent agreement draft from PropertyBrands RentReady is in this email." },
+          ),
+        })));
+        const sent = results.filter((r) => r.result.ok).map((r) => r.email);
+        const failed = results.filter((r) => !r.result.ok);
+        setEmailResult(failed.length === 0
+          ? { status: "sent", to: sent }
+          : { status: "failed", to: failed.map((f) => f.email), sent, error: failed[0].result.error });
       }
       setIsCompleted(true);
     } catch (err) {
@@ -125,7 +156,7 @@ export default function RentReadyHub({ onNavigate }) {
             One-Click Verified Rental Agreements & Smooth Move-In
           </h1>
           <p className="mt-3 text-sm sm:text-base text-blue-100 max-w-2xl mx-auto" style={{ color: "#E0E7FF" }}>
-            Say goodbye to unreviewed generic contracts and broker hassles. Create state-compliant legally vetted agreements, e-sign with digital stamp duty, and schedule shifting in under 5 minutes.
+            Say goodbye to unreviewed generic contracts and broker hassles. Create state-compliant legally vetted agreements, review and e-sign online, and schedule shifting in under 5 minutes.
           </p>
 
           {/* Stepper Progress */}
@@ -183,19 +214,47 @@ export default function RentReadyHub({ onNavigate }) {
                 RentReady Application & Draft Initiated!
               </h2>
               <p className="text-sm text-gray-600 mt-2 max-w-lg mx-auto">
-                Your legally vetted rental agreement draft has been generated for <strong>{formData.propertyAddress}</strong>. Print it, fill in the blank lines and sign it on stamp paper.
+                Your rental agreement draft has been generated for <strong>{formData.propertyAddress}</strong>.{" "}
+                {signLinks ? "The landlord and the tenant each have a personal link to review it, confirm Aadhaar and PAN, and sign." : "Print it, fill in the blank lines and sign it on stamp paper."}
               </p>
+              {signLinks && (
+                <div className="mt-4 max-w-xl mx-auto text-left space-y-3">
+                  {[["Landlord", "owner", formData.ownerName], ["Tenant", "tenant", formData.tenantName]].map(([label, key, name]) => (
+                    <div key={key} className="rounded-xl border border-blue-200 bg-blue-50 p-3">
+                      <p className="text-xs font-bold text-blue-900 uppercase tracking-wide">{label} signing link{name ? ` — ${name}` : ""}</p>
+                      <p className="text-[11px] text-gray-600 break-all mt-1">{signLinks[key]}</p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <button type="button" onClick={() => { try { navigator.clipboard.writeText(signLinks[key]); setCopied(key); setTimeout(() => setCopied(""), 2000); } catch { /* clipboard blocked */ } }}
+                          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-white border border-blue-300 text-blue-800 hover:bg-blue-100">
+                          {copied === key ? "Copied ✓" : "Copy link"}
+                        </button>
+                        <a href={`https://wa.me/?text=${encodeURIComponent(`Please review and sign the rent agreement (${label}): ${signLinks[key]}`)}`} target="_blank" rel="noopener noreferrer"
+                          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700">
+                          Share on WhatsApp
+                        </a>
+                        <a href={signLinks[key]} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#1565C0] text-white hover:bg-[#0D47A1]">Open &amp; sign now</a>
+                      </div>
+                    </div>
+                  ))}
+                  <p className="text-[11px] text-gray-500">Each link is personal — share the landlord link only with the landlord and the tenant link only with the tenant.</p>
+                </div>
+              )}
+              {!signLinks && signLinksError && (
+                <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mt-3 max-w-lg mx-auto">
+                  Online signing links couldn't be created right now ({signLinksError}). You can still print the agreement below and sign it on stamp paper.
+                </p>
+              )}
               {emailResult?.status === "sent" && (
-                <p className="text-sm font-semibold text-emerald-700 mt-3">✓ A copy was emailed to {emailResult.to.join(", ")}.</p>
+                <p className="text-sm font-semibold text-emerald-700 mt-3">✓ {signLinks ? "Signing link" : "Agreement"} emailed to {emailResult.to.join(", ")}.</p>
               )}
               {emailResult?.status === "failed" && (
                 <div className="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 max-w-lg mx-auto">
-                  <p className="font-semibold">We couldn't email the agreement just now{emailResult.error ? ` (${emailResult.error})` : ""}.</p>
-                  <p className="text-xs mt-1">Use "Print / Save as PDF" below, or <a className="underline font-semibold" href={`mailto:${emailResult.to.join(",")}?subject=${encodeURIComponent("Rent agreement draft")}`}>open your email app</a> and attach the saved PDF.</p>
+                  <p className="font-semibold">We couldn't email {emailResult.to.join(", ")}{emailResult.error ? ` (${emailResult.error})` : ""}.</p>
+                  <p className="text-xs mt-1">{signLinks ? "Use the links above — copy them or share on WhatsApp." : "Use \"Print / Save as PDF\" below."}</p>
                 </div>
               )}
               {emailResult?.status === "no-email" && (
-                <p className="text-xs text-gray-500 mt-3">No email address was entered, so nothing was emailed. Use "Print / Save as PDF" below.</p>
+                <p className="text-xs text-gray-500 mt-3">No email address was entered, so nothing was emailed. {signLinks ? "Share the links above instead." : "Use \"Print / Save as PDF\" below."}</p>
               )}
               <div className="mt-8 flex flex-wrap justify-center gap-4">
                 <button

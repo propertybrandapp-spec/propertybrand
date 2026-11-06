@@ -123,3 +123,11 @@ Also run `supabase/migration_030_duplex_type.sql` — adds **Duplex** as a prope
 **Rent agreement emails:** the RentReady page now emails the agreement draft to the owner/tenant addresses entered. This needs the Cloudflare Worker redeployed (`wrangler deploy` in `cloudflare-worker/`) and two secrets set: `wrangler secret put RESEND_API_KEY` (a free key from resend.com) and `wrangler secret put MAIL_FROM` (e.g. `PropertyBrands <agreements@propertybrands.in>` — the domain must be verified in Resend). Optional: `MAIL_BCC` for an internal copy. Until that is set up the page tells the user the email could not be sent and offers Print / Save as PDF instead.
 
 **Contact details:** the company phone (+91 99372 91200) is fixed in `src/lib/contactInfo.js`; the postal address is no longer shown on the site.
+
+Also run `supabase/migration_031_rent_agreement_signing.sql` — this switches on **online review & signing for Rent Ready agreements**. After it runs, "Generate Agreement" creates a private signing link for the landlord and another for the tenant. Each person opens their own link (`https://<your-site>/#/sign/<code>`), reads the agreement, enters their Aadhaar and PAN, types their name as a signature and ticks the consent box. The links are shown on the completion screen (copy / WhatsApp) and are emailed to each party if the email worker is configured.
+
+- **Without this migration** the link cannot be created: the completion screen says so and the printed agreement still works.
+- **Emails** also need the Worker redeployed with `RESEND_API_KEY`, `MAIL_FROM` (and optionally `MAIL_BCC`) set — see Step 4 — and `VITE_R2_WORKER_URL` set on the site. If email is not set up, the completion screen still shows both links to copy/share by hand.
+- **What the Aadhaar / PAN check does:** it checks the *format* (Aadhaar's 12-digit checksum, PAN's 10-character pattern). It is **not** an official UIDAI / Income Tax verification. Only the last 4 digits of Aadhaar are stored; the PAN is stored and readable by admins only.
+- **Signing is an electronic acknowledgement** (typed name + consent + time + IP). It is not an Aadhaar eSign / DSC signature; for stamp-paper registration the printed copy is still needed.
+- To see signed agreements: Supabase → Table Editor → `rent_agreements` (status, who signed, when, Aadhaar last 4, PAN).

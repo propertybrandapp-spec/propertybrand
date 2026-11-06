@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import MagicLoansSection from "./MagicLoansSection";
+import LoanRateComparison from "./LoanRateComparison";
 import { useScrollToAnchor, ANCHOR_HIGHLIGHT_STYLE } from "../lib/useScrollToAnchor";
 import { fetchInvestmentOpportunities } from "../lib/siteContent";
 import { CheckCircle2, FileText, Scale, Zap, Globe } from "lucide-react";
@@ -563,10 +564,31 @@ function RentalYieldCalculator() {
   );
 }
 
+// What a click on an investment card opens: the matching properties for sale,
+// in that area (and of that kind — commercial, plots — where the card says so).
+const COMMERCIAL_TYPES_FILTER = ["Commercial", "Office Space", "Shop / Showroom"];
+const LAND_TYPES_FILTER = ["Plot", "Agricultural Land"];
+function corridorSearch(c) {
+  const filters = { transactionType: "Buy", location: [c.area, c.city].filter(Boolean).join(", ") };
+  if (c.type === "Commercial") filters.types = COMMERCIAL_TYPES_FILTER;
+  else if (c.tag === "Land Banking") filters.types = LAND_TYPES_FILTER;
+  return filters;
+}
+
+// Makes a non-button element behave like one (click, Enter, Space).
+function clickable(onActivate) {
+  return {
+    role: "button",
+    tabIndex: 0,
+    onClick: onActivate,
+    onKeyDown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onActivate(); } },
+  };
+}
+
 // ── Investment Corridor Card ──────────────────────────────────────────────────
-function CorridorCard({ corridor }) {
+function CorridorCard({ corridor, onOpen }) {
   return (
-    <div className="flex-shrink-0 w-64 bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer group">
+    <div {...clickable(() => onOpen && onOpen(corridor))} aria-label={`View properties in ${corridor.area}, ${corridor.city}`} className="flex-shrink-0 w-64 bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] overflow-hidden hover:shadow-lg hover:border-[#1565C0] transition-all duration-200 cursor-pointer group">
       <div className="relative h-36 overflow-hidden">
         <img
           src={corridor.image}
@@ -596,6 +618,7 @@ function CorridorCard({ corridor }) {
           <p className="text-[10px] text-slate-500 leading-tight">Price Range</p>
         </div>
       </div>
+      <p className="px-3.5 pb-3 text-[11px] font-bold text-[#1565C0] group-hover:underline">View properties here →</p>
     </div>
   );
 }
@@ -604,6 +627,7 @@ function CorridorCard({ corridor }) {
 export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
   const highlighted = useScrollToAnchor(scrollTo, [navKey]);
   const [corridors, setCorridors] = useState(null); // null = loading
+  const [selectedBankId, setSelectedBankId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -614,6 +638,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
   }, []);
 
   const INVESTMENT_CORRIDORS = corridors || DEMO_INVESTMENT_CORRIDORS;
+  const openCorridor = (c) => onNavigate && onNavigate("search", corridorSearch(c));
 
   const yieldSorted = [...INVESTMENT_CORRIDORS].filter((c) => c.rentalYield !== "—").sort((a, b) => parseFloat(b.rentalYield) - parseFloat(a.rentalYield));
   const commercialCorridors = INVESTMENT_CORRIDORS.filter((c) => c.type === "Commercial");
@@ -669,7 +694,8 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
 
           {/* Loan Comparison */}
           <div id="loan-comparison" style={{ ...sectionHighlight("loan-comparison"), scrollMarginTop: "100px" }} className="p-1">
-            <MagicLoansSection onNavigate={onNavigate} />
+            <MagicLoansSection onNavigate={onNavigate} onBankSelect={(bank) => { setSelectedBankId(bank.id); document.getElementById("rate-comparison")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} />
+            <LoanRateComparison selectedBankId={selectedBankId} onSelectBank={(bank) => setSelectedBankId(bank.id)} />
           </div>
         </div>
 
@@ -714,22 +740,28 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
 
           {/* High Growth Corridors */}
           <div id="high-growth-corridors" style={{ ...sectionHighlight("high-growth-corridors"), scrollMarginTop: "100px" }} className="mb-10 p-4 -m-4">
-            <h3 className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>High-Growth Investment Corridors</h3>
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <h3 className="text-base font-bold" style={{ color: "#1F2937" }}>High-Growth Investment Corridors</h3>
+              <button type="button" onClick={() => onNavigate && onNavigate("search", { transactionType: "Buy" })} className="text-xs font-bold text-[#1565C0] hover:underline shrink-0">View all properties →</button>
+            </div>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Areas identified by our analysts for strong price appreciation potential.</p>
             <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
               {INVESTMENT_CORRIDORS.map((c) => (
-                <CorridorCard key={c.id} corridor={c} />
+                <CorridorCard key={c.id} corridor={c} onOpen={openCorridor} />
               ))}
             </div>
           </div>
 
           {/* Rental Yield Opportunities */}
           <div id="rental-yield-opportunities" style={{ ...sectionHighlight("rental-yield-opportunities"), scrollMarginTop: "100px" }} className="mb-10 p-4 -m-4">
-            <h3 className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>Best Rental Yield Opportunities</h3>
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <h3 className="text-base font-bold" style={{ color: "#1F2937" }}>Best Rental Yield Opportunities</h3>
+              <button type="button" onClick={() => onNavigate && onNavigate("search", { transactionType: "Buy" })} className="text-xs font-bold text-[#1565C0] hover:underline shrink-0">View all properties →</button>
+            </div>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Areas ranked by rental income relative to purchase price — ideal for buy-to-let investors.</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {yieldSorted.map((c, i) => (
-                <div key={c.id} className="rounded-xl p-4 flex items-center gap-3" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                <div key={c.id} {...clickable(() => openCorridor(c))} aria-label={`View properties in ${c.area}, ${c.city}`} className="rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:border-[#1565C0] hover:shadow-md transition" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
                   <span className="text-lg font-black shrink-0" style={{ color: "#a78bfa", opacity: 0.4 }}>#{i + 1}</span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold truncate" style={{ color: "#1F2937" }}>{c.area}</p>
@@ -743,10 +775,13 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
 
           {/* Commercial Investments */}
           <div id="commercial-investments" style={{ ...sectionHighlight("commercial-investments"), scrollMarginTop: "100px" }} className="mb-10 p-4 -m-4">
-            <h3 className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>Commercial Investments</h3>
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <h3 className="text-base font-bold" style={{ color: "#1F2937" }}>Commercial Investments</h3>
+              <button type="button" onClick={() => onNavigate && onNavigate("search", { transactionType: "Buy", types: ["Commercial", "Office Space", "Shop / Showroom"] })} className="text-xs font-bold text-[#1565C0] hover:underline shrink-0">View all properties →</button>
+            </div>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Office and retail spaces typically offer higher rental yields and longer-term corporate tenants than residential property.</p>
             <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-              {commercialCorridors.map((c) => <CorridorCard key={c.id} corridor={c} />)}
+              {commercialCorridors.map((c) => <CorridorCard key={c.id} corridor={c} onOpen={openCorridor} />)}
             </div>
           </div>
 
@@ -755,17 +790,20 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
             <h3 className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>Land Banking Opportunities</h3>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Buy undeveloped or under-developed plots in the path of growth and hold for long-term appreciation.</p>
             <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-              {landCorridors.map((c) => <CorridorCard key={c.id} corridor={c} />)}
+              {landCorridors.map((c) => <CorridorCard key={c.id} corridor={c} onOpen={openCorridor} />)}
             </div>
           </div>
 
           {/* Retirement Homes */}
           <div id="retirement-homes" style={{ ...sectionHighlight("retirement-homes"), scrollMarginTop: "100px" }} className="mb-10 p-4 -m-4">
-            <h3 className="text-base font-bold mb-1" style={{ color: "#1F2937" }}>Retirement Homes</h3>
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <h3 className="text-base font-bold" style={{ color: "#1F2937" }}>Retirement Homes</h3>
+              <button type="button" onClick={() => onNavigate && onNavigate("search", { transactionType: "Buy", tags: ["Retirement Home"] })} className="text-xs font-bold text-[#1565C0] hover:underline shrink-0">View all properties →</button>
+            </div>
             <p className="text-sm mb-4" style={{ color: "#6B7280" }}>Purpose-built senior living communities with medical access, single-level layouts, and a built-in social community.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {RETIREMENT_HOMES.map((home) => (
-                <div key={home.name} className="rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
+                <div key={home.name} {...clickable(() => onNavigate && onNavigate("search", { transactionType: "Buy", location: home.area }))} aria-label={`View properties near ${home.name}`} className="rounded-xl overflow-hidden cursor-pointer hover:shadow-lg hover:border-[#1565C0] transition" style={{ border: "1px solid #E2E8F0" }}>
                   <div className="h-36 overflow-hidden">
                     <img src={home.image} alt={home.name} className="w-full h-full object-cover" />
                   </div>
@@ -778,6 +816,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
                         <span key={f} className="text-[10px] font-semibold px-2 py-1 rounded-full" style={{ background: "#EFF6FF", color: "#1565C0" }}>{f}</span>
                       ))}
                     </div>
+                    <p className="mt-3 text-[11px] font-bold text-[#1565C0]">View homes in this area →</p>
                   </div>
                 </div>
               ))}

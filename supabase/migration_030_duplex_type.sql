@@ -10,4 +10,3 @@ where not exists (
   select 1 from public.listing_field_options
   where field_type = 'property_type' and lower(value) = 'duplex'
 );
-  

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { AuthProvider } from "./lib/AuthContext";
 import { SavedItemsProvider } from "./lib/SavedItemsContext";
 import { CompareProvider } from "./lib/CompareContext";
+import { CityProvider, useCity } from "./lib/CityContext";
 import Navbar from "./components/Navbar";
 import CompareBar from "./components/CompareBar";
 import ComparePage from "./components/ComparePage";
@@ -35,6 +36,7 @@ import LandDevelopHub from "./components/LandDevelopHub";
 import RentReadyHub from "./components/RentReadyHub";
 import BuildMoveHub from "./components/BuildMoveHub";
 import LifestyleHub from "./components/LifestyleHub";
+import AgreementSign from "./components/AgreementSign";
 
 // ── Simple client-side page router ───────────────────────────────────────────
 // Pages: "home" | "search" | "channel-partner" | "property-management"
@@ -57,12 +59,21 @@ const HASH_PAGES = [
   "land-develop", "rent-ready", "build-move", "lifestyle",
 ];
 
+// Personal signing links look like  #/sign/<token>  (RentReady agreements).
+const SIGN_HASH = /^#\/sign\/([0-9a-fA-F-]{36})\/?$/;
+function signTokenFromHash() {
+  const m = SIGN_HASH.exec(window.location.hash || "");
+  return m ? m[1] : null;
+}
+
 function pageFromHash() {
+  if (signTokenFromHash()) return "sign";
   const p = (window.location.hash || "").replace(/^#\/?/, "");
   return HASH_PAGES.includes(p) ? p : "home";
 }
 
 function AppContent() {
+  const { city: selectedCity } = useCity();
   const [page, setPage] = useState(() => pageFromHash());
   const [navNonce, setNavNonce] = useState(0);
   const [searchFilters, setSearchFilters] = useState(null);
@@ -118,7 +129,14 @@ function AppContent() {
   //  - "property-detail"  → { property, pool } — the clicked property + the list it came from (for "Similar Properties")
   //  - investment-advisory / property-management / architects-design / faq
   //                       → an anchor id string — scrolls to and briefly highlights that exact section
-  function navigate(to, payload) {
+  function navigate(to, rawPayload) {
+    // Every route into the results page carries the city picked in the top bar
+    // (unless the caller chose a location itself), so "Discover", "See all" and
+    // the like stay inside that city.
+    let payload = rawPayload;
+    if (to === "search" && selectedCity && !(rawPayload && rawPayload.location)) {
+      payload = { ...(rawPayload || {}), location: selectedCity };
+    }
     // Remember where the user was scrolled on the page they're leaving
     const leaving = entriesRef.current.get(currentIdRef.current);
     if (leaving) leaving.scrollY = window.scrollY;
@@ -243,6 +261,8 @@ function AppContent() {
         {page === "build-move" && <BuildMoveHub onNavigate={navigate} />}
 
         {page === "lifestyle" && <LifestyleHub onNavigate={navigate} />}
+
+        {page === "sign" && <AgreementSign key={signTokenFromHash() || "none"} token={signTokenFromHash()} />}
       </main>
 
       {/* ── Floating compare bar (visible on every page once something's selected) ── */}
@@ -259,7 +279,9 @@ export default function App() {
     <AuthProvider>
       <SavedItemsProvider>
         <CompareProvider>
-          <AppContent />
+          <CityProvider>
+            <AppContent />
+          </CityProvider>
         </CompareProvider>
       </SavedItemsProvider>
     </AuthProvider>

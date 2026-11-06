@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { fetchPublicListings } from "../lib/listings";
 import { Home } from "lucide-react";
+import { useCity } from "../lib/CityContext";
+import { matchesLocation } from "../lib/searchFilters";
 import QuickViewModal from "./QuickViewModal";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -300,7 +302,8 @@ export default function PopularProperties({ onNavigate }) {
     return true;
   }
 
-  const filtered = ALL_PROPERTIES.filter((p) => matchesFilter(p, activeFilter));
+  const { city: selectedCity } = useCity();
+  const filtered = ALL_PROPERTIES.filter((p) => matchesFilter(p, activeFilter) && (!selectedCity || matchesLocation(p, selectedCity)));
 
   // Owners get their own row; every other poster (builder, agent, channel
   // partner, property manager, …) goes in "Featured Projects" so no listing

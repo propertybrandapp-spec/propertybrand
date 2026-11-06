@@ -8,6 +8,7 @@ import { useCompare } from "../lib/CompareContext";
 import LocationMap from "./LocationMap";
 import AdvertisementBanner from "./AdvertisementBanner";
 import { printElement, downloadFromUrl, fileExtensionOf, isImageUrl } from "../lib/printUtil";
+import { inSameCity } from "../lib/searchFilters";
 import { isLandType, formatPlotArea } from "../lib/landListing";
 
 // ── Request Brochure form options ──
@@ -321,7 +322,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   const comparingThis = isComparing(property.dbId || property.id);
 
   const similar = pool
-    .filter((p) => p.id !== property.id && p.type === property.type)
+    .filter((p) => p.id !== property.id && p.type === property.type && inSameCity(p, property))
     .slice(0, 4);
 
   function openSimilar(p) {

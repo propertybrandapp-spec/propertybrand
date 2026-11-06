@@ -20,6 +20,9 @@ export async function sendAgreementEmail({ to, subject, html, text }) {
       body: JSON.stringify({ to: recipients, subject, html, text }),
     });
     const body = await res.json().catch(() => ({}));
+    if (res.status === 404 && !body.error) {
+      return { ok: false, error: "The email service hasn't been updated yet — the latest Cloudflare Worker (with /send-agreement) needs to be deployed." };
+    }
     if (!res.ok) return { ok: false, error: body.error || `Email service error (${res.status}).` };
     return { ok: true, sent: body.sent || recipients };
   } catch (err) {

@@ -6,6 +6,7 @@ import SelectMembershipModal from "./SelectMembershipModal";
 import BookExpertModal from "./BookExpertModal";
 
 import { SERVICE_CITIES as CITIES } from "../lib/cities";
+import { useCity } from "../lib/CityContext";
 
 // ── REDESIGNED 6-PILLAR MASTER NAVIGATION ────────────────────────────────────
 // As specified in the Discover Website blueprint:
@@ -34,7 +35,7 @@ const NAV_ITEMS = [
       {
         heading: "Rent & Lease",
         links: [
-          { label: "Apartments & Independent Homes", page: "search", filters: { transactionType: "Rent", types: ["Apartment", "Independent House"] } },
+          { label: "Apartments & Independent Homes", page: "search", filters: { transactionType: "Rent", types: ["Apartment", "Independent House", "Duplex", "Villa", "Penthouse", "Studio Apartment"] } },
           { label: "Commercial Offices & Retail", page: "search", filters: { transactionType: "Rent", types: ["Commercial", "Office Space", "Shop / Showroom"] } },
           { label: "Co-Living & Student Housing", page: "search", filters: { transactionType: "Rent", tags: ["Co-living", "Student Accommodation"] } },
           { label: "Warehouses & Storage Facilities", page: "search", filters: { transactionType: "Rent", types: ["Warehouse / Industrial Shed"] } },
@@ -276,7 +277,7 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
         <svg className="w-3.5 h-3.5 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
         </svg>
-        <span>{selectedCity}</span>
+        <span>{selectedCity || "All Cities"}</span>
         <ChevronDown className={isOpen ? "rotate-180" : ""} />
       </button>
 
@@ -292,6 +293,14 @@ function CityDropdown({ selectedCity, onSelect, isOpen, onToggle }) {
             />
           </form>
           <p className="text-[10px] font-bold uppercase tracking-widest px-3 pb-1 text-gray-400">Select City</p>
+          {!query && (
+            <button
+              onClick={() => onSelect("")}
+              className={`block w-full text-left px-3 py-1.5 text-xs transition ${!selectedCity ? "bg-blue-50 text-blue-700 font-bold" : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"}`}
+            >
+              All Cities
+            </button>
+          )}
           {query && !exact && (
             <button
               onClick={submitTyped}
@@ -326,7 +335,7 @@ export default function Navbar({ onNavigate, currentPage }) {
 
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [cityOpen, setCityOpen] = useState(false);
-  const [selectedCity, setSelectedCity] = useState("Bhubaneswar");
+  const { city: selectedCity, setCity: setSelectedCity } = useCity();
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -363,7 +372,7 @@ export default function Navbar({ onNavigate, currentPage }) {
   function handleCitySelect(city) {
     setSelectedCity(city);
     setCityOpen(false);
-    onNavigate && onNavigate("search", { location: city });
+    onNavigate && onNavigate("search", city ? { location: city } : { location: "" });
   }
 
   function openModalHandler(type, topic) {

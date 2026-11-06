@@ -5,7 +5,7 @@ import { useSavedItems } from "../lib/SavedItemsContext";
 import { useCompare } from "../lib/CompareContext";
 import QuickViewModal from "./QuickViewModal";
 import AdvertisementBanner from "./AdvertisementBanner";
-import { withExtraTypes, matchesPropertyType } from "../lib/propertyTypes";
+import { withExtraTypes, matchesPropertyType, matchesTags } from "../lib/propertyTypes";
 import {
   budgetSteps, formatBudget, isBudgetActive, matchesBudget, matchesLocation, sameText,
 } from "../lib/searchFilters";
@@ -572,7 +572,7 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
     if (filters.postedBy?.length && !filters.postedBy.includes(p.postedBy)) return false;
     if (filters.verifiedOnly && !p.verified) return false;
     if (filters.amenities?.length && !filters.amenities.some(a => (p.amenities || []).includes(a))) return false;
-    if (filters.tags?.length && !filters.tags.some(t => (p.tags || []).includes(t))) return false;
+    if (!matchesTags(filters.tags, p)) return false;
     if (filters.furnishing?.length) {
       // The listing's own Furnishing field is the source of truth; only fall back
       // to tags/description for older listings that never set it. (The old

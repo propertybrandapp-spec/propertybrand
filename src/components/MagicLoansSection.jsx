@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
 // service most tutorials reference) was shut down in Dec 2025. For a real
 // production app, swap `domain` for a hosted logo asset from each bank's own
 // brand kit (with permission) rather than hot-linking a third-party service.
-const banks = [
+export const banks = [
   {
     id: 1,
     name: "L&T Financial Services",
@@ -203,8 +203,6 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
   const handleBankClick = (bank) => {
     if (onBankSelect) {
       onBankSelect(bank);
-    } else if (onNavigate) {
-      onNavigate("investment-advisory", { bankId: bank.id, bankName: bank.name });
     }
   };
 
@@ -316,12 +314,13 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
             {/* CTA row */}
             <div className="flex items-center gap-6 mt-4">
               <button
-                onClick={() => onNavigate && onNavigate("investment-advisory")}
+                onClick={() => document.getElementById("rate-comparison")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                 className="text-[#1565C0] font-semibold text-sm flex items-center gap-1 hover:underline"
               >
                 Explore Bank Offers <span aria-hidden>→</span>
               </button>
               <button
+                onClick={() => document.getElementById("eligibility-check")?.scrollIntoView({ behavior: "smooth", block: "center" })}
                 className="px-6 py-2.5 rounded-full text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 style={{
                   background: "linear-gradient(135deg, #0F2D52, #1565C0)",

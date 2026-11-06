@@ -31,6 +31,24 @@ function money(n) {
   return v > 0 ? v.toLocaleString("en-IN") : null;
 }
 
+// A party's electronic signature, once they have signed through their link.
+function SignatureLine({ sig }) {
+  if (!sig?.signed_at) return <p>Signature: __________________________</p>;
+  return (
+    <p>
+      Signature:{" "}
+      <span style={{ fontFamily: "'Brush Script MT','Segoe Script','Lucida Handwriting',cursive", fontSize: "20px" }}>{sig.signature}</span>
+      <span className="block text-[10px] text-gray-500">Digitally signed (electronic acknowledgement)</span>
+    </p>
+  );
+}
+
+function SignatureDate({ sig }) {
+  if (!sig?.signed_at) return <p>Date: __/__/20__</p>;
+  const when = new Date(sig.signed_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return <p>Date: <V>{when} IST</V></p>;
+}
+
 function V({ children }) {
   return <strong className="font-bold underline decoration-dotted underline-offset-2">{children}</strong>;
 }
@@ -53,7 +71,7 @@ function SignBlock({ title, lines }) {
   );
 }
 
-const RentAgreementDocument = forwardRef(function RentAgreementDocument({ data }, ref) {
+const RentAgreementDocument = forwardRef(function RentAgreementDocument({ data, signatures }, ref) {
   const city = (data.city || "").trim() || "Bhubaneswar";
   const inBhubaneswar = city.toLowerCase() === "bhubaneswar";
   const stateText = inBhubaneswar ? "Odisha" : "the State in which the premises are situated";
@@ -242,15 +260,15 @@ const RentAgreementDocument = forwardRef(function RentAgreementDocument({ data }
       <div className="grid grid-cols-2 gap-x-8 gap-y-5 mt-5">
         <div className="avoid-break">
           <p className="font-bold mb-1">LANDLORD</p>
-          <p>Signature: __________________________</p>
+          <SignatureLine sig={signatures?.owner} />
           <p>Full Name: <V>{data.ownerName || "__________________________"}</V></p>
-          <p>Date: __/__/20__</p>
+          <SignatureDate sig={signatures?.owner} />
         </div>
         <div className="avoid-break">
           <p className="font-bold mb-1">TENANT</p>
-          <p>Signature: __________________________</p>
+          <SignatureLine sig={signatures?.tenant} />
           <p>Full Name: <V>{data.tenantName || "__________________________"}</V></p>
-          <p>Date: __/__/20__</p>
+          <SignatureDate sig={signatures?.tenant} />
         </div>
         <SignBlock title="WITNESS 1" lines={["Signature", "Name", "Address"]} />
         <SignBlock title="WITNESS 2" lines={["Signature", "Name", "Address"]} />
