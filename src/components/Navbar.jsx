@@ -249,7 +249,7 @@ function DropdownMenu({ item, isOpen, onNavigate, onOpenModal }) {
       </div>
       <div className="bg-gray-50/80 px-5 py-2.5 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
         <span className="font-medium text-blue-900">{item.tagline}</span>
-        <span className="text-gray-400">Verified by Property Brands</span>
+        <span className="text-gray-400">Verified by PropertyBrands</span>
       </div>
     </div>
   );
@@ -372,7 +372,7 @@ export default function Navbar({ onNavigate, currentPage }) {
   function handleCitySelect(city) {
     setSelectedCity(city);
     setCityOpen(false);
-    onNavigate && onNavigate("search", city ? { location: city } : { location: "" });
+    onNavigate && onNavigate("search", { location: city || "", __keepFilters: true });
   }
 
   function openModalHandler(type, topic) {
@@ -401,8 +401,8 @@ export default function Navbar({ onNavigate, currentPage }) {
               className="h-11 w-auto object-contain"
             />
             <div className="hidden sm:flex flex-col border-l border-gray-200 pl-3">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-900 leading-tight">
-                Property Brands
+              <span className="text-[11px] font-bold tracking-wide text-blue-900 leading-tight">
+                PropertyBrands
               </span>
               <span className="text-[10px] font-semibold text-gray-500 tracking-tight">
                 Discover · Invest · Build · Manage

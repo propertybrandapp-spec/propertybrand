@@ -1,3 +1,4 @@
+import ProjectExtrasFields from "./ProjectExtrasFields";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../lib/AuthContext";
 import { createListing, LANDMARK_CATEGORIES } from "../lib/listings";
@@ -84,6 +85,11 @@ const EMPTY_FORM = {
   longitude: null,
   videoUrls: [],
   images: [],
+  unitConfigs: [],
+  handoverDate: "",
+  handoverTimeline: "",
+  priceTrend: [],
+  contactPhone: "",
 
   // ── Section 2A: Property Identity & Basic Details ──
   projectName: "",
@@ -537,6 +543,11 @@ export default function PostProperty({ onNavigate }) {
 
     if (!form.title || !form.location || (!form.priceOnRequest && !form.priceRaw)) {
       setSaveError('Title, location, and price are required — or check "Call for Details" if you\'d rather not list a price.');
+      return;
+    }
+
+    if (String(form.contactPhone || "").replace(/\D/g, "").slice(-10).length !== 10) {
+      setSaveError("Please enter your 10-digit contact number — our team uses it to verify and approve your listing.");
       return;
     }
 
@@ -1068,6 +1079,8 @@ export default function PostProperty({ onNavigate }) {
             )}
           </div>
 
+          <ProjectExtrasFields form={form} set={set} isLand={isLand} hasBhk={!!profile.bhk} />
+
           <div className="rounded-2xl p-6 space-y-5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
             <div>
               <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Price &amp; Financial Details</h2>
@@ -1442,6 +1455,10 @@ export default function PostProperty({ onNavigate }) {
                 <TextInput value={form.posterEmail} onChange={(e) => set("posterEmail", e.target.value)} placeholder="e.g. rajesh@example.com" />
               </Field>
             </div>
+
+            <Field label="Your contact number (private)" required hint="Only the PropertyBrands team sees this, to call you when approving your listing. It is never shown to visitors.">
+              <TextInput value={form.contactPhone} onChange={(e) => set("contactPhone", e.target.value.replace(/[^\d+\s-]/g, ""))} inputMode="tel" placeholder="10-digit mobile number" aria-label="Your contact number (private)" />
+            </Field>
 
             <Field label="Preferred Contact Methods">
               <div className="flex flex-wrap gap-2">

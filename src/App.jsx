@@ -90,6 +90,9 @@ function AppContent() {
   // page plus its payload (search filters, viewed property, …) — and restores
   // the scroll position. Payloads live in memory (entriesRef), not in the URL.
   const entriesRef = useRef(new Map());   // entry id -> { page, payload, scrollY }
+  // The filters of the most recent results page, so "Back to results" links
+  // (breadcrumb, not-found screen) return to the same search, not a blank one.
+  const lastSearchRef = useRef(readLastSearch());
   const currentIdRef = useRef(0);
   const nextIdRef = useRef(1);
 
@@ -134,8 +137,24 @@ function AppContent() {
     // (unless the caller chose a location itself), so "Discover", "See all" and
     // the like stay inside that city.
     let payload = rawPayload;
-    if (to === "search" && selectedCity && !(rawPayload && rawPayload.location)) {
-      payload = { ...(rawPayload || {}), location: selectedCity };
+    let explicit = false; // the caller has already decided the location (incl. "All Cities")
+    if (to === "search" && rawPayload && rawPayload.__restoreLast) {
+      explicit = true;
+      // "Back to results": the last search as the visitor left it.
+      const { __restoreLast, ...rest } = rawPayload;
+      payload = lastSearchRef.current ? { ...lastSearchRef.current, ...rest } : (Object.keys(rest).length ? rest : null);
+    } else if (to === "search" && rawPayload && rawPayload.__keepFilters) {
+      explicit = true;
+      // Changing the city while already looking at results: swap only the
+      // location, keep every other filter the visitor set.
+      const { __keepFilters, ...rest } = rawPayload;
+      const { __ui, ...current } = (page === "search" && lastSearchRef.current) || {};
+      payload = { ...current, ...rest };
+    }
+    // Every route into the results page carries the city picked in the top bar,
+    // unless the caller chose a location itself.
+    if (to === "search" && selectedCity && !explicit && !(payload && payload.location)) {
+      payload = { ...(payload || {}), location: selectedCity };
     }
     // Remember where the user was scrolled on the page they're leaving
     const leaving = entriesRef.current.get(currentIdRef.current);
@@ -157,6 +176,8 @@ function AppContent() {
   const rememberSearchFilters = useCallback((filters) => {
     const entry = entriesRef.current.get(currentIdRef.current);
     if (entry && entry.page === "search") entry.payload = filters;
+    lastSearchRef.current = filters;
+    try { window.sessionStorage.setItem(LAST_SEARCH_KEY, JSON.stringify(filters)); } catch { /* private mode */ }
   }, []);
 
   const goBack = useCallback(() => {
@@ -211,7 +232,7 @@ function AppContent() {
         {page === "search" && <SearchResults key={navNonce} initialFilters={searchFilters} onNavigate={navigate} onFiltersChange={rememberSearchFilters} />}
 
         {page === "property-detail" && (
-          <PropertyDetail key={navNonce} property={viewingProperty?.property} pool={viewingProperty?.pool} onNavigate={navigate} />
+          <PropertyDetail key={navNonce} property={viewingProperty?.property} pool={viewingProperty?.pool} onNavigate={navigate} onBackToResults={() => navigate("search", { __restoreLast: true })} />
         )}
 
         {page === "channel-partner" && <ChannelPartner onNavigate={navigate} />}
@@ -272,6 +293,11 @@ function AppContent() {
       <Footer onNavigate={navigate} />
     </div>
   );
+}
+
+const LAST_SEARCH_KEY = "pb_last_search";
+function readLastSearch() {
+  try { return JSON.parse(window.sessionStorage.getItem(LAST_SEARCH_KEY) || "null"); } catch { return null; }
 }
 
 export default function App() {

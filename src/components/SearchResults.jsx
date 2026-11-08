@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { rangeText } from "../lib/unitSizes";
 import { fetchPublicListings } from "../lib/listings";
 import { fetchListingFieldOptions } from "../lib/listingOptions";
 import { useSavedItems } from "../lib/SavedItemsContext";
@@ -39,6 +40,12 @@ const NO_BUDGET = [0, null];
 
 // How many results are shown at first, and how many more each "Load More" click adds.
 const PAGE_STEP = 12;
+// Several sizes in one project: "1,050 – 1,450 sqft" instead of just the smallest.
+function unitRange(p) {
+  const areas = (p.unitConfigs || []).map((u) => u.areaSqft).filter(Boolean);
+  if (areas.length < 2) return "";
+  return rangeText(areas, (n) => `${n.toLocaleString("en-IN")} sqft`);
+}
 
 // ── Helper ─────────────────────────────────────────────────────────────────────
 function CheckBox({ label, checked, onChange }) {
@@ -298,7 +305,7 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
         <div className="flex items-baseline gap-3 mb-2">
           <span className="text-xl font-extrabold" style={{ color: "#1565C0" }}>{property.price}</span>
           <span className="text-xs" style={{ color: "#6B7280" }}>|</span>
-          <span className="text-sm font-medium" style={{ color: "#6B7280" }}>{property.area}</span>
+          <span className="text-sm font-medium" style={{ color: "#6B7280" }}>{unitRange(property) || property.area}</span>
         </div>
 
         {/* Location */}
@@ -442,7 +449,7 @@ function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
         </div>
         <div className="flex items-baseline gap-2 mb-2">
           <span className="text-base font-extrabold" style={{ color: "#1565C0" }}>{property.price}</span>
-          <span className="text-xs" style={{ color: "#6B7280" }}>| {property.area}</span>
+          <span className="text-xs" style={{ color: "#6B7280" }}>| {unitRange(property) || property.area}</span>
         </div>
         <div className="flex items-center gap-1.5 mb-3">
           <svg className="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20" style={{ color: "#1565C0" }}>
@@ -503,11 +510,17 @@ function buildFilters(overrides) {
 }
 
 export default function SearchResults({ initialFilters, onNavigate, onFiltersChange }) {
-  const [viewMode, setViewMode] = useState("list"); // list | grid
+  // What the visitor had on screen last time (sort, grid/list, how many
+  // pages were loaded) comes back with the filters when they return from a
+  // property page.
+  const ui = initialFilters?.__ui || {};
+  const [viewMode, setViewMode] = useState(ui.viewMode || "list"); // list | grid
   const resultsRef = useRef(null);
-  const [sortBy, setSortBy] = useState("Relevance");
+  const [sortBy, setSortBy] = useState(ui.sortBy || "Relevance");
   // Results are shown a page at a time; "Load More Properties" reveals the next page.
-  const [visibleCount, setVisibleCount] = useState(PAGE_STEP);
+  const [visibleCount, setVisibleCount] = useState(Number(ui.visibleCount) > 0 ? Number(ui.visibleCount) : PAGE_STEP);
+  const keepVisibleOnce = useRef(Number(ui.visibleCount) > PAGE_STEP);
+  const filterSigRef = useRef(null);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filters, setFilters] = useState(() => buildFilters(initialFilters));
@@ -517,8 +530,8 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
     }
   }, [initialFilters]);
   useEffect(() => {
-    if (onFiltersChange) onFiltersChange(filters);
-  }, [filters, onFiltersChange]);
+    // `visibleCount` is read from state below, after it is declared.
+  }, []);
   const [listings, setListings] = useState(null); // null = still loading, [] = loaded but empty
   const [loadError, setLoadError] = useState("");
   const [fieldOptions, setFieldOptions] = useState(null);
@@ -609,8 +622,20 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
 
   // A new search / filter / sort starts again from the first page.
   useEffect(() => {
+    // Only a real change of filters/sort starts over — re-applying the same
+    // filters (e.g. when restoring after Back) keeps the pages already loaded.
+    const sig = JSON.stringify([filters, sortBy]);
+    const first = filterSigRef.current === null;
+    if (!first && filterSigRef.current === sig) return;
+    filterSigRef.current = sig;
+    if (first && keepVisibleOnce.current) return; // restoring after Back
     setVisibleCount(PAGE_STEP);
   }, [filters, sortBy]);
+
+  // Report the live filters + view state so Back / "Back to results" restores them.
+  useEffect(() => {
+    if (onFiltersChange) onFiltersChange({ ...filters, __ui: { viewMode, sortBy, visibleCount } });
+  }, [filters, viewMode, sortBy, visibleCount, onFiltersChange]);
 
   const activeFilterCount = filters.types.length + filters.bhk.length + filters.possession.length +
     filters.postedBy.length + filters.amenities.length + filters.tags.length + (filters.verifiedOnly ? 1 : 0) +

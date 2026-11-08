@@ -133,7 +133,7 @@ export default function BuildMoveHub({ onNavigate }) {
             Complete Post-Purchase Services & Home-Building Journey
           </h1>
           <p className="mt-3 text-sm sm:text-base text-blue-200 max-w-2xl mx-auto leading-relaxed" style={{ color: "#BFDBFE" }}>
-            Property Brands coordinates the entire lifecycle after acquisition: wholesale building materials, pre-possession snagging inspections, insured movers, and turnkey architecture.
+            PropertyBrands coordinates the entire lifecycle after acquisition: wholesale building materials, pre-possession snagging inspections, insured movers, and turnkey architecture.
           </p>
 
           {/* Service Selector Tabs */}
@@ -210,7 +210,7 @@ export default function BuildMoveHub({ onNavigate }) {
           <div className="lg:col-span-5">
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-xl sticky top-24">
               <div className="border-b border-gray-100 pb-3 mb-5">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-blue-700">PropertyBrands Verified Network</span>
+                <span className="text-[10px] font-bold tracking-widest text-blue-700">PropertyBrands Verified Network</span>
                 <h3 className="text-lg font-bold text-gray-900 mt-0.5">Request Service Quotation</h3>
                 <p className="text-xs text-gray-500">Receive vetted vendor quotes within 2 business hours</p>
               </div>

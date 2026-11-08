@@ -131,3 +131,11 @@ Also run `supabase/migration_031_rent_agreement_signing.sql` — this switches o
 - **What the Aadhaar / PAN check does:** it checks the *format* (Aadhaar's 12-digit checksum, PAN's 10-character pattern). It is **not** an official UIDAI / Income Tax verification. Only the last 4 digits of Aadhaar are stored; the PAN is stored and readable by admins only.
 - **Signing is an electronic acknowledgement** (typed name + consent + time + IP). It is not an Aadhaar eSign / DSC signature; for stamp-paper registration the printed copy is still needed.
 - To see signed agreements: Supabase → Table Editor → `rent_agreements` (status, who signed, when, Aadhaar last 4, PAN).
+
+Also run `supabase/migration_032_unit_sizes_handover_trend_contact.sql` — adds:
+- **Several sizes in one project** (e.g. 2 BHK 1,050 sq ft and 3 BHK 1,450 sq ft, each with its own price) — shown as a table on the property page, as a size range on the cards, and matched by the budget filter if *any* size fits.
+- **Handover timeline** (month + notes) in the project description.
+- **Price trend** for the location (₹ per sq ft by year) as a small chart. The figures are whatever the lister/admin types in — the site does not fetch market data — so label them as indicative.
+- **Private contact number**: Post Property now asks for a 10-digit number. It is stored in its own table, `listing_contacts`, readable only by the person who posted and by admins, and is shown in the admin Listings table ("Contact" column) and at the top of the edit form so you can call before approving. It is never part of the public listing data.
+
+Without this migration the site still works: sizes and handover are kept in the description text, the trend is not saved, and the contact number is not stored (the listing is still submitted).

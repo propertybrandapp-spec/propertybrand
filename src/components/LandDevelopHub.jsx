@@ -179,7 +179,7 @@ export default function LandDevelopHub({ onNavigate }) {
             Essential Land Listing & Due Diligence Requirements
           </h2>
           <p className="text-sm text-gray-600 mt-2">
-            Every plot and land parcel on Property Brands is subjected to verified documentation checks to protect buyers and maximize developer confidence.
+            Every plot and land parcel on PropertyBrands is subjected to verified documentation checks to protect buyers and maximize developer confidence.
           </p>
         </div>
 

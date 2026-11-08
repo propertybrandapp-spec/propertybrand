@@ -1,3 +1,4 @@
+import ProjectHighlights from "./ProjectHighlights";
 import { useState, useEffect, useRef } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { useAuth } from "../lib/AuthContext";
@@ -32,6 +33,12 @@ function toEmbeddableVideoUrl(url) {
   const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
   if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
   return null;
+}
+
+// YouTube gives every video a preview image; other hosts don't.
+function videoThumbUrl(url) {
+  const m = String(url || "").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/);
+  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
 }
 
 // Prefers an explicit share link (e.g. pointing at a specific building
@@ -175,7 +182,7 @@ function SimilarCard({ property, onOpen }) {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function PropertyDetail({ property, pool = [], onNavigate }) {
+export default function PropertyDetail({ property, pool = [], onNavigate, onBackToResults }) {
   const { isPropertySaved, toggleSaveProperty } = useSavedItems();
   const { items: compareItems, isComparing, toggleCompare, maxCompare } = useCompare();
   const [activeImage, setActiveImage] = useState(0);
@@ -308,7 +315,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
         <p className="text-lg font-bold" style={{ color: "#1F2937" }}>Property not found</p>
-        <button onClick={() => onNavigate && onNavigate("search")} className="mt-4 text-sm font-bold" style={{ color: "#1565C0" }}>
+        <button onClick={() => (onBackToResults ? onBackToResults() : onNavigate && onNavigate("search"))} className="mt-4 text-sm font-bold" style={{ color: "#1565C0" }}>
           ← Back to Search
         </button>
       </div>
@@ -316,6 +323,8 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
   }
 
   const images = property.images?.length ? property.images : [];
+  // The one video list: video links + drone view, shown only in the photo slider.
+  const galleryVideos = Array.from(new Set([...(property.videoUrls || []), property.droneViewUrl].filter(Boolean)));
   const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
   const saved = isPropertySaved(property.dbId || property.id);
   const poster = resolvePoster(property); // used by both new sticky bars below
@@ -363,7 +372,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
         <div className="flex items-center gap-1.5 text-xs mb-5 flex-wrap" style={{ color: "#6B7280" }}>
           <button onClick={() => onNavigate && onNavigate("home")} className="hover:underline" style={{ color: "#1565C0" }}>Home</button>
           <span>/</span>
-          <button onClick={() => onNavigate && onNavigate("search")} className="hover:underline" style={{ color: "#1565C0" }}>
+          <button onClick={() => (onBackToResults ? onBackToResults() : onNavigate && onNavigate("search"))} className="hover:underline" style={{ color: "#1565C0" }}>
             {property.transactionType === "Rent" ? "Rent" : "Buy"}
           </button>
           {property.type && (<><span>/</span><span>{property.type}</span></>)}
@@ -379,53 +388,74 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
             {/* Hero gallery — Section 4: photo count badge + quick shortcuts to
                 video, 360° tour, and floor plan (all still live in their own
                 fuller sections further down; these just jump there). */}
-            <div className="relative rounded-2xl overflow-hidden mb-2" style={{ border: "1px solid #E2E8F0", background: "#F1F5F9" }}>
-              {images.length > 0 ? (
-                <img src={images[activeImage]} alt={property.title} className="w-full h-[320px] sm:h-[440px] object-cover" />
-              ) : (
-                <div className="w-full h-[320px] sm:h-[440px] flex items-center justify-center text-sm" style={{ color: "#6B7280" }}>
-                  No photos available yet
-                </div>
-              )}
-              {images.length > 0 && (
-                <span className="absolute bottom-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(31,41,55,0.75)", color: "#FFFFFF" }}>
-                  {activeImage + 1} / {images.length} photos
-                </span>
-              )}
-            </div>
             {(() => {
-              const detail = (property.imageDetails || []).find((d) => d.url === images[activeImage]);
-              if (!detail || (!detail.caption && !detail.roomLabel)) return null;
+              // Video(s) sit in the same slider as the photos (after the last photo).
+              const videoSlides = galleryVideos.map((url) => ({ type: "video", url, embed: toEmbeddableVideoUrl(url), thumb: videoThumbUrl(url) }));
+              const slides = [...images.map((url) => ({ type: "image", url })), ...videoSlides];
+              const slide = slides[activeImage] || slides[0];
+              const firstVideoIdx = images.length;
               return (
-                <p className="text-xs mb-3" style={{ color: "#6B7280" }}>
-                  {detail.roomLabel && <span className="font-semibold" style={{ color: "#1F2937" }}>{detail.roomLabel}</span>}
-                  {detail.roomLabel && detail.caption && " · "}
-                  {detail.caption}
-                </p>
+                <>
+                  <div className="relative rounded-2xl overflow-hidden mb-2" style={{ border: "1px solid #E2E8F0", background: "#F1F5F9" }} data-testid="gallery-main">
+                    {!slide ? (
+                      <div className="w-full h-[320px] sm:h-[440px] flex items-center justify-center text-sm" style={{ color: "#6B7280" }}>
+                        No photos available yet
+                      </div>
+                    ) : slide.type === "image" ? (
+                      <img src={slide.url} alt={property.title} className="w-full h-[320px] sm:h-[440px] object-cover" />
+                    ) : slide.embed ? (
+                      <iframe src={slide.embed} title="Property video" className="w-full h-[320px] sm:h-[440px] bg-black" allowFullScreen />
+                    ) : (
+                      <a href={slide.url} target="_blank" rel="noopener noreferrer" className="w-full h-[320px] sm:h-[440px] flex flex-col items-center justify-center gap-2 text-sm font-bold" style={{ color: "#1565C0" }}>
+                        <span className="text-4xl">▶</span> Watch video
+                      </a>
+                    )}
+                    {slide && (
+                      <span className="absolute bottom-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(31,41,55,0.75)", color: "#FFFFFF" }}>
+                        {slide.type === "video" ? "▶ Video" : `${activeImage + 1} / ${images.length} photos`}
+                      </span>
+                    )}
+                    {slide?.type === "image" && videoSlides.length > 0 && (
+                      <button type="button" onClick={() => setActiveImage(firstVideoIdx)} aria-label="Play video"
+                        className="absolute bottom-3 left-3 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5" style={{ background: "#FFFFFF", color: "#1F2937", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
+                        ▶ Watch video
+                      </button>
+                    )}
+                  </div>
+                  {slide?.type === "image" && (() => {
+                    const detail = (property.imageDetails || []).find((d) => d.url === slide.url);
+                    if (!detail || (!detail.caption && !detail.roomLabel)) return null;
+                    return (
+                      <p className="text-xs mb-3" style={{ color: "#6B7280" }}>
+                        {detail.roomLabel && <span className="font-semibold" style={{ color: "#1F2937" }}>{detail.roomLabel}</span>}
+                        {detail.roomLabel && detail.caption && " · "}
+                        {detail.caption}
+                      </p>
+                    );
+                  })()}
+                  {slides.length > 1 && (
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }} data-testid="gallery-thumbs">
+                      {slides.map((sl, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActiveImage(i)}
+                          aria-label={sl.type === "video" ? "Video" : `Photo ${i + 1}`}
+                          className="shrink-0 w-20 h-16 rounded-lg overflow-hidden transition-all relative"
+                          style={{ border: activeImage === i ? "2px solid #1565C0" : "2px solid transparent", opacity: activeImage === i ? 1 : 0.7, background: "#1F2937" }}
+                        >
+                          {sl.type === "image" || sl.thumb ? <img src={sl.type === "image" ? sl.url : sl.thumb} alt="" className="w-full h-full object-cover" /> : null}
+                          {sl.type === "video" && (
+                            <span className="absolute inset-0 flex items-center justify-center text-white text-lg" style={{ background: "rgba(0,0,0,0.35)" }}>▶</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
               );
             })()}
-            {images.length > 1 && (
-              <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveImage(i)}
-                    className="shrink-0 w-20 h-16 rounded-lg overflow-hidden transition-all"
-                    style={{ border: activeImage === i ? "2px solid #1565C0" : "2px solid transparent", opacity: activeImage === i ? 1 : 0.7 }}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
-            {(property.videoUrls?.length > 0 || property.virtualTourUrl || property.floorPlanUrl) && (
+            {(property.virtualTourUrl || property.floorPlanUrl) && (
               <div className="flex flex-wrap gap-2 mb-8">
-                {property.videoUrls?.length > 0 && (
-                  <button onClick={() => scrollToSection("videos-section")}
-                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1F2937" }}>
-                    ▶ Video
-                  </button>
-                )}
                 {property.virtualTourUrl && (
                   <button onClick={() => scrollToSection("virtual-experience-section")}
                     className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-lg" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1F2937" }}>
@@ -454,36 +484,9 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                 )}
               </div>
             </div>
-            {/* Videos */}
-            {property.videoUrls?.length > 0 && (
-              <div id="videos-section" className="mb-8">
-                <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>Videos</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {property.videoUrls.map((url) => {
-                    const embedUrl = toEmbeddableVideoUrl(url);
-                    return embedUrl ? (
-                      <div key={url} className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
-                        <iframe src={embedUrl} title="Property video" className="w-full h-full" allowFullScreen />
-                      </div>
-                    ) : (
-                      <a key={url} href={url} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline"
-                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
-                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Watch Video
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* Virtual Experience, Floor Plan & Construction Progress (Section 2G) */}
             {(() => {
-              const hasVirtual = property.virtualTourUrl || property.droneViewUrl;
+              const hasVirtual = property.virtualTourUrl;
               const hasFloorPlan = property.floorPlanUrl;
               const progressPhotos = property.project?.constructionProgressPhotos || [];
               if (!hasVirtual && !hasFloorPlan && progressPhotos.length === 0) return null;
@@ -491,7 +494,6 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
               // Matterport/Kuula-style links are directly iframe-embeddable;
               // anything else just gets a plain "open" link instead.
               const tourEmbeddable = property.virtualTourUrl && /matterport|kuula|cloudpano/.test(property.virtualTourUrl);
-              const droneEmbedUrl = property.droneViewUrl ? toEmbeddableVideoUrl(property.droneViewUrl) : null;
 
               return (
                 <div id="virtual-experience-section" className="mb-8 space-y-5">
@@ -507,23 +509,6 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                         className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline w-fit"
                         style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
                         Open 360° Virtual Tour →
-                      </a>
-                    )
-                  )}
-
-                  {property.droneViewUrl && (
-                    droneEmbedUrl ? (
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: "#6B7280" }}>Drone View</p>
-                        <div className="aspect-video rounded-xl overflow-hidden" style={{ border: "1px solid #E2E8F0" }}>
-                          <iframe src={droneEmbedUrl} title="Drone view" className="w-full h-full" allowFullScreen />
-                        </div>
-                      </div>
-                    ) : (
-                      <a href={property.droneViewUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl hover:underline w-fit"
-                        style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#1565C0" }}>
-                        Watch Drone View →
                       </a>
                     )
                   )}
@@ -1091,6 +1076,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate }) {
                   {property.petPolicyNotes && (
                     <p className="text-xs mb-4" style={{ color: "#6B7280" }}>{property.petPolicyNotes}</p>
                   )}
+                  <ProjectHighlights property={property} comparable={comparable} onEnquire={(u) => onNavigate && onNavigate("contact", { property, intent: "contact", unit: u })} />
                   {rows.length > 0 && (
                     <>
                       <h3 className="text-sm font-bold mb-3" style={{ color: "#1F2937" }}>Specifications</h3>
