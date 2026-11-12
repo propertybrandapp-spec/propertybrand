@@ -952,7 +952,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
                         <div className="rounded-xl p-3.5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
                           <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>Expected Possession</p>
                           <p className="text-sm font-bold mt-0.5" style={{ color: "#1F2937" }}>
-                            {new Date(property.project.expectedPossessionDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                            {new Date(property.project.expectedPossessionDate).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
                           </p>
                         </div>
                       )}

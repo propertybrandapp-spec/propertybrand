@@ -177,7 +177,7 @@ export default function ComparePage({ onNavigate }) {
         { label: "Carpet / Super Built-up Area", render: (p) => p.area || "—" },
         { label: "Floor Level", render: (p) => p.floor || (isLandType(p.type) ? "—" : "Mid Floor") },
         { label: "Facing / Vaastu", render: (p) => p.facing || (isLandType(p.type) ? "—" : "North-East / Vaastu Compliant") },
-        { label: "Possession Date", render: (p) => p.project?.expectedPossessionDate || p.status || "Ready to Move" },
+        { label: "Possession Date", render: (p) => p.project?.expectedPossessionDate ? new Date(p.project.expectedPossessionDate).toLocaleDateString("en-IN", { month: "short", year: "numeric" }) : (p.status || "Ready to Move") },
         { label: "Posted By", render: (p) => `${p.postedBy || "Owner"} ${p.postedDays ? `(${p.postedDays}d ago)` : ""}` },
       ],
     },
