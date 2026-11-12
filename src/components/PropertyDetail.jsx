@@ -543,6 +543,28 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
               );
             })()}
 
+            {/* Joint Development Opportunity Banner */}
+            {property.openForJda && (
+              <div className="mb-6 rounded-2xl p-5 bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-xs font-bold mb-1.5">
+                    <span>🤝</span> Joint Development (JDA) Opportunity
+                  </div>
+                  <h4 className="text-base font-bold text-gray-900">Landowner Open for Developer Joint Development</h4>
+                  <p className="text-xs text-gray-600 mt-0.5">
+                    {property.jdaTerms ? `Terms / Sharing: ${property.jdaTerms}` : "Suitable for residential, commercial or mixed-use builder partnership."}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onNavigate && onNavigate("land-develop")}
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white whitespace-nowrap shadow-sm transition"
+                >
+                  JDA Advisory & Matching →
+                </button>
+              </div>
+            )}
+
             {/* Quick facts — Section 4's spec'd set: BHK, carpet area, floor,
                 possession, furnishing, facing, parking, age. (Posted By /
                 Listed-days-ago moved to the byline under the title instead.) */}
@@ -557,6 +579,9 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
                       property.plotApproval && { label: "Approval", value: property.plotApproval },
                       property.cornerPlot && { label: "Plot Type", value: "Corner plot" },
                       property.boundaryWall && { label: "Boundary Wall", value: "Built" },
+                      property.openForJda && { label: "JDA Option", value: property.jdaTerms || "Open for JDA" },
+                      property.titleVerified && { label: "Title Check", value: "Verified 30-Yr" },
+                      property.zoningDone && { label: "Zoning / CLU", value: "Done" },
                     ]
                   : [
                       property.bhkLabel && { label: "Configuration", value: property.bhkLabel },

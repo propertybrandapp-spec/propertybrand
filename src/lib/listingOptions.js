@@ -14,8 +14,16 @@ export async function fetchListingFieldOptions() {
   );
   if (error || !data || data.length === 0) return { data: null, error };
 
-  const grouped = { propertyTypes: [], bhkOptions: [], amenities: [], tags: [], budgetRanges: [] };
-  const keyByFieldType = { property_type: "propertyTypes", bhk: "bhkOptions", amenity: "amenities", tag: "tags", budget_range: "budgetRanges" };
+  const grouped = { propertyTypes: [], bhkOptions: [], amenities: [], tags: [], budgetRanges: [], possessionOptions: [], landUseOptions: [] };
+  const keyByFieldType = {
+    property_type: "propertyTypes",
+    bhk: "bhkOptions",
+    possession: "possessionOptions",
+    land_use: "landUseOptions",
+    amenity: "amenities",
+    tag: "tags",
+    budget_range: "budgetRanges",
+  };
   data.forEach((row) => {
     const key = keyByFieldType[row.field_type];
     if (key) grouped[key].push(row.value);

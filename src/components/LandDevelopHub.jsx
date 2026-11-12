@@ -26,8 +26,8 @@ const LAND_PILLARS = [
     tagline: "Maximize landowner returns by partnering with top-tier developers for legally structured revenue/area sharing.",
     icon: "🤝",
     badge: "High Return",
-    action: "Explore JDA Partners",
-    consultTopic: "land",
+    action: "Browse JDA Land Parcels",
+    isJdaSearch: true,
   },
   {
     id: "verify",
@@ -74,6 +74,8 @@ export default function LandDevelopHub({ onNavigate }) {
   function handlePillarClick(pillar) {
     if (pillar.isPost) {
       onNavigate && onNavigate("post-property");
+    } else if (pillar.isJdaSearch) {
+      onNavigate && onNavigate("search", { jdaOnly: true, transactionType: "Buy" });
     } else if (pillar.consultTopic) {
       setSelectedTopic(pillar.consultTopic);
       setExpertModalOpen(true);
@@ -110,6 +112,12 @@ export default function LandDevelopHub({ onNavigate }) {
               style={{ background: "#1565C0" }}
             >
               Browse Land Listings
+            </button>
+            <button
+              onClick={() => onNavigate && onNavigate("search", { jdaOnly: true, transactionType: "Buy" })}
+              className="px-6 py-3 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all hover:scale-105"
+            >
+              Browse JDA Parcels
             </button>
             <button
               onClick={() => {

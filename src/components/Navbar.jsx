@@ -89,7 +89,7 @@ const NAV_ITEMS = [
         links: [
           { label: "Buy Residential & Commercial Plots", page: "search", filters: { transactionType: "Buy", types: ["Plot"] } },
           { label: "Farmland & Agricultural Land", page: "search", filters: { transactionType: "Buy", types: ["Agricultural Land", "Farmhouse"] } },
-          { label: "Joint Development (JDA) Matching", page: "land-develop" },
+          { label: "Joint Development (JDA) Matching", page: "search", filters: { jdaOnly: true, transactionType: "Buy" } },
           { label: "List Land for Sale / JDA", page: "post-property" },
         ],
       },

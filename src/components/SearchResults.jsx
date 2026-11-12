@@ -200,8 +200,11 @@ function Sidebar({
             </div>
           ))}
 
-          {/* Verified only */}
-          <div style={{ borderTop: "1px solid #E2E8F0", paddingTop: "16px" }}>
+          {/* Verified & JDA options */}
+          <div style={{ borderTop: "1px solid #E2E8F0", paddingTop: "16px" }} className="space-y-3">
+            <CheckBox label="🤝 Joint Development (JDA) Only"
+              checked={filters.jdaOnly}
+              onChange={() => setFilters(f => ({ ...f, jdaOnly: !f.jdaOnly }))} />
             <CheckBox label="Verified Properties Only"
               checked={filters.verifiedOnly}
               onChange={() => setFilters(f => ({ ...f, verifiedOnly: !f.verifiedOnly }))} />
@@ -239,11 +242,20 @@ function PropertyCardList({ property, onOpen, onQuickView, onNavigate }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent 60%)" }} />
 
-        {/* Badge */}
-        <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full"
-          style={{ background: property.badgeColor, color: "#FFFFFF" }}>
-          {property.badge}
-        </span>
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[80%]">
+          {property.badge && (
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm"
+              style={{ background: property.badgeColor || "#1565C0", color: "#FFFFFF" }}>
+              {property.badge}
+            </span>
+          )}
+          {property.openForJda && (
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white shadow-sm flex items-center gap-1">
+              🤝 JDA Partner
+            </span>
+          )}
+        </div>
 
         {/* Quick actions */}
         <div className="absolute top-3 right-3 flex flex-col gap-1.5">
@@ -398,10 +410,19 @@ function PropertyCardGrid({ property, onOpen, onQuickView, onNavigate }) {
         <img src={property.images[0]} alt={property.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55), transparent 60%)" }} />
-        <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full"
-          style={{ background: property.badgeColor, color: "#FFFFFF" }}>
-          {property.badge}
-        </span>
+        <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 max-w-[80%]">
+          {property.badge && (
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm"
+              style={{ background: property.badgeColor || "#1565C0", color: "#FFFFFF" }}>
+              {property.badge}
+            </span>
+          )}
+          {property.openForJda && (
+            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white shadow-sm flex items-center gap-1">
+              🤝 JDA
+            </span>
+          )}
+        </div>
         <div className="absolute top-3 right-3 flex flex-col gap-1.5">
           <button onClick={e => { e.stopPropagation(); onQuickView && onQuickView(property); }}
             aria-label="Quick view"
@@ -503,6 +524,7 @@ function buildFilters(overrides) {
     amenities: overrides?.amenities || [],
     tags: overrides?.tags || [],
     verifiedOnly: overrides?.verifiedOnly || false,
+    jdaOnly: overrides?.jdaOnly || false,
     furnishing: overrides?.furnishing || [],
     warehouseSpecs: overrides?.warehouseSpecs || [],
     landZoning: overrides?.landZoning || [],
@@ -584,6 +606,7 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
     if (filters.possession.length && !filters.possession.includes(p.status)) return false;
     if (filters.postedBy?.length && !filters.postedBy.includes(p.postedBy)) return false;
     if (filters.verifiedOnly && !p.verified) return false;
+    if (filters.jdaOnly && !p.openForJda && !matchesTags(["JDA", "Joint Development"], p)) return false;
     if (filters.amenities?.length && !filters.amenities.some(a => (p.amenities || []).includes(a))) return false;
     if (!matchesTags(filters.tags, p)) return false;
     if (filters.furnishing?.length) {
@@ -638,7 +661,7 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
   }, [filters, viewMode, sortBy, visibleCount, onFiltersChange]);
 
   const activeFilterCount = filters.types.length + filters.bhk.length + filters.possession.length +
-    filters.postedBy.length + filters.amenities.length + filters.tags.length + (filters.verifiedOnly ? 1 : 0) +
+    filters.postedBy.length + filters.amenities.length + filters.tags.length + (filters.verifiedOnly ? 1 : 0) + (filters.jdaOnly ? 1 : 0) +
     filters.furnishing.length + filters.warehouseSpecs.length + filters.landZoning.length +
     (isBudgetActive(filters.budget) ? 1 : 0);
 
