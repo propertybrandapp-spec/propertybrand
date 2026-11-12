@@ -129,7 +129,7 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
   return (
     <div
       onClick={() => onOpen && onOpen(property)}
-      className="relative bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64"
+      className="relative bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64 flex flex-col h-full"
     >
       {featured && (
         <div className="absolute -top-px left-0 right-0 h-0.5 bg-gradient-to-r from-yellow-400 via-[#1565C0] to-yellow-400 rounded-t-xl z-10" />
@@ -146,59 +146,61 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
         <HeartBtn property={property} />
       </div>
 
-      <div className="p-3.5">
-        {/* Title + Price */}
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="text-sm font-bold text-[#1F2937] leading-tight">{title}</h3>
-          {verified && (
-            <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-[#1565C0] font-bold">
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Verified
-            </span>
-          )}
+      <div className="p-3.5 flex-1 flex flex-col justify-between">
+        <div className="flex-1 flex flex-col">
+          {/* Title + Price */}
+          <div className="flex items-start justify-between gap-2 mb-1 min-h-[2.25rem]">
+            <h3 className="text-sm font-bold text-[#1F2937] leading-tight line-clamp-2">{title}</h3>
+            {verified && (
+              <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-[#1565C0] font-bold">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Verified
+              </span>
+            )}
+          </div>
+
+          {/* Price + Area */}
+          <div className="flex items-baseline gap-2 mb-1.5">
+            <span className="text-base font-extrabold text-[#1F2937]">{price}</span>
+            <span className="text-xs text-[#6B7280] font-medium">|</span>
+            <span className="text-xs text-[#6B7280] font-medium">{area}</span>
+          </div>
+
+          {/* Location */}
+          <div className="flex items-start gap-1 mb-2 min-h-[2rem]">
+            <svg className="w-3 h-3 text-[#1565C0] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+            </svg>
+            <span className="text-[11px] text-[#6B7280] leading-tight line-clamp-2">{location}</span>
+          </div>
+
+          {/* Amenities */}
+          <div className="flex flex-wrap gap-1 mb-2.5 min-h-[1.5rem] items-center">
+            {amenities && amenities.length > 0 && amenities.slice(0, 3).map((a) => (
+              <span key={a} className="text-[10px] bg-[#F1F5F9] text-[#6B7280] px-1.5 py-0.5 rounded font-medium truncate max-w-[95px]">
+                {a}
+              </span>
+            ))}
+            {amenities && amenities.length > 3 && (
+              <span className="text-[10px] text-[#1565C0] font-semibold px-1 shrink-0">
+                +{amenities.length - 3} more
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Price + Area */}
-        <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-base font-extrabold text-[#1F2937]">{price}</span>
-          <span className="text-xs text-[#6B7280] font-medium">|</span>
-          <span className="text-xs text-[#6B7280] font-medium">{area}</span>
-        </div>
-
-        {/* Location */}
-        <div className="flex items-start gap-1 mb-2.5">
-          <svg className="w-3 h-3 text-[#1565C0] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-          </svg>
-          <span className="text-[11px] text-[#6B7280] leading-tight">{location}</span>
-        </div>
-
-        {/* Amenities */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {amenities.slice(0, 3).map((a) => (
-            <span key={a} className="text-[10px] bg-[#F1F5F9] text-[#6B7280] px-1.5 py-0.5 rounded font-medium">
-              {a}
-            </span>
-          ))}
-          {amenities.length > 3 && (
-            <span className="text-[10px] text-[#1565C0] font-semibold px-1">
-              +{amenities.length - 3} more
-            </span>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-2.5 border-t border-[#E2E8F0]">
-          <div className="text-[11px] text-[#6B7280]">
+        {/* Footer - aligned on the exact same baseline */}
+        <div className="flex items-center justify-between pt-2.5 border-t border-[#E2E8F0] mt-auto">
+          <div className="text-[11px] text-[#6B7280] truncate mr-2">
             By <span className="font-semibold text-[#6B7280]">{postedBy}</span>
             {" · "}
             {postedDays === 0 ? "Today" : `${postedDays}d ago`}
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate("contact", { subject: property.transactionType === "Rent" ? "rent" : "buy", property, intent: "contact" }); }}
-            className="flex items-center gap-1 text-[11px] font-bold text-[#1565C0] hover:underline"
+            className="flex items-center gap-1 text-[11px] font-bold text-[#1565C0] hover:underline shrink-0"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V5z" />
@@ -250,10 +252,10 @@ function ScrollRow({ properties, onOpen, onQuickView, onNavigate }) {
         </svg>
       </button>
 
-      {/* Scrollable list */}
+      {/* Scrollable list - equal height items */}
       <div
         ref={rowRef}
-        className="flex items-start gap-4 overflow-x-auto scroll-smooth pb-2 scrollbar-hide"
+        className="flex items-stretch gap-4 overflow-x-auto scroll-smooth py-1 scrollbar-hide"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {properties.map((p) => (
@@ -358,7 +360,7 @@ export default function PopularProperties({ onNavigate }) {
           <>
             {/* ── Owner Properties Row ── */}
             {ownerProperties.length > 0 && (
-              <div className="mb-10">
+              <div className="mb-6">
                 <SectionHeader title="Popular Owner Properties" onNavigate={onNavigate} />
                 <ScrollRow properties={ownerProperties} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
               </div>
@@ -366,7 +368,7 @@ export default function PopularProperties({ onNavigate }) {
 
             {/* ── Builder / Featured Projects Row ── */}
             {builderProperties.length > 0 && (
-              <div className="mb-10">
+              <div className="mb-6">
                 <SectionHeader title="Featured Projects" seeAllLabel="See all Projects" onNavigate={onNavigate} />
                 <ScrollRow properties={builderProperties} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
               </div>
@@ -374,7 +376,7 @@ export default function PopularProperties({ onNavigate }) {
 
             {/* ── No results for this specific filter ── */}
             {ownerProperties.length === 0 && builderProperties.length === 0 && (
-              <div className="mb-10">
+              <div className="mb-6">
                 <SectionHeader title={`${activeFilter} Properties`} onNavigate={onNavigate} />
                 <div className="text-center py-16 text-[#6B7280]">
                   <svg className="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
