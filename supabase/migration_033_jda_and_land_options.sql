@@ -37,3 +37,4 @@ where not exists (
   select 1 from public.listing_field_options o
   where o.field_type = 'land_use' and o.value = v.value
 );
+
