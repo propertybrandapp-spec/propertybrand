@@ -323,8 +323,8 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
   }
 
   const images = property.images?.length ? property.images : [];
-  // The one video list: video links + drone view, shown only in the photo slider.
-  const galleryVideos = Array.from(new Set([...(property.videoUrls || []), property.droneViewUrl].filter(Boolean)));
+  // The one video list: walkthrough videos + location tour + drone view, shown in the photo slider.
+  const galleryVideos = Array.from(new Set([...(property.videoUrls || []), property.locationVideoUrl, property.droneViewUrl].filter(Boolean)));
   const contactSubject = property.transactionType === "Rent" ? "rent" : "buy";
   const saved = isPropertySaved(property.dbId || property.id);
   const poster = resolvePoster(property); // used by both new sticky bars below
@@ -1091,6 +1091,8 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
                 property.internetReadiness && { label: "Internet", value: property.internetReadiness },
                 property.mobileNetworkQuality && { label: "Mobile Network", value: property.mobileNetworkQuality },
                 property.petPolicy && { label: "Pet Policy", value: property.petPolicy },
+                property.idealFor?.length > 0 && { label: "Ideal For", value: property.idealFor.join(", ") },
+                property.investmentCorridor && { label: "Investment Corridor", value: property.investmentCorridor },
               ].filter(Boolean);
               return (
                 <div className="mb-8">
@@ -1101,6 +1103,30 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
                   {property.petPolicyNotes && (
                     <p className="text-xs mb-4" style={{ color: "#6B7280" }}>{property.petPolicyNotes}</p>
                   )}
+
+                  {property.investmentCorridor && (
+                    <div className="mb-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-semibold">
+                      <span>📈</span>
+                      <span>Part of <strong>{property.investmentCorridor}</strong> Investment Corridor</span>
+                    </div>
+                  )}
+
+                  {property.idealFor?.length > 0 && (
+                    <div className="mb-5 p-4 rounded-xl" style={{ background: "#F0F9FF", border: "1px solid #BAE6FD" }}>
+                      <p className="text-xs font-bold uppercase tracking-wider text-sky-800 mb-2">🎯 Ideal For</p>
+                      <div className="flex flex-wrap gap-2">
+                        {property.idealFor.map((item) => (
+                          <span
+                            key={item}
+                            className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-sky-700 border border-sky-300 shadow-xs"
+                          >
+                            ✓ {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <ProjectHighlights property={property} comparable={comparable} onEnquire={(u) => onNavigate && onNavigate("contact", { property, intent: "contact", unit: u })} />
                   {rows.length > 0 && (
                     <>

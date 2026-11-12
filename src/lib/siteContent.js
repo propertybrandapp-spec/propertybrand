@@ -93,6 +93,7 @@ function normalizeInvestmentOpportunity(row) {
     priceRange: row.price_range,
     type: row.property_type,
     image: row.image_url,
+    linkedListingIds: Array.isArray(row.linked_listing_ids) ? row.linked_listing_ids : [],
   };
 }
 

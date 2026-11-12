@@ -12,12 +12,14 @@ import AuthModal from "./AuthModal";
 import { withExtraTypes, transactionFor } from "../lib/propertyTypes";
 import { Home, CheckCircle2 } from "lucide-react";
 import { parsePriceInput } from "../lib/priceUtils";
+import { fetchInvestmentOpportunities } from "../lib/siteContent";
 
 // Fallback defaults — used until the dynamic options load (or if the
 // "Site Content" → Listing Options table is still empty). Admins can add
 // more of these from the admin console without a code change.
 const DEFAULT_PROPERTY_TYPES = ["Apartment", "Villa", "Independent House", "Duplex", "Plot", "Commercial", "Office Space", "Shop / Showroom", "Warehouse / Industrial Shed", "Farmhouse", "Penthouse", "Studio Apartment", "Agricultural Land", "Office", "Retail", "Industrial", "Co-living", "Student Accommodation"];
 const DEFAULT_BHK_OPTIONS = ["1 RK", "1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 BHK", "5+ BHK"];
+const DEFAULT_IDEAL_FOR_OPTIONS = ["Families", "Working Professionals", "Bachelors", "Students", "Retirees", "Doctors / Clinics", "Commercial Setup", "Investors / High ROI", "Startups", "Corporate Lease", "Couples"];
 const DEFAULT_AMENITIES = ["Lift", "Parking", "Visitor Parking", "Power Backup", "Security", "24x7 Security", "CCTV", "Intercom", "Swimming Pool", "Gym", "Garden", "Club House", "Multipurpose Hall", "Indoor Games", "Kids Play Area", "Jogging Track", "Amphitheatre", "Yoga / Meditation Area", "Senior Citizen Sitout", "Cafeteria", "WiFi", "Housekeeping", "Fire Safety", "Rain Water Harvesting", "Sewage Treatment Plant", "Solar Water Heating", "EV Charging Point", "Water Softener Plant", "Vaastu Compliant", "Pet Friendly", "Gated Community"];
 const DEFAULT_POSSESSION_OPTIONS = ["Ready to Move", "Under Construction", "New Launch"];
 const FACING_OPTIONS = ["North", "South", "East", "West", "North-East", "North-West", "South-East", "South-West"];
@@ -85,6 +87,9 @@ const EMPTY_FORM = {
   latitude: null,
   longitude: null,
   videoUrls: [],
+  locationVideoUrl: "",
+  idealFor: [],
+  investmentCorridor: "",
   images: [],
   unitConfigs: [],
   handoverDate: "",
@@ -362,9 +367,12 @@ export default function PostProperty({ onNavigate }) {
   const mandatoryCategories = isLand ? LAND_MANDATORY_CATEGORIES : MANDATORY_ROOM_CATEGORIES;
   const photoLabelOptions = isLand ? LAND_PHOTO_LABELS : ROOM_LABEL_OPTIONS;
 
+  const [corridors, setCorridors] = useState([]);
+
   useEffect(() => {
     let cancelled = false;
     fetchListingFieldOptions().then(({ data }) => { if (!cancelled) setOptions(data); });
+    fetchInvestmentOpportunities().then(({ data }) => { if (!cancelled && data) setCorridors(data); });
     return () => { cancelled = true; };
   }, []);
 
@@ -392,6 +400,29 @@ export default function PostProperty({ onNavigate }) {
     }
     setCustomBhkDraft("");
     setShowCustomBhk(false);
+  }
+
+  const [customIdealForList, setCustomIdealForList] = useState([]);
+  const [showCustomIdealFor, setShowCustomIdealFor] = useState(false);
+  const [customIdealForDraft, setCustomIdealForDraft] = useState("");
+
+  const allIdealForOptions = Array.from(new Set([
+    ...DEFAULT_IDEAL_FOR_OPTIONS,
+    ...customIdealForList,
+    ...(Array.isArray(form.idealFor) ? form.idealFor : []),
+  ]));
+
+  function handleAddCustomIdealFor() {
+    const val = customIdealForDraft.trim();
+    if (!val) return;
+    if (!customIdealForList.includes(val)) {
+      setCustomIdealForList((prev) => [...prev, val]);
+    }
+    if (!form.idealFor.includes(val)) {
+      setForm((f) => ({ ...f, idealFor: [...f.idealFor, val] }));
+    }
+    setCustomIdealForDraft("");
+    setShowCustomIdealFor(false);
   }
 
   function toggleInArray(key, value) {
@@ -1049,6 +1080,69 @@ export default function PostProperty({ onNavigate }) {
                 ))}
               </div>
             </Field>
+
+            {/* Ideal For */}
+            <Field label="Ideal For" hint="Select who this property suits best, or add your own custom targets — displayed on the listing page.">
+              <div className="flex flex-wrap items-center gap-2">
+                {allIdealForOptions.map((opt) => (
+                  <Chip key={opt} label={opt} active={(form.idealFor || []).includes(opt)} onClick={() => toggleInArray("idealFor", opt)} />
+                ))}
+                {showCustomIdealFor ? (
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-blue-400 bg-blue-50/60">
+                    <input
+                      type="text"
+                      value={customIdealForDraft}
+                      onChange={(e) => setCustomIdealForDraft(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddCustomIdealFor();
+                        } else if (e.key === "Escape") {
+                          setShowCustomIdealFor(false);
+                        }
+                      }}
+                      placeholder="e.g. IT Professionals, Expats"
+                      className="text-xs bg-transparent outline-none w-36 text-slate-800 font-semibold placeholder:text-slate-400"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddCustomIdealFor}
+                      className="text-xs font-bold text-blue-700 hover:text-blue-900 px-1 py-0.5 rounded"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowCustomIdealFor(false); setCustomIdealForDraft(""); }}
+                      className="text-xs text-slate-400 hover:text-slate-600 px-0.5"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowCustomIdealFor(true)}
+                    className="text-xs font-semibold px-2.5 py-1 rounded-full border border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <span className="text-sm font-bold leading-none">+</span> Custom Ideal For
+                  </button>
+                )}
+              </div>
+            </Field>
+
+            {/* Investment Corridor / Opportunity */}
+            <Field label="Investment Corridor / Advisory Opportunity" hint="Link this property directly to an Investment Corridor (e.g. Nayapalli, Main Road) so visitors browsing investment opportunities find this property directly.">
+              <Select value={form.investmentCorridor || ""} onChange={(e) => set("investmentCorridor", e.target.value)}>
+                <option value="">— Not linked to an investment corridor —</option>
+                {corridors.map((c) => (
+                  <option key={c.id || c.area} value={c.area}>
+                    {c.area} ({c.tag || c.type || c.city})
+                  </option>
+                ))}
+              </Select>
+            </Field>
           </div>
 
           <div className="rounded-2xl p-6 space-y-6" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
@@ -1563,21 +1657,68 @@ export default function PostProperty({ onNavigate }) {
             </Field>
           </div>
 
-          <div className="rounded-2xl p-6 space-y-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-            <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Videos (Location Video &amp; Walkthrough)</h2>
-            <p className="text-xs" style={{ color: "#6B7280" }}>Paste links to location/neighborhood video tours or walkthrough videos (YouTube, Vimeo) — optional.</p>
-            <div className="flex flex-wrap gap-2">
-              {form.videoUrls.map((url) => (
-                <span key={url} className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ background: "#F1F5F9", color: "#1F2937" }}>
-                  {url.length > 40 ? url.slice(0, 40) + "…" : url}
-                  <button type="button" onClick={() => removeVideoUrl(url)} className="font-bold" style={{ color: "#DC2626" }}>×</button>
-                </span>
-              ))}
+          {/* ── Videos (Separated: Location Video & Property Walkthrough Videos) ── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Location / Neighborhood Video */}
+            <div className="rounded-2xl p-6 space-y-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">📍</span>
+                  <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Location / Neighborhood Video Tour</h2>
+                </div>
+                <p className="text-xs mt-1" style={{ color: "#6B7280" }}>
+                  Dedicated video link for the surrounding locality, road connectivity, and neighborhood — powers the interactive &quot;Watch Location Video&quot; button on the property page.
+                </p>
+              </div>
+              <TextInput
+                value={form.locationVideoUrl}
+                onChange={(e) => set("locationVideoUrl", e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=... or Vimeo"
+              />
+              {form.locationVideoUrl && (
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span className="text-[11px] text-emerald-700 font-medium">Location video active</span>
+                  <a
+                    href={form.locationVideoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-blue-600 font-semibold hover:underline ml-auto"
+                  >
+                    Preview ↗
+                  </a>
+                </div>
+              )}
             </div>
-            <div className="flex gap-2">
-              <TextInput value={videoDraft} onChange={(e) => setVideoDraft(e.target.value)} placeholder="https://youtube.com/watch?v=..."
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addVideoUrl(); } }} />
-              <button type="button" onClick={addVideoUrl} className="text-xs font-bold px-4 rounded-xl shrink-0" style={{ background: "#1565C0", color: "#FFFFFF" }}>Add</button>
+
+            {/* Property Walkthrough Videos */}
+            <div className="rounded-2xl p-6 space-y-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🎬</span>
+                  <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Property Walkthrough Video(s)</h2>
+                </div>
+                <p className="text-xs mt-1" style={{ color: "#6B7280" }}>
+                  Property walkthroughs, 3D tours, or interior videos (YouTube or Vimeo) — displayed in the listing&apos;s photo &amp; video gallery.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {form.videoUrls.map((url) => (
+                  <span key={url} className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ background: "#F1F5F9", color: "#1F2937" }}>
+                    {url.length > 36 ? url.slice(0, 36) + "…" : url}
+                    <button type="button" onClick={() => removeVideoUrl(url)} className="font-bold hover:text-red-700" style={{ color: "#DC2626" }}>×</button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <TextInput
+                  value={videoDraft}
+                  onChange={(e) => setVideoDraft(e.target.value)}
+                  placeholder="https://youtube.com/watch?v=..."
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addVideoUrl(); } }}
+                />
+                <button type="button" onClick={addVideoUrl} className="text-xs font-bold px-4 rounded-xl shrink-0" style={{ background: "#1565C0", color: "#FFFFFF" }}>Add</button>
+              </div>
             </div>
           </div>
 

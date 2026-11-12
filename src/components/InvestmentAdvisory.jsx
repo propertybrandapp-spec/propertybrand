@@ -569,7 +569,20 @@ function RentalYieldCalculator() {
 const COMMERCIAL_TYPES_FILTER = ["Commercial", "Office Space", "Shop / Showroom"];
 const LAND_TYPES_FILTER = ["Plot", "Agricultural Land"];
 function corridorSearch(c) {
-  const filters = { transactionType: "Buy", location: [c.area, c.city].filter(Boolean).join(", ") };
+  if (Array.isArray(c.linkedListingIds) && c.linkedListingIds.length > 0) {
+    return {
+      transactionType: "Buy",
+      listingIds: c.linkedListingIds,
+      corridorTitle: `${c.area}${c.tag ? ` (${c.tag})` : ""}`,
+      location: c.area || c.city || "",
+    };
+  }
+  const filters = {
+    transactionType: "Buy",
+    location: c.area || c.city || "",
+    corridorName: c.area || "",
+    fallbackCity: c.city || "",
+  };
   if (c.type === "Commercial") filters.types = COMMERCIAL_TYPES_FILTER;
   else if (c.tag === "Land Banking") filters.types = LAND_TYPES_FILTER;
   return filters;

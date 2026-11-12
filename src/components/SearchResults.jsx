@@ -599,6 +599,9 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
 
   // Apply filters
   const filtered = ALL_PROPERTIES.filter(p => {
+    if (Array.isArray(filters.listingIds) && filters.listingIds.length > 0) {
+      return filters.listingIds.includes(p.id) || filters.listingIds.includes(p.dbId);
+    }
     if (p.transactionType !== filters.transactionType) return false;
     if (!matchesBudget(p, filters.budget)) return false;
     if (!matchesPropertyType(filters.types, p)) return false;
@@ -620,7 +623,19 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
     }
     if (filters.warehouseSpecs?.length && !filters.warehouseSpecs.some(w => (p.unitFeatures || p.amenities || p.tags || []).some(x => typeof x === "string" && x.toLowerCase().includes(w.toLowerCase().split(" ")[0])) || (p.description || "").toLowerCase().includes(w.toLowerCase().split(" ")[0]))) return false;
     if (filters.landZoning?.length && !filters.landZoning.some(z => (p.tags || p.approvals || []).some(x => typeof x === "string" && x.toLowerCase().includes(z.toLowerCase().split(" ")[0])) || (p.title || "").toLowerCase().includes(z.toLowerCase().split(" ")[0]))) return false;
-    if (!matchesLocation(p, filters.location)) return false;
+    if (filters.corridorName && (
+      (p.investmentCorridor && p.investmentCorridor.toLowerCase() === filters.corridorName.toLowerCase()) ||
+      (p.tags || []).some(t => typeof t === "string" && t.toLowerCase() === filters.corridorName.toLowerCase()) ||
+      (p.location || "").toLowerCase().includes(filters.corridorName.toLowerCase())
+    )) {
+      return true;
+    }
+    if (filters.location && !matchesLocation(p, filters.location)) {
+      if (filters.fallbackCity && matchesLocation(p, filters.fallbackCity)) {
+        return true;
+      }
+      return false;
+    }
     return true;
   });
 
@@ -870,8 +885,14 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
         <div ref={resultsRef} className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div>
             <h1 className="text-lg font-bold" style={{ color: "#1F2937" }}>
-              {filters.transactionType === "Rent" ? "Properties for Rent" : "Properties for Sale"}
-              {filters.location.trim() && <> in <span style={{ color: "#1565C0" }}>{filters.location.trim()}</span></>}
+              {filters.corridorTitle ? (
+                <>Properties in <span style={{ color: "#1565C0" }}>{filters.corridorTitle}</span> Investment Corridor</>
+              ) : (
+                <>
+                  {filters.transactionType === "Rent" ? "Properties for Rent" : "Properties for Sale"}
+                  {filters.location.trim() && <> in <span style={{ color: "#1565C0" }}>{filters.location.trim()}</span></>}
+                </>
+              )}
             </h1>
             <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
               {sorted.length} properties found
