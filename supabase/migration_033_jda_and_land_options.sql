@@ -9,7 +9,13 @@ alter table public.listings add column if not exists jda_terms             text;
 alter table public.listings add column if not exists title_verified        boolean not null default false;
 alter table public.listings add column if not exists zoning_conversion_done boolean not null default false;
 
--- 2. Populate default options for Possession & Land Use in listing_field_options
+-- 2. Expand field_type check constraint on listing_field_options to allow 'possession' and 'land_use'
+alter table public.listing_field_options drop constraint if exists listing_field_options_field_type_check;
+alter table public.listing_field_options
+  add constraint listing_field_options_field_type_check
+  check (field_type in ('property_type', 'bhk', 'amenity', 'tag', 'budget_range', 'possession', 'land_use', 'ideal_for'));
+
+-- 3. Populate default options for Possession & Land Use in listing_field_options
 -- so admins can view, customize, and add custom entries in Site Content -> Listing Options.
 insert into public.listing_field_options (field_type, value, display_order)
 select 'possession', v.value, v.ord
