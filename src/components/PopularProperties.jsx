@@ -129,7 +129,7 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
   return (
     <div
       onClick={() => onOpen && onOpen(property)}
-      className="relative bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64 flex flex-col h-full"
+      className="relative bg-[#FFFFFF] rounded-xl border border-[#E2E8F0] hover:shadow-xl transition-shadow duration-200 cursor-pointer group flex-shrink-0 w-64 flex flex-col h-[390px]"
     >
       {featured && (
         <div className="absolute -top-px left-0 right-0 h-0.5 bg-gradient-to-r from-yellow-400 via-[#1565C0] to-yellow-400 rounded-t-xl z-10" />
@@ -149,7 +149,7 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
       <div className="p-3.5 flex-1 flex flex-col justify-between">
         <div className="flex-1 flex flex-col">
           {/* Title + Price */}
-          <div className="flex items-start justify-between gap-2 mb-1 min-h-[2.25rem]">
+          <div className="flex items-start justify-between gap-2 mb-1 h-10 overflow-hidden">
             <h3 className="text-sm font-bold text-[#1F2937] leading-tight line-clamp-2">{title}</h3>
             {verified && (
               <span className="shrink-0 flex items-center gap-0.5 text-[10px] text-[#1565C0] font-bold">
@@ -162,14 +162,14 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
           </div>
 
           {/* Price + Area */}
-          <div className="flex items-baseline gap-2 mb-1.5">
-            <span className="text-base font-extrabold text-[#1F2937]">{price}</span>
+          <div className="flex items-baseline gap-2 mb-1.5 h-6">
+            <span className="text-base font-extrabold text-[#1F2937] truncate">{price}</span>
             <span className="text-xs text-[#6B7280] font-medium">|</span>
-            <span className="text-xs text-[#6B7280] font-medium">{area}</span>
+            <span className="text-xs text-[#6B7280] font-medium truncate">{area}</span>
           </div>
 
           {/* Location */}
-          <div className="flex items-start gap-1 mb-2 min-h-[2rem]">
+          <div className="flex items-start gap-1 mb-2 h-8 overflow-hidden">
             <svg className="w-3 h-3 text-[#1565C0] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
             </svg>
@@ -177,14 +177,14 @@ function PropertyCard({ property, onOpen, onQuickView, onNavigate }) {
           </div>
 
           {/* Amenities */}
-          <div className="flex flex-wrap gap-1 mb-2.5 min-h-[1.5rem] items-center">
+          <div className="flex flex-wrap content-start gap-1 mb-2 h-11 overflow-hidden">
             {amenities && amenities.length > 0 && amenities.slice(0, 3).map((a) => (
               <span key={a} className="text-[10px] bg-[#F1F5F9] text-[#6B7280] px-1.5 py-0.5 rounded font-medium truncate max-w-[95px]">
                 {a}
               </span>
             ))}
             {amenities && amenities.length > 3 && (
-              <span className="text-[10px] text-[#1565C0] font-semibold px-1 shrink-0">
+              <span className="text-[10px] text-[#1565C0] font-semibold px-1 shrink-0 self-center">
                 +{amenities.length - 3} more
               </span>
             )}
@@ -360,7 +360,7 @@ export default function PopularProperties({ onNavigate }) {
           <>
             {/* ── Owner Properties Row ── */}
             {ownerProperties.length > 0 && (
-              <div className="mb-6">
+              <div className="mb-5">
                 <SectionHeader title="Popular Owner Properties" onNavigate={onNavigate} />
                 <ScrollRow properties={ownerProperties} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
               </div>
@@ -368,7 +368,7 @@ export default function PopularProperties({ onNavigate }) {
 
             {/* ── Builder / Featured Projects Row ── */}
             {builderProperties.length > 0 && (
-              <div className="mb-6">
+              <div className="mb-5">
                 <SectionHeader title="Featured Projects" seeAllLabel="See all Projects" onNavigate={onNavigate} />
                 <ScrollRow properties={builderProperties} onOpen={openProperty} onQuickView={setQuickViewProperty} onNavigate={onNavigate} />
               </div>
@@ -376,7 +376,7 @@ export default function PopularProperties({ onNavigate }) {
 
             {/* ── No results for this specific filter ── */}
             {ownerProperties.length === 0 && builderProperties.length === 0 && (
-              <div className="mb-6">
+              <div className="mb-5">
                 <SectionHeader title={`${activeFilter} Properties`} onNavigate={onNavigate} />
                 <div className="text-center py-16 text-[#6B7280]">
                   <svg className="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
