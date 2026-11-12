@@ -266,7 +266,7 @@ export default function Footer({ onNavigate }) {
           </span>
 
           <h2 className="text-[#1F2937] text-3xl font-extrabold leading-tight mb-8">
-          property<span className="text-[#F59E0B]">Brands</span> Realty Services
+          Property<span className="text-[#F59E0B]">Brands</span> Realty Services
           </h2>
 
         <div className="space-y-5">

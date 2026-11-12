@@ -147,7 +147,7 @@ function NewProjectsSection() {
           New Launch
         </span>
         <h2 className="text-2xl font-extrabold text-[#1F2937] tracking-tight">
-          property<span className="text-[#1565C0]">Homes</span>
+          Property<span className="text-[#1565C0]">Homes</span>
         </h2>
         <p className="text-[#6B7280] text-sm mt-1 font-medium">
           Encyclopedia For All New Projects

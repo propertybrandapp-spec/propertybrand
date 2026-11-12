@@ -671,7 +671,7 @@ export default function InvestmentAdvisory({ onNavigate, scrollTo, navKey }) {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-2xl font-extrabold text-[#1F2937] tracking-tight">
-                  property<span className="text-[#1565C0]">Loans</span>
+                  Property<span className="text-[#1565C0]">Loans</span>
                 </span>
               </div>
               <p className="text-slate-500 text-sm">Compare Home Loan Offers from 40+ Banks</p>

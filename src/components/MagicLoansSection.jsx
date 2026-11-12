@@ -232,7 +232,7 @@ export default function MagicLoansSection({ onNavigate, onBankSelect }) {
             {/* Brand */}
             <div>
               <div className="flex items-center gap-0.5 mb-2">
-                <span className="text-[#1F2937] font-bold text-xl tracking-tight leading-none">property</span>
+                <span className="text-[#1F2937] font-bold text-xl tracking-tight leading-none">Property</span>
                 <span className="font-bold text-xl tracking-tight leading-none text-[#1565C0]">
                   L
                   <span
