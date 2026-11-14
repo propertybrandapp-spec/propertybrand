@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
-import { fetchPublicListings } from "../lib/listings";
+import { fetchHomepageListings } from "../lib/listings";
 import { Home } from "lucide-react";
 import { useCity } from "../lib/CityContext";
 import { matchesLocation } from "../lib/searchFilters";
@@ -276,20 +276,44 @@ function ScrollRow({ properties, onOpen, onQuickView, onNavigate }) {
   );
 }
 
+const HOMEPAGE_CACHE_KEY = "pb_homepage_listings_cache_v2";
+
+function loadCachedListings() {
+  try {
+    const raw = localStorage.getItem(HOMEPAGE_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function PopularProperties({ onNavigate }) {
   const [activeFilter, setActiveFilter] = useState("All");
-  const [listings, setListings] = useState(null); // null = loading, [] = loaded but empty
+  // Instant load: starts immediately with cached properties so page opens with 0 wait time!
+  const [listings, setListings] = useState(() => loadCachedListings());
 
   useEffect(() => {
     let cancelled = false;
-    fetchPublicListings()
+    fetchHomepageListings(60)
       .then(({ data }) => {
-        if (!cancelled) setListings(data || []);
+        if (!cancelled && data && data.length > 0) {
+          setListings(data);
+          try {
+            localStorage.setItem(HOMEPAGE_CACHE_KEY, JSON.stringify(data));
+          } catch {
+            /* ignore */
+          }
+        } else if (!cancelled && !listings) {
+          setListings(data || []);
+        }
       })
       .catch((err) => {
         console.warn("Could not fetch popular properties:", err);
-        if (!cancelled) setListings([]);
+        if (!cancelled && !listings) setListings([]);
       });
     return () => { cancelled = true; };
   }, []);

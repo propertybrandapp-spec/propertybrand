@@ -773,6 +773,22 @@ async function fetchAllListings(buildQuery) {
   return { data: normalizeRows(rows), error: null };
 }
 
+export async function fetchHomepageListings(limit = 60) {
+  const { data, error } = await safeQuery(
+    supabase
+      .from("listings")
+      .select(LISTING_BULK_SELECT)
+      .eq("status", "Live")
+      .order("created_at", { ascending: false })
+      .limit(limit)
+  );
+  if (error) {
+    console.warn("fetchHomepageListings error:", error);
+    return { data: [], error };
+  }
+  return { data: normalizeRows(data || []), error: null };
+}
+
 export async function fetchPublicListings() {
   return fetchAllListings(() =>
     supabase.from("listings").select(LISTING_BULK_SELECT).eq("status", "Live")
