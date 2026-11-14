@@ -293,12 +293,13 @@ function loadCachedListings() {
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function PopularProperties({ onNavigate }) {
   const [activeFilter, setActiveFilter] = useState("All");
+  const { city: selectedCity } = useCity();
   // Instant load: starts immediately with cached properties so page opens with 0 wait time!
   const [listings, setListings] = useState(() => loadCachedListings());
 
   useEffect(() => {
     let cancelled = false;
-    fetchHomepageListings(60)
+    fetchHomepageListings({ limit: 20, city: selectedCity })
       .then(({ data }) => {
         if (!cancelled && data && data.length > 0) {
           setListings(data);
@@ -316,7 +317,7 @@ export default function PopularProperties({ onNavigate }) {
         if (!cancelled && !listings) setListings([]);
       });
     return () => { cancelled = true; };
-  }, []);
+  }, [selectedCity]);
 
   const ALL_PROPERTIES = listings || [];
   const isLoading = listings === null;
@@ -333,7 +334,6 @@ export default function PopularProperties({ onNavigate }) {
     return true;
   }
 
-  const { city: selectedCity } = useCity();
   const filtered = ALL_PROPERTIES.filter((p) => matchesFilter(p, activeFilter) && (!selectedCity || matchesLocation(p, selectedCity)));
 
   // Owners get their own row; every other poster (builder, agent, channel

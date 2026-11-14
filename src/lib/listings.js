@@ -773,20 +773,45 @@ async function fetchAllListings(buildQuery) {
   return { data: normalizeRows(rows), error: null };
 }
 
-export async function fetchHomepageListings(limit = 60) {
-  const { data, error } = await safeQuery(
-    supabase
-      .from("listings")
-      .select(LISTING_BULK_SELECT)
-      .eq("status", "Live")
-      .order("created_at", { ascending: false })
-      .limit(limit)
-  );
-  if (error) {
-    console.warn("fetchHomepageListings error:", error);
-    return { data: [], error };
+const HOMEPAGE_CARD_SELECT = "id, title, price_label, price_value, price_on_request, location, city, locality, landmark, pincode, property_type, bhk, area_sqft, images, image_url, posted_by, verified, featured, badge, badge_color, created_at, tags, amenities, transaction_type, listing_type, possession";
+
+// ── Ultra-lean homepage fetch: only 10 Owner and 10 Builder properties (20 total) ──
+export async function fetchHomepageListings({ limit = 20, city = null } = {}) {
+  const perSection = Math.max(5, Math.floor(limit / 2)); // 10 per row = 20 total
+
+  let ownerQuery = supabase
+    .from("listings")
+    .select(HOMEPAGE_CARD_SELECT)
+    .eq("status", "Live")
+    .eq("posted_by", "Owner");
+
+  let builderQuery = supabase
+    .from("listings")
+    .select(HOMEPAGE_CARD_SELECT)
+    .eq("status", "Live")
+    .neq("posted_by", "Owner");
+
+  if (city && String(city).trim()) {
+    const cleanCity = String(city).trim().toLowerCase();
+    ownerQuery = ownerQuery.or(`city.ilike.%${cleanCity}%,location.ilike.%${cleanCity}%`);
+    builderQuery = builderQuery.or(`city.ilike.%${cleanCity}%,location.ilike.%${cleanCity}%`);
   }
-  return { data: normalizeRows(data || []), error: null };
+
+  const [ownersRes, buildersRes] = await Promise.all([
+    safeQuery(ownerQuery.order("created_at", { ascending: false }).limit(perSection)),
+    safeQuery(builderQuery.order("created_at", { ascending: false }).limit(perSection)),
+  ]);
+
+  const ownerRows = ownersRes.data || [];
+  const builderRows = buildersRes.data || [];
+  const combined = [...ownerRows, ...builderRows];
+
+  // If city filter had no results, fallback to latest global properties
+  if (combined.length === 0 && city) {
+    return fetchHomepageListings({ limit, city: null });
+  }
+
+  return { data: normalizeRows(combined), error: null };
 }
 
 export async function fetchPublicListings() {
