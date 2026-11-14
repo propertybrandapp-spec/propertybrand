@@ -276,11 +276,14 @@ function ScrollRow({ properties, onOpen, onQuickView, onNavigate }) {
   );
 }
 
-const HOMEPAGE_CACHE_KEY = "pb_homepage_listings_cache_v2";
+function getCacheKey(city) {
+  const c = city && String(city).trim().toLowerCase();
+  return c ? `pb_homepage_listings_v3_${c}` : "pb_homepage_listings_v3_all";
+}
 
-function loadCachedListings() {
+function loadCachedListings(city) {
   try {
-    const raw = localStorage.getItem(HOMEPAGE_CACHE_KEY);
+    const raw = localStorage.getItem(getCacheKey(city)) || localStorage.getItem("pb_homepage_listings_cache_v2");
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -295,16 +298,20 @@ export default function PopularProperties({ onNavigate }) {
   const [activeFilter, setActiveFilter] = useState("All");
   const { city: selectedCity } = useCity();
   // Instant load: starts immediately with cached properties so page opens with 0 wait time!
-  const [listings, setListings] = useState(() => loadCachedListings());
+  const [listings, setListings] = useState(() => loadCachedListings(selectedCity));
 
   useEffect(() => {
+    // When city changes, restore its cache immediately if available
+    const cached = loadCachedListings(selectedCity);
+    if (cached) setListings(cached);
+
     let cancelled = false;
-    fetchHomepageListings({ limit: 20, city: selectedCity })
+    fetchHomepageListings({ limit: 120, city: selectedCity })
       .then(({ data }) => {
         if (!cancelled && data && data.length > 0) {
           setListings(data);
           try {
-            localStorage.setItem(HOMEPAGE_CACHE_KEY, JSON.stringify(data));
+            localStorage.setItem(getCacheKey(selectedCity), JSON.stringify(data));
           } catch {
             /* ignore */
           }
@@ -334,7 +341,10 @@ export default function PopularProperties({ onNavigate }) {
     return true;
   }
 
-  const filtered = ALL_PROPERTIES.filter((p) => matchesFilter(p, activeFilter) && (!selectedCity || matchesLocation(p, selectedCity)));
+  // Filter by city first; fall back gracefully to all properties if the specific city has no listings yet
+  const cityFiltered = ALL_PROPERTIES.filter((p) => !selectedCity || matchesLocation(p, selectedCity));
+  const pool = cityFiltered.length > 0 ? cityFiltered : ALL_PROPERTIES;
+  const filtered = pool.filter((p) => matchesFilter(p, activeFilter));
 
   // Owners get their own row; every other poster (builder, agent, channel
   // partner, property manager, …) goes in "Featured Projects" so no listing

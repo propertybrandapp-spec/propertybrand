@@ -926,8 +926,17 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
               )}
             </h1>
             <p className="text-xs mt-0.5" style={{ color: "#6B7280" }}>
-              {sorted.length} properties found
-              {activeFilterCount > 0 && <span style={{ color: "#F59E0B" }}> · {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} applied</span>}
+              {isLoading ? (
+                <span className="inline-flex items-center gap-1.5 font-medium text-[#1565C0]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1565C0] animate-ping" />
+                  Loading properties...
+                </span>
+              ) : (
+                <>
+                  {sorted.length} {sorted.length === 1 ? "property" : "properties"} found
+                  {activeFilterCount > 0 && <span style={{ color: "#F59E0B" }}> · {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} applied</span>}
+                </>
+              )}
             </p>
           </div>
 
