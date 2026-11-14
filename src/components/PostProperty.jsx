@@ -1818,13 +1818,18 @@ export default function PostProperty({ onNavigate }) {
             <Field label="Floor Plan Caption">
               <TextInput value={form.floorPlanCaption} onChange={(e) => set("floorPlanCaption", e.target.value)} placeholder="e.g. 3BHK · 1450 sqft, with dimensions" />
             </Field>
-            <Field label="Brochure" hint="Upload a PDF, or paste a link to one. Shows as a Download Brochure button on the listing.">
+            <Field label="Brochure (Google Drive Link)" hint="Paste Google Drive link to the property brochure (make sure sharing is set to 'Anyone with the link can view'). You can also upload a PDF.">
               <div className="flex items-center gap-3 flex-wrap">
-                <TextInput value={form.brochureUrl} onChange={(e) => set("brochureUrl", e.target.value)} placeholder="https://... (or upload →)" />
+                <TextInput value={form.brochureUrl} onChange={(e) => set("brochureUrl", e.target.value)} placeholder="https://drive.google.com/... or paste Drive link (or upload →)" />
                 <label className="text-xs font-bold px-3 py-2.5 rounded-lg cursor-pointer shrink-0" style={{ background: "#F1F5F9", color: "#1F2937" }}>
                   {brochureUploading ? "Uploading…" : "Upload PDF"}
                   <input type="file" accept="application/pdf,image/*" className="hidden" onChange={handleBrochureFileSelected} disabled={brochureUploading} />
                 </label>
+                {form.brochureUrl && (
+                  <a href={form.brochureUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-blue-600 hover:underline shrink-0">
+                    Test Link ↗
+                  </a>
+                )}
               </div>
               {brochureUploadError && <p className="text-xs font-semibold mt-1.5" style={{ color: "#DC2626" }}>{brochureUploadError}</p>}
             </Field>

@@ -8,7 +8,7 @@ import { fetchSiteSettings } from "../lib/siteContent";
 import { useCompare } from "../lib/CompareContext";
 import LocationMap from "./LocationMap";
 import AdvertisementBanner from "./AdvertisementBanner";
-import { printElement, downloadFromUrl, fileExtensionOf, isImageUrl } from "../lib/printUtil";
+import { printElement, downloadFromUrl, fileExtensionOf, isImageUrl, isGoogleDriveUrl, toGoogleDrivePreviewUrl } from "../lib/printUtil";
 import { inSameCity } from "../lib/searchFilters";
 import { isLandType, formatPlotArea } from "../lib/landListing";
 
@@ -274,6 +274,11 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
   async function handleBrochureDownload() {
     setBrochureNote("");
     if (property.brochureUrl) {
+      if (isGoogleDriveUrl(property.brochureUrl)) {
+        window.open(property.brochureUrl, "_blank", "noopener,noreferrer");
+        setBrochureNote("Opening Google Drive brochure in a new tab…");
+        return;
+      }
       const ext = fileExtensionOf(property.brochureUrl) || "pdf";
       const name = `${(property.title || "Property").replace(/[^a-zA-Z0-9_-]+/g, "_")}_Brochure.${ext}`;
       const { method } = await downloadFromUrl(property.brochureUrl, name);
@@ -1701,7 +1706,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                   </svg>
-                  {property.brochureUrl ? "Download" : "Download PDF"}
+                  {isGoogleDriveUrl(property.brochureUrl) ? "Open in Drive" : (property.brochureUrl ? "Download" : "Download PDF")}
                 </button>
                 <button
                   type="button"
@@ -1732,7 +1737,12 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
                   {isImageUrl(property.brochureUrl) ? (
                     <img src={property.brochureUrl} alt="Brochure preview" className="w-full h-full object-contain p-2" />
                   ) : (
-                    <iframe src={property.brochureUrl} title="Property Brochure" className="w-full h-full" />
+                    <iframe
+                      src={toGoogleDrivePreviewUrl(property.brochureUrl)}
+                      title="Property Brochure"
+                      className="w-full h-full border-0"
+                      allow="autoplay"
+                    />
                   )}
                 </div>
               ) : (

@@ -74,3 +74,21 @@ export function fileExtensionOf(url) {
 export function isImageUrl(url) {
   return ["png", "jpg", "jpeg", "webp", "gif", "avif"].includes(fileExtensionOf(url));
 }
+
+export function isGoogleDriveUrl(url) {
+  if (!url || typeof url !== "string") return false;
+  return url.includes("drive.google.com") || url.includes("docs.google.com");
+}
+
+export function toGoogleDrivePreviewUrl(url) {
+  if (!url || typeof url !== "string") return url;
+  if (!isGoogleDriveUrl(url)) return url;
+  // Match file ID from standard Drive formats: /file/d/{id}, /d/{id}, or id={id}
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+                    url.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
+                    url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (fileMatch && fileMatch[1]) {
+    return `https://drive.google.com/file/d/${fileMatch[1]}/preview`;
+  }
+  return url;
+}
