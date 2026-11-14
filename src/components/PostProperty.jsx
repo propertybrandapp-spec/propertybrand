@@ -209,6 +209,7 @@ const EMPTY_FORM = {
   posterName: "",
   posterPhone: "",
   posterEmail: "",
+  posterAddress: "",
   posterPhotoUrl: "",
   posterPreferredContactMethods: [],
   posterAvailabilityNotes: "",
@@ -681,8 +682,24 @@ export default function PostProperty({ onNavigate }) {
       return;
     }
 
-    if (String(form.contactPhone || "").replace(/\D/g, "").slice(-10).length !== 10) {
-      setSaveError("Please enter your 10-digit contact number — our team uses it to verify and approve your listing.");
+    if (!form.posterName?.trim() || form.posterName.trim().length < 2) {
+      setSaveError("Please enter your full name so our team can identify you for property verification.");
+      return;
+    }
+
+    const phoneDigits = String(form.contactPhone || form.posterPhone || "").replace(/\D/g, "").slice(-10);
+    if (phoneDigits.length !== 10 || !/^[6-9]\d{9}$/.test(phoneDigits)) {
+      setSaveError("Please enter a valid 10-digit mobile number so our team can reach you.");
+      return;
+    }
+
+    if (!form.posterEmail?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.posterEmail.trim())) {
+      setSaveError("Please enter a valid email address for verification and approval updates.");
+      return;
+    }
+
+    if (!form.posterAddress?.trim() || form.posterAddress.trim().length < 5) {
+      setSaveError("Please enter your current residential / office address so our team can properly identify and verify you.");
       return;
     }
 
@@ -695,6 +712,8 @@ export default function PostProperty({ onNavigate }) {
     setSaving(true);
     const { error } = await createListing({
       ...form,
+      posterPhone: phoneDigits,
+      contactPhone: phoneDigits,
       price: form.priceOnRequest ? "" : priceLabelFromRaw(form.priceRaw),
       // moderationStatus intentionally omitted — createListing/denormalizeListing
       // defaults it to "Pending", and RLS only allows inserting as Pending anyway.
@@ -1846,45 +1865,78 @@ export default function PostProperty({ onNavigate }) {
           </div>
 
           <div className="rounded-2xl p-6 space-y-5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
-            <div>
-              <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Your Contact Information</h2>
-              <p className="text-xs mt-1" style={{ color: "#6B7280" }}>How buyers/tenants can reach you about this listing.</p>
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">👤</span>
+                  <h2 className="text-sm font-bold" style={{ color: "#1F2937" }}>Poster Identification &amp; Contact Information</h2>
+                </div>
+                <p className="text-xs mt-1" style={{ color: "#6B7280" }}>
+                  Please provide your identity details so our team can verify and approve your property listing.
+                </p>
+              </div>
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                🔒 For Internal Verification Only
+              </span>
             </div>
 
-            <Field label="I am posting as a...">
+            <div className="rounded-xl p-3 bg-blue-50/60 border border-blue-100 text-xs text-blue-900 leading-relaxed">
+              <strong>Identity Notice:</strong> To maintain genuine, verified listings, PropertyBrands collects the poster&apos;s full name, phone, email, and address. These details are used exclusively by our internal moderation team to verify ownership and contact you for listing approvals.
+            </div>
+
+            <Field label="I am posting as a..." required>
               <Select value={form.postedBy} onChange={(e) => set("postedBy", e.target.value)}>
                 {POSTED_BY_OPTIONS.map((p) => <option key={p} value={p}>{p}</option>)}
               </Select>
             </Field>
 
-            <div className="flex items-center gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Your Full Name" required hint="Legal name for owner/poster identification.">
+                <TextInput value={form.posterName} onChange={(e) => set("posterName", e.target.value)} placeholder="e.g. Rajesh Kumar Mohapatra" required />
+              </Field>
+              <Field label="Your Mobile Number" required hint="10-digit number for call / WhatsApp verification.">
+                <TextInput
+                  value={form.contactPhone}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^\d+\s-]/g, "");
+                    set("contactPhone", val);
+                    set("posterPhone", val);
+                  }}
+                  inputMode="tel"
+                  placeholder="e.g. 98765 43210"
+                  required
+                />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Your Email Address" required hint="Used to send your listing status and approval updates.">
+                <TextInput type="email" value={form.posterEmail} onChange={(e) => set("posterEmail", e.target.value)} placeholder="e.g. rajesh@example.com" required />
+              </Field>
+              <Field label="Your Relationship to the Property" required>
+                <Select value={form.sellerRoleConfirmation} onChange={(e) => set("sellerRoleConfirmation", e.target.value)} required>
+                  <option value="">— Select your role —</option>
+                  {SELLER_ROLE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </Select>
+              </Field>
+            </div>
+
+            <Field label="Your Current Residential / Office Address" required hint="Your personal address so our verification desk can properly identify you. Kept strictly private.">
+              <TextInput value={form.posterAddress} onChange={(e) => set("posterAddress", e.target.value)} placeholder="e.g. Flat 402, Royal Residency, Patia, Bhubaneswar - 751024" required />
+            </Field>
+
+            <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
               {form.posterPhotoUrl ? (
                 <img src={form.posterPhotoUrl} alt="" className="w-12 h-12 rounded-full object-cover shrink-0" />
               ) : (
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "#F1F5F9", color: "#6B7280" }}>?</div>
               )}
               <label className="text-xs font-bold px-3 py-2 rounded-lg cursor-pointer" style={{ background: "#F1F5F9", color: "#1F2937" }}>
-                {posterPhotoUploading ? "Uploading…" : "Upload Photo"}
+                {posterPhotoUploading ? "Uploading…" : "Upload Photo (Optional)"}
                 <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="hidden" onChange={handlePosterPhotoSelected} disabled={posterPhotoUploading} />
               </label>
               {posterPhotoError && <span className="text-xs font-semibold" style={{ color: "#DC2626" }}>{posterPhotoError}</span>}
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Field label="Your Name">
-                <TextInput value={form.posterName} onChange={(e) => set("posterName", e.target.value)} placeholder="e.g. Rajesh Kumar" />
-              </Field>
-              <Field label="Phone">
-                <TextInput value={form.posterPhone} onChange={(e) => set("posterPhone", e.target.value)} placeholder="e.g. 98765 43210" />
-              </Field>
-              <Field label="Email">
-                <TextInput value={form.posterEmail} onChange={(e) => set("posterEmail", e.target.value)} placeholder="e.g. rajesh@example.com" />
-              </Field>
-            </div>
-
-            <Field label="Your contact number (private)" required hint="Only the PropertyBrands team sees this, to call you when approving your listing. It is never shown to visitors.">
-              <TextInput value={form.contactPhone} onChange={(e) => set("contactPhone", e.target.value.replace(/[^\d+\s-]/g, ""))} inputMode="tel" placeholder="10-digit mobile number" aria-label="Your contact number (private)" />
-            </Field>
 
             <Field label="Preferred Contact Methods">
               <div className="flex flex-wrap gap-2">
@@ -1900,7 +1952,7 @@ export default function PostProperty({ onNavigate }) {
 
             <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer" style={{ color: "#1F2937" }}>
               <input type="checkbox" checked={form.posterPhoneMaskingEnabled} onChange={(e) => set("posterPhoneMaskingEnabled", e.target.checked)} className="w-4 h-4 rounded accent-[#1565C0]" />
-              Mask my phone number until a visitor taps "Reveal"
+              Mask my phone number on public page until a visitor taps &quot;Reveal&quot;
             </label>
           </div>
 
