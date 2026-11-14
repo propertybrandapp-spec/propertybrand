@@ -283,9 +283,14 @@ export default function PopularProperties({ onNavigate }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetchPublicListings().then(({ data }) => {
-      if (!cancelled) setListings(data);
-    });
+    fetchPublicListings()
+      .then(({ data }) => {
+        if (!cancelled) setListings(data || []);
+      })
+      .catch((err) => {
+        console.warn("Could not fetch popular properties:", err);
+        if (!cancelled) setListings([]);
+      });
     return () => { cancelled = true; };
   }, []);
 
