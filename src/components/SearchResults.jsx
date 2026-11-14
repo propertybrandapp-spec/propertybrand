@@ -554,17 +554,48 @@ export default function SearchResults({ initialFilters, onNavigate, onFiltersCha
   useEffect(() => {
     // `visibleCount` is read from state below, after it is declared.
   }, []);
-  const [listings, setListings] = useState(null); // null = still loading, [] = loaded but empty
+  const [listings, setListings] = useState(() => {
+    try {
+      const cached = localStorage.getItem("pb_search_listings_cache") || localStorage.getItem("pb_homepage_listings_cache_v2");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      /* ignore */
+    }
+    return null;
+  });
   const [loadError, setLoadError] = useState("");
   const [fieldOptions, setFieldOptions] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetchPublicListings().then(({ data, error }) => {
-      if (cancelled) return;
-      setListings(data);
-      if (error) setLoadError(error.message || "Couldn't load properties right now.");
-    });
+    fetchPublicListings((partial) => {
+      // Progressive load: display first batch in milliseconds without waiting for full catalog!
+      if (!cancelled && partial && partial.length > 0) {
+        setListings((current) => (current && current.length >= partial.length ? current : partial));
+      }
+    })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (data && data.length > 0) {
+          setListings(data);
+          try {
+            localStorage.setItem("pb_search_listings_cache", JSON.stringify(data));
+          } catch {
+            /* ignore */
+          }
+        } else if (!listings) {
+          setListings(data || []);
+        }
+        if (error) setLoadError(error.message || "Couldn't load properties right now.");
+      })
+      .catch((err) => {
+        console.warn("Could not fetch search listings:", err);
+        if (!cancelled && !listings) setListings([]);
+      });
+
     fetchListingFieldOptions().then(({ data }) => { if (!cancelled) setFieldOptions(data); });
     return () => { cancelled = true; };
   }, []);
