@@ -59,6 +59,47 @@ export async function fetchClientReviews() {
   return { data: (data || []).map(normalizeClientReview), error: null };
 }
 
+export async function submitPublicClientReview({ name, role, location, rating, category, text, property }) {
+  const initials = (name || "PB")
+    .trim()
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "PB";
+
+  const gradients = [
+    "from-blue-500 to-blue-700",
+    "from-emerald-500 to-emerald-700",
+    "from-indigo-500 to-indigo-700",
+    "from-purple-500 to-purple-700",
+    "from-sky-500 to-sky-700",
+    "from-teal-500 to-teal-700",
+  ];
+  const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
+
+  const row = {
+    name: name.trim(),
+    role: role?.trim() || "Client",
+    location: location?.trim() || "Bhubaneswar",
+    avatar_initials: initials,
+    avatar_gradient: randomGradient,
+    rating: Math.max(1, Math.min(5, parseInt(rating) || 5)),
+    category: category?.trim() || "Home Buyers",
+    review_text: text.trim(),
+    property_label: property?.trim() || null,
+    review_date: new Date().toISOString().slice(0, 10),
+    is_verified: false,
+    is_active: false, // Pending admin approval
+    display_order: 99,
+  };
+
+  const { data, error } = await safeQuery(
+    supabase.from("client_reviews").insert(row).select().single()
+  );
+  return { data, error };
+}
+
 function normalizeSubscriptionPlan(row) {
   return {
     id: row.id,

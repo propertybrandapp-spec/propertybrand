@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { fetchClientReviews } from "../lib/siteContent";
+import { fetchClientReviews, submitPublicClientReview } from "../lib/siteContent";
 import { Smile, Home, MapPin, Briefcase } from "lucide-react";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -257,11 +257,227 @@ function TestimonialCard({ t, featured = false }) {
   );
 }
 
+// ── Public Feedback / Review Modal ───────────────────────────────────────────
+function FeedbackModal({ isOpen, onClose }) {
+  const [form, setForm] = useState({
+    name: "",
+    role: "Home Buyer",
+    location: "Bhubaneswar",
+    category: "Home Buyers",
+    property: "",
+    rating: 5,
+    text: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  if (!isOpen) return null;
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.name.trim()) { setError("Please enter your name."); return; }
+    if (!form.text.trim()) { setError("Please write a few words about your experience."); return; }
+    if (form.text.trim().length < 15) { setError("Please share a bit more detail (at least 15 characters)."); return; }
+
+    setError("");
+    setSubmitting(true);
+    const { error: err } = await submitPublicClientReview(form);
+    setSubmitting(false);
+
+    if (err) {
+      setError("Something went wrong submitting your review. Please try again.");
+      return;
+    }
+    setSubmitted(true);
+  }
+
+  function handleClose() {
+    setSubmitted(false);
+    setError("");
+    setForm({
+      name: "",
+      role: "Home Buyer",
+      location: "Bhubaneswar",
+      category: "Home Buyers",
+      property: "",
+      rating: 5,
+      text: "",
+    });
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={handleClose}>
+      <div className="relative w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          onClick={handleClose}
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+
+        {submitted ? (
+          <div className="text-center py-6">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center text-3xl mb-4">
+              ✓
+            </div>
+            <h3 className="text-xl font-extrabold text-slate-900 mb-2">Thank You for Your Feedback!</h3>
+            <p className="text-sm text-slate-600 mb-6 max-w-sm mx-auto leading-relaxed">
+              Your review has been submitted successfully. Once approved by our team, it will appear live in the client stories section.
+            </p>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] transition shadow-sm cursor-pointer"
+            >
+              Done
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <span className="text-[10px] font-bold text-[#1565C0] uppercase tracking-wider block">Share Your Experience</span>
+              <h3 className="text-xl font-extrabold text-slate-900 mt-0.5">Write a Review</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Your feedback helps other buyers, tenants, and investors find the right property with confidence.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">Rating *</label>
+              <div className="flex items-center gap-1.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setForm({ ...form, rating: star })}
+                    className="p-1 hover:scale-110 transition cursor-pointer"
+                  >
+                    <svg
+                      className={`w-7 h-7 ${star <= form.rating ? "text-amber-400 fill-amber-400" : "text-slate-300"}`}
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </button>
+                ))}
+                <span className="text-xs font-bold text-slate-600 ml-2">{form.rating} out of 5 stars</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Your Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="e.g. Rahul Mishra"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">I am a...</label>
+                <select
+                  value={form.role}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none bg-white"
+                >
+                  <option value="Home Buyer">Home Buyer</option>
+                  <option value="Property Seller">Property Seller</option>
+                  <option value="Tenant">Tenant</option>
+                  <option value="NRI Investor">NRI Investor</option>
+                  <option value="Commercial Client">Commercial Client</option>
+                  <option value="Developer Partner">Developer Partner</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">City / Location</label>
+                <input
+                  type="text"
+                  value={form.location}
+                  onChange={(e) => setForm({ ...form, location: e.target.value })}
+                  placeholder="e.g. Bhubaneswar"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Property / Project <span className="font-normal text-slate-400">(optional)</span></label>
+                <input
+                  type="text"
+                  value={form.property}
+                  onChange={(e) => setForm({ ...form, property: e.target.value })}
+                  placeholder="e.g. 3 BHK Flat, Patia"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none bg-white"
+              >
+                <option value="Home Buyers">Home Buyers</option>
+                <option value="Investors">Investors</option>
+                <option value="Tenants">Tenants</option>
+                <option value="Developers">Developers</option>
+                <option value="Corporate Clients">Corporate Clients</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Your Review *</label>
+              <textarea
+                rows={4}
+                required
+                value={form.text}
+                onChange={(e) => setForm({ ...form, text: e.target.value })}
+                placeholder="Share what went well — property selection, verified documents, pricing, loan assistance, or support..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none resize-none"
+              />
+            </div>
+
+            {error && <p className="text-xs font-semibold text-red-600">{error}</p>}
+
+            <div className="pt-2 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] disabled:opacity-60 transition shadow-sm cursor-pointer"
+              >
+                {submitting ? "Submitting…" : "Submit Review"}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function Testimonials({ onNavigate }) {
   const [activeFilter, setActiveFilter] = useState("All");
   const [current, setCurrent] = useState(0);
   const [reviews, setReviews] = useState(null); // null = loading
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -359,12 +575,21 @@ export default function Testimonials({ onNavigate }) {
               <div className="w-10 h-0.5 bg-[#1565C0] rounded-full mt-1" />
               <p className="text-[#6B7280] text-sm mt-1">Real stories from real people</p>
             </div>
-            <div className="flex items-center gap-1.5 bg-[#F1F5F9] border border-[#E2E8F0] px-3 py-1.5 rounded-full shrink-0">
-              <svg className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span className="text-sm font-bold text-[#1F2937]">4.9</span>
-              <span className="text-xs text-[#6B7280]">/ 5 · 1200+ reviews</span>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <div className="flex items-center gap-1.5 bg-[#F1F5F9] border border-[#E2E8F0] px-3 py-1.5 rounded-full shrink-0">
+                <svg className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                <span className="text-sm font-bold text-[#1F2937]">4.9</span>
+                <span className="text-xs text-[#6B7280]">/ 5 · 1200+ reviews</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowFeedbackModal(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] transition shadow-sm cursor-pointer"
+              >
+                <span>✍️</span> Share Feedback
+              </button>
             </div>
           </div>
 
@@ -445,16 +670,25 @@ export default function Testimonials({ onNavigate }) {
             Join thousands of happy clients who found their dream property with us
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button onClick={() => onNavigate && onNavigate("search")} className="bg-[#1565C0] text-white font-bold px-6 py-3 rounded-lg hover:bg-[#0D47A1] transition shadow-sm">
+            <button onClick={() => onNavigate && onNavigate("search")} className="bg-[#1565C0] text-white font-bold px-6 py-3 rounded-lg hover:bg-[#0D47A1] transition shadow-sm cursor-pointer">
               Explore Properties
             </button>
-            <button onClick={() => onNavigate && onNavigate("contact")} className="bg-[#FFFFFF] text-[#1565C0] font-bold px-6 py-3 rounded-lg border-2 border-[#1565C0] hover:bg-[#EFF6FF] transition">
+            <button onClick={() => onNavigate && onNavigate("contact")} className="bg-[#FFFFFF] text-[#1565C0] font-bold px-6 py-3 rounded-lg border-2 border-[#1565C0] hover:bg-[#EFF6FF] transition cursor-pointer">
               Talk to an Expert
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowFeedbackModal(true)}
+              className="bg-white text-[#1F2937] font-bold px-6 py-3 rounded-lg border border-slate-300 hover:border-[#1565C0] hover:text-[#1565C0] transition shadow-sm flex items-center gap-2 cursor-pointer"
+            >
+              <span>✍️</span> Write a Review
             </button>
           </div>
         </div>
 
       </div>
+
+      <FeedbackModal isOpen={showFeedbackModal} onClose={() => setShowFeedbackModal(false)} />
     </section>
   );
 }
