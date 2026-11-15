@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { useAuth } from "../lib/AuthContext";
 import { submitLead } from "../lib/leads";
-import { fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS, AMENITY_CATEGORIES, groupedAmenities } from "../lib/listings";
+import { fetchListingById, fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS, AMENITY_CATEGORIES, groupedAmenities } from "../lib/listings";
 import { fetchSiteSettings } from "../lib/siteContent";
 import { useCompare } from "../lib/CompareContext";
 import LocationMap from "./LocationMap";
@@ -182,7 +182,21 @@ function SimilarCard({ property, onOpen }) {
 }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function PropertyDetail({ property, pool = [], onNavigate, onBackToResults }) {
+export default function PropertyDetail({ property: initialProperty, pool = [], onNavigate, onBackToResults }) {
+  const [property, setProperty] = useState(initialProperty);
+
+  useEffect(() => {
+    setProperty(initialProperty);
+    const id = initialProperty?.dbId || initialProperty?.id;
+    if (!id) return;
+    let cancelled = false;
+    fetchListingById(id).then(({ data }) => {
+      if (!cancelled && data) {
+        setProperty((prev) => ({ ...(prev || {}), ...data }));
+      }
+    });
+    return () => { cancelled = true; };
+  }, [initialProperty?.dbId, initialProperty?.id]);
   const { isPropertySaved, toggleSaveProperty } = useSavedItems();
   const { items: compareItems, isComparing, toggleCompare, maxCompare } = useCompare();
   const [activeImage, setActiveImage] = useState(0);
@@ -1364,7 +1378,7 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                   </svg>
-                  Download Brochure
+                  {isGoogleDriveUrl(property.brochureUrl) ? "View Brochure (Google Drive)" : "Download Brochure"}
                 </button>
                 <button
                   onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "callback" })}
@@ -1698,16 +1712,30 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
               </div>
 
               <div className="flex items-center gap-2.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleBrochureDownload}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] shadow-sm transition cursor-pointer"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
-                  </svg>
-                  {isGoogleDriveUrl(property.brochureUrl) ? "Open in Drive" : (property.brochureUrl ? "Download" : "Download PDF")}
-                </button>
+                {isGoogleDriveUrl(property.brochureUrl) ? (
+                  <a
+                    href={property.brochureUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] shadow-sm transition cursor-pointer"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Open in Google Drive ↗
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleBrochureDownload}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] shadow-sm transition cursor-pointer"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+                    </svg>
+                    {property.brochureUrl ? "Download" : "Download PDF"}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={handleBrochurePrint}
@@ -1733,17 +1761,39 @@ export default function PropertyDetail({ property, pool = [], onNavigate, onBack
             {/* Modal Content / Preview */}
             <div className="flex-1 overflow-y-auto p-6 bg-slate-100">
               {property.brochureUrl ? (
-                <div className="w-full h-[65vh] bg-white rounded-2xl overflow-hidden shadow-inner border border-slate-200">
-                  {isImageUrl(property.brochureUrl) ? (
-                    <img src={property.brochureUrl} alt="Brochure preview" className="w-full h-full object-contain p-2" />
-                  ) : (
-                    <iframe
-                      src={toGoogleDrivePreviewUrl(property.brochureUrl)}
-                      title="Property Brochure"
-                      className="w-full h-full border-0"
-                      allow="autoplay"
-                    />
+                <div className="w-full flex flex-col gap-3">
+                  {isGoogleDriveUrl(property.brochureUrl) && (
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-blue-50 border border-blue-200 rounded-2xl shrink-0">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-xl">📄</span>
+                        <div>
+                          <p className="text-xs font-bold text-[#1565C0]">Google Drive Brochure Attached</p>
+                          <p className="text-[11px] text-slate-600">You can view the document below or open it directly in Google Drive.</p>
+                        </div>
+                      </div>
+                      <a
+                        href={property.brochureUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] transition shrink-0 cursor-pointer shadow-sm"
+                      >
+                        Open Drive Link ↗
+                      </a>
+                    </div>
                   )}
+
+                  <div className="w-full h-[65vh] bg-white rounded-2xl overflow-hidden shadow-inner border border-slate-200">
+                    {isImageUrl(property.brochureUrl) ? (
+                      <img src={property.brochureUrl} alt="Brochure preview" className="w-full h-full object-contain p-2" />
+                    ) : (
+                      <iframe
+                        src={toGoogleDrivePreviewUrl(property.brochureUrl)}
+                        title="Property Brochure"
+                        className="w-full h-full border-0"
+                        allow="autoplay"
+                      />
+                    )}
+                  </div>
                 </div>
               ) : (
                 /* Beautiful Property Factsheet Brochure */
