@@ -214,15 +214,10 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
 
   // ── Request Brochure form ──
   // The brochure is released after the visitor leaves their contact details;
-  // that submission is saved as a lead tagged to this listing (admin console
-  // → Leads → Property). Once submitted, the brochure stays unlocked for this
-  // listing for the rest of the browser session.
+  // that submission is saved as a lead in the admin panel tagged as a brochure request.
   const { profile } = useAuth();
-  const brochureKey = `pb_brochure_${property?.dbId || property?.id || ""}`;
   const [showBrochureForm, setShowBrochureForm] = useState(false);
-  const [brochureUnlocked, setBrochureUnlocked] = useState(() => {
-    try { return sessionStorage.getItem(brochureKey) === "1"; } catch { return false; }
-  });
+  const [brochureUnlocked, setBrochureUnlocked] = useState(false);
   const [brochureForm, setBrochureForm] = useState({
     name: "", phone: "", email: "", purpose: "", timeline: "", contactTime: "Anytime", message: "", consent: false,
   });
@@ -276,7 +271,6 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
     setBrochureSubmitting(false);
     if (error) { setBrochureFormError("Something went wrong sending your request. Please try again."); return; }
 
-    try { sessionStorage.setItem(brochureKey, "1"); } catch { /* private mode etc. — just won't persist */ }
     setBrochureUnlocked(true);
     setShowBrochureForm(false);
     setShowBrochureModal(true);
@@ -290,7 +284,7 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
     if (property.brochureUrl) {
       if (isGoogleDriveUrl(property.brochureUrl)) {
         window.open(property.brochureUrl, "_blank", "noopener,noreferrer");
-        setBrochureNote("Opening Google Drive brochure in a new tab…");
+        setBrochureNote("Opening brochure in a new tab…");
         return;
       }
       const ext = fileExtensionOf(property.brochureUrl) || "pdf";
@@ -1378,7 +1372,7 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                   </svg>
-                  {isGoogleDriveUrl(property.brochureUrl) ? "View Brochure (Google Drive)" : "Download Brochure"}
+                  Download Brochure
                 </button>
                 <button
                   onClick={() => onNavigate && onNavigate("contact", { subject: contactSubject, property, intent: "callback" })}
@@ -1712,7 +1706,7 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
               </div>
 
               <div className="flex items-center gap-2.5 shrink-0">
-                {isGoogleDriveUrl(property.brochureUrl) ? (
+                {property.brochureUrl ? (
                   <a
                     href={property.brochureUrl}
                     target="_blank"
@@ -1722,7 +1716,7 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
-                    Open in Google Drive ↗
+                    Open Full Brochure ↗
                   </a>
                 ) : (
                   <button
@@ -1733,7 +1727,7 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
                     </svg>
-                    {property.brochureUrl ? "Download" : "Download PDF"}
+                    Download PDF
                   </button>
                 )}
                 <button
@@ -1761,39 +1755,17 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
             {/* Modal Content / Preview */}
             <div className="flex-1 overflow-y-auto p-6 bg-slate-100">
               {property.brochureUrl ? (
-                <div className="w-full flex flex-col gap-3">
-                  {isGoogleDriveUrl(property.brochureUrl) && (
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-blue-50 border border-blue-200 rounded-2xl shrink-0">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-xl">📄</span>
-                        <div>
-                          <p className="text-xs font-bold text-[#1565C0]">Google Drive Brochure Attached</p>
-                          <p className="text-[11px] text-slate-600">You can view the document below or open it directly in Google Drive.</p>
-                        </div>
-                      </div>
-                      <a
-                        href={property.brochureUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] transition shrink-0 cursor-pointer shadow-sm"
-                      >
-                        Open Drive Link ↗
-                      </a>
-                    </div>
+                <div className="w-full h-[68vh] bg-white rounded-2xl overflow-hidden shadow-inner border border-slate-200">
+                  {isImageUrl(property.brochureUrl) ? (
+                    <img src={property.brochureUrl} alt="Brochure preview" className="w-full h-full object-contain p-2" />
+                  ) : (
+                    <iframe
+                      src={toGoogleDrivePreviewUrl(property.brochureUrl)}
+                      title="Property Brochure"
+                      className="w-full h-full border-0"
+                      allow="autoplay"
+                    />
                   )}
-
-                  <div className="w-full h-[65vh] bg-white rounded-2xl overflow-hidden shadow-inner border border-slate-200">
-                    {isImageUrl(property.brochureUrl) ? (
-                      <img src={property.brochureUrl} alt="Brochure preview" className="w-full h-full object-contain p-2" />
-                    ) : (
-                      <iframe
-                        src={toGoogleDrivePreviewUrl(property.brochureUrl)}
-                        title="Property Brochure"
-                        className="w-full h-full border-0"
-                        allow="autoplay"
-                      />
-                    )}
-                  </div>
                 </div>
               ) : (
                 /* Beautiful Property Factsheet Brochure */
