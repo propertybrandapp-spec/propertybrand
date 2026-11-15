@@ -261,7 +261,7 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
         brochureForm.message.trim() && `Message: ${brochureForm.message.trim()}`,
       ].filter(Boolean).join(" | "),
       budget: property.price,
-      listingId: property.dbId,
+      listingId: property.dbId || property.id,
       // Feeds the structured buyer fields the admin Leads page already shows
       buyerPreferences: property.transactionType === "Rent" ? undefined : {
         purpose: brochureForm.purpose || undefined,
@@ -269,7 +269,11 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
       },
     });
     setBrochureSubmitting(false);
-    if (error) { setBrochureFormError("Something went wrong sending your request. Please try again."); return; }
+    if (error) {
+      console.error("submitBrochureRequest error:", error);
+      setBrochureFormError("Something went wrong sending your request. Please try again.");
+      return;
+    }
 
     setBrochureUnlocked(true);
     setShowBrochureForm(false);
