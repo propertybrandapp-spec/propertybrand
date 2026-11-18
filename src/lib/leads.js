@@ -253,7 +253,7 @@ export async function submitLead({ name, phone, email, interest, message, budget
   // Sync to local dev leads store so it instantly reflects in admin panel
   try {
     const devLeadPayload = {
-      id: leadId,
+      id: generatedId || (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
       name,
       phone,
       email: email || null,

@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { useAuth } from "../lib/AuthContext";
 import { submitLead } from "../lib/leads";
-import { fetchListingById, fetchPriceHistory, fetchComparableListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS, AMENITY_CATEGORIES, groupedAmenities } from "../lib/listings";
+import { fetchListingById, fetchPriceHistory, fetchComparableListings, fetchProjectListings, LANDMARK_LAYERS, LANDMARK_LAYER_GROUPS, AMENITY_CATEGORIES, groupedAmenities } from "../lib/listings";
 import { fetchSiteSettings } from "../lib/siteContent";
 import { useCompare } from "../lib/CompareContext";
 import LocationMap from "./LocationMap";
@@ -209,6 +209,7 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
   const [showStickyBar, setShowStickyBar] = useState(false);
   const [showLocationVideoModal, setShowLocationVideoModal] = useState(false);
   const [showBrochureModal, setShowBrochureModal] = useState(false);
+  const [projectListings, setProjectListings] = useState([]);
   const brochureSheetRef = useRef(null);
   const [brochureNote, setBrochureNote] = useState("");
 
@@ -270,14 +271,32 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
     });
     setBrochureSubmitting(false);
     if (error) {
-      console.error("submitBrochureRequest error:", error);
-      setBrochureFormError("Something went wrong sending your request. Please try again.");
-      return;
+      console.warn("submitBrochureRequest error (queued locally as fallback):", error);
+      // Cache lead in localStorage so it is never lost during temporary database downtime
+      try {
+        const queue = JSON.parse(localStorage.getItem("pb_queued_brochure_leads") || "[]");
+        queue.push({
+          name,
+          phone: digits,
+          email,
+          interest: `[BROCHURE REQUEST] Requested brochure for ${property.title}, ${property.location}`,
+          listingId: property.dbId || property.id,
+          savedAt: new Date().toISOString(),
+        });
+        localStorage.setItem("pb_queued_brochure_leads", JSON.stringify(queue));
+      } catch (_) {}
     }
 
     setBrochureUnlocked(true);
     setShowBrochureForm(false);
     setShowBrochureModal(true);
+
+    // If listing has an official brochure URL (e.g. Google Drive or PDF link), automatically redirect / open it
+    if (property.brochureUrl) {
+      try {
+        window.open(property.brochureUrl, "_blank", "noopener,noreferrer");
+      } catch (_) {}
+    }
   }
 
   // Download Brochure: the uploaded file is saved to the device; a listing
@@ -325,8 +344,16 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
     const listingId = property.dbId || property.id;
     fetchPriceHistory(listingId).then(({ data }) => { if (!cancelled) setPriceHistory(data || []); });
     fetchComparableListings(property.location, listingId).then(({ data }) => { if (!cancelled) setComparable(data); });
+    if (property.projectId || property.projectName) {
+      fetchProjectListings({ projectId: property.projectId, projectName: property.projectName }).then(({ data }) => {
+        if (!cancelled && data) {
+          const others = data.filter((item) => (item.dbId || item.id) !== listingId);
+          setProjectListings(others);
+        }
+      });
+    }
     return () => { cancelled = true; };
-  }, [property?.dbId, property?.id, property?.location]);
+  }, [property?.dbId, property?.id, property?.location, property?.projectId, property?.projectName]);
 
   if (!property) {
     return (
@@ -602,7 +629,9 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                     ]
                   : [
                       property.bhkLabel && { label: "Configuration", value: property.bhkLabel },
-                      (property.carpetArea || property.area) && { label: "Carpet Area", value: property.carpetArea ? `${property.carpetArea} sqft` : property.area },
+                      property.carpetArea && { label: "Carpet Area (CA)", value: `${property.carpetArea} sqft` },
+                      property.builtUpArea && { label: "Built-up (BUA)", value: `${property.builtUpArea} sqft` },
+                      (property.superBuiltUpArea || (!property.carpetArea && property.area)) && { label: "Sale Area (SA)", value: property.superBuiltUpArea ? `${property.superBuiltUpArea} sqft` : property.area },
                       property.floor && { label: "Floor", value: property.floor },
                     ]),
                 property.status && { label: "Possession", value: property.status },
@@ -617,6 +646,60 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                 </div>
               ))}
             </div>
+
+            {/* ── Project Unit Configurations & Price Ranges (Section 4 & Requirement 7 & 8) ── */}
+            <ProjectHighlights property={property} comparable={comparable} onEnquire={(u) => onNavigate && onNavigate("contact", { property, intent: "contact", unit: u })} />
+
+            {/* ── Available Units & Other Listings in this Project (Requirement 8) ── */}
+            {projectListings.length > 0 && (
+              <div className="mb-8 rounded-2xl p-5" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">Available Units in this Project</h3>
+                    <p className="text-xs text-slate-500">Other active listings available in {property.projectName || property.title}</p>
+                  </div>
+                  <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800">
+                    {projectListings.length} {projectListings.length === 1 ? "Other Unit" : "Other Units"} Available
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {projectListings.map((unit) => (
+                    <div key={unit.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-sm font-bold text-slate-900 line-clamp-1">{unit.title}</h4>
+                          <span className="text-xs font-bold text-blue-700 shrink-0">{unit.price}</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-1 truncate">{unit.location}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-3 text-[11px] font-semibold text-slate-600">
+                          {unit.bhkLabel && <span className="px-2 py-0.5 rounded bg-slate-100">{unit.bhkLabel}</span>}
+                          {unit.carpetArea && <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-800">CA: {unit.carpetArea} sqft</span>}
+                          {unit.builtUpArea && <span className="px-2 py-0.5 rounded bg-slate-100">BUA: {unit.builtUpArea} sqft</span>}
+                          {unit.superBuiltUpArea && <span className="px-2 py-0.5 rounded bg-slate-100">SA: {unit.superBuiltUpArea} sqft</span>}
+                          {unit.status && <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">{unit.status}</span>}
+                        </div>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openSimilar(unit)}
+                          className="text-xs font-bold text-blue-600 hover:underline"
+                        >
+                          View Unit →
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigate && onNavigate("contact", { property: unit, intent: "contact" })}
+                          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#1565C0] text-white hover:bg-[#0D47A1]"
+                        >
+                          Enquire
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Price & Financial Details (Section 2B) */}
             {(() => {
@@ -819,8 +902,28 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                       className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-1.5 rounded-full hover:opacity-85 transition cursor-pointer"
                       style={{ background: "#F1F5F9", color: "#1F2937", border: "1px solid #E2E8F0" }}
                     >
-                      ▶ Watch Location Video
+                      ▶ Watch Location Video in Popup
                     </button>
+                  </div>
+                )}
+
+                {/* Inline Location Video Player (Requirement 4) */}
+                {property.locationVideoUrl && toEmbeddableVideoUrl(property.locationVideoUrl) && (
+                  <div className="mt-4 rounded-xl overflow-hidden border border-slate-200 shadow-xs">
+                    <div className="px-3.5 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        📍 Neighborhood &amp; Location Video Tour
+                      </span>
+                      <a href={property.locationVideoUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] text-blue-600 font-semibold hover:underline">
+                        Open in YouTube ↗
+                      </a>
+                    </div>
+                    <iframe
+                      src={toEmbeddableVideoUrl(property.locationVideoUrl)}
+                      title="Location and neighborhood video tour"
+                      className="w-full aspect-video bg-black"
+                      allowFullScreen
+                    />
                   </div>
                 )}
 
@@ -891,31 +994,100 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
             )}
 
             {/* Project & Developer Information (Section 2D) */}
-            {(property.developer || property.developerName || property.project) && (
+            {(property.developer || property.developerName || property.project || property.projectDescription || property.developerPositioning || property.constructionPercent != null || property.constructionUpdates || (property.videoReviews && property.videoReviews.length > 0)) && (
               <div className="mb-8 space-y-6">
                 <h2 className="text-base font-bold" style={{ color: "#1F2937" }}>Project &amp; Developer</h2>
 
-                {(property.developer || property.developerName) && (
+                {/* Developer Profile & Brand Positioning (Item 2) */}
+                {(property.developer || property.developerName || property.developerPositioning) && (
                   <div className="rounded-xl p-4" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-bold" style={{ color: "#1F2937" }}>
-                        {property.developer?.name || property.developerName}
+                        {property.developer?.name || property.developerName || "Verified Developer"}
                       </p>
-                      {property.developer?.verified && (
+                      {(property.developer?.verified || property.verified) && (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "#EFF6FF", color: "#1565C0" }}>✓ Verified Developer</span>
                       )}
                     </div>
+
+                    {(property.developerPositioning || property.developer?.positioning) && (
+                      <div className="mt-2.5 p-3 rounded-lg bg-blue-50/80 border border-blue-100 flex items-start gap-2">
+                        <span className="text-blue-600 text-sm font-bold select-none">“</span>
+                        <p className="text-xs font-semibold text-blue-900 italic leading-relaxed">
+                          {property.developerPositioning || property.developer?.positioning}
+                        </p>
+                      </div>
+                    )}
+
                     {property.developer && (property.developer.experienceYears || property.developer.completedProjectsCount || property.developer.currentProjectsCount) && (
-                      <p className="text-xs mt-1.5" style={{ color: "#6B7280" }}>
+                      <p className="text-xs mt-2" style={{ color: "#6B7280" }}>
                         {[
-                          property.developer.experienceYears && `${property.developer.experienceYears} years' experience`,
+                          property.developer.experienceYears && `${property.developer.experienceYears}+ years' experience`,
                           property.developer.completedProjectsCount && `${property.developer.completedProjectsCount} completed projects`,
                           property.developer.currentProjectsCount && `${property.developer.currentProjectsCount} ongoing`,
                         ].filter(Boolean).join(" · ")}
                       </p>
                     )}
                     {property.developer?.description && (
-                      <p className="text-xs mt-1.5" style={{ color: "#6B7280" }}>{property.developer.description}</p>
+                      <p className="text-xs mt-2 text-slate-600 leading-relaxed">{property.developer.description}</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Project Description & Narrative Overview (Item 1) */}
+                {(property.projectDescription || property.project?.description) && (
+                  <div className="rounded-xl p-5 bg-gradient-to-br from-slate-50 to-white border border-slate-200 shadow-xs">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-base">🏢</span>
+                      <h3 className="text-sm font-bold text-slate-900">Project Overview &amp; Vision</h3>
+                    </div>
+                    <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                      {property.projectDescription || property.project?.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Construction Updates, Progress Bar & Milestones (Item 3) */}
+                {((property.constructionPercent != null) || property.constructionUpdates || property.project?.constructionStage || property.project?.constructionUpdates || property.status === "Under Construction") && (
+                  <div className="rounded-xl p-4 bg-slate-50 border border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-600">Construction Status</span>
+                        {(property.project?.constructionStage || property.status) && (
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                            {property.project?.constructionStage || property.status}
+                          </span>
+                        )}
+                      </div>
+                      {property.constructionPercent != null && (
+                        <span className="text-sm font-extrabold text-blue-700">
+                          {property.constructionPercent}% Completed
+                        </span>
+                      )}
+                    </div>
+                    {property.constructionPercent != null && (
+                      <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                        <div
+                          className="bg-gradient-to-r from-blue-600 to-emerald-500 h-3 rounded-full transition-all duration-500"
+                          style={{ width: `${Math.min(100, Math.max(0, property.constructionPercent))}%` }}
+                        />
+                      </div>
+                    )}
+                    {property.project?.constructionStageVerifiedAt && (
+                      <p className="text-[11px] text-slate-500">
+                        Stage verified as of {new Date(property.project.constructionStageVerifiedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                      </p>
+                    )}
+                    {(property.constructionUpdates || property.project?.constructionUpdates) && (
+                      <div className="pt-2 border-t border-slate-200/80">
+                        <p className="text-xs font-bold text-slate-700 mb-1">Latest On-Site Progress Update:</p>
+                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
+                          {property.constructionUpdates || property.project?.constructionUpdates}
+                        </p>
+                      </div>
+                    )}
+                    {property.project?.handoverTimeline && (
+                      <p className="text-xs text-slate-500 italic">Timeline: {property.project.handoverTimeline}</p>
                     )}
                   </div>
                 )}
@@ -1064,6 +1236,37 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                         )}
                       </div>
                     )}
+
+                    {/* YouTube / Video Reviews & Walkthroughs (Item 5) */}
+                    {((property.videoReviews && property.videoReviews.length > 0) || (property.project?.videoReviews && property.project.videoReviews.length > 0)) && (
+                      <div className="space-y-3 pt-3" style={{ borderTop: "1px solid #E2E8F0" }}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">🎥</span>
+                          <h3 className="text-sm font-bold text-slate-900">YouTube &amp; Video Reviews</h3>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {(property.videoReviews?.length ? property.videoReviews : property.project?.videoReviews || []).map((rev, i) => {
+                            const embed = toEmbeddableVideoUrl(rev.url);
+                            return (
+                              <div key={i} className="rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs flex flex-col">
+                                {embed ? (
+                                  <iframe src={embed} title={rev.title || `Review ${i+1}`} className="w-full aspect-video bg-black" allowFullScreen />
+                                ) : (
+                                  <a href={rev.url} target="_blank" rel="noopener noreferrer" className="w-full aspect-video bg-slate-900 flex flex-col items-center justify-center text-white text-xs font-bold gap-2 hover:bg-slate-800">
+                                    <span className="text-3xl text-red-500">▶</span>
+                                    <span>Watch on YouTube ↗</span>
+                                  </a>
+                                )}
+                                <div className="p-3">
+                                  <p className="text-xs font-bold text-slate-900 line-clamp-2">{rev.title || "Video Review & Walkthrough"}</p>
+                                  {rev.reviewer && <p className="text-[11px] text-slate-500 mt-1 font-medium">By {rev.reviewer}</p>}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -1087,9 +1290,9 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                 property.bathrooms != null && { label: "Bathrooms", value: property.bathrooms },
                 property.balconies != null && { label: "Balconies", value: property.balconies },
                 property.servantRoom && { label: "Servant Room", value: "Yes" },
-                property.builtUpArea && { label: "Built-up Area", value: `${property.builtUpArea} sqft` },
-                property.superBuiltUpArea && { label: "Super Built-up Area", value: `${property.superBuiltUpArea} sqft` },
-                property.carpetArea && { label: "Carpet Area", value: `${property.carpetArea} sqft` },
+                property.carpetArea && { label: "Carpet Area (CA)", value: `${property.carpetArea} sqft` },
+                property.builtUpArea && { label: "Built-up Area (BUA)", value: `${property.builtUpArea} sqft` },
+                property.superBuiltUpArea && { label: "Sale Area (SA)", value: `${property.superBuiltUpArea} sqft` },
                 property.plotArea && { label: "Plot Area", value: formatPlotArea(property.plotArea) || `${property.plotArea} sqft` },
                 property.plotLength && property.plotWidth && { label: "Plot Dimensions", value: `${property.plotLength} ft × ${property.plotWidth} ft` },
                 property.roadWidth && { label: "Road Width", value: `${property.roadWidth} ft` },
@@ -1144,7 +1347,6 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                     </div>
                   )}
 
-                  <ProjectHighlights property={property} comparable={comparable} onEnquire={(u) => onNavigate && onNavigate("contact", { property, intent: "contact", unit: u })} />
                   {rows.length > 0 && (
                     <>
                       <h3 className="text-sm font-bold mb-3" style={{ color: "#1F2937" }}>Specifications</h3>

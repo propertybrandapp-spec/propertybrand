@@ -350,6 +350,8 @@ export default function PostProperty({ onNavigate }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [options, setOptions] = useState(null); // null = loading
   const [videoDraft, setVideoDraft] = useState("");
+  const [showAddVideoInPhotos, setShowAddVideoInPhotos] = useState(false);
+  const [photoVideoDraft, setPhotoVideoDraft] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [photoWarnings, setPhotoWarnings] = useState([]);
@@ -503,6 +505,28 @@ export default function PostProperty({ onNavigate }) {
 
   function removeVideoUrl(url) {
     set("videoUrls", form.videoUrls.filter((u) => u !== url));
+  }
+
+  function extractYouTubeId(url) {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i);
+    return match ? match[1] : null;
+  }
+
+  function getVideoThumbnail(url) {
+    const ytid = extractYouTubeId(url);
+    if (ytid) return `https://img.youtube.com/vi/${ytid}/hqdefault.jpg`;
+    return null;
+  }
+
+  function handleAddVideoInPhotos() {
+    const trimmed = photoVideoDraft.trim();
+    if (!trimmed) return;
+    if (!form.videoUrls.includes(trimmed)) {
+      set("videoUrls", [...form.videoUrls, trimmed]);
+    }
+    setPhotoVideoDraft("");
+    setShowAddVideoInPhotos(false);
   }
 
   const imageHashesRef = useRef(new Map()); // url -> perceptual hash, this session only — not persisted
@@ -1799,7 +1823,46 @@ export default function PostProperty({ onNavigate }) {
                   </div>
                 );
               })}
-              <label className="rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer aspect-square" style={{ border: "1.5px dashed #E2E8F0", color: "#6B7280" }}>
+
+              {/* Video links displayed alongside photos in gallery */}
+              {form.videoUrls.map((url) => {
+                const thumb = getVideoThumbnail(url);
+                return (
+                  <div key={url} className="rounded-xl overflow-hidden border border-blue-200 bg-slate-900 flex flex-col">
+                    <div className="relative w-full aspect-square group bg-slate-950 flex items-center justify-center overflow-hidden">
+                      {thumb ? (
+                        <img src={thumb} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" />
+                      ) : (
+                        <div className="text-3xl text-blue-400 font-bold">▶</div>
+                      )}
+                      <span className="absolute top-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-600 text-white flex items-center gap-1 shadow-xs">
+                        ▶ VIDEO
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeVideoUrl(url)}
+                        className="absolute top-1 right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-black/75 text-white hover:bg-red-600 transition"
+                        title="Remove video"
+                      >
+                        ×
+                      </button>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute bottom-1 right-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-black/75 text-blue-300 hover:text-white"
+                      >
+                        Play ↗
+                      </a>
+                    </div>
+                    <div className="p-2 bg-slate-800 text-[11px] text-slate-300 truncate">
+                      {url.length > 30 ? url.slice(0, 30) + "…" : url}
+                    </div>
+                  </div>
+                );
+              })}
+
+              <label className="rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer aspect-square hover:bg-slate-50 transition-colors" style={{ border: "1.5px dashed #E2E8F0", color: "#6B7280" }}>
                 {uploading ? (
                   <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" style={{ color: "#1565C0" }}>
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
@@ -1815,7 +1878,45 @@ export default function PostProperty({ onNavigate }) {
                 )}
                 <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple onChange={handleFilesSelected} className="hidden" disabled={uploading} />
               </label>
+
+              {/* + Add Video Link Button in Photos */}
+              <button
+                type="button"
+                onClick={() => setShowAddVideoInPhotos((v) => !v)}
+                className="rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors aspect-square hover:bg-blue-50 text-blue-700 border-1.5 border-dashed border-blue-300 bg-blue-50/40"
+              >
+                <span className="text-xl">🎬</span>
+                <span className="text-[10px] font-bold text-center px-1">+ Add Video Link</span>
+              </button>
             </div>
+
+            {/* Inline Add Video Link Drawer in Photos Section */}
+            {showAddVideoInPhotos && (
+              <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 space-y-2 mt-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold text-blue-900">Add Video Link to Photos &amp; Media Gallery</p>
+                  <button type="button" onClick={() => setShowAddVideoInPhotos(false)} className="text-xs font-bold text-slate-500 hover:text-slate-700">✕</button>
+                </div>
+                <div className="flex gap-2">
+                  <TextInput
+                    value={photoVideoDraft}
+                    onChange={(e) => setPhotoVideoDraft(e.target.value)}
+                    placeholder="https://www.youtube.com/watch?v=... or Vimeo URL"
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddVideoInPhotos(); } }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddVideoInPhotos}
+                    className="text-xs font-bold px-4 py-2 rounded-xl bg-[#1565C0] text-white shrink-0 hover:bg-[#0D47A1]"
+                  >
+                    Add Video
+                  </button>
+                </div>
+                <p className="text-[11px] text-blue-700">
+                  Pasting a video link here sits alongside photos in the hero gallery slider on the property page.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="rounded-2xl p-6 space-y-5" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0" }}>
@@ -1837,9 +1938,9 @@ export default function PostProperty({ onNavigate }) {
             <Field label="Floor Plan Caption">
               <TextInput value={form.floorPlanCaption} onChange={(e) => set("floorPlanCaption", e.target.value)} placeholder="e.g. 3BHK · 1450 sqft, with dimensions" />
             </Field>
-            <Field label="Brochure (Google Drive Link)" hint="Paste Google Drive link to the property brochure (make sure sharing is set to 'Anyone with the link can view'). You can also upload a PDF.">
+            <Field label="Official Brochure Link / File" hint="Paste link to the property brochure (PDF or cloud link), or upload a PDF file directly.">
               <div className="flex items-center gap-3 flex-wrap">
-                <TextInput value={form.brochureUrl} onChange={(e) => set("brochureUrl", e.target.value)} placeholder="https://drive.google.com/... or paste Drive link (or upload →)" />
+                <TextInput value={form.brochureUrl} onChange={(e) => set("brochureUrl", e.target.value)} placeholder="https://... or paste link (or upload →)" />
                 <label className="text-xs font-bold px-3 py-2.5 rounded-lg cursor-pointer shrink-0" style={{ background: "#F1F5F9", color: "#1F2937" }}>
                   {brochureUploading ? "Uploading…" : "Upload PDF"}
                   <input type="file" accept="application/pdf,image/*" className="hidden" onChange={handleBrochureFileSelected} disabled={brochureUploading} />
@@ -1857,7 +1958,7 @@ export default function PostProperty({ onNavigate }) {
               </div>
               {form.brochureUrl && (
                 <p className="text-xs font-medium text-emerald-700 mt-1 flex items-center gap-1">
-                  ✓ Brochure link attached — scroll to the bottom and click <strong>&quot;Submit Property for Review&quot;</strong> to save.
+                  ✓ Brochure attached — scroll to the bottom and click <strong>&quot;Submit Property for Review&quot;</strong> to save.
                 </p>
               )}
               {brochureUploadError && <p className="text-xs font-semibold mt-1.5" style={{ color: "#DC2626" }}>{brochureUploadError}</p>}

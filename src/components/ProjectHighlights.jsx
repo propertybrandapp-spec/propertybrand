@@ -33,7 +33,20 @@ function TrendChart({ points }) {
 }
 
 export default function ProjectHighlights({ property, comparable, onEnquire }) {
-  const units = property.unitConfigs || [];
+  let units = property.unitConfigs || [];
+  // Fallback: If no multi-unit configs exist yet, synthesize one from the property's own BHK, CA, BUA, SA, and price
+  if (units.length === 0 && (property.carpetArea || property.builtUpArea || property.superBuiltUpArea || property.area || property.price)) {
+    units = [{
+      label: property.bhkLabel || property.type || "Unit",
+      carpetArea: property.carpetArea,
+      builtUpArea: property.builtUpArea,
+      superArea: property.superBuiltUpArea || (property.area ? parseInt(property.area, 10) || null : null),
+      areaSqft: property.superBuiltUpArea || property.builtUpArea || property.carpetArea,
+      price: null,
+      priceRange: property.price || "Price on Request",
+    }];
+  }
+
   const handover = handoverText(property.handoverDate, property.handoverTimeline);
   const trend = cleanTrend(property.priceTrend);
   const change = trendChange(trend);
@@ -53,31 +66,64 @@ export default function ProjectHighlights({ property, comparable, onEnquire }) {
       )}
 
       {units.length > 0 && (
-        <div data-testid="unit-sizes">
-          <h3 className="text-sm font-bold mb-3" style={{ color: "#1F2937" }}>Sizes available in this project</h3>
-          <div className="overflow-x-auto rounded-xl" style={{ border: "1px solid #E2E8F0" }}>
+        <div data-testid="unit-sizes" className="space-y-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <h3 className="text-base font-bold" style={{ color: "#1F2937" }}>Available Configurations &amp; Sizes</h3>
+            <span className="text-xs font-medium text-slate-500">CA: Carpet · BUA: Built-up · SA: Sale / Super Area</span>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ background: "#F8FAFC", color: "#6B7280" }} className="text-[11px] uppercase tracking-wide">
-                  <th className="text-left px-4 py-2.5 font-bold">Size</th>
-                  <th className="text-left px-4 py-2.5 font-bold">Area</th>
-                  <th className="text-left px-4 py-2.5 font-bold">Price</th>
-                  <th className="px-4 py-2.5" />
+                <tr style={{ background: "#F8FAFC", color: "#475569" }} className="text-[11px] uppercase tracking-wide border-b border-slate-200">
+                  <th className="text-left px-4 py-3 font-bold">Size / Config</th>
+                  <th className="text-left px-4 py-3 font-bold">Carpet Area (CA)</th>
+                  <th className="text-left px-4 py-3 font-bold">Built-up (BUA)</th>
+                  <th className="text-left px-4 py-3 font-bold">Sale Area (SA)</th>
+                  <th className="text-left px-4 py-3 font-bold">Price / Range</th>
+                  <th className="px-4 py-3 text-right font-bold">Action</th>
                 </tr>
               </thead>
-              <tbody>
-                {units.map((u, i) => (
-                  <tr key={i} style={{ borderTop: "1px solid #F1F5F9" }}>
-                    <td className="px-4 py-3 font-bold" style={{ color: "#1F2937" }}>{u.label}</td>
-                    <td className="px-4 py-3" style={{ color: "#1F2937" }}>{u.areaSqft ? `${u.areaSqft.toLocaleString("en-IN")} sq ft` : "—"}</td>
-                    <td className="px-4 py-3 font-semibold" style={{ color: "#1565C0" }}>{u.price ? formatPrice(u.price) : "On request"}</td>
-                    <td className="px-4 py-3 text-right">
-                      {onEnquire && <button type="button" onClick={() => onEnquire(u)} className="text-xs font-bold hover:underline" style={{ color: "#1565C0" }}>Enquire</button>}
-                    </td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-slate-100">
+                {units.map((u, i) => {
+                  const ca = u.carpetArea ? `${Number(u.carpetArea).toLocaleString("en-IN")} sqft` : "—";
+                  const bua = u.builtUpArea ? `${Number(u.builtUpArea).toLocaleString("en-IN")} sqft` : "—";
+                  const sa = (u.superArea || u.areaSqft) ? `${Number(u.superArea || u.areaSqft).toLocaleString("en-IN")} sqft` : "—";
+                  const priceDisplay = u.priceRange || (u.price ? formatPrice(u.price) : "Price on Request");
+
+                  return (
+                    <tr key={i} className="hover:bg-slate-50/70 transition">
+                      <td className="px-4 py-3 font-bold text-slate-900 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold mr-1.5 border border-blue-100 inline-block">
+                          {u.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-700 font-medium whitespace-nowrap">{ca}</td>
+                      <td className="px-4 py-3 text-slate-700 font-medium whitespace-nowrap">{bua}</td>
+                      <td className="px-4 py-3 text-slate-900 font-semibold whitespace-nowrap">{sa}</td>
+                      <td className="px-4 py-3 font-bold text-[#1565C0] whitespace-nowrap">{priceDisplay}</td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        {onEnquire && (
+                          <button
+                            type="button"
+                            onClick={() => onEnquire(u)}
+                            className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#1565C0] hover:bg-[#0D47A1] text-white transition shadow-xs cursor-pointer"
+                          >
+                            Enquire
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
+          </div>
+
+          <div className="flex flex-wrap gap-4 text-[11px] text-slate-500 pt-1">
+            <span><strong>CA</strong> (Carpet Area): Net usable floor area</span>
+            <span><strong>BUA</strong> (Built-up Area): Carpet area + wall thickness</span>
+            <span><strong>SA</strong> (Sale Area): Super built-up area including common amenities</span>
           </div>
         </div>
       )}
