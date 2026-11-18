@@ -6,6 +6,7 @@ const CONSULTATION_TOPICS = [
   { id: "investment", label: "Investment Planning & ROI Analysis", icon: "📈", desc: "Rental yields, high-growth corridors & portfolio allocation" },
   { id: "legal", label: "Legal Due Diligence & Title Verification", icon: "⚖️", desc: "RERA checks, encumbrance verification & draft review" },
   { id: "land", label: "Land Feasibility & Joint Development (JDA)", icon: "🗺️", desc: "Zoning review, conversion approvals & builder matching" },
+  { id: "vastu", label: "Vastu Checking & Vastu Consultation", icon: "🧭", desc: "Scientific Vastu audit, floor plan correction & remedies without demolition" },
   { id: "architecture", label: "Architecture, Planning & Interior Design", icon: "🏛️", desc: "Turnkey planning, floor plans & structural vetting" },
   { id: "loans", label: "Home Loans & Financial Structuring", icon: "💰", desc: "Bank rate comparison, eligibility checks & balance transfers" },
   { id: "nri", label: "NRI Property Management & Repatriation", icon: "🌐", desc: "Remote management, tax advisory (TDS/195) & power of attorney" },

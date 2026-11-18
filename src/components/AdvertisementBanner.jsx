@@ -1,40 +1,60 @@
-import { useState, useEffect } from "react";
-import { fetchHeroContent } from "../lib/siteContent";
+import React, { useState, useEffect } from "react";
+import { fetchBanners } from "../lib/siteContent";
 
-export default function AdvertisementBanner({ onNavigate }) {
-  const [content, setContent] = useState(null);
+export default function AdvertisementBanner({ placement = "home", onNavigate }) {
+  const [banners, setBanners] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    fetchHeroContent().then(({ data }) => {
-      if (!cancelled && data) setContent(data);
+    fetchBanners(placement).then(({ data }) => {
+      if (!cancelled && data && data.length > 0) {
+        setBanners(data);
+        setCurrentIndex(0);
+      }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [placement]);
 
-  const bannerData = {
-    badge: content?.promoBadge || "Exclusive Launch Offer",
-    title: content?.promoHeading || "Premium Luxury Residences & High-Yield Commercial Spaces",
-    subtitle: content?.promoEyebrow || "Discover vetted RERA-approved developments with flexible payment plans and guaranteed appreciation.",
-    image: content?.promoImage || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&auto=format&fit=crop&q=80",
-    ctaLabel: content?.promoCtaLabel || "Explore Featured Deals",
-    ctaLink: content?.promoCtaLinkValue || "search",
-  };
+  // Auto rotate if multiple banners
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % banners.length);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [banners.length]);
+
+  if (!banners.length) return null;
+
+  const b = banners[currentIndex] || banners[0];
+
+  function handleCtaClick() {
+    if (!onNavigate) return;
+    if (b.linkType === "url" && b.linkValue) {
+      window.open(b.linkValue, "_blank", "noopener,noreferrer");
+    } else {
+      onNavigate(b.linkValue || "search");
+    }
+  }
 
   return (
-    <section className="max-w-7xl mx-auto px-4 my-10">
+    <section className="max-w-7xl mx-auto px-4 my-8">
       <div
-        className="relative overflow-hidden rounded-3xl border border-slate-200 shadow-xl bg-slate-900 text-white"
+        className="relative overflow-hidden rounded-3xl border border-slate-200/80 shadow-xl bg-slate-950 text-white transition-all duration-500"
         style={{ minHeight: "220px" }}
       >
         {/* Background Image with Dark Gradient Overlay */}
         <div className="absolute inset-0 z-0">
-          <img
-            src={bannerData.image}
-            alt="Advertisement Banner"
-            className="w-full h-full object-cover opacity-30 transform hover:scale-105 transition-transform duration-700"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-transparent" />
+          {b.image && (
+            <img
+              key={b.id || currentIndex}
+              src={b.image}
+              alt={b.title}
+              className="w-full h-full object-cover opacity-35 transform hover:scale-105 transition-all duration-1000 ease-out"
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-transparent" />
         </div>
 
         {/* Content */}
@@ -42,31 +62,51 @@ export default function AdvertisementBanner({ onNavigate }) {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              {bannerData.badge}
+              {b.badge || "Sponsored"}
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold text-white leading-tight">
-              {bannerData.title}
+              {b.title}
             </h2>
-            <p className="mt-2 text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl">
-              {bannerData.subtitle}
-            </p>
+            {b.subtitle && (
+              <p className="mt-2 text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl">
+                {b.subtitle}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full md:w-auto">
             <button
-              onClick={() => onNavigate && onNavigate(bannerData.ctaLink || "search")}
+              type="button"
+              onClick={handleCtaClick}
               className="px-6 py-3.5 rounded-xl font-bold text-sm bg-[#1565C0] hover:bg-[#0D47A1] text-white shadow-lg transition-all duration-300 text-center cursor-pointer"
             >
-              {bannerData.ctaLabel}
+              {b.cta || "Explore Now"}
             </button>
             <button
-              onClick={() => onNavigate && onNavigate("contact", "expert")}
+              type="button"
+              onClick={() => onNavigate && onNavigate("contact", "Ad Inquiry")}
               className="px-6 py-3.5 rounded-xl font-bold text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md transition-all duration-300 text-center cursor-pointer"
             >
-              Contact Advisory
+              Advertise Here
             </button>
           </div>
         </div>
+
+        {/* Slide navigation dots if multiple banners */}
+        {banners.length > 1 && (
+          <div className="absolute bottom-3 right-6 z-20 flex items-center gap-1.5">
+            {banners.map((item, idx) => (
+              <button
+                key={item.id || idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                  currentIndex === idx ? "w-6 bg-amber-400" : "w-1.5 bg-white/40 hover:bg-white/70"
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

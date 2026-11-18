@@ -43,6 +43,18 @@ const SERVICES = [
   {
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 0v-4m0-10V3m9 9h-4M7 12H3m14.364-5.364l-2.828 2.828M8.464 15.536L5.636 18.364m0-12.728l2.828 2.828m8.496 8.496l2.828 2.828" />
+      </svg>
+    ),
+    title: "Vastu Checking & Consultation",
+    desc: "Scientific Vastu evaluation, energy flow balancing, and practical architectural remedies without demolition for homes and commercial setups.",
+    tag: "Starts at ₹2,999",
+    tagColor: "#F59E0B",
+    image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=500&h=320&fit=crop",
+  },
+  {
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 4h16v16H4V4z" />
       </svg>
     ),

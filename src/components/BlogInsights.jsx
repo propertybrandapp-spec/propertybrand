@@ -306,12 +306,12 @@ export default function BlogInsights({ onNavigate }) {
   const isLoading = dbPosts === null;
   const posts = dbPosts || [];
   const featuredArticle = posts[0] || null;
-  const gridPosts = posts.slice(1);
+  const gridPosts = posts.length > 1 ? posts.slice(1) : posts;
 
   const filtered =
     activeCategory === "All"
-      ? gridPosts
-      : gridPosts.filter((p) => p.category === activeCategory);
+      ? (posts.length > 1 ? posts.slice(1) : posts)
+      : posts.filter((p) => p.category === activeCategory);
 
   return (
     <section className="bg-[#FFFFFF] py-10 px-4">

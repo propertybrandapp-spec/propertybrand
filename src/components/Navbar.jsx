@@ -26,6 +26,7 @@ const NAV_ITEMS = [
         links: [
           { label: "Residential Apartments & Villas", page: "search", filters: { transactionType: "Buy", types: ["Apartment", "Villa"] } },
           { label: "Luxury & Gated Communities", page: "search", filters: { transactionType: "Buy", tags: ["Luxury", "Gated Community"] } },
+          { label: "Senior Housing & Retirement Living", page: "search", filters: { transactionType: "Buy", types: ["Senior Living", "Senior Housing"] } },
           { label: "Commercial Offices & Retail", page: "search", filters: { transactionType: "Buy", types: ["Commercial", "Office Space", "Shop / Showroom"] } },
           { label: "Industrial & Logistics Sheds", page: "search", filters: { transactionType: "Buy", types: ["Warehouse / Industrial Shed"] } },
           { label: "Residential & Commercial Plots", page: "search", filters: { transactionType: "Buy", types: ["Plot"] } },
@@ -47,8 +48,9 @@ const NAV_ITEMS = [
         heading: "Direct Portals",
         links: [
           { label: "Post Property (100% Free)", page: "post-property" },
-          { label: "Channel Partner Network", page: "channel-partner" },
+          { label: "Real Estate Blog & Insights", page: "blog" },
           { label: "Preferred Agents Directory", page: "agents" },
+          { label: "Channel Partner Network", page: "channel-partner" },
           { label: "Client Inquiries Dashboard", page: "inquiries" },
         ],
       },
@@ -96,6 +98,7 @@ const NAV_ITEMS = [
       {
         heading: "Verification & Development",
         links: [
+          { label: "Land Due Diligence & Title Verification", page: "land-develop", anchor: "due-diligence" },
           { label: "Land Title & 30-Yr Encumbrance Check", page: "modal:book-expert", consultTopic: "legal" },
           { label: "Zoning & Conversion Feasibility", page: "land-develop" },
           { label: "Architects & Turnkey Builders", page: "modal:book-expert", consultTopic: "land" },
@@ -155,6 +158,15 @@ const NAV_ITEMS = [
           { label: "Packers & Movers Shifting Quotes", page: "build-move" },
           { label: "Pre-Possession Snagging & Inspection", page: "build-move" },
           { label: "Move-In Deep Cleaning & Sanitization", page: "rent-ready" },
+        ],
+      },
+      {
+        heading: "Grihapravesh & Vastu",
+        links: [
+          { label: "Grihapravesh Services & Puja Packages", page: "grihapravesh" },
+          { label: "Vedic Pandit & Havan Booking", page: "grihapravesh" },
+          { label: "Vastu Checking & Consultation", page: "modal:book-expert", consultTopic: "vastu" },
+          { label: "Auspicious Muhurat Consultation", page: "grihapravesh" },
         ],
       },
     ],
@@ -529,8 +541,18 @@ export default function Navbar({ onNavigate, currentPage }) {
               );
             })}
 
-            {/* Quick RentReady link pill */}
-            <li className="ml-auto">
+            {/* Quick RentReady link pill & Blog Pill */}
+            <li className="ml-auto flex items-center gap-2">
+              <button
+                onClick={() => onNavigate && onNavigate("blog")}
+                className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full transition ${
+                  currentPage === "blog"
+                    ? "text-[#1565C0] bg-blue-100 border border-blue-300"
+                    : "text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200"
+                }`}
+              >
+                <span>📰</span> Blog & Insights
+              </button>
               <button
                 onClick={() => onNavigate && onNavigate("rent-ready")}
                 className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-1 rounded-full border border-amber-200 transition"
@@ -563,6 +585,24 @@ export default function Navbar({ onNavigate, currentPage }) {
               className="py-2 px-3 rounded-xl text-xs font-bold bg-gray-100 text-gray-800"
             >
               Book an Expert
+            </button>
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                onNavigate && onNavigate("blog");
+              }}
+              className="py-2 px-3 rounded-xl text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200"
+            >
+              📰 Blog & Insights
+            </button>
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                onNavigate && onNavigate("grihapravesh");
+              }}
+              className="py-2 px-3 rounded-xl text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200"
+            >
+              🪔 Grihapravesh Hub
             </button>
           </div>
 

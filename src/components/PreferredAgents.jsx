@@ -181,6 +181,63 @@ function NewProjectsSection() {
   );
 }
 
+// ── Directory Service Packages ───────────────────────────────────────────────
+const DIRECTORY_PACKAGES = [
+  {
+    id: "free",
+    name: "Starter Directory Listing",
+    price: "Free",
+    period: "/ Lifetime",
+    badge: "Basic",
+    desc: "For individual brokers & new agents entering the PropertyBrands verified network.",
+    features: [
+      "Verified Public Agent Directory Profile",
+      "RERA registration & license badge display",
+      "Locality & micro-market coverage tags",
+      "Direct phone & WhatsApp contact button",
+      "Up to 5 active property listings included",
+    ],
+    cta: "Join Directory Free",
+    popular: false,
+  },
+  {
+    id: "pro",
+    name: "Pro Agent Service Package",
+    price: "₹2,499",
+    period: "/ month",
+    badge: "Most Popular",
+    desc: "For top-performing independent agents seeking 5x higher search rank and buyer inquiries.",
+    features: [
+      "Verified 'Preferred Partner' blue badge",
+      "Top-tier directory ranking in your micro-market",
+      "Direct lead notification alerts to WhatsApp & SMS",
+      "Featured agent spotlight on project detail pages",
+      "Unlimited active property listings",
+      "Priority relationship manager support",
+    ],
+    cta: "Choose Pro Package",
+    popular: true,
+  },
+  {
+    id: "agency",
+    name: "Elite Agency / Brokerage",
+    price: "₹5,999",
+    period: "/ month",
+    badge: "For Firms",
+    desc: "For established real estate firms, channel partner agencies & brokerage teams.",
+    features: [
+      "Multi-agent team directory profile (up to 5 agents)",
+      "Exclusive territory lead distribution rights",
+      "Banner placement across locality search results",
+      "CRM export & automated lead pipeline sync",
+      "Quarterly market intelligence dossier",
+      "Dedicated corporate account director",
+    ],
+    cta: "Partner as Agency",
+    popular: false,
+  },
+];
+
 // ── Site Visit Banner ─────────────────────────────────────────────────────────
 function SiteVisitBanner() {
   return (
@@ -359,6 +416,68 @@ export default function PreferredAgents({ onNavigate }) {
 
         {/* ── New Projects Encyclopedia ── */}
         <NewProjectsSection />
+
+        {/* ── Directory Service Packages Section (Item 4) ── */}
+        <div className="rounded-3xl p-6 sm:p-10 bg-slate-50 border border-slate-200">
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#1565C0] bg-blue-100 px-3 py-1 rounded-full">
+              Agent & Partner Directory
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-2">
+              Directory Service Packages & Membership Tiers
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Boost your brand authority, capture verified buyer leads, and get top placement across local real estate searches.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {DIRECTORY_PACKAGES.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`rounded-2xl p-6 bg-white transition-all flex flex-col justify-between relative ${
+                  pkg.popular
+                    ? "border-2 border-[#1565C0] shadow-xl"
+                    : "border border-slate-200 shadow-sm hover:shadow-md"
+                }`}
+              >
+                {pkg.popular && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#1565C0] text-white">
+                    {pkg.badge}
+                  </span>
+                )}
+                <div>
+                  <h4 className="text-base font-bold text-slate-900">{pkg.name}</h4>
+                  <div className="my-3">
+                    <span className="text-2xl font-black text-slate-900">{pkg.price}</span>
+                    <span className="text-xs text-slate-500 ml-1">{pkg.period}</span>
+                  </div>
+                  <p className="text-xs text-slate-600 mb-4 leading-relaxed">{pkg.desc}</p>
+                  <ul className="space-y-2 text-xs text-slate-700">
+                    {pkg.features.map((f, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="text-emerald-600 font-bold">✓</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onNavigate && onNavigate("contact", `Directory Package: ${pkg.name}`)}
+                  className={`mt-6 w-full py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                    pkg.popular
+                      ? "bg-[#1565C0] hover:bg-[#0D47A1] text-white shadow"
+                      : "border border-slate-300 text-slate-700 hover:bg-slate-100"
+                  }`}
+                >
+                  {pkg.cta} →
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* ── Site Visit Banner ── */}
         <SiteVisitBanner />

@@ -647,6 +647,32 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
               ))}
             </div>
 
+            {/* ── Land Due Diligence & Legal Verification Banner (for Plots / Land) ── */}
+            {isLandType(property.type) && (
+              <div className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-blue-50/90 to-indigo-50/80 border border-blue-200/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-[#1565C0] text-white uppercase tracking-wider">
+                      ⚖️ Land Due Diligence
+                    </span>
+                    <span className="text-xs font-bold text-blue-950">
+                      30-Year Title Search, Encumbrance & Boundary Verification
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 mt-1.5 max-w-xl leading-relaxed">
+                    Protect your capital before token advance: verified revenue extract (Patta / RoR), Nil-Encumbrance Certificate (EC), Master Plan conversion zoning status, and physical GPS boundary demarcation.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onNavigate && onNavigate("land-develop")}
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] shadow transition shrink-0 cursor-pointer"
+                >
+                  Request Due Diligence Report →
+                </button>
+              </div>
+            )}
+
             {/* ── Project Unit Configurations & Price Ranges (Section 4 & Requirement 7 & 8) ── */}
             <ProjectHighlights property={property} comparable={comparable} onEnquire={(u) => onNavigate && onNavigate("contact", { property, intent: "contact", unit: u })} />
 

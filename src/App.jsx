@@ -36,6 +36,7 @@ import LandDevelopHub from "./components/LandDevelopHub";
 import RentReadyHub from "./components/RentReadyHub";
 import BuildMoveHub from "./components/BuildMoveHub";
 import LifestyleHub from "./components/LifestyleHub";
+import GrihapraveshHub from "./components/GrihapraveshHub";
 import AgreementSign from "./components/AgreementSign";
 
 // ── Simple client-side page router ───────────────────────────────────────────
@@ -56,7 +57,7 @@ const HASH_PAGES = [
   "home", "search", "channel-partner", "property-management", "investment-advisory", "agents", "about",
   "contact", "careers", "blog", "faq", "privacy-policy", "terms-conditions", "disclaimer", "sitemap",
   "post-property", "my-properties", "profile", "saved", "inquiries", "compare", "architects-design",
-  "land-develop", "rent-ready", "build-move", "lifestyle",
+  "land-develop", "rent-ready", "build-move", "lifestyle", "grihapravesh",
 ];
 
 // Personal signing links look like  #/sign/<token>  (RentReady agreements).
@@ -282,6 +283,8 @@ function AppContent() {
         {page === "build-move" && <BuildMoveHub onNavigate={navigate} />}
 
         {page === "lifestyle" && <LifestyleHub onNavigate={navigate} />}
+
+        {page === "grihapravesh" && <GrihapraveshHub onNavigate={navigate} />}
 
         {page === "sign" && <AgreementSign key={signTokenFromHash() || "none"} token={signTokenFromHash()} />}
       </main>

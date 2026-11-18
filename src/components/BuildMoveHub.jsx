@@ -57,6 +57,34 @@ const SERVICE_VERTICALS = [
     ],
     badge: "Turnkey Design",
   },
+  {
+    id: "vastu",
+    title: "Vastu Checking & Consultation",
+    icon: "🧭",
+    tagline: "Scientific directional audit, energy balancing and non-demolition remedies.",
+    features: [
+      "Room-by-room Vastu audit (Master bedroom, kitchen, puja room, entrance)",
+      "Main entrance directional evaluation using degree-precise compass mapping",
+      "Practical non-structural remedies (colors, elemental balance, crystals, mirrors)",
+      "Pre-purchase Vastu vetting before signing sale deeds or token payments",
+      "Vastu compliance certification report for your apartment or villa",
+    ],
+    badge: "Certified Vastu Experts",
+  },
+  {
+    id: "grihapravesh",
+    title: "Grihapravesh & Housewarming Services",
+    icon: "🪔",
+    tagline: "Vedic Pandit booking, organic puja samagri kits, floral decor & auspicious muhurat.",
+    features: [
+      "Senior Vedic Pandit booking for Vastu Shanti & Navagraha Havan",
+      "Doorstep delivery of 108 organic puja samagri essentials",
+      "Fresh traditional floral doorway toran, marigold arches & rangolis",
+      "Pre-muhurat intensive floor, kitchen & bathroom deep sanitization",
+      "Sattvic feast catering & personalized prasad gift boxes",
+    ],
+    badge: "Sacred & Stress-Free",
+  },
 ];
 
 export default function BuildMoveHub({ onNavigate }) {
@@ -100,6 +128,10 @@ export default function BuildMoveHub({ onNavigate }) {
       details = `From: ${formData.shiftingFrom} -> To: ${formData.shiftingTo} | Est Date: ${formData.shiftingDate}`;
     } else if (selectedService === "inspection") {
       details = `Unit Type: ${formData.inspectionUnitType} | Address: ${formData.propertyAddress}, ${formData.city}`;
+    } else if (selectedService === "vastu") {
+      details = `Vastu Consultation & Audit | City: ${formData.city} | Address/Property: ${formData.propertyAddress || "Residential/Commercial"} | Notes: ${formData.notes}`;
+    } else if (selectedService === "grihapravesh") {
+      details = `Grihapravesh Services & Puja Booking | City: ${formData.city} | Muhurat Date: ${formData.shiftingDate || "TBD"} | Address: ${formData.propertyAddress}`;
     } else {
       details = `Design & Architecture | City: ${formData.city} | Notes: ${formData.notes}`;
     }

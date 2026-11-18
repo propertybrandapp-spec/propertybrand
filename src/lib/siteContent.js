@@ -298,3 +298,151 @@ export async function fetchBanners(placement = "home") {
   }
   return { data: DEFAULT_AD_BANNERS.filter((b) => b.placement === placement || b.placement === "all"), error: null };
 }
+
+// ── Grihapravesh Sub-Services & Packages ─────────────────────────────────────
+export const DEFAULT_GRIHAPRAVESH_SERVICES = [
+  {
+    id: "gp-1",
+    title: "Vedic Pandit & Complete Grihapravesh Havan",
+    category: "Puja & Rituals",
+    description: "Vastu Shanti, Navagraha Puja, Ganesh Pujan, and sacred cow entry coordination conducted by senior certified Vedic Pandits.",
+    price: "Starts at ₹5,100",
+    inclusions: [
+      "Vastu Shanti & Navagraha Havan",
+      "Ganesh & Kuldevta Pujan",
+      "Vedic Astrologer Muhurat calculation",
+      "Havan Kund & ritual fire materials setup",
+      "Prasadam sanctification",
+    ],
+    icon: "🪔",
+    image: "https://images.unsplash.com/photo-1609137144822-0d65942475a8?w=600&auto=format&fit=crop&q=80",
+    popular: true,
+    active: true,
+    order: 1,
+  },
+  {
+    id: "gp-2",
+    title: "Complete Organic Puja Samagri & Essentials Kit",
+    category: "Puja & Rituals",
+    description: "All-in-one pre-packaged, authenticated 108 sacred puja items delivered to your doorstep 24 hours prior to muhurat.",
+    price: "Starts at ₹2,499",
+    inclusions: [
+      "Pure cow ghee & dry wood for havan",
+      "Navadhanya, Gangajal & Kalash kit",
+      "Toran, Rangoli powders & Diyas",
+      "Camphor, Loban & Guggal incense",
+      "Handmade cotton wicks & brass thali kit",
+    ],
+    icon: "✨",
+    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&auto=format&fit=crop&q=80",
+    popular: false,
+    active: true,
+    order: 2,
+  },
+  {
+    id: "gp-3",
+    title: "Traditional Floral Decor & Doorway Toran",
+    category: "Decor & Ambience",
+    description: "Fresh marigold and mango leaf doorway entrance arches, handcrafted floral rangolis, and fragrant brass urli water bowls.",
+    price: "Starts at ₹4,500",
+    inclusions: [
+      "Fresh marigold doorway toran & pillars",
+      "Hand-crafted flower rangoli at entrance",
+      "Living room focal puja altar backdrop",
+      "Aromatic jasmine & rose petal bowl styling",
+      "Eco-friendly natural setup & post-event cleanup",
+    ],
+    icon: "🌸",
+    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&auto=format&fit=crop&q=80",
+    popular: true,
+    active: true,
+    order: 3,
+  },
+  {
+    id: "gp-4",
+    title: "Pre-Muhurat Deep Cleaning & Sanitization",
+    category: "Deep Cleaning & Moving",
+    description: "Intensive single-day deep cleaning of floors, windows, kitchen cabinets, bathrooms, and high ceilings before sacred entry.",
+    price: "Starts at ₹3,999",
+    inclusions: [
+      "Single-disc rotary floor scrub & buff",
+      "Kitchen degreasing & cabinet vacuuming",
+      "Bathroom descaling & sanitization",
+      "Glass window & sliding door track cleaning",
+      "Aromatic organic herbal smoke fumigation",
+    ],
+    icon: "🧹",
+    image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&auto=format&fit=crop&q=80",
+    popular: false,
+    active: true,
+    order: 4,
+  },
+  {
+    id: "gp-5",
+    title: "Sattvic Feast Catering & Custom Sweet Boxes",
+    category: "Catering & Prasad",
+    description: "Freshly cooked traditional vegetarian feast (no onion/garlic options available) and custom-packed gift boxes for your guests.",
+    price: "Starts at ₹350 / plate",
+    inclusions: [
+      "Authentic sattvic vegetarian menu",
+      "Special Panchamrit & Mahaprasad preparation",
+      "Live counter for hot puris and delicacies",
+      "Personalized sweet boxes with custom thank-you tags",
+      "Professional eco-friendly service crew",
+    ],
+    icon: "🍲",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&auto=format&fit=crop&q=80",
+    popular: false,
+    active: true,
+    order: 5,
+  },
+  {
+    id: "gp-6",
+    title: "Muhurat Day Shifting & Essentials Relocation",
+    category: "Deep Cleaning & Moving",
+    description: "Punctual transportation of your sacred deity, puja mandir, and essential first-night household baggage right on muhurat hour.",
+    price: "Starts at ₹4,999",
+    inclusions: [
+      "Dedicated closed vehicle on muhurat hour",
+      "Special protective velvet crating for Puja Mandir",
+      "Careful handling of first milk-boiling vessel & stove",
+      "Priority loading/unloading assistance",
+      "Zero delay commitment",
+    ],
+    icon: "🚚",
+    image: "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=600&auto=format&fit=crop&q=80",
+    popular: false,
+    active: true,
+    order: 6,
+  },
+];
+
+function normalizeGrihapraveshService(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.category || "Puja & Rituals",
+    description: row.description || "",
+    price: row.price_label || "",
+    inclusions: Array.isArray(row.inclusions) ? row.inclusions : [],
+    icon: row.icon || "🪔",
+    image: row.image_url || "",
+    popular: !!row.is_popular,
+    active: row.is_active !== false,
+    order: row.display_order || 0,
+  };
+}
+
+export async function fetchGrihapraveshServices() {
+  const { data, error } = await safeQuery(
+    supabase
+      .from("grihapravesh_services")
+      .select("*")
+      .eq("is_active", true)
+      .order("display_order", { ascending: true })
+  );
+  if (!error && data && data.length > 0) {
+    return { data: data.map(normalizeGrihapraveshService), error: null };
+  }
+  return { data: DEFAULT_GRIHAPRAVESH_SERVICES, error: null };
+}

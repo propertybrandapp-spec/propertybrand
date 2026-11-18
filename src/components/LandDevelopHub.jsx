@@ -178,7 +178,7 @@ export default function LandDevelopHub({ onNavigate }) {
       </section>
 
       {/* Due Diligence Checklist Section */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      <section id="due-diligence" className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <span className="text-xs font-extrabold uppercase tracking-widest text-blue-700">
             Professional Verification Standard
@@ -191,7 +191,7 @@ export default function LandDevelopHub({ onNavigate }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {ESSENTIAL_LAND_CHECKS.map((item, idx) => (
             <div key={idx} className="p-5 rounded-2xl border border-gray-200 bg-gray-50/70 hover:bg-white hover:shadow-md transition">
               <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center text-xs mb-3">
@@ -201,6 +201,113 @@ export default function LandDevelopHub({ onNavigate }) {
               <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">{item.desc}</p>
             </div>
           ))}
+        </div>
+
+        {/* ── Specialized Land Due Diligence Packages ── */}
+        <div className="mt-6 mb-12">
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-800 uppercase tracking-wider border border-blue-200">
+              Legal Due Diligence Packages
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-2">
+              Audited Legal & Title Search Packages for Land Buyers
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Never pay a land token or sign an agreement without an independent title search report from certified property advocates.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Package 1 */}
+            <div className="rounded-3xl p-6 bg-white border border-slate-200 shadow-sm hover:shadow-lg transition flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Fast Title Check</span>
+                <h4 className="text-lg font-bold text-slate-900 mt-1">Essential Title Search</h4>
+                <div className="my-4">
+                  <span className="text-2xl font-black text-slate-900">₹4,999</span>
+                  <span className="text-xs text-slate-500 ml-1">/ parcel</span>
+                </div>
+                <p className="text-xs text-slate-600 mb-4">
+                  Ideal for individual residential plot buyers looking for quick title verification before token payment.
+                </p>
+                <ul className="space-y-2 text-xs text-slate-700">
+                  <li className="flex items-center gap-2">✓ 15-Year Nil-Encumbrance Certificate (EC)</li>
+                  <li className="flex items-center gap-2">✓ Patta, RoR & Khata extract verification</li>
+                  <li className="flex items-center gap-2">✓ Primary seller identity & title match</li>
+                  <li className="flex items-center gap-2">✓ High-level municipal zoning check</li>
+                  <li className="flex items-center gap-2">✓ 48-hour delivery timeline</li>
+                </ul>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setSelectedTopic("legal"); setExpertModalOpen(true); }}
+                className="mt-6 w-full py-2.5 rounded-xl text-xs font-bold text-[#1565C0] border border-[#1565C0] hover:bg-blue-50 transition cursor-pointer"
+              >
+                Order Essential Check
+              </button>
+            </div>
+
+            {/* Package 2 */}
+            <div className="rounded-3xl p-6 bg-gradient-to-b from-blue-50/50 to-white border-2 border-[#1565C0] shadow-md hover:shadow-xl transition flex flex-col justify-between relative">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#1565C0] text-white">
+                Most Popular
+              </span>
+              <div>
+                <span className="text-xs font-bold text-[#1565C0] uppercase tracking-wider">Complete Peace of Mind</span>
+                <h4 className="text-lg font-bold text-slate-900 mt-1">30-Year Comprehensive Legal Audit</h4>
+                <div className="my-4">
+                  <span className="text-2xl font-black text-[#1565C0]">₹12,999</span>
+                  <span className="text-xs text-slate-500 ml-1">/ parcel</span>
+                </div>
+                <p className="text-xs text-slate-600 mb-4">
+                  Comprehensive 30-year mother deed audit, civil court litigation search, and official government conversion verification.
+                </p>
+                <ul className="space-y-2 text-xs text-slate-700">
+                  <li className="flex items-center gap-2">✓ 30-Year Encumbrance Certificate & Title Deeds Chain</li>
+                  <li className="flex items-center gap-2">✓ District & High Court Litigation Search</li>
+                  <li className="flex items-center gap-2">✓ Non-Agricultural (NA / CLU) Order Verification</li>
+                  <li className="flex items-center gap-2">✓ Master Plan Alignment & Road Frontage Clearance</li>
+                  <li className="flex items-center gap-2">✓ Formal Legal Opinion Report signed by Advocate</li>
+                </ul>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setSelectedTopic("legal"); setExpertModalOpen(true); }}
+                className="mt-6 w-full py-2.5 rounded-xl text-xs font-bold text-white bg-[#1565C0] hover:bg-[#0D47A1] shadow transition cursor-pointer"
+              >
+                Order 30-Year Comprehensive Audit
+              </button>
+            </div>
+
+            {/* Package 3 */}
+            <div className="rounded-3xl p-6 bg-white border border-slate-200 shadow-sm hover:shadow-lg transition flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-bold text-purple-700 uppercase tracking-wider">Commercial / JDA</span>
+                <h4 className="text-lg font-bold text-slate-900 mt-1">Institutional & JDA Feasibility</h4>
+                <div className="my-4">
+                  <span className="text-2xl font-black text-slate-900">₹24,999</span>
+                  <span className="text-xs text-slate-500 ml-1">/ parcel</span>
+                </div>
+                <p className="text-xs text-slate-600 mb-4">
+                  Designed for developers, institutional funds, and landowners planning Joint Development or commercial projects.
+                </p>
+                <ul className="space-y-2 text-xs text-slate-700">
+                  <li className="flex items-center gap-2">✓ Complete 30-Year Legal Chain & Encumbrance</li>
+                  <li className="flex items-center gap-2">✓ GPS Survey Boundary & Demarcation Verification</li>
+                  <li className="flex items-center gap-2">✓ FAR / FSI calculations & permissible construction area</li>
+                  <li className="flex items-center gap-2">✓ 50:50 / 60:40 JDA revenue sharing risk analysis</li>
+                  <li className="flex items-center gap-2">✓ Dedicated Senior Real Estate Legal Counsel</li>
+                </ul>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setSelectedTopic("land"); setExpertModalOpen(true); }}
+                className="mt-6 w-full py-2.5 rounded-xl text-xs font-bold text-purple-700 border border-purple-700 hover:bg-purple-50 transition cursor-pointer"
+              >
+                Order Institutional Feasibility
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* CTA banner */}

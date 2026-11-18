@@ -77,7 +77,7 @@ export default function LifestyleHub({ onNavigate }) {
                   Active resort-style communities designed for retirees who want vibrant socializing, housekeeping, security, and zero maintenance hassles.
                 </p>
                 <button
-                  onClick={() => onNavigate && onNavigate("search", { transactionType: "Buy", tags: ["Gated Community"] })}
+                  onClick={() => onNavigate && onNavigate("search", { transactionType: "Buy", types: ["Senior Living", "Senior Housing"] })}
                   className="mt-4 text-xs font-bold text-teal-700 hover:underline"
                 >
                   Browse Independent Living →
