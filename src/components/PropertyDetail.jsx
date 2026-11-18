@@ -1,4 +1,5 @@
 import ProjectHighlights from "./ProjectHighlights";
+import FormattedContent from "./FormattedContent";
 import { useState, useEffect, useRef } from "react";
 import { useSavedItems } from "../lib/SavedItemsContext";
 import { useAuth } from "../lib/AuthContext";
@@ -817,7 +818,9 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                         </div>
                       )}
                       {property.loanEligibilityNotes && (
-                        <p className="text-sm" style={{ color: "#6B7280" }}>{property.loanEligibilityNotes}</p>
+                        <div className="mt-1">
+                          <FormattedContent text={property.loanEligibilityNotes} textColor="text-slate-600" />
+                        </div>
                       )}
                     </div>
                   )}
@@ -1037,11 +1040,14 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                     </div>
 
                     {(property.developerPositioning || property.developer?.positioning) && (
-                      <div className="mt-2.5 p-3 rounded-lg bg-blue-50/80 border border-blue-100 flex items-start gap-2">
-                        <span className="text-blue-600 text-sm font-bold select-none">“</span>
-                        <p className="text-xs font-semibold text-blue-900 italic leading-relaxed">
-                          {property.developerPositioning || property.developer?.positioning}
-                        </p>
+                      <div className="mt-2.5 p-3.5 rounded-xl bg-blue-50/80 border border-blue-100 flex items-start gap-2.5">
+                        <span className="text-blue-600 text-lg font-bold select-none leading-none mt-0.5">“</span>
+                        <div className="flex-1 min-w-0">
+                          <FormattedContent
+                            text={property.developerPositioning || property.developer?.positioning}
+                            textColor="text-blue-950 font-medium"
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -1055,7 +1061,12 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                       </p>
                     )}
                     {property.developer?.description && (
-                      <p className="text-xs mt-2 text-slate-600 leading-relaxed">{property.developer.description}</p>
+                      <div className="mt-2.5">
+                        <FormattedContent
+                          text={property.developer.description}
+                          textColor="text-slate-600"
+                        />
+                      </div>
                     )}
                   </div>
                 )}
@@ -1063,13 +1074,14 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                 {/* Project Description & Narrative Overview (Item 1) */}
                 {(property.projectDescription || property.project?.description) && (
                   <div className="rounded-xl p-5 bg-gradient-to-br from-slate-50 to-white border border-slate-200 shadow-xs">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-3">
                       <span className="text-base">🏢</span>
                       <h3 className="text-sm font-bold text-slate-900">Project Overview &amp; Vision</h3>
                     </div>
-                    <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                      {property.projectDescription || property.project?.description}
-                    </p>
+                    <FormattedContent
+                      text={property.projectDescription || property.project?.description}
+                      textColor="text-slate-700"
+                    />
                   </div>
                 )}
 
@@ -1106,10 +1118,11 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
                     )}
                     {(property.constructionUpdates || property.project?.constructionUpdates) && (
                       <div className="pt-2 border-t border-slate-200/80">
-                        <p className="text-xs font-bold text-slate-700 mb-1">Latest On-Site Progress Update:</p>
-                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">
-                          {property.constructionUpdates || property.project?.constructionUpdates}
-                        </p>
+                        <p className="text-xs font-bold text-slate-700 mb-1.5">Latest On-Site Progress Update:</p>
+                        <FormattedContent
+                          text={property.constructionUpdates || property.project?.constructionUpdates}
+                          textColor="text-slate-600"
+                        />
                       </div>
                     )}
                     {property.project?.handoverTimeline && (
@@ -1342,12 +1355,18 @@ export default function PropertyDetail({ property: initialProperty, pool = [], o
               ].filter(Boolean);
               return (
                 <div className="mb-8">
-                  <h2 className="text-base font-bold mb-2" style={{ color: "#1F2937" }}>About this property</h2>
-                  <p className="text-sm leading-relaxed mb-4" style={{ color: "#6B7280" }}>
-                    {property.description || `This ${property.bhkLabel ? property.bhkLabel + " " : ""}${property.type?.toLowerCase() || "property"} in ${property.location} is listed ${property.transactionType === "Rent" ? "for rent" : "for sale"} by a ${property.postedBy?.toLowerCase() || "verified"} on PropertyBrands${property.area ? `, spanning ${property.area}` : ""}. Reach out below to schedule a visit or speak with our team for more details.`}
-                  </p>
+                  <h2 className="text-base font-bold mb-3" style={{ color: "#1F2937" }}>About this property</h2>
+                  <div className="mb-4">
+                    <FormattedContent
+                      text={property.description || `This ${property.bhkLabel ? property.bhkLabel + " " : ""}${property.type?.toLowerCase() || "property"} in ${property.location} is listed ${property.transactionType === "Rent" ? "for rent" : "for sale"} by a ${property.postedBy?.toLowerCase() || "verified"} on PropertyBrands${property.area ? `, spanning ${property.area}` : ""}. Reach out below to schedule a visit or speak with our team for more details.`}
+                      textColor="text-slate-600"
+                    />
+                  </div>
                   {property.petPolicyNotes && (
-                    <p className="text-xs mb-4" style={{ color: "#6B7280" }}>{property.petPolicyNotes}</p>
+                    <div className="mb-4 p-3 rounded-xl bg-amber-50/60 border border-amber-200/60 text-xs text-amber-900">
+                      <p className="font-bold mb-1">🐾 Pet Policy Notes:</p>
+                      <FormattedContent text={property.petPolicyNotes} textColor="text-amber-900" />
+                    </div>
                   )}
 
                   {property.investmentCorridor && (
